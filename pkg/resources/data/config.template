@@ -1,0 +1,16 @@
+easykube:
+  # location of addons dir
+  addon-root: {{ .AddonDir }}
+  
+  # where local configuration is stored
+  config-dir: {{ .ConfigurationDir }}
+  
+  # if an absolute path is not given, persistence will be located in config-dir
+  # this is used by kind to store peristent data, it will survive cluster deletion
+  persistence-dir: {{ .PersistenceDir }}
+  
+  # Container Runtime
+  container-runtime: docker
+  
+  # loopback domain, a domain where everything resolves to 127.0.0.1
+  loopback-domain: localtest.me

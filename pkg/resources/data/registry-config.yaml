@@ -1,0 +1,29 @@
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+  delete:
+    enabled: true
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /var/lib/registry
+http:
+  addr: :5000
+#  tls:
+#    certificate: /etc/ssl/localtest.me.crt
+#    key: /etc/ssl/localtest.me.key
+  headers:
+    X-Content-Type-Options: [ nosniff ]
+    Access-Control-Allow-Origin: ['http://registry.localtest.me']
+    Access-Control-Allow-Methods: [ 'HEAD', 'GET', 'OPTIONS', 'DELETE' ]
+    Access-Control-Allow-Headers: [ 'Authorization', 'Accept' ]
+    Access-Control-Max-Age: [ 1728000 ]
+    Access-Control-Allow-Credentials: [ true ]
+    Access-Control-Expose-Headers: [ 'Docker-Content-Digest' ]
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3

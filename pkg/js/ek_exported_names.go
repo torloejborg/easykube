@@ -1,0 +1,15 @@
+package jsutils
+
+const AND_THEN_APPLY = "thenApply"
+const COPY_TO = "copyTo"
+const KEY_VALUE = "keyValue"
+const CREATE_SECRET = "createSecret"
+const EXEC_IN_CONTAINER = "execInContainer"
+const GET_SECRET = "getSecret"
+const PRELOAD = "preload"
+const KUSTOMIZE = "kustomize"
+const WAIT_FOR_DEPLOYMENT = "waitForDeployment"
+const WAIT_FOR_CRD = "waitForCRD"
+const SPARSE_CHECKOUT = "sparseCheckout"
+const HELM_TEMPLATE = "helmTemplate"
+const PROCESS_SECRETS = "processExternalSecrets"

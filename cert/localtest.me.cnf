@@ -1,0 +1,23 @@
+[req]
+default_bits       = 2048
+default_md         = sha256
+default_keyfile    = localtest.me.key
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+prompt            = no
+encrypt_key       = no
+
+[req_distinguished_name]
+C  = DK
+ST = DK
+L  = Copenhagen
+O  = UFST
+OU = Appudvikling
+CN = *.localtest.me
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1   = *.localtest.me
+DNS.2   = localtest.me

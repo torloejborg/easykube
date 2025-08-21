@@ -1,0 +1,95 @@
+package test
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/torloj/easykube/pkg/ek"
+	"testing"
+)
+
+func TestJsonConfigParsing(t *testing.T) {
+	data := []byte(`
+let configuration = {
+	"dependsOn" : ["foo","bar"],
+	"extraPorts" : [
+		{
+			"nodePort" : 8080,
+			"hostPort" : 8080,
+			"protocol" : "TCP"
+		}
+	],
+	"extraMounts" : [
+		{
+			"hostPath" : "/var/run/docker.sock",
+			"containerPath" : "/var/run/docker.sock"	
+		}
+	]
+	}
+	`)
+
+	cfg := &ek.AddonConfig{}
+	reader := ek.NewAddonReader(GetEKContext())
+
+	extracted, _ := reader.ExtractJSON(string(data))
+
+	err := json.Unmarshal([]byte(extracted), &cfg)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestJsonConfigParsingWithOnlyDepends(t *testing.T) {
+	data := []byte(`
+	let configuration = {
+		"dependsOn" : ["foo","bar"]
+	}
+	`)
+
+	cfg := &ek.AddonConfig{}
+	extracted, _ := ek.NewAddonReader(GetEKContext()).ExtractJSON(string(data))
+
+	err := json.Unmarshal([]byte(extracted), &cfg)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestTroublesomeInput(t *testing.T) {
+	input := `{"extraPorts": [{"nodePort": 80, "hostPort": 80, "protocol": "TCP"}]}`
+	cfg := &ek.AddonConfig{}
+
+	err := json.Unmarshal([]byte(input), &cfg)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestDiscoverAddons(t *testing.T) {
+	addons := ek.NewAddonReader(GetEKContext()).GetAddons()
+
+	for i := range addons {
+		fmt.Println(addons[i].Config)
+	}
+}
+
+func TestInstallationOrder(t *testing.T) {
+
+	reader := ek.NewAddonReader(GetEKContext())
+	addons := reader.GetAddons()
+
+	var master *ek.Addon
+
+	for k, v := range addons {
+		if k == "ingress" {
+			master = v
+			break
+		}
+	}
+
+	order := reader.GetExecutionOrder(master, addons)
+
+	for i := range order {
+		fmt.Println(order[i].Name)
+	}
+
+}

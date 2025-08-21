@@ -1,0 +1,6 @@
+;localtest.me zone
+localtest.me.                   IN          SOA         sns.dns.icann.org.  noc.dns.icann.org. 2019101701 7200 3600 1209600 3600
+localtest.me.                   IN          NS          b.iana-servers.net.
+localtest.me.                   IN          NS          b.iana-servers.net.
+localtest.me.                   IN          A           127.0.0.1
+*                               IN          A           127.0.0.1

@@ -1,0 +1,21 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = "/etc/containerd/certs.d"
+nodes:
+  - role: control-plane
+    extraPortMappings:{{range . -}}
+    {{ range .Config.ExtraPorts }}
+    - hostPort: {{.HostPort}}
+      containerPort: {{.NodePort}}
+      protocol: {{.Protocol}}
+    {{- end}}
+    {{- end}}
+    extraMounts:{{range . -}}
+    {{ range .Config.ExtraMounts }}
+    - hostPath: {{.PersistenceDir}}/{{.HostPath}}
+      containerPath: {{.ContainerPath}}
+    {{- end}}
+    {{- end}}

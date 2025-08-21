@@ -1,0 +1,14 @@
+These addons contribute to cluster configuration
+{{ range $addon := . -}}
+{{- if or .Config.ExtraPorts .Config.ExtraMounts }}
+Addon: "{{ .Name }}"
+{{- end -}}
+	{{ if .Config.ExtraPorts }}
+  Ports:
+	{{ range $pc := $addon.Config.ExtraPorts }}- 127.0.0.1 {{.HostPort}}/{{.Protocol}} -> NodePort {{.NodePort}}
+	{{end}}{{- end -}}
+	{{ if .Config.ExtraMounts }}
+  Mounts:
+	{{ range $m := $addon.Config.ExtraMounts }}- {{.PersistenceDir}}/{{.HostPath}} -> {{.ContainerPath}}
+	{{ end }}{{- end -}}
+{{ end -}}

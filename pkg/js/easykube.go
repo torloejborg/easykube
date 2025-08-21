@@ -1,0 +1,94 @@
+package jsutils
+
+import (
+	"fmt"
+	"github.com/dop251/goja"
+	"github.com/torloj/easykube/ekctx"
+	"os"
+	"reflect"
+)
+
+type IEasykube interface {
+	Kustomize() func(goja.FunctionCall) goja.Value
+	WaitForDeployment() func(goja.FunctionCall) goja.Value
+	AndThenApply() func(goja.FunctionCall) goja.Value
+	PreloadImages() func(goja.FunctionCall) goja.Value
+	WaitForCRD() func(goja.FunctionCall) goja.Value
+	CopyTo() func(goja.FunctionCall) goja.Value
+}
+
+type Easykube struct {
+	EKContext *ekctx.EKContext
+	AddonCtx  *AddonContext
+}
+
+func ConfigureEasykubeScript(ctx *ekctx.EKContext, addon *AddonContext) {
+	check := func(e error) {
+		if e != nil {
+			panic(e)
+		}
+	}
+
+	e := &Easykube{EKContext: ctx, AddonCtx: addon}
+
+	easykubeObj := addon.NewObject()
+	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
+	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
+	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
+	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
+	check(easykubeObj.Set(PRELOAD, e.PreloadImages()))
+	check(easykubeObj.Set(WAIT_FOR_CRD, e.WaitForCRD()))
+	check(easykubeObj.Set(COPY_TO, e.CopyTo()))
+	check(easykubeObj.Set(CREATE_SECRET, e.CreateSecret()))
+	check(easykubeObj.Set(GET_SECRET, e.GetSecret()))
+	check(easykubeObj.Set(SPARSE_CHECKOUT, e.GitSparseCheckout()))
+	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
+	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
+	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
+
+	addon.ExportFunction("_ek", easykubeObj)
+
+}
+
+func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
+	out := e.EKContext.Printer
+	argLen := len(f.Arguments)
+	var undef = 0
+	for v := range f.Arguments {
+		if f.Arguments[v] == goja.Undefined() {
+			undef = undef + 1
+		}
+	}
+
+	if undef != 0 {
+		out.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
+			e.AddonCtx.addon.Name,
+			jsName,
+			argLen,
+			undef)
+
+		os.Exit(-1)
+	}
+}
+
+func (e *Easykube) extractStringSliceFromArgument(arg goja.Value) []string {
+
+	// Ensure it's an array
+	if arg.ExportType().Kind() != reflect.Slice {
+		panic(e.AddonCtx.vm.ToValue("Expected an array"))
+	}
+
+	// Convert to []interface{} first
+	ifaceArray := arg.Export().([]interface{})
+	strings := make([]string, len(ifaceArray))
+
+	for i, v := range ifaceArray {
+		if s, ok := v.(string); ok {
+			strings[i] = s
+		} else {
+			panic(e.AddonCtx.vm.ToValue(fmt.Sprintf("Element at index %d is not a string", i)))
+		}
+	}
+
+	return strings
+}
