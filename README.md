@@ -5,7 +5,7 @@
 ## Download the binary for your platform
 
 ### [OSX/amd64](https://github.com/torloejborg/easykube/releases/latest/download/easykube-darwin-amd64.zip)
-### [OSX/arm64 (Silicon)](https:github.com/torloejborg/easykube/releases/latest/download/easykube-darwin-arm64.zip)
+### [OSX/arm64](https://github.com/torloejborg/easykube/releases/latest/download/easykube-darwin-arm64.zip)
 ### [Linux/amd64](https://github.com/torloejborg/easykube/releases/latest/download/easykube-linux-amd64.zip)
 ### [Windows/amd64](https://github.com/torloejborg/easykube/releases/latest/download/easykube-windows-amd64.zip)
 
