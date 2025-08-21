@@ -1,4 +1,4 @@
-# easykube 1.0.0
+# Easykube 1.0.0
 
 "A tool for learning kubernetes, running various stacks, and hacking your applications locally"
 
