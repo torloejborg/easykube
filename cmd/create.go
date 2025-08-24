@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"github.com/torloj/easykube/ekctx"
+	"net"
 	"os"
+	"strings"
+	"time"
+
+	"github.com/torloj/easykube/ekctx"
 
 	"github.com/spf13/cobra"
 	"github.com/torloj/easykube/pkg/constants"
@@ -46,6 +51,19 @@ var createCmd = &cobra.Command{
 
 		addons := ek.NewAddonReader(appContext).GetAddons()
 		ct.CreateContainerRegistry()
+
+		occupiedPorts, _ := ensureClusterPortsFree(addons)
+		if nil != occupiedPorts {
+			out.FmtGreen("Can not create easykube cluster")
+			fmt.Println()
+			for k, v := range occupiedPorts {
+				out.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.Name, strings.Join(ek.IntSliceToStrings(v), ","))
+			}
+			fmt.Println()
+			out.FmtRed("Please halt your local services, or remove the ExtraPorts configuration from the addons listed above ")
+			os.Exit(-1)
+		}
+
 		report := cu.CreateKindCluster(addons)
 
 		ct.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
@@ -87,7 +105,36 @@ var createCmd = &cobra.Command{
 	},
 }
 
+func ensureClusterPortsFree(addons map[string]*ek.Addon) (map[*ek.Addon][]int, error) {
+
+	IsPortAvailable := func(host string, port int) bool {
+		addr := fmt.Sprintf("%s:%d", host, port)
+		l, err := net.DialTimeout("tcp", addr, 500*time.Millisecond)
+		if err != nil {
+			return true
+		}
+		_ = l.Close()
+		return false
+	}
+
+	failed := make(map[*ek.Addon][]int)
+
+	for _, a := range addons {
+		for _, p := range a.Config.ExtraPorts {
+			if !IsPortAvailable("127.0.0.1", p.HostPort) {
+				failed[a] = append(failed[a], p.HostPort)
+			}
+		}
+	}
+
+	if len(failed) != 0 {
+		return failed, errors.New("some ports are not available")
+	} else {
+		return nil, nil
+	}
+}
+
 func init() {
 	rootCmd.AddCommand(createCmd)
-	createCmd.Flags().StringP(constants.ARG_SECRETS, "s", "", "Property file to load as 'easykube-secrets', useful for imagepull secrets and other custom configuration")
+	createCmd.Flags().StringP(constants.ARG_SECRETS, "s", "", "Property file to load as 'easykube-secrets', useful for image pull secrets and other custom configuration")
 }
