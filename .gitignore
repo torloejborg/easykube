@@ -1,3 +1,6 @@
 easykube
 .idea
 .vscode
+build
+dist
+cert-lan

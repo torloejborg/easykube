@@ -3,6 +3,7 @@ package jsutils
 const AND_THEN_APPLY = "thenApply"
 const COPY_TO = "copyTo"
 const KEY_VALUE = "keyValue"
+const KEY_ENV = "env"
 const CREATE_SECRET = "createSecret"
 const EXEC_IN_CONTAINER = "execInContainer"
 const GET_SECRET = "getSecret"

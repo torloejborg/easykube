@@ -1,6 +1,6 @@
 # easykube 1.0.0
 
-"A tool for learning kubernetes, running various stacks, and hacking your applications locally"
+"A tool for learning kubernetes, run various stacks, develop complex applications locally"
 
 ## Download the binary for your platform
 

@@ -2,10 +2,11 @@ package jsutils
 
 import (
 	"fmt"
-	"github.com/dop251/goja"
-	"github.com/torloj/easykube/ekctx"
 	"os"
 	"reflect"
+
+	"github.com/dop251/goja"
+	"github.com/torloj/easykube/ekctx"
 )
 
 type IEasykube interface {
@@ -45,6 +46,7 @@ func ConfigureEasykubeScript(ctx *ekctx.EKContext, addon *AddonContext) {
 	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
 	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
 	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
+	check(easykubeObj.Set(KEY_ENV, e.Env()))
 
 	addon.ExportFunction("_ek", easykubeObj)
 
