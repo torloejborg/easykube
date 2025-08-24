@@ -2,12 +2,14 @@ package ek
 
 import (
 	"bufio"
-	"github.com/torloj/easykube/pkg/resources"
 	"log"
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
+
+	"github.com/torloj/easykube/pkg/resources"
 )
 
 var dirstack = &Stack[string]{}
@@ -128,4 +130,12 @@ func ReadPropertyFile(path string) (map[string]string, error) {
 
 	return configmap, nil
 
+}
+
+func IntSliceToStrings(input []int) []string {
+	result := make([]string, len(input))
+	for i, n := range input {
+		result[i] = strconv.Itoa(n)
+	}
+	return result
 }
