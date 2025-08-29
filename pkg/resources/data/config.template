@@ -9,8 +9,5 @@ easykube:
   # this is used by kind to store peristent data, it will survive cluster deletion
   persistence-dir: {{ .PersistenceDir }}
   
-  # Container Runtime
+  # Container Runtime (as of now, only docker is supported. podman support is planned)
   container-runtime: docker
-  
-  # loopback domain, a domain where everything resolves to 127.0.0.1
-  loopback-domain: localtest.me

@@ -15,7 +15,7 @@ nodes:
     {{- end}}
     extraMounts:{{range . -}}
     {{ range .Config.ExtraMounts }}
-    - hostPath: {{.PersistenceDir}}/{{.HostPath}}
+    - hostPath: {{.PersistenceDir}}{{.HostPath}}
       containerPath: {{.ContainerPath}}
     {{- end}}
     {{- end}}

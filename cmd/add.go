@@ -1,14 +1,15 @@
 package cmd
 
 import (
+	"os"
+	"slices"
+	"strings"
+
 	"github.com/spf13/cobra"
 	"github.com/torloj/easykube/ekctx"
 	"github.com/torloj/easykube/pkg/constants"
 	"github.com/torloj/easykube/pkg/ek"
 	jsutils "github.com/torloj/easykube/pkg/js"
-	"os"
-	"slices"
-	"strings"
 )
 
 // addCmd represents the install command
@@ -25,7 +26,7 @@ var addCmd = &cobra.Command{
 		tools := ek.NewExternalTools(ekCtx)
 
 		forceInstall := ekCtx.GetBoolFlag(constants.FLAG_FORCE)
-		noDepends := ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS)
+		//noDepends := ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS)
 		targetCluster := ekCtx.GetStringFlag(constants.FLAG_CLUSTER)
 		installed := ek.NewK8SUtils(ekCtx).GetInstalledAddons()
 
@@ -35,6 +36,7 @@ var addCmd = &cobra.Command{
 		ek.NewExternalTools(ekCtx).EnsureLocalContext()
 
 		wanted, missing := pickAddons(args, addons)
+
 		if len(missing) > 0 {
 			out.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
 			os.Exit(-1)
@@ -45,29 +47,21 @@ var addCmd = &cobra.Command{
 			defer tools.SwitchContext(constants.CLUSTER_CONTEXT)
 		}
 
-		for idx := range wanted {
-
-			current := wanted[idx]
-
-			var toInstall = make([]*ek.Addon, 0)
-			if noDepends {
-				toInstall = append(toInstall, current)
-			} else {
-				order := reader.GetExecutionOrder(current, addons)
-				toInstall = append(toInstall, order...)
-			}
-
-			for i := range toInstall {
-
-				if slices.Contains(installed, toInstall[i].ShortName) && !forceInstall {
-					out.FmtYellow("%s already present in cluster", toInstall[i].ShortName)
-					continue
-				}
-
-				jsutils.NewJsUtils(ekCtx, toInstall[i]).ExecAddonScript(toInstall[i])
-			}
+		toInstall, err := ek.ResolveDependencies(wanted, addons)
+		if err != nil {
+			out.FmtRed("dependency resolution failed: %v", err)
 		}
 
+		for idx := range toInstall {
+
+			current := toInstall[idx]
+			if slices.Contains(installed, current.ShortName) && !forceInstall {
+				out.FmtYellow("%s already present in cluster", current.ShortName)
+				continue
+			}
+
+			jsutils.NewJsUtils(ekCtx, toInstall[idx]).ExecAddonScript(toInstall[idx])
+		}
 	},
 }
 

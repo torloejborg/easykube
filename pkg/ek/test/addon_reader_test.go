@@ -3,8 +3,9 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/torloj/easykube/pkg/ek"
 	"testing"
+
+	"github.com/torloj/easykube/pkg/ek"
 )
 
 func TestJsonConfigParsing(t *testing.T) {
@@ -21,7 +22,7 @@ let configuration = {
 	"extraMounts" : [
 		{
 			"hostPath" : "/var/run/docker.sock",
-			"containerPath" : "/var/run/docker.sock"	
+			"containerPath" : "docker.sock"	
 		}
 	]
 	}

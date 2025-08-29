@@ -51,9 +51,8 @@ By itself, easykube is not very exciting, it can only establish an empty cluster
 
 4. Use it; `easykube --help` prints out a summary of all commands, `easykube <command> --help` prints the summary for that command. 
 
-6. `(unset KUBECONFIG && easykube create -s <your local properties file>)` will create a kind cluster and import your *your.properties* as a secret which easykube will use to pull images from a private registry. It will also create a new kind-easykube cluster config.
- NOTE: If you are not using a private repository, the "-s" argument can be skipped, and images will be pulled from dockerhub  HINT: Create an alias, like "ek", "easykube" gets tedious to type :)
-`
+6. `easykube create -s <your local properties file>` will create a kind cluster and import your *your.properties* as a secret which easykube will use to pull images from a private registry. It will also create a new kind-easykube cluster config.
+ NOTE: If you are not using a private repository, the "-s" argument can be skipped, and images will be pulled from dockerhub.
 
 ## What it does
 
