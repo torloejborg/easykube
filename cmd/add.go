@@ -47,21 +47,26 @@ var addCmd = &cobra.Command{
 			defer tools.SwitchContext(constants.CLUSTER_CONTEXT)
 		}
 
-		toInstall, err := ek.ResolveDependencies(wanted, addons)
-		if err != nil {
-			out.FmtRed("dependency resolution failed: %v", err)
-		}
-
-		for idx := range toInstall {
-
-			current := toInstall[idx]
-			if slices.Contains(installed, current.ShortName) && !forceInstall {
-				out.FmtYellow("%s already present in cluster", current.ShortName)
-				continue
+		if ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS) {
+			jsutils.NewJsUtils(ekCtx, wanted[0]).ExecAddonScript(wanted[0])
+		} else {
+			toInstall, err := ek.ResolveDependencies(wanted, addons)
+			if err != nil {
+				out.FmtRed("dependency resolution failed: %v", err)
 			}
 
-			jsutils.NewJsUtils(ekCtx, toInstall[idx]).ExecAddonScript(toInstall[idx])
+			for idx := range toInstall {
+
+				current := toInstall[idx]
+				if slices.Contains(installed, current.ShortName) && !forceInstall {
+					out.FmtYellow("%s already present in cluster", current.ShortName)
+					continue
+				}
+
+				jsutils.NewJsUtils(ekCtx, toInstall[idx]).ExecAddonScript(toInstall[idx])
+			}
 		}
+
 	},
 }
 
