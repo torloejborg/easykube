@@ -16,7 +16,6 @@ import (
 
 type IClusterUtils interface {
 	CreateKindCluster(modules map[string]*Addon) string
-	PatchCoreDNS()
 	RenderToYAML(addonList []*Addon) string
 	ConfigurationReport(addonList []*Addon) string
 	EnsurePersistenceDirectory()
@@ -159,10 +158,6 @@ func (u *ClusterUtils) RenderToYAML(addonList []*Addon) string {
 	return buf.String()
 }
 
-func (u *ClusterUtils) PatchCoreDNS() {
-
-}
-
 func (u *ClusterUtils) EnsurePersistenceDirectory() {
 
 	ar := NewAddonReader(u.EkContext)
@@ -184,5 +179,4 @@ func (u *ClusterUtils) EnsurePersistenceDirectory() {
 			}
 		}
 	}
-
 }

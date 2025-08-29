@@ -1,9 +1,10 @@
 package test
 
 import (
-	"github.com/torloj/easykube/pkg/ek"
-	"log"
+	"fmt"
 	"testing"
+
+	"github.com/torloj/easykube/pkg/ek"
 )
 
 func TestTopologicalSort(t *testing.T) {
@@ -20,9 +21,9 @@ func TestTopologicalSort(t *testing.T) {
 		storage,
 		postgres)
 
-	graph.AddNode(postgres, storage)
-	graph.AddNode(jenkins, storage)
-	graph.AddNode(jenkins, ingress)
+	_ = graph.AddEdge(postgres, storage)
+	graph.AddEdge(jenkins, storage)
+	graph.AddEdge(jenkins, ingress)
 
 	sorted, err := graph.TopologicalSort()
 	if err != nil {
@@ -43,43 +44,19 @@ func TestExecutionOrder(t *testing.T) {
 	adr := ek.NewAddonReader(GetEKContext())
 	addons := adr.GetAddons()
 
-	getAddonDependencyList := func(name string) []*ek.Addon {
-		depends := make([]*ek.Addon, 0)
-		dependsOn := addons[name].Config.DependsOn
+	g, err := ek.BuildDependencyGraph(addons["a"], addons)
 
-		for x := range dependsOn {
-			depends = append(depends, addons[dependsOn[x]])
-		}
-
-		return depends
-	}
-
-	g := ek.NewGraph()
-	// add all nodes
-	nl := make([]*ek.Addon, 0)
-	for _, v := range addons {
-		nl = append(nl, v)
-	}
-	g.Nodes = nl
-
-	for k, v := range addons {
-		d := getAddonDependencyList(k)
-
-		for x := range d {
-			e := g.AddDependency(v, d[x])
-			if e != nil {
-				panic(e.Error())
-			}
-		}
-	}
-
-	result, err := g.TopologicalSort()
 	if err != nil {
 		panic(err)
 	}
 
-	for a := range result {
-		log.Println(result[a].Name)
+	l, tserr := g.TopologicalSort()
+	if tserr != nil {
+		panic(tserr)
+	}
+
+	for _, addon := range l {
+		fmt.Println(addon.Name)
 	}
 
 }

@@ -2,11 +2,12 @@ package test
 
 import (
 	"fmt"
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/ek"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/torloj/easykube/ekctx"
+	"github.com/torloj/easykube/pkg/ek"
 )
 
 func GetEKContext() *ekctx.EKContext {
@@ -125,7 +126,7 @@ func TestClusterCreateReport(*testing.T) {
 				},
 				{
 					ContainerPath: "/mnt/foo-d",
-					HostPath:      "docker-d",
+					HostPath:      "/some/abs/dir/docker-d",
 				},
 			},
 			ExtraPorts: []ek.PortConfig{

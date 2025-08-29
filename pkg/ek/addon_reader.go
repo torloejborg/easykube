@@ -3,19 +3,18 @@ package ek
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/torloj/easykube/ekctx"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strings"
 	"unicode"
+
+	"github.com/torloj/easykube/ekctx"
 )
 
 type IAddonReader interface {
 	GetAddons() map[string]*Addon
-	GetExecutionOrder(wanted *Addon, addons map[string]*Addon) []*Addon
 	ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error)
 	ExtractJSON(input string) (string, bool)
 }
@@ -88,7 +87,7 @@ func (adr *AddonReader) resolveExecutionOrder(
 	for x := range d {
 
 		next := allAddons[d[x]]
-		err := g.AddDependency(toInstall, next)
+		err := g.AddEdge(toInstall, next)
 
 		if err != nil {
 			adr.EkContext.Printer.FmtRed(err.Error())
@@ -98,43 +97,13 @@ func (adr *AddonReader) resolveExecutionOrder(
 		*out = append(*out, next)
 
 		adr.resolveExecutionOrder(g, next, allAddons, out, outgraph)
-		err = outgraph.AddDependency(toInstall, next)
+		err = outgraph.AddEdge(toInstall, next)
 
 		if err != nil {
 			adr.EkContext.Printer.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 	}
-}
-
-func (adr *AddonReader) GetExecutionOrder(wanted *Addon, addons map[string]*Addon) []*Addon {
-
-	// transform map to list
-	addonList := make([]*Addon, 0)
-	for _, v := range addons {
-		addonList = append(addonList, v)
-	}
-
-	// We create a Graph with the entire nodeset, this is used to detect cycles
-	// when resolving the execution order
-	g := NewGraph()
-	g.SetNodeList(addonList)
-	install := make([]*Addon, 0)
-	install = append(install, wanted)
-
-	// A new Graph will contain the result (a subset of the original Graph)
-	outGraph := NewGraph()
-	adr.resolveExecutionOrder(g, wanted, addons, &install, outGraph)
-	outGraph.SetNodeList(install)
-
-	order, e := outGraph.TopologicalSort()
-	if e != nil {
-		adr.EkContext.Printer.FmtRed(e.Error())
-		os.Exit(-1)
-	}
-
-	slices.Reverse(order)
-	return order
 }
 
 func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error) {
@@ -167,7 +136,15 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig,
 
 		// Set persistence location for all ExtraMounts
 		for idx, _ := range cfg.ExtraMounts {
-			cfg.ExtraMounts[idx].PersistenceDir = adr.EkConfig.PersistenceDir
+			cfg.ExtraMounts[idx].PersistenceDir = adr.EkConfig.PersistenceDir + "/"
+
+			// An absolute path in HostPath will be respected, and not be relative
+			// to the user persistence directory
+			if strings.HasPrefix(cfg.ExtraMounts[idx].HostPath, "/") {
+				cfg.ExtraMounts[idx].PersistenceDir = cfg.ExtraMounts[idx].HostPath
+				cfg.ExtraMounts[idx].HostPath = ""
+			}
+
 		}
 
 		return cfg, jsonErr

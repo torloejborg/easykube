@@ -18,7 +18,8 @@ let configuration = {
          //   }
          //],
          // You can also define custom storage locations that will mount a persistent-volume,
-         // to a location on your local file system.
+         // to a location on your local file system. If hostPath is relative it will be created in the
+         // <UserConfigDir>/easykube/persistence, otherwise the absolute path is used.
          // "extraMounts" : [
          //   {
          //           "hostPath":"storage",
