@@ -2,12 +2,13 @@ package jsutils
 
 import (
 	"fmt"
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/constants"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/torloj/easykube/ekctx"
+	"github.com/torloj/easykube/pkg/constants"
 
 	"github.com/dop251/goja"
 	"github.com/torloj/easykube/pkg/ek"

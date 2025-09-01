@@ -4,12 +4,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/constants"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/torloj/easykube/ekctx"
+	"github.com/torloj/easykube/pkg/constants"
 )
 
 type ContainerSearch struct {

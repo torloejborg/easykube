@@ -3,10 +3,11 @@ package jsutils
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/torloj/easykube/pkg/constants"
-	"k8s.io/utils/ptr"
 	"strings"
 	"sync"
+
+	"github.com/torloj/easykube/pkg/constants"
+	"k8s.io/utils/ptr"
 
 	"github.com/dop251/goja"
 	"github.com/torloj/easykube/pkg/ek"

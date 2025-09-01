@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/constants"
-	"github.com/torloj/easykube/pkg/ek"
 	"os"
 	"path/filepath"
 	"slices"
+
+	"github.com/torloj/easykube/ekctx"
+	"github.com/torloj/easykube/pkg/constants"
+	"github.com/torloj/easykube/pkg/ek"
 
 	"github.com/spf13/cobra"
 )

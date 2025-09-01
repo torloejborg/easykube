@@ -1,10 +1,11 @@
 package jsutils
 
 import (
-	"github.com/dop251/goja"
-	"github.com/torloj/easykube/pkg/ek"
 	"log"
 	"path/filepath"
+
+	"github.com/dop251/goja"
+	"github.com/torloj/easykube/pkg/ek"
 )
 
 func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {

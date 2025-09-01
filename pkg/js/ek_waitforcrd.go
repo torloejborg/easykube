@@ -1,9 +1,10 @@
 package jsutils
 
 import (
+	"time"
+
 	"github.com/dop251/goja"
 	"github.com/torloj/easykube/pkg/ek"
-	"time"
 )
 
 func (ctx *Easykube) WaitForCRD() func(goja.FunctionCall) goja.Value {

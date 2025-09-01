@@ -1,9 +1,10 @@
 package jsutils
 
 import (
+	"os"
+
 	"github.com/dop251/goja"
 	"github.com/torloj/easykube/pkg/ek"
-	"os"
 )
 
 func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {

@@ -1,23 +1,11 @@
 package test
 
 import (
-	"log"
 	"testing"
 	"time"
 
 	"github.com/torloj/easykube/pkg/ek"
 )
-
-func TestWaitForDelployment(t *testing.T) {
-
-	utils := ek.NewK8SUtils(GetEKContext())
-	err := utils.WaitForDeploymentReadyWatch("ingress-nginx-controller", "ingress-nginx")
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-}
 
 func TestWaitforCustomResource(t *testing.T) {
 	utils := ek.NewK8SUtils(GetEKContext())

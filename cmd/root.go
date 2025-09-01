@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"context"
-	"github.com/torloj/easykube/ekctx"
 	"log"
 	"os"
+
+	"github.com/torloj/easykube/ekctx"
 
 	"github.com/spf13/cobra"
 )

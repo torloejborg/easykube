@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"os"
+	"slices"
+	"sort"
+
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"github.com/torloj/easykube/ekctx"
 	"github.com/torloj/easykube/pkg/ek"
-	"os"
-	"slices"
-	"sort"
 )
 
 // listCmd represents the list command
