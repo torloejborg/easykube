@@ -3,11 +3,12 @@ package jsutils
 import (
 	"bytes"
 	"fmt"
+	"os"
+
 	"github.com/dop251/goja"
 	"github.com/torloj/easykube/ekctx"
 	"github.com/torloj/easykube/pkg/ek"
 	"gopkg.in/yaml.v3"
-	"os"
 )
 
 func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ek.ExternalSecret, error) {

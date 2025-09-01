@@ -3,11 +3,12 @@ package ek
 import (
 	"bytes"
 	"fmt"
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/constants"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/torloj/easykube/ekctx"
+	"github.com/torloj/easykube/pkg/constants"
 )
 
 type ExternalToolsImpl struct {

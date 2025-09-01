@@ -1,9 +1,10 @@
 package jsutils
 
 import (
+	"strings"
+
 	"github.com/dop251/goja"
 	"github.com/torloj/easykube/pkg/constants"
-	"strings"
 )
 
 func (ctx *Easykube) KeyValue() func(goja.FunctionCall) goja.Value {

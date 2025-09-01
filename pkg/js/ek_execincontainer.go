@@ -2,9 +2,10 @@ package jsutils
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/dop251/goja"
 	"github.com/torloj/easykube/pkg/ek"
-	"strings"
 )
 
 func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {

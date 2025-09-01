@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/torloj/easykube/ekctx"
 	"github.com/torloj/easykube/pkg/constants"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/torloj/easykube/pkg/ek"

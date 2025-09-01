@@ -72,25 +72,3 @@ func TestDiscoverAddons(t *testing.T) {
 		fmt.Println(addons[i].Config)
 	}
 }
-
-func TestInstallationOrder(t *testing.T) {
-
-	reader := ek.NewAddonReader(GetEKContext())
-	addons := reader.GetAddons()
-
-	var master *ek.Addon
-
-	for k, v := range addons {
-		if k == "ingress" {
-			master = v
-			break
-		}
-	}
-
-	order := reader.GetExecutionOrder(master, addons)
-
-	for i := range order {
-		fmt.Println(order[i].Name)
-	}
-
-}

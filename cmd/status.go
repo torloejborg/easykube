@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/torloj/easykube/pkg/constants"
 	"os"
 	"os/exec"
+
+	"github.com/torloj/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
 	"github.com/torloj/easykube/ekctx"

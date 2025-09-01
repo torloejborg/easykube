@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 
 	"github.com/torloj/easykube/pkg/ek"
@@ -26,6 +27,7 @@ func TestTopologicalSort(t *testing.T) {
 	graph.AddEdge(jenkins, ingress)
 
 	sorted, err := graph.TopologicalSort()
+	slices.Reverse(sorted)
 	if err != nil {
 		panic(err)
 	}
@@ -40,23 +42,30 @@ func TestTopologicalSort(t *testing.T) {
 	}
 }
 
-func TestExecutionOrder(t *testing.T) {
-	adr := ek.NewAddonReader(GetEKContext())
-	addons := adr.GetAddons()
+func TestDiamondGraph(t *testing.T) {
+	graph := ek.NewGraph()
 
-	g, err := ek.BuildDependencyGraph(addons["a"], addons)
+	a := &ek.Addon{Name: "a"}
+	b := &ek.Addon{Name: "b"}
+	c := &ek.Addon{Name: "c"}
+	d := &ek.Addon{Name: "d"}
+
+	graph.Nodes = append(graph.Nodes, a, b, c, d)
+
+	_ = graph.AddEdge(a, b)
+	graph.AddEdge(a, c)
+	graph.AddEdge(b, d)
+	graph.AddEdge(c, d)
+
+	sorted, err := graph.TopologicalSort()
+	slices.Reverse(sorted)
 
 	if err != nil {
 		panic(err)
 	}
 
-	l, tserr := g.TopologicalSort()
-	if tserr != nil {
-		panic(tserr)
-	}
-
-	for _, addon := range l {
-		fmt.Println(addon.Name)
+	for _, n := range sorted {
+		fmt.Println(n.Name)
 	}
 
 }
