@@ -15,6 +15,7 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 		chart := call.Argument(0).String()
 		values := call.Argument(1).String()
 		destination := call.Argument(2).String()
+		namespace := call.Argument(3).String()
 
 		if !ek.FileOrDirExists(chart) {
 			out.FmtRed("specified chart %s does not exist", chart)
@@ -26,8 +27,14 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 			os.Exit(-1)
 		}
 
+		if namespace == "" {
+			namespace = "default"
+		}
+
 		tools := ek.NewExternalTools(ctx.EKContext)
-		stdout, stderr, err := tools.RunCommand("helm", "template", chart, "--values", values)
+		stdout, stderr, err := tools.RunCommand("helm", "template", chart,
+			"--values", values,
+			"--namespace", namespace)
 
 		if err != nil {
 			out.FmtRed("helm failed %s", stderr)
