@@ -5,7 +5,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func TestTopologicalSort(t *testing.T) {

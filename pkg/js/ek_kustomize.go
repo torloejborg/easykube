@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/torloj/easykube/pkg/constants"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func TestJsonConfigParsing(t *testing.T) {

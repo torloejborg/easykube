@@ -2,7 +2,7 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 )
 
 type ConsImpl struct {

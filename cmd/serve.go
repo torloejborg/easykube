@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 )
 
 // destroyCmd represents the destroy command

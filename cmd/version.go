@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 )
+
+var Version = "latest"
 
 // destroyCmd represents the destroy command
 var versionCmd = &cobra.Command{
@@ -13,7 +15,7 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ekCtx := ekctx.GetAppContext(cmd)
 		out := ekCtx.Printer
-		out.FmtGreen("1.1.0")
+		out.FmtGreen(Version)
 	},
 }
 

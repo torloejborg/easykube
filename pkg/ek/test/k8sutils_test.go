@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func TestWaitforCustomResource(t *testing.T) {

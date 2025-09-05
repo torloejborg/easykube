@@ -18,7 +18,7 @@ import (
 	image2 "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
-	"github.com/torloj/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 type DockerImpl struct {

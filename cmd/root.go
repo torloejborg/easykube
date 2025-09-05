@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 
 	"github.com/spf13/cobra"
 )

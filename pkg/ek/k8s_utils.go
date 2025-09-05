@@ -14,15 +14,15 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
 
-	"github.com/torloj/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/constants"
 
-	"github.com/torloj/easykube/pkg/resources"
+	"github.com/torloejborg/easykube/pkg/resources"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	applyv1 "k8s.io/client-go/applyconfigurations/core/v1"
