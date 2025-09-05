@@ -7,8 +7,8 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // listCmd represents the list command

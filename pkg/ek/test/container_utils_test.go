@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
-	"github.com/torloj/easykube/pkg/constants"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ek"
 	"testing"
 )
 

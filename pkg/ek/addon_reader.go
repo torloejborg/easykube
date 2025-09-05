@@ -10,7 +10,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 )
 
 type IAddonReader interface {

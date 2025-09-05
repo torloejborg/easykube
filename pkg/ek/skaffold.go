@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/torloj/easykube/pkg/resources"
+	"github.com/torloejborg/easykube/pkg/resources"
 )
 
 type SkaffoldImpl struct {

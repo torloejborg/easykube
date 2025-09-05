@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 type ExternalToolsImpl struct {

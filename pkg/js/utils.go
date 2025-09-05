@@ -2,7 +2,7 @@ package jsutils
 
 import (
 	"github.com/google/uuid"
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 )
 
 type IUtils interface {

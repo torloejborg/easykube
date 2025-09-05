@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/dop251/goja"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {

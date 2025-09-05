@@ -1,4 +1,4 @@
-module github.com/torloj/easykube
+module github.com/torloejborg/easykube
 
 go 1.24.0
 

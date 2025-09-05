@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/dop251/goja"
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ek"
 	"gopkg.in/yaml.v3"
 )
 

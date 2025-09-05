@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/torloj/easykube/pkg/resources"
+	"github.com/torloejborg/easykube/pkg/resources"
 )
 
 var dirstack = &Stack[string]{}

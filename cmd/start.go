@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // configCmd represents the config command

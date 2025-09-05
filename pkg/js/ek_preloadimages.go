@@ -6,11 +6,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/torloj/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/constants"
 	"k8s.io/utils/ptr"
 
 	"github.com/dop251/goja"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {

@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/torloj/easykube/ekctx"
+	"github.com/torloejborg/easykube/ekctx"
 
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
-	"github.com/torloj/easykube/pkg/resources"
+	"github.com/torloejborg/easykube/pkg/resources"
 )
 
 type EasykubeConfigData struct {

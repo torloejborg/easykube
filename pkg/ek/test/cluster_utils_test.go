@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func GetEKContext() *ekctx.EKContext {

@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/torloj/easykube/ekctx"
-	"github.com/torloj/easykube/pkg/constants"
-	"github.com/torloj/easykube/pkg/ek"
-	jsutils "github.com/torloj/easykube/pkg/js"
+	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ek"
+	jsutils "github.com/torloejborg/easykube/pkg/js"
 )
 
 // addCmd represents the install command
