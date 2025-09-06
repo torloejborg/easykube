@@ -12,7 +12,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/ek"
 )
 
-// statusCmd represents the check command
+// statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "inspects you environment to see if prerequisites are met",
