@@ -8,7 +8,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/ek"
 )
 
-// configCmd represents the config command
+// startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "starts the cluster node and registry container",

@@ -5,7 +5,7 @@ import (
 	"github.com/torloejborg/easykube/ekctx"
 )
 
-// destroyCmd represents the destroy command
+// serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "starts the embedded webserver",

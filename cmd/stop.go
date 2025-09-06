@@ -8,7 +8,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/ek"
 )
 
-// configCmd represents the config command
+// stopCmd represents the stop command
 var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "stops the cluster node and registry container",

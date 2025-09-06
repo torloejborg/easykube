@@ -10,7 +10,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/ek"
 )
 
-// createAddonCmd represents the createAddon command
+// skaffoldCmd represents the skaffold command
 var skaffoldCmd = &cobra.Command{
 	Use:   "skaffold --name [] --location []",
 	Short: "creates a new addon using a basic template",

@@ -7,7 +7,7 @@ import (
 
 var Version = "latest"
 
-// destroyCmd represents the destroy command
+// versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "shows the version of easykube CLI",
