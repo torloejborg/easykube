@@ -79,7 +79,7 @@ type IK8SUtils interface {
 	CreateConfigmap(name, namespace string) error
 	DeleteKeyFromConfigmap(name, namespace, key string)
 	Exec(namespace, pod, command string, args []string) (string, string, error)
-	GetInstalledAddons() []string
+	GetInstalledAddons() ([]string, error)
 	UpdateConfigMap(name, namespace, key string, data []byte)
 	ListPods(namespace string) ([]string, error)
 	PatchCoreDNS()
@@ -202,19 +202,19 @@ func (k8s *K8SUtilsImpl) UpdateConfigMap(name, namespace, key string, data []byt
 	}
 }
 
-func (k8s *K8SUtilsImpl) GetInstalledAddons() []string {
+func (k8s *K8SUtilsImpl) GetInstalledAddons() ([]string, error) {
 	result := make([]string, 0)
 	addons, err := k8s.ReadConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
 
 	if err != nil {
-		return result
+		return result, err
 	}
 
 	for key, _ := range addons {
 		result = append(result, key)
 	}
 
-	return result
+	return result, nil
 }
 
 func (k8s *K8SUtilsImpl) ReadConfigmap(name string, namespace string) (map[string]string, error) {

@@ -4,3 +4,4 @@ easykube
 build
 dist
 cert-lan
+complete.zsh
