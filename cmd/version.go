@@ -5,7 +5,7 @@ import (
 	"github.com/torloejborg/easykube/ekctx"
 )
 
-var Version = "latest"
+var Version = "latest" // set by linker flag
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{

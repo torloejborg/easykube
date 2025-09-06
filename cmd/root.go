@@ -25,7 +25,11 @@ hint: start with 'easykube config'
 `,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {},
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			_ = cmd.Help()
+		}
+	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		cmd.SetContext(withAppContext(cmd.Context(), &ekctx.EKContext{
 			Command: cmd,
