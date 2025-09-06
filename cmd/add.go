@@ -28,10 +28,14 @@ var addCmd = &cobra.Command{
 		forceInstall := ekCtx.GetBoolFlag(constants.FLAG_FORCE)
 		//noDepends := ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS)
 		targetCluster := ekCtx.GetStringFlag(constants.FLAG_CLUSTER)
-		installed := ek.NewK8SUtils(ekCtx).GetInstalledAddons()
+		installed, err := ek.NewK8SUtils(ekCtx).GetInstalledAddons()
+		if err != nil {
+			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
+			os.Exit(1)
+		}
 
 		// switch to the easykube context - this is purely to avoid trouble
-		// user might have switched to another context to do work, and forgot to change
+		// user might have switched to another context to do work and forgot to change
 		// context back to easykube. --context argument overrides this
 		ek.NewExternalTools(ekCtx).EnsureLocalContext()
 
@@ -67,6 +71,16 @@ var addCmd = &cobra.Command{
 			}
 		}
 
+	},
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+		addons := make([]string, 0)
+		for _, i := range ek.NewAddonReader(ekctx.GetAppContext(cmd)).GetAddons() {
+			addons = append(addons, i.ShortName)
+		}
+		return addons, cobra.ShellCompDirectiveNoFileComp
+
+		//return nil, cobra.ShellCompDirectiveNoFileComp
 	},
 }
 

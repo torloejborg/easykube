@@ -9,15 +9,6 @@ import (
 	"github.com/torloejborg/easykube/ekctx"
 )
 
-type IEasykube interface {
-	Kustomize() func(goja.FunctionCall) goja.Value
-	WaitForDeployment() func(goja.FunctionCall) goja.Value
-	AndThenApply() func(goja.FunctionCall) goja.Value
-	PreloadImages() func(goja.FunctionCall) goja.Value
-	WaitForCRD() func(goja.FunctionCall) goja.Value
-	CopyTo() func(goja.FunctionCall) goja.Value
-}
-
 type Easykube struct {
 	EKContext *ekctx.EKContext
 	AddonCtx  *AddonContext
