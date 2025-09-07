@@ -7,6 +7,7 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/ek"
 	"gopkg.in/yaml.v3"
 )
@@ -51,7 +52,7 @@ func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ek.Externa
 
 func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		k8sutils := ek.NewK8SUtils(ctx.EKContext)
+		k8sutils := pkg.CreateK8sUtils()
 		out := ctx.EKContext.Printer
 		ctx.checkArgs(call, PROCESS_SECRETS)
 

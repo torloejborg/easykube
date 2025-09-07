@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg"
 )
 
 func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
@@ -13,7 +13,8 @@ func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, EXEC_IN_CONTAINER)
 
 		out := ctx.EKContext.Printer
-		k8s := ek.NewK8SUtils(ctx.EKContext)
+		k8s := pkg.CreateK8sUtils()
+
 		deployment := call.Argument(0).String()
 		namespace := call.Argument(1).String()
 		command := call.Argument(2).String()

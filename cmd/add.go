@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ek"
 	jsutils "github.com/torloejborg/easykube/pkg/js"
@@ -21,14 +22,24 @@ var addCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ekCtx := ekctx.GetAppContext(cmd)
 		out := ekCtx.Printer
-		reader := ek.NewAddonReader(ekCtx)
-		addons := reader.GetAddons()
-		tools := ek.NewExternalTools(ekCtx)
+
+		// create a 'toolbox' of needed utilities for cluster creation
+		tb := struct {
+			addon ek.IAddonReader
+			k8s   ek.IK8SUtils
+			tools ek.IExternalTools
+		}{
+			pkg.CreateAddonReader(),
+			pkg.CreateK8sUtils(),
+			pkg.CreateExternalTools(),
+		}
+
+		addons := tb.addon.GetAddons()
 
 		forceInstall := ekCtx.GetBoolFlag(constants.FLAG_FORCE)
 		//noDepends := ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS)
 		targetCluster := ekCtx.GetStringFlag(constants.FLAG_CLUSTER)
-		installed, err := ek.NewK8SUtils(ekCtx).GetInstalledAddons()
+		installed, err := tb.k8s.GetInstalledAddons()
 		if err != nil {
 			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 			os.Exit(1)
@@ -37,7 +48,7 @@ var addCmd = &cobra.Command{
 		// switch to the easykube context - this is purely to avoid trouble
 		// user might have switched to another context to do work and forgot to change
 		// context back to easykube. --context argument overrides this
-		ek.NewExternalTools(ekCtx).EnsureLocalContext()
+		tb.tools.EnsureLocalContext()
 
 		wanted, missing := pickAddons(args, addons)
 
@@ -47,8 +58,8 @@ var addCmd = &cobra.Command{
 		}
 
 		if len(targetCluster) > 0 {
-			tools.SwitchContext(targetCluster)
-			defer tools.SwitchContext(constants.CLUSTER_CONTEXT)
+			tb.tools.SwitchContext(targetCluster)
+			defer tb.tools.SwitchContext(constants.CLUSTER_CONTEXT)
 		}
 
 		if ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS) {
@@ -75,12 +86,10 @@ var addCmd = &cobra.Command{
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
 		addons := make([]string, 0)
-		for _, i := range ek.NewAddonReader(ekctx.GetAppContext(cmd)).GetAddons() {
+		for _, i := range pkg.CreateAddonReader().GetAddons() {
 			addons = append(addons, i.ShortName)
 		}
 		return addons, cobra.ShellCompDirectiveNoFileComp
-
-		//return nil, cobra.ShellCompDirectiveNoFileComp
 	},
 }
 

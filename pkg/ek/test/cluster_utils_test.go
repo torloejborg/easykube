@@ -41,12 +41,12 @@ func TestRenderYaml(t *testing.T) {
 
 	al := []*ek.Addon{a}
 
-	cut := ek.NewClusterUtils(GetEKContext())
+	cut := CreateFakeClusterUtils()
 	fmt.Println(cut.RenderToYAML(al))
 }
 
 func TestConfigGeneratedFromAddons(t *testing.T) {
-	ar := ek.NewAddonReader(GetEKContext())
+	ar := CreateFakeAddonReader()
 	addonMap := ar.GetAddons()
 
 	var addons []*ek.Addon
@@ -55,14 +55,14 @@ func TestConfigGeneratedFromAddons(t *testing.T) {
 		addons = append(addons, addon)
 	}
 
-	cut := ek.NewClusterUtils(GetEKContext())
+	cut := CreateFakeClusterUtils()
 	yaml := cut.RenderToYAML(addons)
 	fmt.Println(yaml)
 
 }
 
 func TestCreateCluster(*testing.T) {
-	cu := ek.NewClusterUtils(GetEKContext())
+	cu := CreateFakeClusterUtils()
 	cu.CreateKindCluster(map[string]*ek.Addon{})
 }
 
@@ -144,25 +144,25 @@ func TestClusterCreateReport(*testing.T) {
 	addons = append(addons, b)
 	addons = append(addons, c)
 
-	cu := ek.NewClusterUtils(GetEKContext())
+	cu := CreateFakeClusterUtils()
 	fmt.Println(cu.ConfigurationReport(addons))
 
 }
 
 func TestUpdateConfigmap(t *testing.T) {
-	k8su := ek.NewK8SUtils(GetEKContext())
+	k8su := CreateFakeK8sUtil()
 	k8su.CreateConfigmap("testing", "default")
 	k8su.UpdateConfigMap("testing", "default", "myvalue", []byte("hello"))
 }
 
 func TestGetInstalledAddons(t *testing.T) {
-	k8su := ek.NewK8SUtils(GetEKContext())
-	addons := k8su.GetInstalledAddons()
+	k8su := CreateFakeK8sUtil()
+	addons, _ := k8su.GetInstalledAddons()
 	fmt.Println(addons)
 }
 
-func TestCreatePeristenceDirectories(t *testing.T) {
-	clu := ek.NewClusterUtils(GetEKContext())
+func TestCreatePersistenceDirectories(t *testing.T) {
+	clu := CreateFakeClusterUtils()
 	clu.EnsurePersistenceDirectory()
 
 }

@@ -2,17 +2,17 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg"
 )
 
 func (ctx *Easykube) GetSecret() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, GET_SECRET)
-		
+
 		namespace := call.Argument(0).String()
 		name := call.Argument(1).String()
 
-		k8 := ek.NewK8SUtils(ctx.EKContext)
+		k8 := pkg.CreateK8sUtils()
 		res, err := k8.GetSecret(name, namespace)
 
 		m := make(map[string]string)

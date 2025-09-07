@@ -6,11 +6,11 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"k8s.io/utils/ptr"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
@@ -26,7 +26,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		if err != nil {
 			panic(err)
 		}
-		cru := ek.NewContainerRuntime(ctx.EKContext)
+		cru := pkg.CreateContainerRuntime()
 
 		var i = 0
 		var wg sync.WaitGroup
@@ -42,7 +42,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 				if !cru.HasImageInKindRegistry(dest) || mustPull {
 
 					if strings.Contains(source, "ccta.dk") {
-						s, err := ek.NewK8SUtils(ctx.EKContext).GetSecret("easykube-secrets", "default")
+						s, err := pkg.CreateK8sUtils().GetSecret("easykube-secrets", "default")
 						if err != nil {
 							panic(err)
 						}

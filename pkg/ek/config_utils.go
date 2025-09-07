@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
 
 	"github.com/gookit/config/v2"
@@ -34,11 +35,16 @@ type IEasykubeConfig interface {
 type EasykubeConfig struct {
 	ConfigDirName string
 	UserConfigDir string
+	Fs            afero.Fs
 }
 
-func NewEasykubeConfig(ctx *ekctx.EKContext) IEasykubeConfig {
+func NewEasykubeConfig(ctx *ekctx.EKContext, fileFacade afero.Fs) IEasykubeConfig {
 	configDir, _ := os.UserConfigDir()
-	return &EasykubeConfig{UserConfigDir: configDir, ConfigDirName: "easykube"}
+	return &EasykubeConfig{
+		UserConfigDir: configDir,
+		ConfigDirName: "easykube",
+		Fs:            fileFacade,
+	}
 }
 
 func (ec *EasykubeConfig) LaunchEditor(config, editor string) {
@@ -112,10 +118,10 @@ func (ec *EasykubeConfig) MakeConfig() {
 	}
 
 	pathToConfigFile := filepath.Join(userConfigDir, ec.ConfigDirName, "config.yaml")
-	_, err = os.Stat(pathToConfigFile)
+	_, err = ec.Fs.Stat(pathToConfigFile)
 
 	if os.IsNotExist(err) {
-		os.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
+		ec.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
 
 		model := EasykubeConfigData{
 			AddonDir:         "./addons",
@@ -123,7 +129,7 @@ func (ec *EasykubeConfig) MakeConfig() {
 			PersistenceDir:   filepath.Join(ec.UserConfigDir, ec.ConfigDirName, "persistence"),
 		}
 
-		file, err := os.Create(pathToConfigFile)
+		file, err := ec.Fs.Create(pathToConfigFile)
 		if nil != err {
 			log.Panic(err)
 		}
@@ -150,10 +156,10 @@ func (ec *EasykubeConfig) MakeConfig() {
 		if nil != err {
 			log.Panic(err)
 		}
-
-		CopyResource("cert/localtest.me.crt", "localtest.me.crt")
-		CopyResource("cert/localtest.me.key", "localtest.me.key")
-		CopyResource("registry-config.yaml", "registry-config.yaml")
+		utl := Utils{Fs: ec.Fs}
+		utl.CopyResource("cert/localtest.me.crt", "localtest.me.crt")
+		utl.CopyResource("cert/localtest.me.key", "localtest.me.key")
+		utl.CopyResource("registry-config.yaml", "registry-config.yaml")
 
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/ek"
 )
 
@@ -18,11 +19,22 @@ var listCmd = &cobra.Command{
 	Long:  "installed addons are marked with tickmark",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := ekctx.GetAppContext(cmd)
-		cru := ek.NewContainerRuntime(ctx)
-		modules := ek.NewAddonReader(ctx).GetAddons()
+
+		// create a 'toolbox' of needed utilities for cluster creation
+		tb := struct {
+			addon     ek.IAddonReader
+			k8s       ek.IK8SUtils
+			container ek.IContainerRuntime
+		}{
+			pkg.CreateAddonReader(),
+			pkg.CreateK8sUtils(),
+			pkg.CreateContainerRuntime(),
+		}
+
+		modules := tb.addon.GetAddons()
 		installed := make([]string, 0)
-		if cru.IsClusterRunning() {
-			i, err := ek.NewK8SUtils(ctx).GetInstalledAddons()
+		if tb.container.IsClusterRunning() {
+			i, err := tb.k8s.GetInstalledAddons()
 			if err != nil {
 				ctx.Printer.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 				os.Exit(1)

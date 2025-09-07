@@ -1,14 +1,16 @@
 package test
 
 import (
-	"github.com/torloejborg/easykube/pkg/ek"
 	"testing"
+
+	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func TestCreateAddon(t *testing.T) {
 
-	conf := ek.NewEasykubeConfig(GetEKContext())
+	conf := CreateFakeEasykubeConfig()
 	cfg, _ := conf.LoadConfig()
-	skaf := ek.NewSkaffold(cfg.AddonDir)
+	skaf := ek.NewSkaffold(cfg.AddonDir, FILESYSTEM)
 	skaf.CreateNewAddon("foo", "middleware")
+
 }

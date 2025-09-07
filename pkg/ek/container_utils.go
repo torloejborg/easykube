@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 )
@@ -93,15 +94,15 @@ type IContainerRuntime interface {
 	Tag(source, target string)
 }
 
-func NewContainerRuntime(ctx *ekctx.EKContext) IContainerRuntime {
+func NewContainerRuntime(ctx *ekctx.EKContext, fs afero.Fs) IContainerRuntime {
 
-	cfg, err := NewEasykubeConfig(ctx).LoadConfig()
+	cfg, err := NewEasykubeConfig(ctx, fs).LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 	if cfg.ContainerRuntime == "podman" {
 		return NewPodmanImpl()
 	} else {
-		return NewDockerImpl()
+		return NewDockerImpl(fs)
 	}
 }

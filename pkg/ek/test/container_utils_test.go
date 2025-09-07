@@ -2,9 +2,10 @@ package test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ek"
-	"testing"
 )
 
 func TestPullImage(*testing.T) {
@@ -29,7 +30,7 @@ func TestPushImagePodman(*testing.T) {
 }
 
 func TestPushImageDocker(*testing.T) {
-	pm := ek.NewDockerImpl()
+	pm := CreateFakeContainerRuntime()
 	pm.Pull("busybox:1", nil)
 	pm.Tag("busybox:1", "localhost:5000/busybox:1")
 	pm.Push("localhost:5000/busybox:1")
@@ -38,13 +39,13 @@ func TestPushImageDocker(*testing.T) {
 }
 
 func TestCreateRegistry(*testing.T) {
-	pm := ek.NewContainerRuntime(GetEKContext())
+	pm := CreateFakeContainerRuntime()
 	pm.CreateContainerRegistry()
 }
 
 func TestFindContainer(t *testing.T) {
 
-	pm := ek.NewContainerRuntime(GetEKContext())
+	pm := CreateFakeContainerRuntime()
 	cs := pm.FindContainer("kind-registry")
 
 	fmt.Println(cs.Found)
@@ -54,18 +55,18 @@ func TestFindContainer(t *testing.T) {
 }
 
 func TestHasImage(t *testing.T) {
-	pm := ek.NewContainerRuntime(GetEKContext())
+	pm := CreateFakeContainerRuntime()
 	fmt.Printf("registry:2 exists ? %t\n", pm.HasImage("docker.io/library/registry:2"))
 	fmt.Printf("foo/bar exists ? %t\n", pm.HasImage("foo/bar"))
 }
 
 func TestPushLocal(t *testing.T) {
-	pm := ek.NewContainerRuntime(GetEKContext())
+	pm := CreateFakeContainerRuntime()
 	pm.Push("registry:2")
 }
 
 func TestHasKindImage(*testing.T) {
-	pm := ek.NewContainerRuntime(GetEKContext())
+	pm := CreateFakeContainerRuntime()
 	fmt.Println(pm.HasImageInKindRegistry(constants.KIND_IMAGE))
 
 }

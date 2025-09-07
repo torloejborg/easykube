@@ -29,7 +29,7 @@ let configuration = {
 	`)
 
 	cfg := &ek.AddonConfig{}
-	reader := ek.NewAddonReader(GetEKContext())
+	reader := CreateFakeAddonReader()
 
 	extracted, _ := reader.ExtractJSON(string(data))
 
@@ -47,7 +47,7 @@ func TestJsonConfigParsingWithOnlyDepends(t *testing.T) {
 	`)
 
 	cfg := &ek.AddonConfig{}
-	extracted, _ := ek.NewAddonReader(GetEKContext()).ExtractJSON(string(data))
+	extracted, _ := CreateFakeAddonReader().ExtractJSON(string(data))
 
 	err := json.Unmarshal([]byte(extracted), &cfg)
 	if err != nil {
@@ -66,7 +66,7 @@ func TestTroublesomeInput(t *testing.T) {
 }
 
 func TestDiscoverAddons(t *testing.T) {
-	addons := ek.NewAddonReader(GetEKContext()).GetAddons()
+	addons := CreateFakeAddonReader().GetAddons()
 
 	for i := range addons {
 		fmt.Println(addons[i].Config)

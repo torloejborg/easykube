@@ -15,7 +15,7 @@ type ExternalToolsImpl struct {
 	ctx *ekctx.EKContext
 }
 
-type ExternalTools interface {
+type IExternalTools interface {
 	KustomizeBuild(dir string) string
 	ApplyYaml(yamlFile string)
 	DeleteYaml(yamlFile string)
@@ -24,7 +24,7 @@ type ExternalTools interface {
 	RunCommand(name string, args ...string) (stdout string, stderr string, err error)
 }
 
-func NewExternalTools(context *ekctx.EKContext) ExternalTools {
+func NewExternalTools(context *ekctx.EKContext) IExternalTools {
 	return &ExternalToolsImpl{
 		ctx: context,
 	}
@@ -39,7 +39,7 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 		"build",
 		"-enable-helm",
 		"--enable-alpha-plugins",
-		"--enable-exec", ".")
+		"--enable-exec", dir)
 
 	var stdout, stderr bytes.Buffer
 	kustomize.Stdout = &stdout

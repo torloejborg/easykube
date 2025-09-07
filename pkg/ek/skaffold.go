@@ -8,20 +8,23 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
 type SkaffoldImpl struct {
 	AddonDir string
+	Fs       afero.Fs
 }
 
 type ISkaffold interface {
 	CreateNewAddon(name, dest string)
 }
 
-func NewSkaffold(addonDir string) ISkaffold {
+func NewSkaffold(addonDir string, fileFacade afero.Fs) ISkaffold {
 	return &SkaffoldImpl{
 		AddonDir: addonDir,
+		Fs:       fileFacade,
 	}
 }
 
@@ -31,7 +34,7 @@ type model struct {
 
 func (s *SkaffoldImpl) CreateNewAddon(name, dest string) {
 
-	err := os.MkdirAll(filepath.Join(s.AddonDir, dest, name, "manifests"), os.ModePerm)
+	err := s.Fs.MkdirAll(filepath.Join(s.AddonDir, dest, name, "manifests"), os.ModePerm)
 	if err != nil {
 		println("failed to create addon dir")
 		log.Fatal(err)
@@ -81,20 +84,19 @@ func (a *SkaffoldImpl) renderTemplate(src string, model any) string {
 
 func (a *SkaffoldImpl) saveFile(data string, dest string) {
 
-	file, err := os.Create(dest)
+	file, err := a.Fs.Create(dest)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(file)
-
 	_, err = file.WriteString(data)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	err = file.Close()
+	if err != nil {
+		panic(err)
 	}
 }

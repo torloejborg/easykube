@@ -2,13 +2,12 @@ package test
 
 import (
 	"fmt"
-	"github.com/torloejborg/easykube/pkg/ek"
 	"testing"
 )
 
 func TestLoadConfig(t *testing.T) {
 
-	cut := ek.NewEasykubeConfig(GetEKContext())
+	cut := CreateFakeEasykubeConfig()
 	cfg, err := cut.LoadConfig()
 
 	if err != nil {

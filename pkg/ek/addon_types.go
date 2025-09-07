@@ -1,6 +1,8 @@
 package ek
 
-import "os"
+import (
+	"github.com/spf13/afero"
+)
 
 type PortConfig struct {
 	NodePort int    `json:"nodePort"`
@@ -29,13 +31,13 @@ type Addon struct {
 	// Configuration for the addon
 	Config AddonConfig
 	// Addon javascript file
-	File *os.File
+	File string
 	// Root of the addon directory
 	RootDir string
 }
 
-func (a *Addon) ReadScriptFile() string {
-	val, err := os.ReadFile(a.File.Name())
+func (a *Addon) ReadScriptFile(fs afero.Fs) string {
+	val, err := afero.ReadFile(fs, a.File)
 	if err != nil {
 		panic(err)
 	}

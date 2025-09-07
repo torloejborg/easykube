@@ -71,12 +71,13 @@ func NewJsUtils(ctx *ekctx.EKContext, source *ek.Addon) IJsUtils {
 }
 
 func (jsu *JsUtils) ExecAddonScript(a *ek.Addon) {
-	script := a.ReadScriptFile()
+	script := a.ReadScriptFile(jsu.EKContext.Fs)
 
 	// Before we execute the addon javascript, set the working directory, such that all fileoperations for
 	// the addon will be relative to the addon directory, when we are done, go back where we came from.
-	ek.PushDir(filepath.Dir(a.File.Name()))
-	defer ek.PopDir()
+	u := ek.Utils{Fs: jsu.EKContext.Fs}
+	u.PushDir(filepath.Dir(a.File))
+	defer u.PopDir()
 
 	jsu.EKContext.Printer.FmtGreen("🔧 Processing %s", a.Name)
 

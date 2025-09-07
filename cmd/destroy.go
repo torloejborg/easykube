@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // destroyCmd represents the destroy command
@@ -17,7 +17,7 @@ var destroyCmd = &cobra.Command{
 		ekCtx := ekctx.GetAppContext(cmd)
 		out := ekCtx.Printer
 
-		cru := ek.NewContainerRuntime(ekCtx)
+		cru := pkg.CreateContainerRuntime()
 		search := cru.FindContainer(constants.KIND_CONTAINER)
 
 		if search.Found {

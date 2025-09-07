@@ -8,7 +8,9 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"sigs.k8s.io/kind/pkg/cluster"
@@ -25,16 +27,18 @@ type ClusterUtils struct {
 	Debug     bool
 	EkConfig  *EasykubeConfigData
 	EkContext *ekctx.EKContext
+	Fs        afero.Fs
 }
 
-func NewClusterUtils(ctx *ekctx.EKContext) IClusterUtils {
-	cfg, err := NewEasykubeConfig(ctx).LoadConfig()
+func NewClusterUtils(ctx *ekctx.EKContext, fileFacade afero.Fs) IClusterUtils {
+	cfg, err := NewEasykubeConfig(ctx, ctx.Fs).LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 	return &ClusterUtils{
 		EkConfig:  cfg,
 		EkContext: ctx,
+		Fs:        fileFacade,
 	}
 }
 
@@ -51,7 +55,7 @@ func (u *ClusterUtils) ConfigurationReport(addonList []*Addon) string {
 
 func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
-	cru := NewContainerRuntime(u.EkContext)
+	cru := NewContainerRuntime(u.EkContext, u.Fs)
 	out := u.EkContext.Printer
 
 	// kind already exists, but not started
@@ -92,7 +96,8 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
 		configDir, _ := os.UserConfigDir()
 		configFile := u.RenderToYAML(addonList)
-		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
+		utl := Utils{Fs: u.Fs}
+		utl.SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)
 		optNoGreeting := cluster.CreateWithDisplaySalutation(false)
@@ -160,7 +165,7 @@ func (u *ClusterUtils) RenderToYAML(addonList []*Addon) string {
 
 func (u *ClusterUtils) EnsurePersistenceDirectory() {
 
-	ar := NewAddonReader(u.EkContext)
+	ar := pkg.CreateAddonReader()
 	addons := ar.GetAddons()
 
 	for _, a := range addons {

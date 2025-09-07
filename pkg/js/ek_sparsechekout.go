@@ -23,13 +23,13 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
 
 		destination := call.Argument(3).String()
-
-		if ek.FileOrDirExists(destination) {
+		u := ek.Utils{Fs: e.EKContext.Fs}
+		if u.FileOrDirExists(destination) {
 			out.FmtYellow("Repository %s already checked out at %s", repo, destination)
 			return call.This
 		}
 
-		err := os.MkdirAll(destination, 0777)
+		err := e.EKContext.Fs.MkdirAll(destination, 0777)
 		if err != nil {
 			panic(err)
 		}

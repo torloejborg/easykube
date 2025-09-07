@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ek"
 
@@ -14,8 +15,9 @@ import (
 
 func remove(addon *ek.Addon, ctx *ekctx.EKContext, k8s ek.IK8SUtils) {
 	// enter the addon directory
-	ek.PushDir(filepath.Dir(addon.File.Name()))
-	defer ek.PopDir()
+	u := ek.Utils{Fs: pkg.FILESYSTEM}
+	u.PushDir(filepath.Dir(addon.File))
+	defer u.PopDir()
 
 	tools := ek.NewExternalTools(ctx)
 	yamlFile := tools.KustomizeBuild(".")
@@ -39,10 +41,10 @@ var removeCmd = &cobra.Command{
 		out := ekCtx.Printer
 
 		// switch to the easykube context
-		ek.NewExternalTools(ekCtx).EnsureLocalContext()
+		pkg.CreateExternalTools().EnsureLocalContext()
 
-		k8s := ek.NewK8SUtils(ekCtx)
-		allAddons := ek.NewAddonReader(ekCtx).GetAddons()
+		k8s := pkg.CreateK8sUtils()
+		allAddons := pkg.CreateAddonReader().GetAddons()
 		installedAddons, e := k8s.GetInstalledAddons()
 		if e != nil {
 			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
@@ -68,7 +70,7 @@ var removeCmd = &cobra.Command{
 		}
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		k8sutils := ek.NewK8SUtils(ekctx.GetAppContext(cmd))
+		k8sutils := pkg.CreateK8sUtils()
 		clusterAddons, e := k8sutils.GetInstalledAddons()
 		if e == nil {
 			return clusterAddons, cobra.ShellCompDirectiveNoFileComp

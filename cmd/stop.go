@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // stopCmd represents the stop command
@@ -15,7 +15,7 @@ var stopCmd = &cobra.Command{
 	Long:  "", Run: func(cmd *cobra.Command, args []string) {
 
 		ctx := ekctx.GetAppContext(cmd)
-		cru := ek.NewContainerRuntime(ctx)
+		cru := pkg.CreateContainerRuntime()
 
 		if cru.IsContainerRunning(constants.KIND_CONTAINER) {
 			cru.StopContainer(constants.KIND_CONTAINER)

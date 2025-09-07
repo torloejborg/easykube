@@ -1,14 +1,17 @@
 package ekctx
 
 import (
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/afero"
+	"github.com/spf13/cobra"
 )
 
 type EKContext struct {
 	Logger  *log.Logger
 	Printer *Printer
 	Command *cobra.Command
+	Fs      afero.Fs
 }
 
 func (e *EKContext) GetBoolFlag(name string) bool {

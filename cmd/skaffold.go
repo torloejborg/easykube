@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
@@ -28,14 +29,14 @@ var skaffoldCmd = &cobra.Command{
 		addonName := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
 		addonDest := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
 
-		conf := ek.NewEasykubeConfig(ekCtx)
+		conf := pkg.CreateEasykubeConfig()
 		ekc, err := conf.LoadConfig()
 		if nil != err {
 			out.FmtGreen("cannot proceed without easykube configuration")
 			os.Exit(-1)
 		}
 
-		skaf := ek.NewSkaffold(ekc.AddonDir)
+		skaf := ek.NewSkaffold(ekc.AddonDir, pkg.FILESYSTEM)
 		skaf.CreateNewAddon(addonName, addonDest)
 
 	},

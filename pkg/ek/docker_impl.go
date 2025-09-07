@@ -18,6 +18,7 @@ import (
 	image2 "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
@@ -25,9 +26,10 @@ type DockerImpl struct {
 	Docker *client.Client
 	ctx    context.Context
 	Common ContainerRuntimeCommon
+	Fs     afero.Fs
 }
 
-func NewDockerImpl() IContainerRuntime {
+func NewDockerImpl(fs afero.Fs) IContainerRuntime {
 
 	docker, err := client.NewClientWithOpts(
 		client.FromEnv,
@@ -41,6 +43,7 @@ func NewDockerImpl() IContainerRuntime {
 		Docker: docker,
 		ctx:    context.Background(),
 		Common: ContainerRuntimeCommon{},
+		Fs:     fs,
 	}
 
 }
@@ -258,15 +261,15 @@ func (cr *DockerImpl) IsContainerRuntimeAvailable() bool {
 }
 
 func (cr *DockerImpl) CreateContainerRegistry() {
-
+	u := Utils{cr.Fs}
 	registry := constants.REGISTRY_IMAGE
 	containerName := constants.REGISTRY_CONTAINER
 
 	// make sure that the registry-config file exists
 	configDir, _ := os.UserConfigDir()
-	CopyResource("registry-config.yaml", "registry-config.yaml")
-	CopyResource("cert/server.crt", "localtest.me.crt")
-	CopyResource("cert/server.key", "localtest.me.key")
+	u.CopyResource("registry-config.yaml", "registry-config.yaml")
+	u.CopyResource("cert/server.crt", "localtest.me.crt")
+	u.CopyResource("cert/server.key", "localtest.me.key")
 
 	imageSearch := cr.HasImage(registry)
 	if !imageSearch {

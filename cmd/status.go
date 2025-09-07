@@ -5,11 +5,11 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // statusCmd represents the status command
@@ -20,11 +20,11 @@ var statusCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ekCtx := ekctx.GetAppContext(cmd)
 		out := ekCtx.Printer
-		cru := ek.NewContainerRuntime(ekCtx)
+		cru := pkg.CreateContainerRuntime()
 
-		conf := ek.NewEasykubeConfig(ekCtx)
+		conf := pkg.CreateEasykubeConfig()
 		cfg, _ := conf.LoadConfig()
-		ar := ek.NewAddonReader(ekCtx)
+		ar := pkg.CreateAddonReader()
 		if !cru.IsContainerRuntimeAvailable() {
 			out.FmtRed("Container runtime not available, is docker running??")
 			os.Exit(-1)

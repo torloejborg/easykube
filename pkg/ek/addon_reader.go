@@ -10,7 +10,9 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 )
 
 type IAddonReader interface {
@@ -22,10 +24,11 @@ type IAddonReader interface {
 type AddonReader struct {
 	EkConfig  *EasykubeConfigData
 	EkContext *ekctx.EKContext
+	Fs        afero.Fs
 }
 
-func NewAddonReader(ctx *ekctx.EKContext) IAddonReader {
-	cfg, err := NewEasykubeConfig(ctx).LoadConfig()
+func NewAddonReader(ctx *ekctx.EKContext, fsFacade afero.Fs) IAddonReader {
+	cfg, err := pkg.CreateEasykubeConfig().LoadConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -33,29 +36,33 @@ func NewAddonReader(ctx *ekctx.EKContext) IAddonReader {
 	return &AddonReader{
 		EkConfig:  cfg,
 		EkContext: ctx,
+		Fs:        fsFacade,
 	}
 }
 
 func (adr *AddonReader) GetAddons() map[string]*Addon {
 	out := adr.EkContext.Printer
+
 	addons := make(map[string]*Addon)
+
 	addonExpre, _ := regexp.Compile(`^.+\.(ek.js)$`)
+
 	if adr.EkConfig == nil {
 		panic("expected ekconfig pointer!")
 	}
 
-	if _, err := os.Stat(adr.EkConfig.AddonDir); err != nil {
+	if _, err := adr.Fs.Stat(adr.EkConfig.AddonDir); err != nil {
 		return addons
 	}
 
 	walkFunc := func(path string, entry fs.DirEntry, err error) error {
 		if !entry.IsDir() && addonExpre.MatchString(entry.Name()) {
-			file, _ := os.Open(path)
+			file, _ := adr.Fs.Open(path)
 
 			foundAddon := &Addon{
 				Name:      entry.Name(),
 				ShortName: strings.ReplaceAll(entry.Name(), ".ek.js", ""),
-				File:      file,
+				File:      file.Name(),
 				RootDir:   adr.EkConfig.AddonDir,
 			}
 
@@ -109,7 +116,7 @@ func (adr *AddonReader) resolveExecutionOrder(
 func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error) {
 	out := adr.EkContext.Printer
 
-	code, err := os.ReadFile(unconfigured.File.Name())
+	code, err := afero.ReadFile(adr.Fs, unconfigured.File)
 	if err != nil {
 		panic(err)
 	}

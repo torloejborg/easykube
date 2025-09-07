@@ -14,6 +14,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
@@ -39,6 +40,7 @@ type K8SUtilsImpl struct {
 	Clientset  *kubernetes.Clientset
 	RestConfig *rest.Config
 	EKContext  *ekctx.EKContext
+	Fs         afero.Fs
 }
 
 // Define a struct to capture the structure of an ExternalSecret
@@ -92,7 +94,7 @@ type IK8SUtils interface {
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, namespace string) KubernetesSecret
 }
 
-func NewK8SUtils(ekContext *ekctx.EKContext) IK8SUtils {
+func NewK8SUtils(ekContext *ekctx.EKContext, fileFacade afero.Fs) IK8SUtils {
 
 	out := ekContext.Printer
 
@@ -114,7 +116,12 @@ func NewK8SUtils(ekContext *ekctx.EKContext) IK8SUtils {
 		log.Fatal(err)
 	}
 
-	return &K8SUtilsImpl{Clientset: clientset, RestConfig: config, EKContext: ekContext}
+	return &K8SUtilsImpl{
+		Clientset:  clientset,
+		RestConfig: config,
+		EKContext:  ekContext,
+		Fs:         fileFacade,
+	}
 }
 
 func (k8s *K8SUtilsImpl) GetSecret(name, namespace string) (map[string][]byte, error) {
@@ -432,7 +439,7 @@ func (f *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 }
 
 func (k *K8SUtilsImpl) CopyFileToPod(namespace, pod, container, localPath, remotePath string) error {
-	file, err := os.Open(localPath)
+	file, err := k.Fs.Open(localPath)
 	if err != nil {
 		return fmt.Errorf("failed to open local file: %w", err)
 	}

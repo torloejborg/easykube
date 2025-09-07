@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // startCmd represents the start command
@@ -14,7 +14,7 @@ var startCmd = &cobra.Command{
 	Short: "starts the cluster node and registry container",
 	Long:  "", Run: func(cmd *cobra.Command, args []string) {
 		ctx := ekctx.GetAppContext(cmd)
-		cru := ek.NewContainerRuntime(ctx)
+		cru := pkg.CreateContainerRuntime()
 
 		type StartStatus struct {
 			Name    string
