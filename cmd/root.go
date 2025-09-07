@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
 )
@@ -32,19 +32,29 @@ hint: start with 'easykube config'
 		}
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		ctx := &ekctx.EKContext{
+		ctx := ekctx.EKContext{
 			Command: cmd,
 			Logger:  log.New(os.Stdout, "", log.LstdFlags),
 			Printer: &ekctx.Printer{},
-			Fs:      pkg.FILESYSTEM,
+			Fs:      ez.FILESYSTEM,
 		}
 
-		cmd.SetContext(withAppContext(cmd.Context(), ctx))
+		cmd.SetContext(withAppContext(cmd.Context(), &ctx))
 
 		// My go-fu is not strong yet, so this feels a bit funky, I want to have some factories
 		// produce the utility instances, and they need the EKContext upfront - since the variable is
 		// initialized here where the application is bootstrapped, perhaps that's ok. - Send PR's :)
-		pkg.EkCmdContext = ctx
+		ez.EkCmdContext = &ctx
+
+		ez.Kube = ez.Toolbox{
+			IK8SUtils:         ez.CreateK8sUtilsImpl(),
+			IEasykubeConfig:   ez.CreateEasykubeConfigImpl(),
+			IAddonReader:      ez.CreateAddonReaderImpl(),
+			IExternalTools:    ez.CreateExternalToolsImpl(),
+			IContainerRuntime: ez.CreateContainerRuntimeImpl(),
+			IClusterUtils:     ez.CreateClusterUtilsImpl(),
+			EKContext:         ctx,
+		}
 
 	},
 }

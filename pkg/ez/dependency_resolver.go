@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"fmt"

@@ -6,26 +6,24 @@ import (
 	"slices"
 
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
 )
 
-func remove(addon *ek.Addon, ctx *ekctx.EKContext, k8s ek.IK8SUtils) {
+func remove(addon *ez.Addon, ctx *ekctx.EKContext) {
 	// enter the addon directory
-	u := ek.Utils{Fs: pkg.FILESYSTEM}
+	u := ez.Utils{Fs: ez.FILESYSTEM}
 	u.PushDir(filepath.Dir(addon.File))
 	defer u.PopDir()
 
-	tools := ek.NewExternalTools(ctx)
-	yamlFile := tools.KustomizeBuild(".")
-	tools.DeleteYaml(yamlFile)
+	yamlFile := ez.Kube.KustomizeBuild(".")
+	ez.Kube.DeleteYaml(yamlFile)
 	ctx.Printer.FmtGreen("removed %s", addon.ShortName)
-	k8s.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
+	ez.Kube.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
 
-	err := os.Remove(constants.KUSTOMIZE_TARGET_OUTPUT)
+	err := ctx.Fs.Remove(constants.KUSTOMIZE_TARGET_OUTPUT)
 	if err != nil {
 		ctx.Printer.FmtYellow("%s could not be deleted", constants.KUSTOMIZE_TARGET_OUTPUT)
 	}
@@ -41,11 +39,10 @@ var removeCmd = &cobra.Command{
 		out := ekCtx.Printer
 
 		// switch to the easykube context
-		pkg.CreateExternalTools().EnsureLocalContext()
+		ez.Kube.EnsureLocalContext()
 
-		k8s := pkg.CreateK8sUtils()
-		allAddons := pkg.CreateAddonReader().GetAddons()
-		installedAddons, e := k8s.GetInstalledAddons()
+		allAddons := ez.Kube.GetAddons()
+		installedAddons, e := ez.Kube.GetInstalledAddons()
 		if e != nil {
 			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
 			os.Exit(1)
@@ -63,14 +60,14 @@ var removeCmd = &cobra.Command{
 		for i := range args {
 			// is args[i] installed
 			if slices.Contains(installedAddons, args[i]) {
-				remove(allAddons[args[i]], ekCtx, k8s)
+				remove(allAddons[args[i]], ekCtx)
 			} else {
 				out.FmtYellow("%s is not installed", args[i])
 			}
 		}
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		k8sutils := pkg.CreateK8sUtils()
+		k8sutils := ez.CreateK8sUtilsImpl()
 		clusterAddons, e := k8sutils.GetInstalledAddons()
 		if e == nil {
 			return clusterAddons, cobra.ShellCompDirectiveNoFileComp

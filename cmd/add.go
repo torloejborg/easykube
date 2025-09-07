@@ -7,9 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 	jsutils "github.com/torloejborg/easykube/pkg/js"
 )
 
@@ -23,23 +22,14 @@ var addCmd = &cobra.Command{
 		ekCtx := ekctx.GetAppContext(cmd)
 		out := ekCtx.Printer
 
-		// create a 'toolbox' of needed utilities for cluster creation
-		tb := struct {
-			addon ek.IAddonReader
-			k8s   ek.IK8SUtils
-			tools ek.IExternalTools
-		}{
-			pkg.CreateAddonReader(),
-			pkg.CreateK8sUtils(),
-			pkg.CreateExternalTools(),
-		}
+		// create a 'toolbox' of needed utilities for adding an addon
 
-		addons := tb.addon.GetAddons()
+		addons := ez.Kube.GetAddons()
 
 		forceInstall := ekCtx.GetBoolFlag(constants.FLAG_FORCE)
 		//noDepends := ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS)
 		targetCluster := ekCtx.GetStringFlag(constants.FLAG_CLUSTER)
-		installed, err := tb.k8s.GetInstalledAddons()
+		installed, err := ez.Kube.GetInstalledAddons()
 		if err != nil {
 			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 			os.Exit(1)
@@ -48,7 +38,7 @@ var addCmd = &cobra.Command{
 		// switch to the easykube context - this is purely to avoid trouble
 		// user might have switched to another context to do work and forgot to change
 		// context back to easykube. --context argument overrides this
-		tb.tools.EnsureLocalContext()
+		ez.Kube.EnsureLocalContext()
 
 		wanted, missing := pickAddons(args, addons)
 
@@ -58,14 +48,14 @@ var addCmd = &cobra.Command{
 		}
 
 		if len(targetCluster) > 0 {
-			tb.tools.SwitchContext(targetCluster)
-			defer tb.tools.SwitchContext(constants.CLUSTER_CONTEXT)
+			ez.Kube.SwitchContext(targetCluster)
+			defer ez.Kube.SwitchContext(constants.CLUSTER_CONTEXT)
 		}
 
 		if ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS) {
 			jsutils.NewJsUtils(ekCtx, wanted[0]).ExecAddonScript(wanted[0])
 		} else {
-			toInstall, err := ek.ResolveDependencies(wanted, addons)
+			toInstall, err := ez.ResolveDependencies(wanted, addons)
 			if err != nil {
 				out.FmtRed("dependency resolution failed: %v", err)
 			}
@@ -86,15 +76,15 @@ var addCmd = &cobra.Command{
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
 		addons := make([]string, 0)
-		for _, i := range pkg.CreateAddonReader().GetAddons() {
+		for _, i := range ez.Kube.GetAddons() {
 			addons = append(addons, i.ShortName)
 		}
 		return addons, cobra.ShellCompDirectiveNoFileComp
 	},
 }
 
-func pickAddons(name []string, addons map[string]*ek.Addon) ([]*ek.Addon, []string) {
-	result := make([]*ek.Addon, 0)
+func pickAddons(name []string, addons map[string]*ez.Addon) ([]*ez.Addon, []string) {
+	result := make([]*ez.Addon, 0)
 	missing := make([]string, 0)
 
 	for ni := range name {

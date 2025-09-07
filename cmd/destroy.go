@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
 )
@@ -17,15 +17,14 @@ var destroyCmd = &cobra.Command{
 		ekCtx := ekctx.GetAppContext(cmd)
 		out := ekCtx.Printer
 
-		cru := pkg.CreateContainerRuntime()
-		search := cru.FindContainer(constants.KIND_CONTAINER)
+		search := ez.Kube.FindContainer(constants.KIND_CONTAINER)
 
 		if search.Found {
 			out.FmtYellow("Stopping %s", constants.KIND_CONTAINER)
 			if search.IsRunning {
-				cru.StopContainer(search.ContainerID)
+				ez.Kube.StopContainer(search.ContainerID)
 			}
-			cru.RemoveContainer(search.ContainerID)
+			ez.Kube.RemoveContainer(search.ContainerID)
 			out.FmtYellow("Removing %s", constants.KIND_CONTAINER)
 		}
 	},

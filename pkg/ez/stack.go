@@ -1,4 +1,4 @@
-package ek
+package ez
 
 type Stack[T any] struct {
 	data []T

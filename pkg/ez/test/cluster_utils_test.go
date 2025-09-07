@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func GetEKContext() *ekctx.EKContext {
@@ -21,16 +21,16 @@ func GetEKContext() *ekctx.EKContext {
 
 func TestRenderYaml(t *testing.T) {
 
-	a := &ek.Addon{
+	a := &ez.Addon{
 		Name: "foo",
-		Config: ek.AddonConfig{
-			ExtraPorts: []ek.PortConfig{
+		Config: ez.AddonConfig{
+			ExtraPorts: []ez.PortConfig{
 				{
 					HostPort: 9000,
 					Protocol: "TCP",
 				},
 			},
-			ExtraMounts: []ek.MountConfig{
+			ExtraMounts: []ez.MountConfig{
 				{
 					ContainerPath: "pgdata",
 					HostPath:      "postgres",
@@ -39,7 +39,7 @@ func TestRenderYaml(t *testing.T) {
 		},
 	}
 
-	al := []*ek.Addon{a}
+	al := []*ez.Addon{a}
 
 	cut := CreateFakeClusterUtils()
 	fmt.Println(cut.RenderToYAML(al))
@@ -49,7 +49,7 @@ func TestConfigGeneratedFromAddons(t *testing.T) {
 	ar := CreateFakeAddonReader()
 	addonMap := ar.GetAddons()
 
-	var addons []*ek.Addon
+	var addons []*ez.Addon
 
 	for _, addon := range addonMap {
 		addons = append(addons, addon)
@@ -63,15 +63,15 @@ func TestConfigGeneratedFromAddons(t *testing.T) {
 
 func TestCreateCluster(*testing.T) {
 	cu := CreateFakeClusterUtils()
-	cu.CreateKindCluster(map[string]*ek.Addon{})
+	cu.CreateKindCluster(map[string]*ez.Addon{})
 }
 
 func TestClusterCreateReport(*testing.T) {
 
-	a := &ek.Addon{
+	a := &ez.Addon{
 		Name: "alpha",
-		Config: ek.AddonConfig{
-			ExtraPorts: []ek.PortConfig{
+		Config: ez.AddonConfig{
+			ExtraPorts: []ez.PortConfig{
 				{
 					HostPort: 9000,
 					Protocol: "TCP",
@@ -90,10 +90,10 @@ func TestClusterCreateReport(*testing.T) {
 		},
 	}
 
-	b := &ek.Addon{
+	b := &ez.Addon{
 		Name: "bravo",
-		Config: ek.AddonConfig{
-			ExtraPorts: []ek.PortConfig{
+		Config: ez.AddonConfig{
+			ExtraPorts: []ez.PortConfig{
 				{
 					HostPort: 443,
 					Protocol: "TCP",
@@ -108,9 +108,9 @@ func TestClusterCreateReport(*testing.T) {
 		},
 	}
 
-	c := &ek.Addon{
-		Name: "charlie", Config: ek.AddonConfig{
-			ExtraMounts: []ek.MountConfig{
+	c := &ez.Addon{
+		Name: "charlie", Config: ez.AddonConfig{
+			ExtraMounts: []ez.MountConfig{
 				{
 					PersistenceDir: "/some/other/location",
 					ContainerPath:  "/mnt/foo-a",
@@ -129,7 +129,7 @@ func TestClusterCreateReport(*testing.T) {
 					HostPath:      "/some/abs/dir/docker-d",
 				},
 			},
-			ExtraPorts: []ek.PortConfig{
+			ExtraPorts: []ez.PortConfig{
 				{
 					HostPort: 7743,
 					Protocol: "TCP",
@@ -139,7 +139,7 @@ func TestClusterCreateReport(*testing.T) {
 		},
 	}
 
-	var addons []*ek.Addon
+	var addons []*ez.Addon
 	addons = append(addons, a)
 	addons = append(addons, b)
 	addons = append(addons, c)

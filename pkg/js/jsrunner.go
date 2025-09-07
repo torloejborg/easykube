@@ -11,7 +11,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type JsUtils struct {
@@ -21,11 +21,11 @@ type JsUtils struct {
 }
 
 type IJsUtils interface {
-	ExecAddonScript(a *ek.Addon)
+	ExecAddonScript(a *ez.Addon)
 }
 
 type AddonContext struct {
-	addon     *ek.Addon
+	addon     *ez.Addon
 	vm        *goja.Runtime
 	EKContext *ekctx.EKContext
 }
@@ -41,7 +41,7 @@ func (ac *AddonContext) NewObject() *goja.Object {
 	return ac.vm.NewObject()
 }
 
-func NewJsUtils(ctx *ekctx.EKContext, source *ek.Addon) IJsUtils {
+func NewJsUtils(ctx *ekctx.EKContext, source *ez.Addon) IJsUtils {
 
 	vm := goja.New()
 
@@ -70,12 +70,12 @@ func NewJsUtils(ctx *ekctx.EKContext, source *ek.Addon) IJsUtils {
 	}
 }
 
-func (jsu *JsUtils) ExecAddonScript(a *ek.Addon) {
+func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
 	script := a.ReadScriptFile(jsu.EKContext.Fs)
 
 	// Before we execute the addon javascript, set the working directory, such that all fileoperations for
 	// the addon will be relative to the addon directory, when we are done, go back where we came from.
-	u := ek.Utils{Fs: jsu.EKContext.Fs}
+	u := ez.Utils{Fs: jsu.EKContext.Fs}
 	u.PushDir(filepath.Dir(a.File))
 	defer u.PopDir()
 

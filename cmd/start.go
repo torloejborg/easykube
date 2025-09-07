@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
 )
@@ -14,7 +14,6 @@ var startCmd = &cobra.Command{
 	Short: "starts the cluster node and registry container",
 	Long:  "", Run: func(cmd *cobra.Command, args []string) {
 		ctx := ekctx.GetAppContext(cmd)
-		cru := pkg.CreateContainerRuntime()
 
 		type StartStatus struct {
 			Name    string
@@ -23,7 +22,7 @@ var startCmd = &cobra.Command{
 		}
 
 		x := func(container string) StartStatus {
-			f := cru.FindContainer(container)
+			f := ez.Kube.FindContainer(container)
 			if !f.Found {
 				return StartStatus{
 					Name:    container,
@@ -37,7 +36,7 @@ var startCmd = &cobra.Command{
 					OK:      true,
 				}
 			} else if !f.IsRunning {
-				cru.StartContainer(container)
+				ez.Kube.StartContainer(container)
 				return StartStatus{
 					Name:    container,
 					Message: container + " started",

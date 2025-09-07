@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"context"
@@ -55,7 +55,7 @@ func (cr *PodmanImpl) HasImageInKindRegistry(image string) bool {
 	return cr.Common.ImageExistsInKindRegistry(image)
 }
 
-func (cr *PodmanImpl) Push(image string) {
+func (cr *PodmanImpl) PushImage(image string) {
 
 	/*
 		if !cr.HasImageInKindRegistry(image) {
@@ -63,19 +63,19 @@ func (cr *PodmanImpl) Push(image string) {
 			opts := images.PushOptions{
 				SkipTLSVerify: ptr.To(true),
 			}
-			err := images.Push(cr.PodmanContext, image, image, &opts)
+			err := images.PushImage(cr.PodmanContext, image, image, &opts)
 			if nil != err {
 				log.Fatalln(err)
 			}
 		}*/
 }
 
-func (cr *PodmanImpl) Pull(image string, privateRegistryCredentials *string) {
+func (cr *PodmanImpl) PullImage(image string, privateRegistryCredentials *string) {
 
 	/*
 		opts := images.PullOptions{}
 
-		_, err := images.Pull(cr.PodmanContext, image, &opts)
+		_, err := images.PullImage(cr.PodmanContext, image, &opts)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -147,7 +147,7 @@ func (cr *PodmanImpl) RemoveContainer(id string) {
 func (cr *PodmanImpl) Exec(containerId string, cmd []string) {
 }
 
-func (cr *PodmanImpl) WriteFile(containerId string, dst string, filename string, data []byte) {
+func (cr *PodmanImpl) ContainerWriteFile(containerId string, dst string, filename string, data []byte) {
 }
 
 func (cr *PodmanImpl) NetworkConnect(containerId string, networkId string) {
@@ -165,7 +165,7 @@ func (cr *PodmanImpl) CreateContainerRegistry() {
 		// If we alreday have the image don't pull it
 
 		if !cr.HasImage(constants.REGISTRY_IMAGE) {
-			cr.Pull(constants.REGISTRY_IMAGE)
+			cr.PullImage(constants.REGISTRY_IMAGE)
 		}
 
 		// Does the container exists, if not create it
@@ -225,6 +225,6 @@ func (cr *PodmanImpl) Commit(containerID string) {
 
 }
 
-func (cr *PodmanImpl) Tag(source, target string) {
+func (cr *PodmanImpl) TagImage(source, target string) {
 
 }

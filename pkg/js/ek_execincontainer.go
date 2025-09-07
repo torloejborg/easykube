@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
@@ -13,17 +13,16 @@ func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, EXEC_IN_CONTAINER)
 
 		out := ctx.EKContext.Printer
-		k8s := pkg.CreateK8sUtils()
 
 		deployment := call.Argument(0).String()
 		namespace := call.Argument(1).String()
 		command := call.Argument(2).String()
 		args, _ := exportStringArray(call.Argument(3).Export())
 
-		pods, _ := k8s.ListPods(namespace)
+		pods, _ := ez.Kube.ListPods(namespace)
 		for i := range pods {
 			if strings.Contains(pods[i], deployment) {
-				stdout, stderr, err := k8s.Exec(namespace, pods[i], command, args)
+				stdout, stderr, err := ez.Kube.ExecInPod(namespace, pods[i], command, args)
 				if err != nil {
 					out.FmtRed(stderr)
 					out.FmtRed(err.Error())

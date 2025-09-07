@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"archive/tar"
@@ -96,7 +96,7 @@ func (cr *DockerImpl) HasImage(image string) bool {
 	return false
 }
 
-func (cr *DockerImpl) Push(image string) {
+func (cr *DockerImpl) PushImage(image string) {
 
 	opts := image2.PushOptions{
 		All:           false,
@@ -114,7 +114,7 @@ func (cr *DockerImpl) Push(image string) {
 
 }
 
-func (cr *DockerImpl) Pull(image string, privateRegistryCredentials *string) {
+func (cr *DockerImpl) PullImage(image string, privateRegistryCredentials *string) {
 
 	opts := image2.PullOptions{
 		All: false,
@@ -232,7 +232,7 @@ func (cr *DockerImpl) Exec(containerId string, cmd []string) {
 	}
 }
 
-func (cr *DockerImpl) WriteFile(containerId string, dst string, filename string, data []byte) {
+func (cr *DockerImpl) ContainerWriteFile(containerId string, dst string, filename string, data []byte) {
 	opts := container.CopyToContainerOptions{
 		AllowOverwriteDirWithFile: true,
 	}
@@ -273,7 +273,7 @@ func (cr *DockerImpl) CreateContainerRegistry() {
 
 	imageSearch := cr.HasImage(registry)
 	if !imageSearch {
-		cr.Pull(registry, nil)
+		cr.PullImage(registry, nil)
 	}
 
 	containerSearch := cr.FindContainer(containerName)
@@ -331,7 +331,7 @@ func (cr *DockerImpl) Commit(containerID string) {
 	fmt.Println(resp.ID)
 }
 
-func (cr *DockerImpl) Tag(source string, target string) {
+func (cr *DockerImpl) TagImage(source string, target string) {
 
 	err := cr.Docker.ImageTag(cr.ctx, source, target)
 	if err != nil {

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 	"k8s.io/utils/ptr"
 
 	"github.com/dop251/goja"
@@ -26,7 +26,6 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		if err != nil {
 			panic(err)
 		}
-		cru := pkg.CreateContainerRuntime()
 
 		var i = 0
 		var wg sync.WaitGroup
@@ -39,10 +38,10 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			i++
 			wg.Add(1)
 			go func() {
-				if !cru.HasImageInKindRegistry(dest) || mustPull {
+				if !ez.Kube.HasImageInKindRegistry(dest) || mustPull {
 
 					if strings.Contains(source, "ccta.dk") {
-						s, err := pkg.CreateK8sUtils().GetSecret("easykube-secrets", "default")
+						s, err := ez.CreateK8sUtilsImpl().GetSecret("easykube-secrets", "default")
 						if err != nil {
 							panic(err)
 						}
@@ -53,17 +52,17 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 						})
 
 						out.FmtGreen("🖼  pull from private registry %s", source)
-						cru.Pull(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
+						ez.Kube.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
 
 					} else {
 						out.FmtGreen("🖼  pull %s", source)
-						cru.Pull(source, nil)
+						ez.Kube.PullImage(source, nil)
 					}
 
 					out.FmtGreen("🖼  tag %s to %s", source, dest)
-					cru.Tag(source, dest)
+					ez.Kube.TagImage(source, dest)
 
-					cru.Push(dest)
+					ez.Kube.PushImage(dest)
 					out.FmtGreen("🖼  push %s", dest)
 				}
 				defer wg.Done()

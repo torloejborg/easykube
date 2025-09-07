@@ -4,8 +4,7 @@ import (
 	"os"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
@@ -17,7 +16,7 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 		values := call.Argument(1).String()
 		destination := call.Argument(2).String()
 		namespace := call.Argument(3).String()
-		u := ek.Utils{Fs: ctx.EKContext.Fs}
+		u := ez.Utils{Fs: ctx.EKContext.Fs}
 
 		if !u.FileOrDirExists(chart) {
 			out.FmtRed("specified chart %s does not exist", chart)
@@ -33,8 +32,7 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 			namespace = "default"
 		}
 
-		tools := pkg.CreateExternalTools()
-		stdout, stderr, err := tools.RunCommand("helm", "template", chart,
+		stdout, stderr, err := ez.Kube.RunCommand("helm", "template", chart,
 			"--values", values,
 			"--namespace", namespace)
 

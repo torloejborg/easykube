@@ -10,9 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 // createCmd represents the create command
@@ -22,50 +21,33 @@ var createCmd = &cobra.Command{
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// create a 'toolbox' of needed utilities for cluster creation
-		tb := struct {
-			cluster   ek.IClusterUtils
-			container ek.IContainerRuntime
-			addon     ek.IAddonReader
-			k8s       ek.IK8SUtils
-			cfg       ek.IEasykubeConfig
-			tools     ek.IExternalTools
-		}{
-			pkg.CreateClusterUtils(),
-			pkg.CreateContainerRuntime(),
-			pkg.CreateAddonReader(),
-			pkg.CreateK8sUtils(),
-			pkg.CreateEasykubeConfig(),
-			pkg.CreateExternalTools(),
-		}
-
 		appContext := ekctx.GetAppContext(cmd)
 		out := appContext.Printer
 
-		if tb.container.IsContainerRunning(constants.KIND_CONTAINER) {
+		if ez.Kube.IsContainerRunning(constants.KIND_CONTAINER) {
 			out.FmtYellow("Cluster was already created, exiting.")
 			os.Exit(0)
 		}
 
 		out.FmtGreen("Bootstrapping easykube single node cluster")
 		// Ensure configation exists
-		tb.cfg.MakeConfig()
+		ez.Kube.MakeConfig()
 
-		if !tb.container.HasImage(constants.REGISTRY_IMAGE) {
+		if !ez.Kube.HasImage(constants.REGISTRY_IMAGE) {
 			out.FmtYellow("Pulling docker registry image")
-			tb.container.Pull(constants.REGISTRY_IMAGE, nil)
+			ez.Kube.PullImage(constants.REGISTRY_IMAGE, nil)
 		}
 
-		if !tb.container.HasImage(constants.KIND_IMAGE) {
+		if !ez.Kube.HasImage(constants.KIND_IMAGE) {
 			out.FmtYellow("Pulling kind image")
-			tb.container.Pull(constants.KIND_IMAGE, nil)
+			ez.Kube.PullImage(constants.KIND_IMAGE, nil)
 		}
 
-		tb.cluster.EnsurePersistenceDirectory()
-		tb.container.CreateContainerRegistry()
+		ez.Kube.EnsurePersistenceDirectory()
+		ez.Kube.CreateContainerRegistry()
 
-		u := ek.Utils{pkg.FILESYSTEM}
-		occupiedPorts, _ := ensureClusterPortsFree(tb.addon.GetAddons())
+		u := ez.Utils{ez.FILESYSTEM}
+		occupiedPorts, _ := ensureClusterPortsFree(ez.Kube.GetAddons())
 		if nil != occupiedPorts {
 			out.FmtGreen("Can not create easykube cluster")
 			fmt.Println()
@@ -77,11 +59,16 @@ var createCmd = &cobra.Command{
 			os.Exit(-1)
 		}
 
-		report := tb.cluster.CreateKindCluster(tb.addon.GetAddons())
-		tb.container.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
-		tb.k8s.PatchCoreDNS()
+		report := ez.Kube.CreateKindCluster(ez.Kube.GetAddons())
 
-		err := tb.k8s.CreateConfigmap(constants.ADDON_CM, "default")
+		// The cluster is created, and so it will have a new context,
+		ez.Kube.InitK8s(ez.NewK8SUtils(appContext, appContext.Fs))
+
+		ez.Kube.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
+
+		ez.Kube.PatchCoreDNS()
+
+		err := ez.Kube.CreateConfigmap(constants.ADDON_CM, "default")
 		if err != nil {
 			panic(err)
 		}
@@ -89,7 +76,7 @@ var createCmd = &cobra.Command{
 		out.FmtGreen(report)
 
 		// switch to the easykube context
-		tb.tools.EnsureLocalContext()
+		ez.Kube.EnsureLocalContext()
 
 		// ensure secret
 		createSecret := appContext.GetStringFlag("secret")
@@ -108,14 +95,14 @@ var createCmd = &cobra.Command{
 				os.Exit(-1)
 			}
 
-			tb.k8s.CreateSecret("default", "easykube-secrets", configmap)
+			ez.Kube.CreateSecret("default", "easykube-secrets", configmap)
 		} else {
 			out.FmtYellow("Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries.")
 		}
 	},
 }
 
-func ensureClusterPortsFree(addons map[string]*ek.Addon) (map[*ek.Addon][]int, error) {
+func ensureClusterPortsFree(addons map[string]*ez.Addon) (map[*ez.Addon][]int, error) {
 
 	IsPortAvailable := func(host string, port int) bool {
 		addr := fmt.Sprintf("%s:%d", host, port)
@@ -127,7 +114,7 @@ func ensureClusterPortsFree(addons map[string]*ek.Addon) (map[*ek.Addon][]int, e
 		return false
 	}
 
-	failed := make(map[*ek.Addon][]int)
+	failed := make(map[*ez.Addon][]int)
 
 	for _, a := range addons {
 		for _, p := range a.Config.ExtraPorts {

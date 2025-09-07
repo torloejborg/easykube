@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func TestJsonConfigParsing(t *testing.T) {
@@ -28,7 +28,7 @@ let configuration = {
 	}
 	`)
 
-	cfg := &ek.AddonConfig{}
+	cfg := &ez.AddonConfig{}
 	reader := CreateFakeAddonReader()
 
 	extracted, _ := reader.ExtractJSON(string(data))
@@ -46,7 +46,7 @@ func TestJsonConfigParsingWithOnlyDepends(t *testing.T) {
 	}
 	`)
 
-	cfg := &ek.AddonConfig{}
+	cfg := &ez.AddonConfig{}
 	extracted, _ := CreateFakeAddonReader().ExtractJSON(string(data))
 
 	err := json.Unmarshal([]byte(extracted), &cfg)
@@ -57,7 +57,7 @@ func TestJsonConfigParsingWithOnlyDepends(t *testing.T) {
 
 func TestTroublesomeInput(t *testing.T) {
 	input := `{"extraPorts": [{"nodePort": 80, "hostPort": 80, "protocol": "TCP"}]}`
-	cfg := &ek.AddonConfig{}
+	cfg := &ez.AddonConfig{}
 
 	err := json.Unmarshal([]byte(input), &cfg)
 	if err != nil {

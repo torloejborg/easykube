@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"bytes"
@@ -9,11 +9,9 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/ekctx"
-
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
@@ -38,7 +36,7 @@ type EasykubeConfig struct {
 	Fs            afero.Fs
 }
 
-func NewEasykubeConfig(ctx *ekctx.EKContext, fileFacade afero.Fs) IEasykubeConfig {
+func NewEasykubeConfig(fileFacade afero.Fs) IEasykubeConfig {
 	configDir, _ := os.UserConfigDir()
 	return &EasykubeConfig{
 		UserConfigDir: configDir,

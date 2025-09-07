@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"sigs.k8s.io/kind/pkg/cluster"
@@ -31,7 +30,7 @@ type ClusterUtils struct {
 }
 
 func NewClusterUtils(ctx *ekctx.EKContext, fileFacade afero.Fs) IClusterUtils {
-	cfg, err := NewEasykubeConfig(ctx, ctx.Fs).LoadConfig()
+	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -55,11 +54,10 @@ func (u *ClusterUtils) ConfigurationReport(addonList []*Addon) string {
 
 func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
-	cru := NewContainerRuntime(u.EkContext, u.Fs)
 	out := u.EkContext.Printer
 
 	// kind already exists, but not started
-	search := cru.FindContainer("kind-control-plane")
+	search := Kube.FindContainer("kind-control-plane")
 
 	addonList := make([]*Addon, 0)
 	for _, addon := range modules {
@@ -101,7 +99,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)
 		optNoGreeting := cluster.CreateWithDisplaySalutation(false)
-		optReady := cluster.CreateWithWaitForReady(10 * time.Second)
+		optReady := cluster.CreateWithWaitForReady(20 * time.Second)
 
 		kubeconfigPath := filepath.Join(homedir, ".kube", "easykube")
 
@@ -117,16 +115,16 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		}
 
 		// initial cluster should be running now
-		search = cru.FindContainer(constants.KIND_CONTAINER)
+		search = Kube.FindContainer(constants.KIND_CONTAINER)
 
 		if search.IsRunning {
 			out.FmtGreen("Configuring containerd")
 			c1 := []string{"mkdir", "-p", "/etc/containerd/certs.d/localhost:5001"}
-			cru.Exec(search.ContainerID, c1)
+			Kube.Exec(search.ContainerID, c1)
 
 			out.FmtGreen("Adding registry host")
 			toml, err := resources.AppResources.ReadFile("data/hosts.toml")
-			cru.WriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", toml)
+			Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", toml)
 			if err != nil {
 				panic(err)
 			}
@@ -135,7 +133,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
 	if search.Found && !search.IsRunning {
 		out.FmtGreen("Starting existing cluster")
-		cru.StartContainer(search.ContainerID)
+		Kube.StartContainer(search.ContainerID)
 	}
 
 	return u.ConfigurationReport(addonList)
@@ -165,7 +163,7 @@ func (u *ClusterUtils) RenderToYAML(addonList []*Addon) string {
 
 func (u *ClusterUtils) EnsurePersistenceDirectory() {
 
-	ar := pkg.CreateAddonReader()
+	ar := CreateAddonReaderImpl()
 	addons := ar.GetAddons()
 
 	for _, a := range addons {

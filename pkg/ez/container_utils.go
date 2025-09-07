@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"crypto/tls"
@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
@@ -49,7 +48,7 @@ func (i *ContainerRuntimeCommon) ImageExistsInKindRegistry(image string) bool {
 	}
 
 	defer resp.Body.Close()
-
+	
 	body, err := io.ReadAll(resp.Body)
 	if nil != err {
 		log.Fatalln(err)
@@ -76,8 +75,8 @@ type IContainerRuntime interface {
 	IsClusterRunning() bool
 	IsNetworkConnectedToContainer(containerID string, networkID string) bool
 	IsContainerRunning(containerID string) bool
-	Push(image string)
-	Pull(image string, privateRegistryCredentials *string)
+	PushImage(image string)
+	PullImage(image string, privateRegistryCredentials *string)
 	HasImage(image string) bool
 	FindContainer(name string) ContainerSearch
 	HasImageInKindRegistry(name string) bool
@@ -85,18 +84,18 @@ type IContainerRuntime interface {
 	StopContainer(id string)
 	RemoveContainer(id string)
 	Exec(containerId string, cmd []string)
-	WriteFile(containerId string, dst string, filename string, data []byte)
+	ContainerWriteFile(containerId string, dst string, filename string, data []byte)
 	NetworkConnect(containerId string, networkId string)
 	CloseContainerRuntime()
 	IsContainerRuntimeAvailable() bool
 	CreateContainerRegistry()
 	Commit(containerID string)
-	Tag(source, target string)
+	TagImage(source, target string)
 }
 
-func NewContainerRuntime(ctx *ekctx.EKContext, fs afero.Fs) IContainerRuntime {
+func NewContainerRuntime(fs afero.Fs) IContainerRuntime {
 
-	cfg, err := NewEasykubeConfig(ctx, fs).LoadConfig()
+	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}

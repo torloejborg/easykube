@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"encoding/json"
@@ -12,7 +12,6 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
 )
 
 type IAddonReader interface {
@@ -28,7 +27,7 @@ type AddonReader struct {
 }
 
 func NewAddonReader(ctx *ekctx.EKContext, fsFacade afero.Fs) IAddonReader {
-	cfg, err := pkg.CreateEasykubeConfig().LoadConfig()
+	cfg, err := CreateEasykubeConfigImpl().LoadConfig()
 	if err != nil {
 		panic(err)
 	}

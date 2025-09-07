@@ -2,7 +2,7 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) WaitForDeployment() func(goja.FunctionCall) goja.Value {
@@ -13,7 +13,7 @@ func (ctx *Easykube) WaitForDeployment() func(goja.FunctionCall) goja.Value {
 		deployment := call.Arguments[0].ToString().String()
 		namespace := call.Arguments[1].ToString().String()
 
-		err := pkg.CreateK8sUtils().WaitForDeploymentReadyWatch(deployment, namespace)
+		err := ez.Kube.WaitForDeploymentReadyWatch(deployment, namespace)
 		if err != nil {
 			out.FmtRed("% did not come online before timed out", deployment)
 			return goja.Undefined()

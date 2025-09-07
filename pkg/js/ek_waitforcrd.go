@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) WaitForCRD() func(goja.FunctionCall) goja.Value {
@@ -16,8 +16,7 @@ func (ctx *Easykube) WaitForCRD() func(goja.FunctionCall) goja.Value {
 		kind := call.Argument(2).String()
 		timeout := call.Argument(3).ToInteger()
 
-		k8sutils := pkg.CreateK8sUtils()
-		err := k8sutils.WaitForCRD(group, version, kind, time.Duration(timeout)*time.Second)
+		err := ez.Kube.WaitForCRD(group, version, kind, time.Duration(timeout)*time.Second)
 		if err != nil {
 			panic(err)
 		}

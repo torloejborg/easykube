@@ -7,12 +7,11 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 	"gopkg.in/yaml.v3"
 )
 
-func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ek.ExternalSecret, error) {
+func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ez.ExternalSecret, error) {
 	// Read the YAML file
 	yamlFile, err := os.ReadFile(filePath)
 	if err != nil {
@@ -22,7 +21,7 @@ func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ek.Externa
 	yamlReader := bytes.NewReader(yamlFile)
 
 	// Parse the YAML content document by document
-	var externalSecrets []ek.ExternalSecret
+	var externalSecrets []ez.ExternalSecret
 	decoder := yaml.NewDecoder(yamlReader)
 	for {
 		var item map[string]interface{}
@@ -33,7 +32,7 @@ func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ek.Externa
 
 		// Check if the document is an ExternalSecret
 		if item != nil && item["kind"] == "ExternalSecret" {
-			var es ek.ExternalSecret
+			var es ez.ExternalSecret
 			itemBytes, err := yaml.Marshal(item)
 			if err != nil {
 				ctx.Printer.FmtRed("error marshaling item: %v", err)
@@ -52,7 +51,7 @@ func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ek.Externa
 
 func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		k8sutils := pkg.CreateK8sUtils()
+
 		out := ctx.EKContext.Printer
 		ctx.checkArgs(call, PROCESS_SECRETS)
 
@@ -73,8 +72,8 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 		externalSecrets, err := extractExternalSecrets(filePath, ctx.EKContext)
 
 		for i := range externalSecrets {
-			secret := k8sutils.TransformExternalSecret(externalSecrets[i], secretSource, namespace)
-			k8sutils.CreateSecret(namespace, externalSecrets[i].Metadata.Name, secret.Data)
+			secret := ez.Kube.TransformExternalSecret(externalSecrets[i], secretSource, namespace)
+			ez.Kube.CreateSecret(namespace, externalSecrets[i].Metadata.Name, secret.Data)
 		}
 
 		if err != nil {

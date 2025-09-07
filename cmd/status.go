@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/torloejborg/easykube/pkg"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/ekctx"
@@ -20,12 +20,10 @@ var statusCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ekCtx := ekctx.GetAppContext(cmd)
 		out := ekCtx.Printer
-		cru := pkg.CreateContainerRuntime()
 
-		conf := pkg.CreateEasykubeConfig()
-		cfg, _ := conf.LoadConfig()
-		ar := pkg.CreateAddonReader()
-		if !cru.IsContainerRuntimeAvailable() {
+		cfg, _ := ez.Kube.LoadConfig()
+
+		if !ez.Kube.IsContainerRuntimeAvailable() {
 			out.FmtRed("Container runtime not available, is docker running??")
 			os.Exit(-1)
 		}
@@ -39,7 +37,7 @@ var statusCmd = &cobra.Command{
 			}
 		}
 		running := func(containerID string) {
-			if cru.IsContainerRunning(containerID) {
+			if ez.Kube.IsContainerRunning(containerID) {
 				out.FmtGreen("✓ %s container", containerID)
 			} else {
 				out.FmtRed("⚠ %s container not running", containerID)
@@ -56,7 +54,7 @@ var statusCmd = &cobra.Command{
 		running(constants.REGISTRY_CONTAINER)
 		running(constants.KIND_CONTAINER)
 
-		if cru.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind") {
+		if ez.Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind") {
 			out.FmtGreen("✓ %s connected to kind network", constants.REGISTRY_CONTAINER)
 		} else {
 			out.FmtRed("⚠ %s not connected to kind network", constants.REGISTRY_CONTAINER)
@@ -64,7 +62,7 @@ var statusCmd = &cobra.Command{
 
 		fmt.Println()
 		out.FmtGreen("Repository configuration")
-		na := len(ar.GetAddons())
+		na := len(ez.Kube.GetAddons())
 		if _, err := os.Stat(cfg.AddonDir); err == nil {
 			if na == 0 {
 				out.FmtYellow("⚠ %d Addons discovered, check if '%s' is an addon repository", na, cfg.AddonDir)

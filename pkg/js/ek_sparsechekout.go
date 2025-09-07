@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
@@ -23,7 +23,7 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
 
 		destination := call.Argument(3).String()
-		u := ek.Utils{Fs: e.EKContext.Fs}
+		u := ez.Utils{Fs: e.EKContext.Fs}
 		if u.FileOrDirExists(destination) {
 			out.FmtYellow("Repository %s already checked out at %s", repo, destination)
 			return call.This
@@ -50,7 +50,7 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			}
 		}
 
-		tool := ek.NewExternalTools(e.EKContext)
+		tool := ez.NewExternalTools(e.EKContext)
 
 		handleCmd(tool.RunCommand("git", "init"))
 		handleCmd(tool.RunCommand("git", "config", "core.sparsecheckout", "true"))

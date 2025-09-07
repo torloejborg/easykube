@@ -5,35 +5,35 @@ import (
 	"testing"
 
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func TestPullImage(*testing.T) {
-	pm := ek.NewPodmanImpl()
+	pm := ez.NewPodmanImpl()
 
 	fmt.Println("Pulling nginx")
-	pm.Pull("docker.io/nginx", nil)
+	pm.PullImage("docker.io/nginx", nil)
 }
 
 func TestContainerExists(*testing.T) {
-	pm := ek.NewPodmanImpl()
+	pm := ez.NewPodmanImpl()
 	exists := pm.HasImageInKindRegistry("registry:2")
 
 	fmt.Println(exists)
 }
 
 func TestPushImagePodman(*testing.T) {
-	pm := ek.NewPodmanImpl()
+	pm := ez.NewPodmanImpl()
 	fmt.Println("Pushing image to local registry")
 
-	pm.Push("busybox")
+	pm.PushImage("busybox")
 }
 
 func TestPushImageDocker(*testing.T) {
 	pm := CreateFakeContainerRuntime()
-	pm.Pull("busybox:1", nil)
-	pm.Tag("busybox:1", "localhost:5000/busybox:1")
-	pm.Push("localhost:5000/busybox:1")
+	pm.PullImage("busybox:1", nil)
+	pm.TagImage("busybox:1", "localhost:5000/busybox:1")
+	pm.PushImage("localhost:5000/busybox:1")
 	fmt.Println("Pushing image to local registry")
 
 }
@@ -62,7 +62,7 @@ func TestHasImage(t *testing.T) {
 
 func TestPushLocal(t *testing.T) {
 	pm := CreateFakeContainerRuntime()
-	pm.Push("registry:2")
+	pm.PushImage("registry:2")
 }
 
 func TestHasKindImage(*testing.T) {

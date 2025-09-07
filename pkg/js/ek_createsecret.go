@@ -2,7 +2,7 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) CreateSecret() func(goja.FunctionCall) goja.Value {
@@ -13,7 +13,7 @@ func (ctx *Easykube) CreateSecret() func(goja.FunctionCall) goja.Value {
 		secret := make(map[string]string)
 		ctx.AddonCtx.vm.ExportTo(call.Argument(2), &secret)
 
-		k8 := pkg.CreateK8sUtils()
+		k8 := ez.CreateK8sUtilsImpl()
 		k8.CreateSecret(namespace, name, secret)
 
 		return call.This

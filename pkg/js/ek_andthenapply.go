@@ -2,8 +2,7 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) AndThenApply() func(goja.FunctionCall) goja.Value {
@@ -11,14 +10,14 @@ func (ctx *Easykube) AndThenApply() func(goja.FunctionCall) goja.Value {
 
 		out := ctx.EKContext.Printer
 		toApply := call.Argument(0).String()
-		u := ek.Utils{Fs: ctx.EKContext.Fs}
+		u := ez.Utils{Fs: ctx.EKContext.Fs}
 
 		if !u.FileOrDirExists(toApply) {
 			out.FmtRed("could not locate %s to apply", toApply)
 		}
 		ctx.checkArgs(call, AND_THEN_APPLY)
 
-		ext := pkg.CreateExternalTools()
+		ext := ez.CreateExternalToolsImpl()
 		ext.ApplyYaml(toApply)
 
 		return call.This

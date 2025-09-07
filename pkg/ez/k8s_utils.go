@@ -1,4 +1,4 @@
-package ek
+package ez
 
 import (
 	"archive/tar"
@@ -80,7 +80,7 @@ type IK8SUtils interface {
 	CreateSecret(namespace, secretName string, data map[string]string)
 	CreateConfigmap(name, namespace string) error
 	DeleteKeyFromConfigmap(name, namespace, key string)
-	Exec(namespace, pod, command string, args []string) (string, string, error)
+	ExecInPod(namespace, pod, command string, args []string) (string, string, error)
 	GetInstalledAddons() ([]string, error)
 	UpdateConfigMap(name, namespace, key string, data []byte)
 	ListPods(namespace string) ([]string, error)
@@ -89,7 +89,7 @@ type IK8SUtils interface {
 	WaitForDeploymentReadyWatch(name, namespace string) error
 	WaitForCRD(group, version, kind string, timeout time.Duration) error
 	CopyFileToPod(namespace, pod, container, localPath, remotePath string) error
-	FindContainer(deploymentName, namespace, containerPartialName string) (string, string, error)
+	FindContainerInPod(deploymentName, namespace, containerPartialName string) (string, string, error)
 	GetSecret(name, namespace string) (map[string][]byte, error)
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, namespace string) KubernetesSecret
 }
@@ -124,17 +124,17 @@ func NewK8SUtils(ekContext *ekctx.EKContext, fileFacade afero.Fs) IK8SUtils {
 	}
 }
 
-func (k8s *K8SUtilsImpl) GetSecret(name, namespace string) (map[string][]byte, error) {
+func (k *K8SUtilsImpl) GetSecret(name, namespace string) (map[string][]byte, error) {
 
 	ctx := context.Background()
-	cm, err := k8s.Clientset.CoreV1().Secrets(namespace).Get(ctx, name, metav1.GetOptions{
+	cm, err := k.Clientset.CoreV1().Secrets(namespace).Get(ctx, name, metav1.GetOptions{
 		TypeMeta: metav1.TypeMeta{},
 	})
 
 	return cm.Data, err
 }
 
-func (k8s *K8SUtilsImpl) PatchCoreDNS() {
+func (k *K8SUtilsImpl) PatchCoreDNS() {
 
 	ctx := context.Background()
 
@@ -142,14 +142,14 @@ func (k8s *K8SUtilsImpl) PatchCoreDNS() {
 	corefile, _ := resources.AppResources.ReadFile("data/coredns/coredns.config")
 	localdb, _ := resources.AppResources.ReadFile("data/coredns/local.db")
 
-	k8s.UpdateConfigMap("coredns", "kube-system", "local.db", localdb)
-	k8s.UpdateConfigMap("coredns", "kube-system", "Corefile", corefile)
+	k.UpdateConfigMap("coredns", "kube-system", "local.db", localdb)
+	k.UpdateConfigMap("coredns", "kube-system", "Corefile", corefile)
 
 	decode := scheme.Codecs.UniversalDeserializer().Decode
 	obj, gKV, _ := decode(cs, nil, nil)
 	if gKV.Kind == "Deployment" {
 		depl := obj.(*appsv1.Deployment)
-		_, e := k8s.Clientset.AppsV1().Deployments("kube-system").Update(ctx, depl, metav1.UpdateOptions{
+		_, e := k.Clientset.AppsV1().Deployments("kube-system").Update(ctx, depl, metav1.UpdateOptions{
 			TypeMeta: metav1.TypeMeta{},
 		})
 		if e != nil {
@@ -186,11 +186,11 @@ func (k8s *K8SUtilsImpl) CreateConfigmap(name, namespace string) error {
 	return nil
 }
 
-func (k8s *K8SUtilsImpl) UpdateConfigMap(name, namespace, key string, data []byte) {
+func (k *K8SUtilsImpl) UpdateConfigMap(name, namespace, key string, data []byte) {
 
 	ctx := context.Background()
 
-	cm, _ := k8s.Clientset.CoreV1().ConfigMaps(namespace).Get(ctx, name, metav1.GetOptions{
+	cm, _ := k.Clientset.CoreV1().ConfigMaps(namespace).Get(ctx, name, metav1.GetOptions{
 		TypeMeta: metav1.TypeMeta{},
 	})
 
@@ -199,7 +199,7 @@ func (k8s *K8SUtilsImpl) UpdateConfigMap(name, namespace, key string, data []byt
 	}
 
 	cm.Data[key] = string(data)
-	_, err := k8s.Clientset.CoreV1().ConfigMaps(namespace).Update(ctx, cm, metav1.UpdateOptions{
+	_, err := k.Clientset.CoreV1().ConfigMaps(namespace).Update(ctx, cm, metav1.UpdateOptions{
 		TypeMeta:     metav1.TypeMeta{},
 		FieldManager: "easykube",
 	})
@@ -244,8 +244,8 @@ func (k8s *K8SUtilsImpl) ReadConfigmap(name string, namespace string) (map[strin
 	return result, nil
 }
 
-func (k8s *K8SUtilsImpl) DeleteKeyFromConfigmap(name, namespace, key string) {
-	cmap, err := k8s.Clientset.CoreV1().ConfigMaps(namespace).Get(context.Background(), name,
+func (k *K8SUtilsImpl) DeleteKeyFromConfigmap(name, namespace, key string) {
+	cmap, err := k.Clientset.CoreV1().ConfigMaps(namespace).Get(context.Background(), name,
 		metav1.GetOptions{
 			TypeMeta: metav1.TypeMeta{
 				Kind: "ConfigMap",
@@ -257,7 +257,7 @@ func (k8s *K8SUtilsImpl) DeleteKeyFromConfigmap(name, namespace, key string) {
 
 	delete(cmap.Data, key)
 
-	_, err = k8s.Clientset.CoreV1().ConfigMaps(namespace).Update(context.Background(), cmap,
+	_, err = k.Clientset.CoreV1().ConfigMaps(namespace).Update(context.Background(), cmap,
 		metav1.UpdateOptions{
 			TypeMeta: metav1.TypeMeta{
 				Kind: "ConfigMap",
@@ -269,12 +269,12 @@ func (k8s *K8SUtilsImpl) DeleteKeyFromConfigmap(name, namespace, key string) {
 	}
 }
 
-func (k8s *K8SUtilsImpl) WaitForDeploymentReadyWatch(name, namespace string) error {
-	out := k8s.EKContext.Printer
+func (k *K8SUtilsImpl) WaitForDeploymentReadyWatch(name, namespace string) error {
+	out := k.EKContext.Printer
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	watcher, err := k8s.Clientset.AppsV1().Deployments(namespace).Watch(ctx, metav1.ListOptions{
+	watcher, err := k.Clientset.AppsV1().Deployments(namespace).Watch(ctx, metav1.ListOptions{
 		FieldSelector:  fmt.Sprintf("metadata.name=%s", name),
 		TimeoutSeconds: ptr.To(int64(60 * time.Second)),
 		Watch:          true,
@@ -322,13 +322,13 @@ func (k8s *K8SUtilsImpl) ListPods(namespace string) ([]string, error) {
 	return podList, nil
 }
 
-func (k8s *K8SUtilsImpl) Exec(namespace, pod, command string, args []string) (string, string, error) {
+func (k *K8SUtilsImpl) ExecInPod(namespace, pod, command string, args []string) (string, string, error) {
 
 	// Compose command
 	fullCommand := append([]string{command}, args...)
 
 	// Prepare the REST request
-	req := k8s.Clientset.CoreV1().RESTClient().
+	req := k.Clientset.CoreV1().RESTClient().
 		Post().
 		Resource("pods").
 		Name(pod).
@@ -343,7 +343,7 @@ func (k8s *K8SUtilsImpl) Exec(namespace, pod, command string, args []string) (st
 			TTY:     false,
 		}, scheme.ParameterCodec)
 
-	exec, err := remotecommand.NewSPDYExecutor(k8s.RestConfig, "POST", req.URL())
+	exec, err := remotecommand.NewSPDYExecutor(k.RestConfig, "POST", req.URL())
 	if err != nil {
 		return "", "", fmt.Errorf("failed to create executor: %w", err)
 	}
@@ -362,11 +362,11 @@ func (k8s *K8SUtilsImpl) Exec(namespace, pod, command string, args []string) (st
 	return stdout.String(), stderr.String(), nil
 }
 
-func (k8s *K8SUtilsImpl) WaitForCRD(
+func (k *K8SUtilsImpl) WaitForCRD(
 	group, version, kind string,
 	timeout time.Duration,
 ) error {
-	disco, err := discovery.NewDiscoveryClientForConfig(k8s.RestConfig)
+	disco, err := discovery.NewDiscoveryClientForConfig(k.RestConfig)
 	if err != nil {
 		return err
 	}
@@ -394,7 +394,7 @@ func (k8s *K8SUtilsImpl) WaitForCRD(
 	})
 }
 
-func (f *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[string]string) {
+func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[string]string) {
 
 	var isProbablyBase64 = func(s string) bool {
 		decoded, err := base64.StdEncoding.DecodeString(s)
@@ -426,7 +426,7 @@ func (f *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 
 	s.WithData(sdata)
 
-	_, e := f.Clientset.CoreV1().Secrets(namespace).Apply(context.Background(), s, metav1.ApplyOptions{
+	_, e := k.Clientset.CoreV1().Secrets(namespace).Apply(context.Background(), s, metav1.ApplyOptions{
 		TypeMeta:     metav1.TypeMeta{},
 		Force:        false,
 		FieldManager: "easykube",
@@ -504,7 +504,7 @@ func (k *K8SUtilsImpl) CopyFileToPod(namespace, pod, container, localPath, remot
 	return nil
 }
 
-func (k *K8SUtilsImpl) FindContainer(deploymentName, namespace, containerPartialName string) (string, string, error) {
+func (k *K8SUtilsImpl) FindContainerInPod(deploymentName, namespace, containerPartialName string) (string, string, error) {
 	pods, err := k.Clientset.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return "", "", fmt.Errorf("failed to list pods in namespace %q: %w", namespace, err)
