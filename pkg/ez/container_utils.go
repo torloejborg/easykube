@@ -48,7 +48,7 @@ func (i *ContainerRuntimeCommon) ImageExistsInKindRegistry(image string) bool {
 	}
 
 	defer resp.Body.Close()
-	
+
 	body, err := io.ReadAll(resp.Body)
 	if nil != err {
 		log.Fatalln(err)
@@ -95,7 +95,7 @@ type IContainerRuntime interface {
 
 func NewContainerRuntime(fs afero.Fs) IContainerRuntime {
 
-	cfg, err := Kube.LoadConfig()
+	cfg, err := NewEasykubeConfig(fs).LoadConfig()
 	if err != nil {
 		panic(err)
 	}

@@ -30,7 +30,7 @@ type ClusterUtils struct {
 }
 
 func NewClusterUtils(ctx *ekctx.EKContext, fileFacade afero.Fs) IClusterUtils {
-	cfg, err := Kube.LoadConfig()
+	cfg, err := NewEasykubeConfig(ctx.Fs).LoadConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -94,7 +94,9 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
 		configDir, _ := os.UserConfigDir()
 		configFile := u.RenderToYAML(addonList)
+
 		utl := Utils{Fs: u.Fs}
+
 		utl.SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)

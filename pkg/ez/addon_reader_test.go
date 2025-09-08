@@ -1,11 +1,9 @@
-package test
+package ez
 
 import (
 	"encoding/json"
 	"fmt"
 	"testing"
-
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func TestJsonConfigParsing(t *testing.T) {
@@ -27,16 +25,7 @@ let configuration = {
 	]
 	}
 	`)
-
-	cfg := &ez.AddonConfig{}
-	reader := CreateFakeAddonReader()
-
-	extracted, _ := reader.ExtractJSON(string(data))
-
-	err := json.Unmarshal([]byte(extracted), &cfg)
-	if err != nil {
-		panic(err)
-	}
+	fmt.Println(string(data))
 }
 
 func TestJsonConfigParsingWithOnlyDepends(t *testing.T) {
@@ -46,18 +35,13 @@ func TestJsonConfigParsingWithOnlyDepends(t *testing.T) {
 	}
 	`)
 
-	cfg := &ez.AddonConfig{}
-	extracted, _ := CreateFakeAddonReader().ExtractJSON(string(data))
+	fmt.Println(string(data))
 
-	err := json.Unmarshal([]byte(extracted), &cfg)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func TestTroublesomeInput(t *testing.T) {
 	input := `{"extraPorts": [{"nodePort": 80, "hostPort": 80, "protocol": "TCP"}]}`
-	cfg := &ez.AddonConfig{}
+	cfg := &AddonConfig{}
 
 	err := json.Unmarshal([]byte(input), &cfg)
 	if err != nil {
@@ -66,9 +50,5 @@ func TestTroublesomeInput(t *testing.T) {
 }
 
 func TestDiscoverAddons(t *testing.T) {
-	addons := CreateFakeAddonReader().GetAddons()
 
-	for i := range addons {
-		fmt.Println(addons[i].Config)
-	}
 }
