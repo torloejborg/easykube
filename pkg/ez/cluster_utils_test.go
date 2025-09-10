@@ -2,21 +2,8 @@ package ez
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"testing"
-
-	"github.com/torloejborg/easykube/ekctx"
 )
-
-func GetEKContext() *ekctx.EKContext {
-
-	return &ekctx.EKContext{
-
-		Logger:  log.New(os.Stdout, "", log.LstdFlags),
-		Printer: &ekctx.Printer{},
-	}
-}
 
 func TestRenderYaml(t *testing.T) {
 
@@ -49,6 +36,9 @@ func TestConfigGeneratedFromAddons(t *testing.T) {
 }
 
 func TestCreateCluster(*testing.T) {
+
+	Kube.IClusterUtils.EnsurePersistenceDirectory()
+
 }
 
 func TestClusterCreateReport(*testing.T) {

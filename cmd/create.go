@@ -62,7 +62,7 @@ var createCmd = &cobra.Command{
 		report := ez.Kube.CreateKindCluster(ez.Kube.GetAddons())
 
 		// The cluster is created, and so it will have a new context,
-		ez.Kube.InitK8s(ez.NewK8SUtils(appContext, appContext.Fs))
+		ez.Kube.UseK8sUtils(ez.NewK8SUtils(appContext, appContext.Fs))
 
 		ez.Kube.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 

@@ -18,17 +18,49 @@ type Toolbox struct {
 	IContainerRuntime
 	IClusterUtils
 	ekctx.EKContext
+	afero.Fs
 }
 
-func (t *Toolbox) InitK8s(newUtils IK8SUtils) {
+var Kube *Toolbox = &Toolbox{}
+
+func (t *Toolbox) UseK8sUtils(newUtils IK8SUtils) *Toolbox {
 	t.IK8SUtils = newUtils
+	return t
 }
 
-func (t *Toolbox) InitCmdContext(ctx ekctx.EKContext) {
+func (t *Toolbox) UseEasykubeConfig(c IEasykubeConfig) *Toolbox {
+	t.IEasykubeConfig = c
+	return t
+}
+
+func (t *Toolbox) UseAddonReader(r IAddonReader) *Toolbox {
+	t.IAddonReader = r
+	return t
+}
+
+func (t *Toolbox) UseExternalTools(e IExternalTools) *Toolbox {
+	t.IExternalTools = e
+	return t
+}
+
+func (t *Toolbox) UseContainerRuntime(r IContainerRuntime) *Toolbox {
+	t.IContainerRuntime = r
+	return t
+}
+
+func (t *Toolbox) UseClusterUtils(u IClusterUtils) *Toolbox {
+	t.IClusterUtils = u
+	return t
+}
+
+func (t *Toolbox) UseFilesystemLayer(f afero.Fs) *Toolbox {
+	t.Fs = f
+	return t
+}
+
+func (t *Toolbox) UseCmdContext(ctx ekctx.EKContext) {
 	t.EKContext = ctx
 }
-
-var Kube = Toolbox{}
 
 func CreateK8sUtilsImpl() IK8SUtils {
 	return NewK8SUtils(EkCmdContext, FILESYSTEM)
