@@ -11,7 +11,6 @@ import (
 
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
-	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
@@ -33,15 +32,13 @@ type IEasykubeConfig interface {
 type EasykubeConfig struct {
 	ConfigDirName string
 	UserConfigDir string
-	Fs            afero.Fs
 }
 
-func NewEasykubeConfig(fileFacade afero.Fs, os OsDetails) IEasykubeConfig {
+func NewEasykubeConfig(os OsDetails) IEasykubeConfig {
 	configDir, _ := os.GetUserConfigDir()
 	return &EasykubeConfig{
 		UserConfigDir: configDir,
 		ConfigDirName: "easykube",
-		Fs:            fileFacade,
 	}
 }
 
@@ -124,7 +121,7 @@ func (ec *EasykubeConfig) MakeConfig() {
 	_, err = Kube.Fs.Stat(pathToConfigFile)
 
 	if os.IsNotExist(err) {
-		ec.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
+		Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
 
 		model := EasykubeConfigData{
 			AddonDir:         "./addons",

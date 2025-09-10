@@ -20,7 +20,6 @@ var addCmd = &cobra.Command{
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
 
 		// create a 'toolbox' of needed utilities for adding an addon
 
@@ -31,7 +30,7 @@ var addCmd = &cobra.Command{
 		targetCluster := ekCtx.GetStringFlag(constants.FLAG_CLUSTER)
 		installed, err := ez.Kube.GetInstalledAddons()
 		if err != nil {
-			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
+			ez.Kube.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 			os.Exit(1)
 		}
 
@@ -43,7 +42,7 @@ var addCmd = &cobra.Command{
 		wanted, missing := pickAddons(args, addons)
 
 		if len(missing) > 0 {
-			out.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
+			ez.Kube.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
 			os.Exit(-1)
 		}
 
@@ -57,14 +56,14 @@ var addCmd = &cobra.Command{
 		} else {
 			toInstall, err := ez.ResolveDependencies(wanted, addons)
 			if err != nil {
-				out.FmtRed("dependency resolution failed: %v", err)
+				ez.Kube.FmtRed("dependency resolution failed: %v", err)
 			}
 
 			for idx := range toInstall {
 
 				current := toInstall[idx]
 				if slices.Contains(installed, current.ShortName) && !forceInstall {
-					out.FmtYellow("%s already present in cluster", current.ShortName)
+					ez.Kube.FmtYellow("%s already present in cluster", current.ShortName)
 					continue
 				}
 

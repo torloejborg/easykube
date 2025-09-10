@@ -51,8 +51,6 @@ func (u *ClusterUtils) ConfigurationReport(addonList []*Addon) string {
 
 func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
-	out := u.EkContext.Printer
-
 	// kind already exists, but not started
 	search := Kube.FindContainer("kind-control-plane")
 
@@ -79,13 +77,13 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
 		currentDir, e := os.Getwd()
 		if e != nil {
-			out.FmtRed("cannot get current working directory")
+			Kube.FmtRed("cannot get current working directory")
 		}
 		defer os.Chdir(currentDir)
 
 		e = os.Chdir(homedir)
 		if e != nil {
-			out.FmtRed("cannot change directory to %s", homedir)
+			Kube.FmtRed("cannot change directory to %s", homedir)
 			panic(e)
 		}
 
@@ -104,7 +102,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
 		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
-		out.FmtGreen("Waiting for cluster ready")
+		Kube.FmtGreen("Waiting for cluster ready")
 
 		err := cp.Create(constants.CLUSTER_NAME, optKubeConfig, optConfig, optNodeImage, optNoGreeting, optReady)
 		if nil != err {
@@ -115,11 +113,11 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		search = Kube.FindContainer(constants.KIND_CONTAINER)
 
 		if search.IsRunning {
-			out.FmtGreen("Configuring containerd")
+			Kube.FmtGreen("Configuring containerd")
 			c1 := []string{"mkdir", "-p", "/etc/containerd/certs.d/localhost:5001"}
 			Kube.Exec(search.ContainerID, c1)
 
-			out.FmtGreen("Adding registry host")
+			Kube.FmtGreen("Adding registry host")
 			toml, err := resources.AppResources.ReadFile("data/hosts.toml")
 			Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", toml)
 			if err != nil {
@@ -129,7 +127,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 	}
 
 	if search.Found && !search.IsRunning {
-		out.FmtGreen("Starting existing cluster")
+		Kube.FmtGreen("Starting existing cluster")
 		Kube.StartContainer(search.ContainerID)
 	}
 
@@ -160,8 +158,7 @@ func (u *ClusterUtils) RenderToYAML(addonList []*Addon) string {
 
 func (u *ClusterUtils) EnsurePersistenceDirectory() {
 
-	ar := CreateAddonReaderImpl()
-	addons := ar.GetAddons()
+	addons := Kube.GetAddons()
 
 	for _, a := range addons {
 		if len(a.Config.ExtraMounts) > 0 {

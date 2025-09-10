@@ -7,25 +7,10 @@ import (
 	"github.com/spf13/afero"
 )
 
-type EasykubeConfigStub struct {
-	IEasykubeConfig
-}
-type OsDetailsStub struct {
-	OsDetails
-}
-
-func (o *OsDetailsStub) GetUserConfigDir() (string, error) {
-	return "/home/some-user/.config", nil
-}
-
-func (o *OsDetailsStub) GetUserHomeDir() (string, error) {
-	return "/home/some-user", nil
-}
-
 func init() {
 	Kube = &Toolbox{}
 
-	y := &OsDetailsStub{CreateOsDetails()}
+	y := &OsDetailsStub{CreateOsDetailsImpl()}
 	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
 
 	Kube.UseOsDetails(y)

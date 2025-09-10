@@ -23,12 +23,12 @@ var listCmd = &cobra.Command{
 		if ez.Kube.IsClusterRunning() {
 			i, err := ez.Kube.GetInstalledAddons()
 			if err != nil {
-				ctx.Printer.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
+				ez.Kube.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 				os.Exit(1)
 			}
 			installed = append(installed, i...)
 		} else {
-			ctx.Printer.FmtYellow("Kind cluster not running, will not show installed addons\n")
+			ez.Kube.FmtYellow("Kind cluster not running, will not show installed addons\n")
 		}
 
 		// Extract and sort the keys
@@ -49,7 +49,7 @@ var listCmd = &cobra.Command{
 
 		if ctx.GetBoolFlag("plain") {
 			for _, pm := range keys {
-				ctx.Printer.FmtGreen(pm)
+				ez.Kube.FmtGreen(pm)
 			}
 		} else {
 

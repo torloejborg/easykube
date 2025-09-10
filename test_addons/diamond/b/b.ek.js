@@ -1,0 +1,3 @@
+let configuration = {
+    "dependsOn": ["d"]
+}

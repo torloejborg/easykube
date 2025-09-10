@@ -7,6 +7,7 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type Easykube struct {
@@ -45,7 +46,6 @@ func ConfigureEasykubeScript(ctx *ekctx.EKContext, addon *AddonContext) {
 }
 
 func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
-	out := e.EKContext.Printer
 	argLen := len(f.Arguments)
 	var undef = 0
 	for v := range f.Arguments {
@@ -55,7 +55,7 @@ func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
 	}
 
 	if undef != 0 {
-		out.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
+		ez.Kube.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
 			e.AddonCtx.addon.Name,
 			jsName,
 			argLen,

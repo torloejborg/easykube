@@ -8,8 +8,6 @@ import (
 	"github.com/torloejborg/easykube/ekctx"
 )
 
-var FILESYSTEM = afero.NewOsFs()
-
 // EkCmdContext Initialized to empty struct, context will be set later when Cobra is initializing (root.go in cmd package)
 var EkCmdContext = &ekctx.EKContext{}
 
@@ -46,11 +44,14 @@ type Toolbox struct {
 	IContainerRuntime
 	IClusterUtils
 	ekctx.EKContext
+	ekctx.Printer
 	afero.Fs
 	OsDetails
 }
 
-var Kube = &Toolbox{}
+var Kube = &Toolbox{
+	Printer: ekctx.Printer{},
+}
 
 func (t *Toolbox) UseK8sUtils(newUtils IK8SUtils) *Toolbox {
 	t.IK8SUtils = newUtils
@@ -96,15 +97,15 @@ func (t *Toolbox) UseOsDetails(ctx OsDetails) {
 }
 
 func CreateK8sUtilsImpl() IK8SUtils {
-	return NewK8SUtils(EkCmdContext, FILESYSTEM)
+	return NewK8SUtils(EkCmdContext)
 }
 
 func CreateEasykubeConfigImpl(osd OsDetails) IEasykubeConfig {
-	return NewEasykubeConfig(FILESYSTEM, osd)
+	return NewEasykubeConfig(osd)
 }
 
-func CreateAddonReaderImpl() IAddonReader {
-	return NewAddonReader(EkCmdContext, FILESYSTEM)
+func CreateAddonReaderImpl(config IEasykubeConfig) IAddonReader {
+	return NewAddonReader(config)
 }
 
 func CreateExternalToolsImpl() IExternalTools {
@@ -112,14 +113,14 @@ func CreateExternalToolsImpl() IExternalTools {
 }
 
 func CreateContainerRuntimeImpl() IContainerRuntime {
-	return NewContainerRuntime(FILESYSTEM)
+	return NewContainerRuntime()
 }
 
 func CreateClusterUtilsImpl() IClusterUtils {
 	return NewClusterUtils(EkCmdContext)
 }
 
-func CreateOsDetails() OsDetails {
+func CreateOsDetailsImpl() OsDetails {
 	return &OsDetailsImpl{}
 }
 
@@ -130,14 +131,15 @@ func InitializeKubeSingleton(cmd *cobra.Command, ctx ekctx.EKContext) {
 	// initialized here where the application is bootstrapped, perhaps that's ok. - Send PR's :)
 	EkCmdContext = &ctx
 
-	osd := CreateOsDetails()
+	osd := CreateOsDetailsImpl()
+	config := CreateEasykubeConfigImpl(osd)
 
+	Kube.UseFilesystemLayer(afero.NewOsFs())
 	Kube.UseOsDetails(osd)
 	Kube.UseCmdContext(ctx)
-	Kube.UseFilesystemLayer(FILESYSTEM)
 	Kube.UseK8sUtils(CreateK8sUtilsImpl())
-	Kube.UseEasykubeConfig(CreateEasykubeConfigImpl(osd))
-	Kube.UseAddonReader(CreateAddonReaderImpl())
+	Kube.UseEasykubeConfig(config)
+	Kube.UseAddonReader(CreateAddonReaderImpl(config))
 	Kube.UseExternalTools(CreateExternalToolsImpl())
 	Kube.UseContainerRuntime(CreateContainerRuntimeImpl())
 	Kube.UseClusterUtils(CreateClusterUtilsImpl())

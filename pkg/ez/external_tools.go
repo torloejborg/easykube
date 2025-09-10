@@ -34,8 +34,6 @@ func NewExternalTools(context *ekctx.EKContext) IExternalTools {
 
 func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
-	out := et.ctx.Printer
-
 	kustomize := exec.Command(
 		"kustomize",
 		"build",
@@ -49,7 +47,7 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
 	var err = kustomize.Run()
 	if err != nil {
-		out.FmtRed("kustomize failed with %s", string(stderr.Bytes()))
+		Kube.FmtRed("kustomize failed with %s", string(stderr.Bytes()))
 		panic(err)
 	} else {
 		// save output to file
@@ -83,7 +81,7 @@ func (et *ExternalToolsImpl) ApplyYaml(yamlFile string) {
 	err := kubectl.Run()
 
 	if err != nil {
-		et.ctx.Printer.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
+		Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
 		os.Exit(-1)
 	}
 
@@ -97,7 +95,7 @@ func (et *ExternalToolsImpl) DeleteYaml(yamlFile string) {
 
 	err := kubectl.Run()
 	if err != nil {
-		et.ctx.Printer.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
+		Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
 		os.Exit(-1)
 	}
 
@@ -105,30 +103,30 @@ func (et *ExternalToolsImpl) DeleteYaml(yamlFile string) {
 
 func (et *ExternalToolsImpl) EnsureLocalContext() {
 	kubectl := exec.Command("kubectl", "config", "use-context", constants.CLUSTER_CONTEXT)
-	out := et.ctx.Printer
+
 	var stdout, stderr bytes.Buffer
 	kubectl.Stdout = &stdout
 	kubectl.Stderr = &stderr
 
 	if len(os.Getenv("KUBECONFIG")) == 0 {
-		out.FmtGreen("Please configure the KUBECONFIG environment variable to include .kube/easykube configuration file")
+		Kube.FmtGreen("Please configure the KUBECONFIG environment variable to include .kube/easykube configuration file")
 		fmt.Println()
-		out.FmtGreen("https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable")
+		Kube.FmtGreen("https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable")
 		fmt.Println()
-		out.FmtYellow("(The cluster is running, but you cannot manage it yet)")
+		Kube.FmtYellow("(The cluster is running, but you cannot manage it yet)")
 		home, _ := os.UserHomeDir()
 		_ = os.Setenv("KUBECONFIG", filepath.Join(home, ".kube", constants.CLUSTER_NAME))
 	} else {
 		err := kubectl.Run()
 		if err != nil {
-			et.ctx.Printer.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
+			Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
 			os.Exit(-1)
 		}
 	}
 }
 
 func (et *ExternalToolsImpl) SwitchContext(name string) {
-	out := et.ctx.Printer
+
 	kubectl := exec.Command("kubectl", "config", "use-context", name)
 	var stdout, stderr bytes.Buffer
 	kubectl.Stdout = &stdout
@@ -136,10 +134,10 @@ func (et *ExternalToolsImpl) SwitchContext(name string) {
 
 	err := kubectl.Run()
 	if err != nil {
-		et.ctx.Printer.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
+		Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
 		os.Exit(-1)
 	}
-	out.FmtYellow("operating in context '%s'", name)
+	Kube.FmtYellow("operating in context '%s'", name)
 }
 
 func (et *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout string, stderr string, err error) {

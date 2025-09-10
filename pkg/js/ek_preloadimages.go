@@ -15,7 +15,7 @@ import (
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		out := ctx.EKContext.Printer
+
 		mustPull := ctx.EKContext.GetBoolFlag(constants.FLAG_PULL)
 		ctx.checkArgs(call, PRELOAD)
 
@@ -31,7 +31,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		var wg sync.WaitGroup
 
 		if mustPull {
-			out.FmtYellow("🖼 will pull fresh images")
+			ez.Kube.FmtYellow("🖼 will pull fresh images")
 		}
 
 		for source, dest := range result {
@@ -51,19 +51,19 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 							"password": string(s["artifactoryPassword"]),
 						})
 
-						out.FmtGreen("🖼  pull from private registry %s", source)
+						ez.Kube.FmtGreen("🖼  pull from private registry %s", source)
 						ez.Kube.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
 
 					} else {
-						out.FmtGreen("🖼  pull %s", source)
+						ez.Kube.FmtGreen("🖼  pull %s", source)
 						ez.Kube.PullImage(source, nil)
 					}
 
-					out.FmtGreen("🖼  tag %s to %s", source, dest)
+					ez.Kube.FmtGreen("🖼  tag %s to %s", source, dest)
 					ez.Kube.TagImage(source, dest)
 
 					ez.Kube.PushImage(dest)
-					out.FmtGreen("🖼  push %s", dest)
+					ez.Kube.FmtGreen("🖼  push %s", dest)
 				}
 				defer wg.Done()
 			}()

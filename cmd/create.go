@@ -22,24 +22,23 @@ var createCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		appContext := ekctx.GetAppContext(cmd)
-		out := appContext.Printer
 
 		if ez.Kube.IsContainerRunning(constants.KIND_CONTAINER) {
-			out.FmtYellow("Cluster was already created, exiting.")
+			ez.Kube.FmtYellow("Cluster was already created, exiting.")
 			os.Exit(0)
 		}
 
-		out.FmtGreen("Bootstrapping easykube single node cluster")
+		ez.Kube.FmtGreen("Bootstrapping easykube single node cluster")
 		// Ensure configation exists
 		ez.Kube.MakeConfig()
 
 		if !ez.Kube.HasImage(constants.REGISTRY_IMAGE) {
-			out.FmtYellow("Pulling docker registry image")
+			ez.Kube.FmtYellow("Pulling docker registry image")
 			ez.Kube.PullImage(constants.REGISTRY_IMAGE, nil)
 		}
 
 		if !ez.Kube.HasImage(constants.KIND_IMAGE) {
-			out.FmtYellow("Pulling kind image")
+			ez.Kube.FmtYellow("Pulling kind image")
 			ez.Kube.PullImage(constants.KIND_IMAGE, nil)
 		}
 
@@ -48,20 +47,20 @@ var createCmd = &cobra.Command{
 
 		occupiedPorts, _ := ensureClusterPortsFree(ez.Kube.GetAddons())
 		if nil != occupiedPorts {
-			out.FmtGreen("Can not create easykube cluster")
+			ez.Kube.FmtGreen("Can not create easykube cluster")
 			fmt.Println()
 			for k, v := range occupiedPorts {
-				out.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.Name, strings.Join(ez.IntSliceToStrings(v), ","))
+				ez.Kube.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.Name, strings.Join(ez.IntSliceToStrings(v), ","))
 			}
 			fmt.Println()
-			out.FmtRed("Please halt your local services, or remove the ExtraPorts configuration from the addons listed above ")
+			ez.Kube.FmtRed("Please halt your local services, or remove the ExtraPorts configuration from the addons listed above ")
 			os.Exit(-1)
 		}
 
 		report := ez.Kube.CreateKindCluster(ez.Kube.GetAddons())
 
 		// The cluster is created, and so it will have a new context,
-		ez.Kube.UseK8sUtils(ez.NewK8SUtils(appContext, appContext.Fs))
+		ez.Kube.UseK8sUtils(ez.NewK8SUtils(appContext))
 
 		ez.Kube.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 
@@ -72,7 +71,7 @@ var createCmd = &cobra.Command{
 			panic(err)
 		}
 
-		out.FmtGreen(report)
+		ez.Kube.FmtGreen(report)
 
 		// switch to the easykube context
 		ez.Kube.EnsureLocalContext()
@@ -81,22 +80,22 @@ var createCmd = &cobra.Command{
 		createSecret := appContext.GetStringFlag("secret")
 		if len(createSecret) != 0 {
 
-			out.FmtGreen("importing property %s file as secret %s containing:", createSecret, "easykube-secrets")
+			ez.Kube.FmtGreen("importing property %s file as secret %s containing:", createSecret, "easykube-secrets")
 			fmt.Println()
 			configmap, err := ez.ReadPropertyFile(createSecret)
 
 			for key := range configmap {
-				out.FmtGreen("⚿ %s", key)
+				ez.Kube.FmtGreen("⚿ %s", key)
 			}
 
 			if err != nil {
-				out.FmtRed("Did not locate %s\n", createSecret)
+				ez.Kube.FmtRed("Did not locate %s\n", createSecret)
 				os.Exit(-1)
 			}
 
 			ez.Kube.CreateSecret("default", "easykube-secrets", configmap)
 		} else {
-			out.FmtYellow("Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries.")
+			ez.Kube.FmtYellow("Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries.")
 		}
 	},
 }

@@ -35,8 +35,6 @@ hint: start with 'easykube config'
 		ctx := ekctx.EKContext{
 			Command: cmd,
 			Logger:  log.New(os.Stdout, "", log.LstdFlags),
-			Printer: &ekctx.Printer{},
-			Fs:      ez.FILESYSTEM,
 		}
 
 		cmd.SetContext(withAppContext(cmd.Context(), &ctx))

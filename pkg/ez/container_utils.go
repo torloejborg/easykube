@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
@@ -109,7 +108,7 @@ type IContainerRuntime interface {
 	Commit(containerID string)
 }
 
-func NewContainerRuntime(fs afero.Fs) IContainerRuntime {
+func NewContainerRuntime() IContainerRuntime {
 
 	cfg, err := Kube.LoadConfig()
 	if err != nil {
@@ -118,6 +117,6 @@ func NewContainerRuntime(fs afero.Fs) IContainerRuntime {
 	if cfg.ContainerRuntime == "podman" {
 		return NewPodmanImpl()
 	} else {
-		return NewDockerImpl(fs)
+		return NewDockerImpl()
 	}
 }

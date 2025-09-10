@@ -29,7 +29,7 @@ type DockerImpl struct {
 	Fs     afero.Fs
 }
 
-func NewDockerImpl(fs afero.Fs) IContainerRuntime {
+func NewDockerImpl() IContainerRuntime {
 
 	docker, err := client.NewClientWithOpts(
 		client.FromEnv,
@@ -43,7 +43,6 @@ func NewDockerImpl(fs afero.Fs) IContainerRuntime {
 		Docker: docker,
 		ctx:    context.Background(),
 		Common: ContainerRuntimeCommon{},
-		Fs:     fs,
 	}
 
 }

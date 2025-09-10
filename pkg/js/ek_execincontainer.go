@@ -12,8 +12,6 @@ func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, EXEC_IN_CONTAINER)
 
-		out := ctx.EKContext.Printer
-
 		deployment := call.Argument(0).String()
 		namespace := call.Argument(1).String()
 		command := call.Argument(2).String()
@@ -24,8 +22,8 @@ func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 			if strings.Contains(pods[i], deployment) {
 				stdout, stderr, err := ez.Kube.ExecInPod(namespace, pods[i], command, args)
 				if err != nil {
-					out.FmtRed(stderr)
-					out.FmtRed(err.Error())
+					ez.Kube.FmtRed(stderr)
+					ez.Kube.FmtRed(err.Error())
 					return ctx.AddonCtx.vm.ToValue(stderr)
 				}
 

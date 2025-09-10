@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 
@@ -13,7 +12,6 @@ var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "starts the cluster node and registry container",
 	Long:  "", Run: func(cmd *cobra.Command, args []string) {
-		ctx := ekctx.GetAppContext(cmd)
 
 		type StartStatus struct {
 			Name    string
@@ -50,19 +48,19 @@ var startCmd = &cobra.Command{
 		registry := x(constants.REGISTRY_CONTAINER)
 
 		if cluster.OK {
-			ctx.Printer.FmtGreen(cluster.Message)
+			ez.Kube.FmtGreen(cluster.Message)
 		} else {
-			ctx.Printer.FmtRed(cluster.Message)
+			ez.Kube.FmtRed(cluster.Message)
 		}
 
 		if registry.OK {
-			ctx.Printer.FmtGreen(registry.Message)
+			ez.Kube.FmtGreen(registry.Message)
 		} else {
-			ctx.Printer.FmtRed(registry.Message)
+			ez.Kube.FmtRed(registry.Message)
 		}
 
 		if !registry.OK && !cluster.OK {
-			ctx.Printer.FmtYellow("Hint:\n")
+			ez.Kube.FmtYellow("Hint:\n")
 			createCmd.Help()
 		}
 

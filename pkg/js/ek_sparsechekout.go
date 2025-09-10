@@ -15,7 +15,6 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 		currentDir, _ := os.Getwd()
 		defer os.Chdir(currentDir)
 
-		out := e.EKContext.Printer
 		repo := call.Argument(0).String()
 		branch := call.Argument(1).String()
 		source := call.Argument(2)
@@ -24,11 +23,11 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 		destination := call.Argument(3).String()
 		if ez.FileOrDirExists(destination) {
-			out.FmtYellow("Repository %s already checked out at %s", repo, destination)
+			ez.Kube.FmtYellow("Repository %s already checked out at %s", repo, destination)
 			return call.This
 		}
 
-		err := e.EKContext.Fs.MkdirAll(destination, 0777)
+		err := ez.Kube.MkdirAll(destination, 0777)
 		if err != nil {
 			panic(err)
 		}
@@ -41,11 +40,11 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			}
 
 			if stderr != "" {
-				out.FmtGreen(stderr)
+				ez.Kube.FmtGreen(stderr)
 			}
 
 			if stdout != "" {
-				out.FmtGreen(stdout)
+				ez.Kube.FmtGreen(stdout)
 			}
 		}
 

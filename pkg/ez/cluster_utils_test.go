@@ -37,7 +37,7 @@ func TestConfigGeneratedFromAddons(t *testing.T) {
 
 func TestCreateCluster(*testing.T) {
 
-	Kube.IClusterUtils.EnsurePersistenceDirectory()
+	Kube.EnsurePersistenceDirectory()
 
 }
 

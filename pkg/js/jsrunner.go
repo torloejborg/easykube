@@ -71,7 +71,7 @@ func NewJsUtils(ctx *ekctx.EKContext, source *ez.Addon) IJsUtils {
 }
 
 func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
-	script := a.ReadScriptFile(jsu.EKContext.Fs)
+	script := a.ReadScriptFile(ez.Kube.Fs)
 
 	// Before we execute the addon javascript, set the working directory, such that all fileoperations for
 	// the addon will be relative to the addon directory, when we are done, go back where we came from.
@@ -79,7 +79,7 @@ func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
 	ez.PushDir(filepath.Dir(a.File))
 	defer ez.PopDir()
 
-	jsu.EKContext.Printer.FmtGreen("🔧 Processing %s", a.Name)
+	ez.Kube.FmtGreen("🔧 Processing %s", a.Name)
 
 	// Wrap the JavaScript execution in a deferred function
 	err := func() (err error) {

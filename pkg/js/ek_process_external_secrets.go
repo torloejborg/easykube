@@ -35,12 +35,12 @@ func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ez.Externa
 			var es ez.ExternalSecret
 			itemBytes, err := yaml.Marshal(item)
 			if err != nil {
-				ctx.Printer.FmtRed("error marshaling item: %v", err)
+				ez.Kube.FmtRed("error marshaling item: %v", err)
 				continue
 			}
 			err = yaml.Unmarshal(itemBytes, &es)
 			if err != nil {
-				ctx.Printer.FmtRed("error unmarshaling item into ExternalSecret: %v", err)
+				ez.Kube.FmtRed("error unmarshaling item into ExternalSecret: %v", err)
 				continue
 			}
 			externalSecrets = append(externalSecrets, es)
@@ -52,7 +52,6 @@ func extractExternalSecrets(filePath string, ctx *ekctx.EKContext) ([]ez.Externa
 func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
-		out := ctx.EKContext.Printer
 		ctx.checkArgs(call, PROCESS_SECRETS)
 
 		var arg = call.Argument(0)
@@ -66,7 +65,7 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 			panic(err)
 		}
 
-		out.FmtGreen("Processing secrets and applying to %s", namespace)
+		ez.Kube.FmtGreen("Processing secrets and applying to %s", namespace)
 
 		filePath := manifest
 		externalSecrets, err := extractExternalSecrets(filePath, ctx.EKContext)
@@ -77,11 +76,11 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 		}
 
 		if err != nil {
-			out.FmtRed("Error extracting ExternalSecrets: %v", err)
+			ez.Kube.FmtRed("Error extracting ExternalSecrets: %v", err)
 		}
 
 		for _, es := range externalSecrets {
-			out.FmtGreen("Found ExternalSecret: %s", es.Metadata.Name)
+			ez.Kube.FmtGreen("Found ExternalSecret: %s", es.Metadata.Name)
 		}
 
 		return goja.Undefined()

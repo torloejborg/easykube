@@ -23,18 +23,17 @@ var skaffoldCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
 
 		addonName := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
 		addonDest := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
 
 		ekc, err := ez.Kube.LoadConfig()
 		if nil != err {
-			out.FmtGreen("cannot proceed without easykube configuration")
+			ez.Kube.FmtGreen("cannot proceed without easykube configuration")
 			os.Exit(-1)
 		}
 
-		skaf := ez.NewSkaffold(ekc.AddonDir, ez.FILESYSTEM)
+		skaf := ez.NewSkaffold(ekc.AddonDir)
 		skaf.CreateNewAddon(addonName, addonDest)
 
 	},

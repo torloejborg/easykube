@@ -23,27 +23,22 @@ type IAddonReader interface {
 type AddonReader struct {
 	EkConfig  *EasykubeConfigData
 	EkContext *ekctx.EKContext
-	Fs        afero.Fs
 }
 
-func NewAddonReader(ctx *ekctx.EKContext, fsFacade afero.Fs) IAddonReader {
-	cfg, err := Kube.LoadConfig()
+func NewAddonReader(config IEasykubeConfig) IAddonReader {
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 
 	return &AddonReader{
-		EkConfig:  cfg,
-		EkContext: ctx,
-		Fs:        fsFacade,
+		EkConfig: cfg,
 	}
 }
 
 func (adr *AddonReader) GetAddons() map[string]*Addon {
-	out := adr.EkContext.Printer
 
 	addons := make(map[string]*Addon)
-
 	addonExpre, _ := regexp.Compile(`^.+\.(ek.js)$`)
 
 	if adr.EkConfig == nil {
@@ -56,7 +51,7 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 
 	walkFunc := func(path string, entry fs.DirEntry, err error) error {
 		if !entry.IsDir() && addonExpre.MatchString(entry.Name()) {
-			file, _ := adr.Fs.Open(path)
+			file, _ := Kube.Fs.Open(path)
 
 			foundAddon := &Addon{
 				Name:      entry.Name(),
@@ -68,7 +63,7 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 			cfg, err := adr.ExtractConfiguration(foundAddon)
 
 			if err != nil {
-				out.FmtRed("there is issue in %s", foundAddon.Name)
+				Kube.FmtRed("there is issue in %s", foundAddon.Name)
 				panic(err)
 			}
 
@@ -96,7 +91,7 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err := g.AddEdge(toInstall, next)
 
 		if err != nil {
-			adr.EkContext.Printer.FmtRed(err.Error())
+			Kube.Printer.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 
@@ -106,16 +101,16 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err = outgraph.AddEdge(toInstall, next)
 
 		if err != nil {
-			adr.EkContext.Printer.FmtRed(err.Error())
+			Kube.Printer.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 	}
 }
 
 func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error) {
-	out := adr.EkContext.Printer
+	out := Kube.Printer
 
-	code, err := afero.ReadFile(adr.Fs, unconfigured.File)
+	code, err := afero.ReadFile(Kube.Fs, unconfigured.File)
 	if err != nil {
 		panic(err)
 	}

@@ -10,7 +10,6 @@ import (
 
 func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		out := ctx.EKContext.Printer
 
 		yamlFile := ez.Kube.KustomizeBuild(".")
 		ez.Kube.ApplyYaml(yamlFile)
@@ -20,7 +19,7 @@ func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 			ctx.AddonCtx.addon.ShortName,
 			[]byte(time.Now().String()))
 
-		out.FmtGreen("kustomize applied for %s", ctx.AddonCtx.addon.ShortName)
+		ez.Kube.FmtGreen("kustomize applied for %s", ctx.AddonCtx.addon.ShortName)
 
 		return call.This
 	}
@@ -28,9 +27,8 @@ func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 
 func (ctx *Easykube) KustomizeWithOverlay() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		out := ctx.EKContext.Printer
 
-		out.FmtYellow("kustomize with overlay")
+		ez.Kube.FmtYellow("kustomize with overlay")
 		overlay := call.Argument(0).String()
 
 		ez.Kube.KustomizeBuild(overlay)
@@ -41,7 +39,7 @@ func (ctx *Easykube) KustomizeWithOverlay() func(goja.FunctionCall) goja.Value {
 			ctx.AddonCtx.addon.ShortName,
 			[]byte(time.Now().String()))
 
-		out.FmtGreen("kustomize applied for %s using overlay %s", ctx.AddonCtx.addon.ShortName, overlay)
+		ez.Kube.FmtGreen("kustomize applied for %s using overlay %s", ctx.AddonCtx.addon.ShortName, overlay)
 
 		return call.This
 	}

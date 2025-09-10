@@ -106,13 +106,11 @@ type IK8SUtils interface {
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, namespace string) KubernetesSecret
 }
 
-func NewK8SUtils(ekContext *ekctx.EKContext, fileFacade afero.Fs) IK8SUtils {
-
-	out := ekContext.Printer
+func NewK8SUtils(ekContext *ekctx.EKContext) IK8SUtils {
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		out.FmtRed("cannot determine homedir")
+		Kube.FmtRed("cannot determine homedir")
 		panic(err)
 	}
 
@@ -132,7 +130,6 @@ func NewK8SUtils(ekContext *ekctx.EKContext, fileFacade afero.Fs) IK8SUtils {
 		Clientset:  clientset,
 		RestConfig: config,
 		EKContext:  ekContext,
-		Fs:         fileFacade,
 	}
 }
 
@@ -282,7 +279,6 @@ func (k *K8SUtilsImpl) DeleteKeyFromConfigmap(name, namespace, key string) {
 }
 
 func (k *K8SUtilsImpl) WaitForDeploymentReadyWatch(name, namespace string) error {
-	out := k.EKContext.Printer
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
@@ -298,7 +294,7 @@ func (k *K8SUtilsImpl) WaitForDeploymentReadyWatch(name, namespace string) error
 
 	defer watcher.Stop()
 
-	out.FmtGreen("Waiting for deployment %q in namespace %q to become ready...", name, namespace)
+	Kube.FmtGreen("Waiting for deployment %q in namespace %q to become ready...", name, namespace)
 
 	for event := range watcher.ResultChan() {
 		if event.Type == watch.Error {
@@ -311,7 +307,7 @@ func (k *K8SUtilsImpl) WaitForDeploymentReadyWatch(name, namespace string) error
 		}
 
 		if dep.Status.ReadyReplicas == *dep.Spec.Replicas {
-			out.FmtGreen("Deployment is ready!")
+			Kube.FmtGreen("Deployment is ready!")
 			return nil
 		}
 	}
@@ -548,8 +544,6 @@ func (k *K8SUtilsImpl) FindContainerInPod(deploymentName, namespace, containerPa
 
 func (k *K8SUtilsImpl) TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, namespace string) KubernetesSecret {
 
-	out := k.EKContext.Printer
-
 	// Initialize the Kubernetes Secret
 	k8sSecret := KubernetesSecret{
 		ApiVersion: "v1",
@@ -574,10 +568,10 @@ func (k *K8SUtilsImpl) TransformExternalSecret(secret ExternalSecret, mockData m
 
 				k8sSecret.Data[dataItem.SecretKey] = value
 			} else {
-				out.FmtYellow("Warning: Property %s not found in mockData for key %s\n", property, key)
+				Kube.FmtYellow("Warning: Property %s not found in mockData for key %s\n", property, key)
 			}
 		} else {
-			out.FmtYellow("Warning: Key %s not found in mockData\n", key)
+			Kube.FmtYellow("Warning: Key %s not found in mockData\n", key)
 		}
 	}
 

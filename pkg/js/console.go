@@ -3,6 +3,7 @@ package jsutils
 import (
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type ConsImpl struct {
@@ -14,7 +15,7 @@ type ICons interface {
 }
 
 func NewCons(ctx *ekctx.EKContext) ICons {
-	return &ConsImpl{out: ctx.Printer}
+	return &ConsImpl{out: &ez.Kube.Printer}
 }
 
 func (cons *ConsImpl) Console() map[string]func(goja.FunctionCall) goja.Value {

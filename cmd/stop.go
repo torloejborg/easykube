@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 
@@ -14,16 +13,14 @@ var stopCmd = &cobra.Command{
 	Short: "stops the cluster node and registry container",
 	Long:  "", Run: func(cmd *cobra.Command, args []string) {
 
-		ctx := ekctx.GetAppContext(cmd)
-
 		if ez.Kube.IsContainerRunning(constants.KIND_CONTAINER) {
 			ez.Kube.StopContainer(constants.KIND_CONTAINER)
-			ctx.Printer.FmtGreen("stopping %s", constants.KIND_CONTAINER)
+			ez.Kube.FmtGreen("stopping %s", constants.KIND_CONTAINER)
 		}
 
 		if ez.Kube.IsContainerRunning(constants.REGISTRY_CONTAINER) {
 			ez.Kube.StopContainer(constants.REGISTRY_CONTAINER)
-			ctx.Printer.FmtGreen("stopping %s", constants.REGISTRY_CONTAINER)
+			ez.Kube.FmtGreen("stopping %s", constants.REGISTRY_CONTAINER)
 		}
 	},
 }

@@ -7,7 +7,7 @@ import (
 
 func (ctx *Easykube) WaitForDeployment() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		out := ctx.EKContext.Printer
+
 		ctx.checkArgs(call, WAIT_FOR_DEPLOYMENT)
 
 		deployment := call.Arguments[0].ToString().String()
@@ -15,7 +15,7 @@ func (ctx *Easykube) WaitForDeployment() func(goja.FunctionCall) goja.Value {
 
 		err := ez.Kube.WaitForDeploymentReadyWatch(deployment, namespace)
 		if err != nil {
-			out.FmtRed("% did not come online before timed out", deployment)
+			ez.Kube.FmtRed("% did not come online before timed out", deployment)
 			return goja.Undefined()
 		}
 
