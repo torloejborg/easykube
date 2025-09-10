@@ -75,9 +75,9 @@ func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
 
 	// Before we execute the addon javascript, set the working directory, such that all fileoperations for
 	// the addon will be relative to the addon directory, when we are done, go back where we came from.
-	u := ez.Utils{Fs: jsu.EKContext.Fs}
-	u.PushDir(filepath.Dir(a.File))
-	defer u.PopDir()
+
+	ez.PushDir(filepath.Dir(a.File))
+	defer ez.PopDir()
 
 	jsu.EKContext.Printer.FmtGreen("🔧 Processing %s", a.Name)
 

@@ -261,15 +261,15 @@ func (cr *DockerImpl) IsContainerRuntimeAvailable() bool {
 }
 
 func (cr *DockerImpl) CreateContainerRegistry() {
-	u := Utils{cr.Fs}
+
 	registry := constants.REGISTRY_IMAGE
 	containerName := constants.REGISTRY_CONTAINER
 
 	// make sure that the registry-config file exists
 	configDir, _ := os.UserConfigDir()
-	u.CopyResource("registry-config.yaml", "registry-config.yaml")
-	u.CopyResource("cert/server.crt", "localtest.me.crt")
-	u.CopyResource("cert/server.key", "localtest.me.key")
+	CopyResource("registry-config.yaml", "registry-config.yaml")
+	CopyResource("cert/server.crt", "localtest.me.crt")
+	CopyResource("cert/server.key", "localtest.me.key")
 
 	imageSearch := cr.HasImage(registry)
 	if !imageSearch {

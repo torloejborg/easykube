@@ -2,23 +2,19 @@ package ez
 
 import (
 	"bufio"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
-	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
 var dirstack = &Stack[string]{}
 
-type Utils struct {
-	Fs afero.Fs
-}
-
-func (u Utils) PushDir(dir string) {
+func PushDir(dir string) {
 	//fmt.Println("pushdir " + dir)
 	err := os.Chdir(dir)
 	if err != nil {
@@ -27,7 +23,7 @@ func (u Utils) PushDir(dir string) {
 	dirstack.Push(dir)
 }
 
-func (u Utils) PopDir() {
+func PopDir() {
 	dir, result := dirstack.Pop()
 	if result {
 		//fmt.Println("popped dir " + dir)
@@ -38,37 +34,37 @@ func (u Utils) PopDir() {
 	}
 }
 
-func (u Utils) FileOrDirExists(path string) bool {
+func FileOrDirExists(path string) bool {
 
 	path = filepath.Clean(path)
 
-	_, err := u.Fs.Stat(path)
+	_, err := Kube.Fs.Stat(path)
 	return err == nil || os.IsExist(err)
 }
 
-func (u Utils) Check(err error) {
+func Check(err error) {
 	log.Fatal(err)
 }
 
 // Copies an embedded resource from src into the user configuration directory
 // dest is a relative path to ~/.config/easykube
-func (u Utils) CopyResource(src, dest string) {
+func CopyResource(src, dest string) {
 
-	configDir, err := os.UserConfigDir()
+	configDir, err := Kube.GetUserConfigDir()
 	if nil != err {
 		panic(err)
 	}
 
 	configDir = filepath.Join(configDir, "easykube")
 
-	u.Fs.MkdirAll(configDir, 0755)
+	Kube.Fs.MkdirAll(configDir, 0755)
 
 	destinationPath := filepath.Join(configDir, dest)
-	stat, _ := u.Fs.Stat(destinationPath)
+	stat, _ := Kube.Fs.Stat(destinationPath)
 
 	if stat == nil {
 
-		f, _ := u.Fs.Create(destinationPath)
+		f, _ := Kube.Fs.Create(destinationPath)
 		defer f.Close()
 
 		sourceData, err := resources.AppResources.ReadFile("data/" + src)
@@ -83,9 +79,9 @@ func (u Utils) CopyResource(src, dest string) {
 	}
 }
 
-func (u Utils) SaveFile(data string, dest string) {
+func SaveFile(data string, dest string) {
 
-	file, err := u.Fs.Create(dest)
+	file, err := Kube.Fs.Create(dest)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,8 +96,8 @@ func (u Utils) SaveFile(data string, dest string) {
 	}
 }
 
-func (u Utils) ReadPropertyFile(path string) (map[string]string, error) {
-	props, err := u.Fs.OpenFile(path, os.O_RDONLY, os.ModePerm)
+func ReadPropertyFile(path string) (map[string]string, error) {
+	props, err := Kube.Fs.OpenFile(path, os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -121,10 +117,24 @@ func (u Utils) ReadPropertyFile(path string) (map[string]string, error) {
 
 }
 
-func (u Utils) IntSliceToStrings(input []int) []string {
+func IntSliceToStrings(input []int) []string {
 	result := make([]string, len(input))
 	for i, n := range input {
 		result[i] = strconv.Itoa(n)
 	}
 	return result
+}
+
+func ReadFileToBytes(filename string) ([]byte, error) {
+	file, err := Kube.Fs.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close() // Ensure the file is closed after reading
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }

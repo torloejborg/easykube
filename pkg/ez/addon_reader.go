@@ -27,7 +27,7 @@ type AddonReader struct {
 }
 
 func NewAddonReader(ctx *ekctx.EKContext, fsFacade afero.Fs) IAddonReader {
-	cfg, err := CreateEasykubeConfigImpl().LoadConfig()
+	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 		panic("expected ekconfig pointer!")
 	}
 
-	if _, err := adr.Fs.Stat(adr.EkConfig.AddonDir); err != nil {
+	if _, err := Kube.Stat(adr.EkConfig.AddonDir); err != nil {
 		return addons
 	}
 

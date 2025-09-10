@@ -10,9 +10,8 @@ func (ctx *Easykube) AndThenApply() func(goja.FunctionCall) goja.Value {
 
 		out := ctx.EKContext.Printer
 		toApply := call.Argument(0).String()
-		u := ez.Utils{Fs: ctx.EKContext.Fs}
 
-		if !u.FileOrDirExists(toApply) {
+		if !ez.FileOrDirExists(toApply) {
 			out.FmtRed("could not locate %s to apply", toApply)
 		}
 		ctx.checkArgs(call, AND_THEN_APPLY)

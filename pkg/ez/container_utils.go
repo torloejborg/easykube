@@ -71,31 +71,47 @@ func (i *ContainerRuntimeCommon) ImageExistsInKindRegistry(image string) bool {
 	return false
 }
 
-type IContainerRuntime interface {
-	IsClusterRunning() bool
-	IsNetworkConnectedToContainer(containerID string, networkID string) bool
+type ContainerImageManager interface {
 	IsContainerRunning(containerID string) bool
 	PushImage(image string)
 	PullImage(image string, privateRegistryCredentials *string)
 	HasImage(image string) bool
+	TagImage(source, target string)
+}
+
+type ContainerContainerManager interface {
 	FindContainer(name string) ContainerSearch
-	HasImageInKindRegistry(name string) bool
 	StartContainer(id string)
 	StopContainer(id string)
 	RemoveContainer(id string)
-	Exec(containerId string, cmd []string)
 	ContainerWriteFile(containerId string, dst string, filename string, data []byte)
+}
+
+type ContainerNetworkManager interface {
 	NetworkConnect(containerId string, networkId string)
+	IsNetworkConnectedToContainer(containerID string, networkID string) bool
+}
+
+type IContainerRuntime interface {
+	ContainerImageManager
+	ContainerContainerManager
+	ContainerNetworkManager
+
+	IsClusterRunning() bool
+
+	HasImageInKindRegistry(name string) bool
+
+	Exec(containerId string, cmd []string)
+
 	CloseContainerRuntime()
 	IsContainerRuntimeAvailable() bool
 	CreateContainerRegistry()
 	Commit(containerID string)
-	TagImage(source, target string)
 }
 
 func NewContainerRuntime(fs afero.Fs) IContainerRuntime {
 
-	cfg, err := NewEasykubeConfig(fs).LoadConfig()
+	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}

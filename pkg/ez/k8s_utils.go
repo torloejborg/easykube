@@ -76,21 +76,33 @@ type KubernetesSecret struct {
 	Type       string            `yaml:"type"`
 }
 
-type IK8SUtils interface {
+type K8sSecretManager interface {
 	CreateSecret(namespace, secretName string, data map[string]string)
+	GetSecret(name, namespace string) (map[string][]byte, error)
+}
+
+type K8sConfigManager interface {
 	CreateConfigmap(name, namespace string) error
 	DeleteKeyFromConfigmap(name, namespace, key string)
-	ExecInPod(namespace, pod, command string, args []string) (string, string, error)
-	GetInstalledAddons() ([]string, error)
-	UpdateConfigMap(name, namespace, key string, data []byte)
-	ListPods(namespace string) ([]string, error)
-	PatchCoreDNS()
 	ReadConfigmap(name string, namespace string) (map[string]string, error)
+	UpdateConfigMap(name, namespace, key string, data []byte)
+}
+
+type K8sPodManager interface {
+	FindContainerInPod(deploymentName, namespace, containerPartialName string) (string, string, error)
+	ExecInPod(namespace, pod, command string, args []string) (string, string, error)
+	CopyFileToPod(namespace, pod, container, localPath, remotePath string) error
+	ListPods(namespace string) ([]string, error)
+}
+
+type IK8SUtils interface {
+	K8sSecretManager
+	K8sConfigManager
+	K8sPodManager
+	GetInstalledAddons() ([]string, error)
+	PatchCoreDNS()
 	WaitForDeploymentReadyWatch(name, namespace string) error
 	WaitForCRD(group, version, kind string, timeout time.Duration) error
-	CopyFileToPod(namespace, pod, container, localPath, remotePath string) error
-	FindContainerInPod(deploymentName, namespace, containerPartialName string) (string, string, error)
-	GetSecret(name, namespace string) (map[string][]byte, error)
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, namespace string) KubernetesSecret
 }
 

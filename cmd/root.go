@@ -40,21 +40,7 @@ hint: start with 'easykube config'
 		}
 
 		cmd.SetContext(withAppContext(cmd.Context(), &ctx))
-		ez.Kube = &ez.Toolbox{}
-		// My go-fu is not strong yet, so this feels a bit funky, I want to have some factories
-		// produce the utility instances, and they need the EKContext upfront - since the variable is
-		// initialized here where the application is bootstrapped, perhaps that's ok. - Send PR's :)
-		ez.EkCmdContext = &ctx
-
-		ez.Kube.UseCmdContext(ctx)
-		ez.Kube.UseFilesystemLayer(ez.FILESYSTEM)
-		ez.Kube.UseK8sUtils(ez.CreateK8sUtilsImpl())
-		ez.Kube.UseEasykubeConfig(ez.CreateEasykubeConfigImpl())
-		ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl())
-		ez.Kube.UseExternalTools(ez.CreateExternalToolsImpl())
-		ez.Kube.UseContainerRuntime(ez.CreateContainerRuntimeImpl())
-		ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
-
+		ez.InitializeKubeSingleton(cmd, ctx)
 	},
 }
 

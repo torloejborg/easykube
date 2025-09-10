@@ -36,8 +36,8 @@ type EasykubeConfig struct {
 	Fs            afero.Fs
 }
 
-func NewEasykubeConfig(fileFacade afero.Fs) IEasykubeConfig {
-	configDir, _ := os.UserConfigDir()
+func NewEasykubeConfig(fileFacade afero.Fs, os OsDetails) IEasykubeConfig {
+	configDir, _ := os.GetUserConfigDir()
 	return &EasykubeConfig{
 		UserConfigDir: configDir,
 		ConfigDirName: "easykube",
@@ -72,9 +72,14 @@ func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
 
 	// add driver for support yaml content
 	config.AddDriver(yaml.Driver)
-	configDir := ec.UserConfigDir
+	configDir, _ := Kube.GetUserConfigDir()
 
-	err := config.LoadFiles(filepath.Join(configDir, ec.ConfigDirName, "config.yaml"))
+	data, err := ReadFileToBytes(filepath.Join(configDir, ec.ConfigDirName, "config.yaml"))
+	if err != nil {
+		return nil, err
+	}
+
+	err = config.LoadSources("yaml", data)
 	if err != nil {
 		return nil, err
 	}
@@ -110,13 +115,13 @@ func (ec *EasykubeConfig) EditConfig() {
 }
 
 func (ec *EasykubeConfig) MakeConfig() {
-	userConfigDir, err := os.UserConfigDir()
+	userConfigDir, err := Kube.GetUserConfigDir()
 	if nil != err {
 		log.Fatal(err)
 	}
 
 	pathToConfigFile := filepath.Join(userConfigDir, ec.ConfigDirName, "config.yaml")
-	_, err = ec.Fs.Stat(pathToConfigFile)
+	_, err = Kube.Fs.Stat(pathToConfigFile)
 
 	if os.IsNotExist(err) {
 		ec.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
@@ -127,7 +132,7 @@ func (ec *EasykubeConfig) MakeConfig() {
 			PersistenceDir:   filepath.Join(ec.UserConfigDir, ec.ConfigDirName, "persistence"),
 		}
 
-		file, err := ec.Fs.Create(pathToConfigFile)
+		file, err := Kube.Fs.Create(pathToConfigFile)
 		if nil != err {
 			log.Panic(err)
 		}
@@ -154,10 +159,10 @@ func (ec *EasykubeConfig) MakeConfig() {
 		if nil != err {
 			log.Panic(err)
 		}
-		utl := Utils{Fs: ec.Fs}
-		utl.CopyResource("cert/localtest.me.crt", "localtest.me.crt")
-		utl.CopyResource("cert/localtest.me.key", "localtest.me.key")
-		utl.CopyResource("registry-config.yaml", "registry-config.yaml")
+
+		CopyResource("cert/localtest.me.crt", "localtest.me.crt")
+		CopyResource("cert/localtest.me.key", "localtest.me.key")
+		CopyResource("registry-config.yaml", "registry-config.yaml")
 
 	}
 }

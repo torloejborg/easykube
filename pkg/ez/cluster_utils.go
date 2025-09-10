@@ -8,7 +8,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
@@ -26,18 +25,16 @@ type ClusterUtils struct {
 	Debug     bool
 	EkConfig  *EasykubeConfigData
 	EkContext *ekctx.EKContext
-	Fs        afero.Fs
 }
 
-func NewClusterUtils(ctx *ekctx.EKContext, fileFacade afero.Fs) IClusterUtils {
-	cfg, err := NewEasykubeConfig(ctx.Fs).LoadConfig()
+func NewClusterUtils(ctx *ekctx.EKContext) IClusterUtils {
+	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 	return &ClusterUtils{
 		EkConfig:  cfg,
 		EkContext: ctx,
-		Fs:        fileFacade,
 	}
 }
 
@@ -78,7 +75,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		if cp == nil {
 			panic("no cluster provider")
 		}
-		homedir, _ := os.UserHomeDir()
+		homedir, _ := Kube.GetUserHomeDir()
 
 		currentDir, e := os.Getwd()
 		if e != nil {
@@ -95,9 +92,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		configDir, _ := os.UserConfigDir()
 		configFile := u.RenderToYAML(addonList)
 
-		utl := Utils{Fs: u.Fs}
-
-		utl.SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
+		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)
 		optNoGreeting := cluster.CreateWithDisplaySalutation(false)

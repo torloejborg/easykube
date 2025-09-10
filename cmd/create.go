@@ -46,13 +46,12 @@ var createCmd = &cobra.Command{
 		ez.Kube.EnsurePersistenceDirectory()
 		ez.Kube.CreateContainerRegistry()
 
-		u := ez.Utils{ez.FILESYSTEM}
 		occupiedPorts, _ := ensureClusterPortsFree(ez.Kube.GetAddons())
 		if nil != occupiedPorts {
 			out.FmtGreen("Can not create easykube cluster")
 			fmt.Println()
 			for k, v := range occupiedPorts {
-				out.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.Name, strings.Join(u.IntSliceToStrings(v), ","))
+				out.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.Name, strings.Join(ez.IntSliceToStrings(v), ","))
 			}
 			fmt.Println()
 			out.FmtRed("Please halt your local services, or remove the ExtraPorts configuration from the addons listed above ")
@@ -84,7 +83,7 @@ var createCmd = &cobra.Command{
 
 			out.FmtGreen("importing property %s file as secret %s containing:", createSecret, "easykube-secrets")
 			fmt.Println()
-			configmap, err := u.ReadPropertyFile(createSecret)
+			configmap, err := ez.ReadPropertyFile(createSecret)
 
 			for key := range configmap {
 				out.FmtGreen("⚿ %s", key)

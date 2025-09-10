@@ -14,9 +14,8 @@ import (
 
 func remove(addon *ez.Addon, ctx *ekctx.EKContext) {
 	// enter the addon directory
-	u := ez.Utils{Fs: ez.FILESYSTEM}
-	u.PushDir(filepath.Dir(addon.File))
-	defer u.PopDir()
+	ez.PushDir(filepath.Dir(addon.File))
+	defer ez.PopDir()
 
 	yamlFile := ez.Kube.KustomizeBuild(".")
 	ez.Kube.DeleteYaml(yamlFile)
