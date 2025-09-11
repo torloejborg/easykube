@@ -17,13 +17,14 @@ func remove(addon *ez.Addon) {
 	defer ez.PopDir()
 
 	yamlFile := ez.Kube.KustomizeBuild(".")
-	ez.Kube.DeleteYaml(yamlFile)
-	ez.Kube.FmtGreen("removed %s", addon.ShortName)
-	ez.Kube.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
+	ezk := ez.Kube
+	ezk.DeleteYaml(yamlFile)
+	ezk.FmtGreen("removed %s", addon.ShortName)
+	ezk.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
 
-	err := ez.Kube.Remove(constants.KUSTOMIZE_TARGET_OUTPUT)
+	err := ezk.Remove(constants.KUSTOMIZE_TARGET_OUTPUT)
 	if err != nil {
-		ez.Kube.FmtYellow("%s could not be deleted", constants.KUSTOMIZE_TARGET_OUTPUT)
+		ezk.FmtYellow("%s could not be deleted", constants.KUSTOMIZE_TARGET_OUTPUT)
 	}
 }
 
@@ -33,16 +34,18 @@ var removeCmd = &cobra.Command{
 	Short: "removes a previously installed addon",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
+		ezk := ez.Kube
 		// switch to the easykube context
-		ez.Kube.EnsureLocalContext()
+		ezk.EnsureLocalContext()
 
 		allAddons, aerr := ez.Kube.GetAddons()
 		if aerr != nil {
-			ez.Kube.FmtRed("could not get addons %s", aerr.Error())
+			ezk.FmtRed("could not get addons %s", aerr.Error())
 		}
-		installedAddons, e := ez.Kube.GetInstalledAddons()
+
+		installedAddons, e := ezk.GetInstalledAddons()
 		if e != nil {
-			ez.Kube.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
+			ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
 			os.Exit(1)
 		}
 

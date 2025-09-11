@@ -17,24 +17,24 @@ var listCmd = &cobra.Command{
 	Short: "lists available modules in the addon repository",
 	Long:  "installed addons has a tick-mark",
 	Run: func(cmd *cobra.Command, args []string) {
-
+		ezk := ez.Kube
 		commandHelper := ez.CommandHelper(cmd)
 
 		modules, aerr := ez.Kube.GetAddons()
 		if aerr != nil {
-			ez.Kube.FmtRed("list failed: %v", aerr)
+			ezk.FmtRed("list failed: %v", aerr)
 			os.Exit(1)
 		}
 		installed := make([]string, 0)
-		if ez.Kube.IsClusterRunning() {
+		if ezk.IsClusterRunning() {
 			i, err := ez.Kube.GetInstalledAddons()
 			if err != nil {
-				ez.Kube.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
+				ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 				os.Exit(1)
 			}
 			installed = append(installed, i...)
 		} else {
-			ez.Kube.FmtYellow("Kind cluster not running, will not show installed addons\n")
+			ezk.FmtYellow("Kind cluster not running, will not show installed addons\n")
 		}
 
 		// Extract and sort the keys
@@ -55,7 +55,7 @@ var listCmd = &cobra.Command{
 
 		if commandHelper.GetBoolFlag("plain") {
 			for _, pm := range keys {
-				ez.Kube.FmtGreen(pm)
+				ezk.FmtGreen(pm)
 			}
 		} else {
 

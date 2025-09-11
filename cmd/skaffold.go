@@ -21,6 +21,7 @@ var skaffoldCmd = &cobra.Command{
   Useful for starting a new addon.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		ezk := ez.Kube
 		commandHelper := ez.CommandHelper(cmd)
 
 		addonName := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
@@ -28,7 +29,7 @@ var skaffoldCmd = &cobra.Command{
 
 		ekc, err := ez.Kube.LoadConfig()
 		if nil != err {
-			ez.Kube.FmtGreen("cannot proceed without easykube configuration")
+			ezk.FmtGreen("cannot proceed without easykube configuration")
 			os.Exit(-1)
 		}
 

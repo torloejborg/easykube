@@ -13,16 +13,16 @@ var destroyCmd = &cobra.Command{
 	Short: "kills the current easykube cluster",
 	Long:  `stops and removes the easykube container, leaves the registry running`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		search := ez.Kube.FindContainer(constants.KIND_CONTAINER)
+		ezk := ez.Kube
+		search := ezk.FindContainer(constants.KIND_CONTAINER)
 
 		if search.Found {
-			ez.Kube.FmtYellow("Stopping %s", constants.KIND_CONTAINER)
+			ezk.FmtYellow("Stopping %s", constants.KIND_CONTAINER)
 			if search.IsRunning {
-				ez.Kube.StopContainer(search.ContainerID)
+				ezk.StopContainer(search.ContainerID)
 			}
-			ez.Kube.RemoveContainer(search.ContainerID)
-			ez.Kube.FmtYellow("Removing %s", constants.KIND_CONTAINER)
+			ezk.RemoveContainer(search.ContainerID)
+			ezk.FmtYellow("Removing %s", constants.KIND_CONTAINER)
 		}
 	},
 }

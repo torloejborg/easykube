@@ -12,7 +12,7 @@ var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "starts the cluster node and registry container",
 	Long:  "", Run: func(cmd *cobra.Command, args []string) {
-
+		ezk := ez.Kube
 		type StartStatus struct {
 			Name    string
 			Message string
@@ -34,7 +34,7 @@ var startCmd = &cobra.Command{
 					OK:      true,
 				}
 			} else if !f.IsRunning {
-				ez.Kube.StartContainer(container)
+				ezk.StartContainer(container)
 				return StartStatus{
 					Name:    container,
 					Message: container + " started",
@@ -48,19 +48,19 @@ var startCmd = &cobra.Command{
 		registry := x(constants.REGISTRY_CONTAINER)
 
 		if cluster.OK {
-			ez.Kube.FmtGreen(cluster.Message)
+			ezk.FmtGreen(cluster.Message)
 		} else {
-			ez.Kube.FmtRed(cluster.Message)
+			ezk.FmtRed(cluster.Message)
 		}
 
 		if registry.OK {
-			ez.Kube.FmtGreen(registry.Message)
+			ezk.FmtGreen(registry.Message)
 		} else {
-			ez.Kube.FmtRed(registry.Message)
+			ezk.FmtRed(registry.Message)
 		}
 
 		if !registry.OK && !cluster.OK {
-			ez.Kube.FmtYellow("Hint:\n")
+			ezk.FmtYellow("Hint:\n")
 			createCmd.Help()
 		}
 
