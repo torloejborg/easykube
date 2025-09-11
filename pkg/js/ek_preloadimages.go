@@ -7,16 +7,16 @@ import (
 	"sync"
 
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 	"k8s.io/utils/ptr"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		out := ctx.EKContext.Printer
-		mustPull := ctx.EKContext.GetBoolFlag(constants.FLAG_PULL)
+		ezk := ez.Kube
+		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FLAG_PULL)
 		ctx.checkArgs(call, PRELOAD)
 
 		var arg = call.Argument(0)
@@ -26,23 +26,22 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		if err != nil {
 			panic(err)
 		}
-		cru := ek.NewContainerRuntime(ctx.EKContext)
 
 		var i = 0
 		var wg sync.WaitGroup
 
 		if mustPull {
-			out.FmtYellow("🖼 will pull fresh images")
+			ezk.FmtYellow("🖼 will pull fresh images")
 		}
 
 		for source, dest := range result {
 			i++
 			wg.Add(1)
 			go func() {
-				if !cru.HasImageInKindRegistry(dest) || mustPull {
+				if !ezk.HasImageInKindRegistry(dest) || mustPull {
 
 					if strings.Contains(source, "ccta.dk") {
-						s, err := ek.NewK8SUtils(ctx.EKContext).GetSecret("easykube-secrets", "default")
+						s, err := ezk.GetSecret("easykube-secrets", "default")
 						if err != nil {
 							panic(err)
 						}
@@ -52,19 +51,19 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 							"password": string(s["artifactoryPassword"]),
 						})
 
-						out.FmtGreen("🖼  pull from private registry %s", source)
-						cru.Pull(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
+						ezk.FmtGreen("🖼  pull from private registry %s", source)
+						ezk.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
 
 					} else {
-						out.FmtGreen("🖼  pull %s", source)
-						cru.Pull(source, nil)
+						ezk.FmtGreen("🖼  pull %s", source)
+						ezk.PullImage(source, nil)
 					}
 
-					out.FmtGreen("🖼  tag %s to %s", source, dest)
-					cru.Tag(source, dest)
+					ezk.FmtGreen("🖼  tag %s to %s", source, dest)
+					ezk.TagImage(source, dest)
 
-					cru.Push(dest)
-					out.FmtGreen("🖼  push %s", dest)
+					ezk.PushImage(dest)
+					ezk.FmtGreen("🖼  push %s", dest)
 				}
 				defer wg.Done()
 			}()

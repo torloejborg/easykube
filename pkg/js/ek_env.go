@@ -14,7 +14,7 @@ func (ctx *Easykube) Env() func(goja.FunctionCall) goja.Value {
 		val := os.Getenv(key)
 
 		if val == "" {
-			return goja.Undefined()
+			return goja.Null()
 		} else {
 			return ctx.AddonCtx.vm.ToValue(val)
 		}

@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 var Version = "latest" // set by linker flag
@@ -13,9 +13,8 @@ var versionCmd = &cobra.Command{
 	Short: "shows the version of easykube CLI",
 	Long:  `shows the version of easykube CLI`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
-		out.FmtGreen(Version)
+
+		ez.Kube.FmtGreen(Version)
 	},
 }
 

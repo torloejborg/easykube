@@ -2,7 +2,7 @@ package jsutils
 
 import (
 	"github.com/google/uuid"
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type IUtils interface {
@@ -10,11 +10,11 @@ type IUtils interface {
 }
 
 type Utils struct {
-	EKContext *ekctx.EKContext
+	CommandHelper *ez.CobraCommandHelperImpl
 }
 
-func NewUtils(ctx *ekctx.EKContext) IUtils {
-	return &Utils{EKContext: ctx}
+func NewUtils(commandHelper *ez.CobraCommandHelperImpl) IUtils {
+	return &Utils{CommandHelper: commandHelper}
 }
 
 func (u *Utils) UUID() string {

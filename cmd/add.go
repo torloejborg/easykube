@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 	jsutils "github.com/torloejborg/easykube/pkg/js"
 )
 
@@ -19,55 +18,58 @@ var addCmd = &cobra.Command{
 	Long:  `by default addons also applies their dependencies`,
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
-		reader := ek.NewAddonReader(ekCtx)
-		addons := reader.GetAddons()
-		tools := ek.NewExternalTools(ekCtx)
+		ezk := ez.Kube
 
-		forceInstall := ekCtx.GetBoolFlag(constants.FLAG_FORCE)
-		//noDepends := ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS)
-		targetCluster := ekCtx.GetStringFlag(constants.FLAG_CLUSTER)
-		installed, err := ek.NewK8SUtils(ekCtx).GetInstalledAddons()
+		cmdHelper := ez.CommandHelper(cmd)
+
+		addons, err := ezk.GetAddons()
 		if err != nil {
-			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
+			ezk.FmtRed("Error getting addons: %v", err)
+			os.Exit(1)
+		}
+
+		forceInstall := cmdHelper.GetBoolFlag(constants.FLAG_FORCE)
+		targetCluster := cmdHelper.GetStringFlag(constants.FLAG_CLUSTER)
+		installed, err := ezk.GetInstalledAddons()
+		if err != nil {
+			ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 			os.Exit(1)
 		}
 
 		// switch to the easykube context - this is purely to avoid trouble
 		// user might have switched to another context to do work and forgot to change
 		// context back to easykube. --context argument overrides this
-		ek.NewExternalTools(ekCtx).EnsureLocalContext()
+		ezk.EnsureLocalContext()
 
 		wanted, missing := pickAddons(args, addons)
 
 		if len(missing) > 0 {
-			out.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
+			ezk.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
 			os.Exit(-1)
 		}
 
 		if len(targetCluster) > 0 {
-			tools.SwitchContext(targetCluster)
-			defer tools.SwitchContext(constants.CLUSTER_CONTEXT)
+			ezk.SwitchContext(targetCluster)
+			defer ezk.SwitchContext(constants.CLUSTER_CONTEXT)
 		}
 
-		if ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS) {
-			jsutils.NewJsUtils(ekCtx, wanted[0]).ExecAddonScript(wanted[0])
+		if cmdHelper.GetBoolFlag(constants.FLAG_NODEPENDS) {
+			jsutils.NewJsUtils(cmdHelper, wanted[0]).ExecAddonScript(wanted[0])
 		} else {
-			toInstall, err := ek.ResolveDependencies(wanted, addons)
+			toInstall, err := ez.ResolveDependencies(wanted, addons)
 			if err != nil {
-				out.FmtRed("dependency resolution failed: %v", err)
+				ezk.FmtRed("dependency resolution failed: %v", err)
 			}
 
 			for idx := range toInstall {
 
 				current := toInstall[idx]
 				if slices.Contains(installed, current.ShortName) && !forceInstall {
-					out.FmtYellow("%s already present in cluster", current.ShortName)
+					ezk.FmtYellow("%s already present in cluster", current.ShortName)
 					continue
 				}
 
-				jsutils.NewJsUtils(ekCtx, toInstall[idx]).ExecAddonScript(toInstall[idx])
+				jsutils.NewJsUtils(cmdHelper, toInstall[idx]).ExecAddonScript(toInstall[idx])
 			}
 		}
 
@@ -75,17 +77,19 @@ var addCmd = &cobra.Command{
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
 		addons := make([]string, 0)
-		for _, i := range ek.NewAddonReader(ekctx.GetAppContext(cmd)).GetAddons() {
+		a, e := ez.Kube.GetAddons()
+		if e != nil {
+			// ignore for now
+		}
+		for _, i := range a {
 			addons = append(addons, i.ShortName)
 		}
 		return addons, cobra.ShellCompDirectiveNoFileComp
-
-		//return nil, cobra.ShellCompDirectiveNoFileComp
 	},
 }
 
-func pickAddons(name []string, addons map[string]*ek.Addon) ([]*ek.Addon, []string) {
-	result := make([]*ek.Addon, 0)
+func pickAddons(name []string, addons map[string]*ez.Addon) ([]*ez.Addon, []string) {
+	result := make([]*ez.Addon, 0)
 	missing := make([]string, 0)
 
 	for ni := range name {

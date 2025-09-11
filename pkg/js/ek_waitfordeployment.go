@@ -2,20 +2,20 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) WaitForDeployment() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		out := ctx.EKContext.Printer
 		ctx.checkArgs(call, WAIT_FOR_DEPLOYMENT)
-		
+		ezk := ez.Kube
+
 		deployment := call.Arguments[0].ToString().String()
 		namespace := call.Arguments[1].ToString().String()
 
-		err := ek.NewK8SUtils(ctx.EKContext).WaitForDeploymentReadyWatch(deployment, namespace)
+		err := ezk.WaitForDeploymentReadyWatch(deployment, namespace)
 		if err != nil {
-			out.FmtRed("% did not come online before timed out", deployment)
+			ezk.FmtRed("% did not come online before time out", deployment)
 			return goja.Undefined()
 		}
 

@@ -6,25 +6,26 @@ import (
 	"reflect"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type Easykube struct {
-	EKContext *ekctx.EKContext
-	AddonCtx  *AddonContext
+	CobraCommandHelder *ez.CobraCommandHelperImpl
+	AddonCtx           *AddonContext
 }
 
-func ConfigureEasykubeScript(ctx *ekctx.EKContext, addon *AddonContext) {
+func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext) {
 	check := func(e error) {
 		if e != nil {
 			panic(e)
 		}
 	}
 
-	e := &Easykube{EKContext: ctx, AddonCtx: addon}
+	e := &Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
 
 	easykubeObj := addon.NewObject()
 	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
+	check(easykubeObj.Set(KUSTOMIZE_WITH_OVERLAY, e.KustomizeWithOverlay()))
 	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
 	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
 	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
@@ -44,7 +45,6 @@ func ConfigureEasykubeScript(ctx *ekctx.EKContext, addon *AddonContext) {
 }
 
 func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
-	out := e.EKContext.Printer
 	argLen := len(f.Arguments)
 	var undef = 0
 	for v := range f.Arguments {
@@ -54,7 +54,7 @@ func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
 	}
 
 	if undef != 0 {
-		out.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
+		ez.Kube.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
 			e.AddonCtx.addon.Name,
 			jsName,
 			argLen,

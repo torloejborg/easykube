@@ -6,10 +6,9 @@ import (
 	"os/exec"
 
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/ekctx"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // statusCmd represents the status command
@@ -18,62 +17,64 @@ var statusCmd = &cobra.Command{
 	Short: "inspects you environment to see if prerequisites are met",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
-		cru := ek.NewContainerRuntime(ekCtx)
+		ezk := ez.Kube
+		cfg, _ := ezk.LoadConfig()
 
-		conf := ek.NewEasykubeConfig(ekCtx)
-		cfg, _ := conf.LoadConfig()
-		ar := ek.NewAddonReader(ekCtx)
-		if !cru.IsContainerRuntimeAvailable() {
-			out.FmtRed("Container runtime not available, is docker running??")
+		if !ezk.IsContainerRuntimeAvailable() {
+			ezk.FmtRed("Container runtime not available, is docker running??")
 			os.Exit(-1)
 		}
 
 		hasBinary := func(name string) {
 			_, err := exec.LookPath(name)
 			if err != nil {
-				out.FmtRed("⚠ " + name)
+				ezk.FmtRed("⚠ " + name)
 			} else {
-				out.FmtGreen("✓ " + name)
+				ezk.FmtGreen("✓ " + name)
 			}
 		}
 		running := func(containerID string) {
-			if cru.IsContainerRunning(containerID) {
-				out.FmtGreen("✓ %s container", containerID)
+			if ezk.IsContainerRunning(containerID) {
+				ezk.FmtGreen("✓ %s container", containerID)
 			} else {
-				out.FmtRed("⚠ %s container not running", containerID)
+				ezk.FmtRed("⚠ %s container not running", containerID)
 			}
 		}
 
-		out.FmtGreen("Binaries")
+		ezk.FmtGreen("Binaries")
 		hasBinary("docker")
 		hasBinary("helm")
 		hasBinary("kustomize")
 
 		fmt.Println()
-		out.FmtGreen("Container configuration")
+		ezk.FmtGreen("Container configuration")
 		running(constants.REGISTRY_CONTAINER)
 		running(constants.KIND_CONTAINER)
 
-		if cru.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind") {
-			out.FmtGreen("✓ %s connected to kind network", constants.REGISTRY_CONTAINER)
+		if ez.Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind") {
+			ezk.FmtGreen("✓ %s connected to kind network", constants.REGISTRY_CONTAINER)
 		} else {
-			out.FmtRed("⚠ %s not connected to kind network", constants.REGISTRY_CONTAINER)
+			ezk.FmtRed("⚠ %s not connected to kind network", constants.REGISTRY_CONTAINER)
 		}
 
 		fmt.Println()
-		out.FmtGreen("Repository configuration")
-		na := len(ar.GetAddons())
+		ezk.FmtGreen("Repository configuration")
+
+		addons, aerr := ez.Kube.GetAddons()
+		if aerr != nil {
+			ezk.FmtRed(aerr.Error())
+		}
+
+		na := len(addons)
 		if _, err := os.Stat(cfg.AddonDir); err == nil {
 			if na == 0 {
-				out.FmtYellow("⚠ %d Addons discovered, check if '%s' is an addon repository", na, cfg.AddonDir)
+				ezk.FmtYellow("⚠ %d Addons discovered, check if '%s' is an addon repository", na, cfg.AddonDir)
 			} else {
-				out.FmtGreen("✓ %d Addons discovered at '%s'", na, cfg.AddonDir)
+				ezk.FmtGreen("✓ %d Addons discovered at '%s'", na, cfg.AddonDir)
 			}
 
 		} else {
-			out.FmtRed("⚠ Addon directory '%s' does not exist, check your config", cfg.AddonDir)
+			ezk.FmtRed("⚠ Addon directory '%s' does not exist, check your config", cfg.AddonDir)
 		}
 	},
 }

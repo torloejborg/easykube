@@ -1,18 +1,17 @@
 package jsutils
 
 import (
-	"log"
 	"path/filepath"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, COPY_TO)
+		ezk := ez.Kube
 
-		k8sutils := ek.NewK8SUtils(ctx.EKContext)
 		deployment := call.Argument(0).String()
 		namespace := call.Argument(1).String()
 		containerLike := call.Argument(2).String()
@@ -22,16 +21,16 @@ func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
 		// the addon.ek.js file - we will resolve the manifest relative to that
 		addon := ctx.AddonCtx.addon.File
 
-		fullPath := filepath.Dir(addon.Name())
+		fullPath := filepath.Dir(addon)
 
-		podName, containerName, err := k8sutils.FindContainer(deployment, namespace, containerLike)
+		podName, containerName, err := ezk.FindContainerInPod(deployment, namespace, containerLike)
 		if err != nil {
-			log.Fatalf("LocatePod failed: %v", err)
+			ezk.FmtRed("LocatePod failed: %v", err)
 		}
 
-		err = k8sutils.CopyFileToPod(namespace, podName, containerName, filepath.Join(fullPath, sourceFile), destinationFile)
+		err = ezk.CopyFileToPod(namespace, podName, containerName, filepath.Join(fullPath, sourceFile), destinationFile)
 		if err != nil {
-			log.Fatalf("%s failed: %v", COPY_TO, err)
+			ezk.FmtRed("%s failed: %v", COPY_TO, err)
 		}
 
 		return goja.Undefined()

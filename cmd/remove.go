@@ -5,27 +5,26 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
 )
 
-func remove(addon *ek.Addon, ctx *ekctx.EKContext, k8s ek.IK8SUtils) {
+func remove(addon *ez.Addon) {
 	// enter the addon directory
-	ek.PushDir(filepath.Dir(addon.File.Name()))
-	defer ek.PopDir()
+	ez.PushDir(filepath.Dir(addon.File))
+	defer ez.PopDir()
 
-	tools := ek.NewExternalTools(ctx)
-	yamlFile := tools.KustomizeBuild(".")
-	tools.DeleteYaml(yamlFile)
-	ctx.Printer.FmtGreen("removed %s", addon.ShortName)
-	k8s.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
+	yamlFile := ez.Kube.KustomizeBuild(".")
+	ezk := ez.Kube
+	ezk.DeleteYaml(yamlFile)
+	ezk.FmtGreen("removed %s", addon.ShortName)
+	ezk.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
 
-	err := os.Remove(constants.KUSTOMIZE_TARGET_OUTPUT)
+	err := ezk.Remove(constants.KUSTOMIZE_TARGET_OUTPUT)
 	if err != nil {
-		ctx.Printer.FmtYellow("%s could not be deleted", constants.KUSTOMIZE_TARGET_OUTPUT)
+		ezk.FmtYellow("%s could not be deleted", constants.KUSTOMIZE_TARGET_OUTPUT)
 	}
 }
 
@@ -35,22 +34,23 @@ var removeCmd = &cobra.Command{
 	Short: "removes a previously installed addon",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
-
+		ezk := ez.Kube
 		// switch to the easykube context
-		ek.NewExternalTools(ekCtx).EnsureLocalContext()
+		ezk.EnsureLocalContext()
 
-		k8s := ek.NewK8SUtils(ekCtx)
-		allAddons := ek.NewAddonReader(ekCtx).GetAddons()
-		installedAddons, e := k8s.GetInstalledAddons()
+		allAddons, aerr := ez.Kube.GetAddons()
+		if aerr != nil {
+			ezk.FmtRed("could not get addons %s", aerr.Error())
+		}
+
+		installedAddons, e := ezk.GetInstalledAddons()
 		if e != nil {
-			out.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
+			ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
 			os.Exit(1)
 		}
 
 		if len(args) == 0 {
-			out.FmtRed("Please specify one or more addons to remove, usage below\n")
+			ez.Kube.FmtRed("Please specify one or more addons to remove, usage below\n")
 			err := cmd.Help()
 			if err != nil {
 				// ignore
@@ -61,14 +61,14 @@ var removeCmd = &cobra.Command{
 		for i := range args {
 			// is args[i] installed
 			if slices.Contains(installedAddons, args[i]) {
-				remove(allAddons[args[i]], ekCtx, k8s)
+				remove(allAddons[args[i]])
 			} else {
-				out.FmtYellow("%s is not installed", args[i])
+				ez.Kube.FmtYellow("%s is not installed", args[i])
 			}
 		}
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		k8sutils := ek.NewK8SUtils(ekctx.GetAppContext(cmd))
+		k8sutils := ez.CreateK8sUtilsImpl()
 		clusterAddons, e := k8sutils.GetInstalledAddons()
 		if e == nil {
 			return clusterAddons, cobra.ShellCompDirectiveNoFileComp

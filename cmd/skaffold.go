@@ -3,11 +3,10 @@ package cmd
 import (
 	"os"
 
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 // skaffoldCmd represents the skaffold command
@@ -22,20 +21,19 @@ var skaffoldCmd = &cobra.Command{
   Useful for starting a new addon.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
+		ezk := ez.Kube
+		commandHelper := ez.CommandHelper(cmd)
 
-		addonName := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
-		addonDest := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
+		addonName := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
+		addonDest := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
 
-		conf := ek.NewEasykubeConfig(ekCtx)
-		ekc, err := conf.LoadConfig()
+		ekc, err := ez.Kube.LoadConfig()
 		if nil != err {
-			out.FmtGreen("cannot proceed without easykube configuration")
+			ezk.FmtGreen("cannot proceed without easykube configuration")
 			os.Exit(-1)
 		}
 
-		skaf := ek.NewSkaffold(ekc.AddonDir)
+		skaf := ez.NewSkaffold(ekc.AddonDir)
 		skaf.CreateNewAddon(addonName, addonDest)
 
 	},
