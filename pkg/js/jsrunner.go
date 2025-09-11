@@ -59,7 +59,6 @@ func NewJsUtils(commandHelper *ez.CobraCommandHelperImpl, source *ez.Addon) IJsU
 	ConfigureEasykubeScript(commandHelper, ac)
 
 	export("console", NewCons(commandHelper).Console())
-	export("_utils", NewUtils(commandHelper))
 
 	return &JsUtils{
 		vm:                 vm,
