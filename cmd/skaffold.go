@@ -3,7 +3,6 @@ package cmd
 import (
 	"os"
 
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
@@ -22,10 +21,10 @@ var skaffoldCmd = &cobra.Command{
   Useful for starting a new addon.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
+		commandHelper := CommandHelper(cmd)
 
-		addonName := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
-		addonDest := ekCtx.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
+		addonName := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
+		addonDest := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
 
 		ekc, err := ez.Kube.LoadConfig()
 		if nil != err {

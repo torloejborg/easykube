@@ -5,11 +5,9 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/ekctx"
 )
-
-// EkCmdContext Initialized to empty struct, context will be set later when Cobra is initializing (root.go in cmd package)
-var EkCmdContext = &ekctx.EKContext{}
 
 type OsDetails interface {
 	GetUserConfigDir() (string, error)
@@ -36,68 +34,77 @@ func (d *OsDetailsImpl) GetUserHomeDir() (string, error) {
 	return r, nil
 }
 
-type Toolbox struct {
+type EasykubeSingleton struct {
 	IK8SUtils
 	IEasykubeConfig
 	IAddonReader
 	IExternalTools
 	IContainerRuntime
 	IClusterUtils
-	ekctx.EKContext
-	ekctx.IPrinter
-	afero.Fs
 	OsDetails
+	afero.Fs
+	*cobra.Command
+	cmd.CobraCommandHelperImpl
+	ekctx.IPrinter
 }
 
-var Kube = &Toolbox{
+var Kube = &EasykubeSingleton{
 	IPrinter: ekctx.NewPrinter(),
 }
 
-func (t *Toolbox) UseK8sUtils(newUtils IK8SUtils) *Toolbox {
+func (t *EasykubeSingleton) UseK8sUtils(newUtils IK8SUtils) *EasykubeSingleton {
 	t.IK8SUtils = newUtils
 	return t
 }
 
-func (t *Toolbox) UseEasykubeConfig(c IEasykubeConfig) *Toolbox {
+func (t *EasykubeSingleton) UseEasykubeConfig(c IEasykubeConfig) *EasykubeSingleton {
 	t.IEasykubeConfig = c
 	return t
 }
 
-func (t *Toolbox) UseAddonReader(r IAddonReader) *Toolbox {
+func (t *EasykubeSingleton) UseAddonReader(r IAddonReader) *EasykubeSingleton {
 	t.IAddonReader = r
 	return t
 }
 
-func (t *Toolbox) UseExternalTools(e IExternalTools) *Toolbox {
+func (t *EasykubeSingleton) UseExternalTools(e IExternalTools) *EasykubeSingleton {
 	t.IExternalTools = e
 	return t
 }
 
-func (t *Toolbox) UseContainerRuntime(r IContainerRuntime) *Toolbox {
+func (t *EasykubeSingleton) UseContainerRuntime(r IContainerRuntime) *EasykubeSingleton {
 	t.IContainerRuntime = r
 	return t
 }
 
-func (t *Toolbox) UseClusterUtils(u IClusterUtils) *Toolbox {
+func (t *EasykubeSingleton) UseClusterUtils(u IClusterUtils) *EasykubeSingleton {
 	t.IClusterUtils = u
 	return t
 }
 
-func (t *Toolbox) UseFilesystemLayer(f afero.Fs) *Toolbox {
+func (t *EasykubeSingleton) UseFilesystemLayer(f afero.Fs) *EasykubeSingleton {
 	t.Fs = f
 	return t
 }
 
-func (t *Toolbox) UseCmdContext(ctx ekctx.EKContext) {
-	t.EKContext = ctx
+func (t *EasykubeSingleton) UseCmdContext(ctx cmd.CobraCommandHelperImpl) {
+	t.CobraCommandHelperImpl = ctx
 }
 
-func (t *Toolbox) UseOsDetails(ctx OsDetails) {
+func (t *EasykubeSingleton) UseOsDetails(ctx OsDetails) {
 	t.OsDetails = ctx
 }
 
+func (t *EasykubeSingleton) UsePrinter(printer ekctx.IPrinter) {
+	t.IPrinter = printer
+}
+
+//func (t *EasykubeSingleton) UseCobraCommand(cmd *cobra.Command) {
+//	t.Command = cmd
+//}
+
 func CreateK8sUtilsImpl() IK8SUtils {
-	return NewK8SUtils(EkCmdContext)
+	return NewK8SUtils()
 }
 
 func CreateEasykubeConfigImpl(osd OsDetails) IEasykubeConfig {
@@ -109,7 +116,7 @@ func CreateAddonReaderImpl(config IEasykubeConfig) IAddonReader {
 }
 
 func CreateExternalToolsImpl() IExternalTools {
-	return NewExternalTools(EkCmdContext)
+	return NewExternalTools()
 }
 
 func CreateContainerRuntimeImpl() IContainerRuntime {
@@ -117,26 +124,25 @@ func CreateContainerRuntimeImpl() IContainerRuntime {
 }
 
 func CreateClusterUtilsImpl() IClusterUtils {
-	return NewClusterUtils(EkCmdContext)
+	return NewClusterUtils()
 }
 
 func CreateOsDetailsImpl() OsDetails {
 	return &OsDetailsImpl{}
 }
 
-func InitializeKubeSingleton(cmd *cobra.Command, ctx ekctx.EKContext) {
-	Kube = &Toolbox{}
-	// My go-fu is not strong yet, so this feels a bit funky, I want to have some factories
-	// produce the utility instances, and they need the EKContext upfront - since the variable is
-	// initialized here where the application is bootstrapped, perhaps that's ok. - Send PR's :)
-	EkCmdContext = &ctx
+func InitializeKubeSingleton() {
+
+	// I'm damaged by Java, We could inject anything anywhere, now this is my attempt at destructuring
+	// the application into smaller parts and assembling it with an initialization function. This allows
+	// parts or aspects of the application to be configured differently for tests.
 
 	osd := CreateOsDetailsImpl()
 	config := CreateEasykubeConfigImpl(osd)
 
+	Kube.UsePrinter(ekctx.NewPrinter())
 	Kube.UseFilesystemLayer(afero.NewOsFs())
 	Kube.UseOsDetails(osd)
-	Kube.UseCmdContext(ctx)
 	Kube.UseK8sUtils(CreateK8sUtilsImpl())
 	Kube.UseEasykubeConfig(config)
 	Kube.UseAddonReader(CreateAddonReaderImpl(config))

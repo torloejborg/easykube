@@ -17,21 +17,20 @@ var statusCmd = &cobra.Command{
 	Short: "inspects you environment to see if prerequisites are met",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		out := ez.Kube.PrinterImpl
 
 		cfg, _ := ez.Kube.LoadConfig()
-
+		out := ez.Kube.IPrinter
 		if !ez.Kube.IsContainerRuntimeAvailable() {
-			out.FmtRed("Container runtime not available, is docker running??")
+			ez.Kube.FmtRed("Container runtime not available, is docker running??")
 			os.Exit(-1)
 		}
 
 		hasBinary := func(name string) {
 			_, err := exec.LookPath(name)
 			if err != nil {
-				out.FmtRed("⚠ " + name)
+				ez.Kube.FmtRed("⚠ " + name)
 			} else {
-				out.FmtGreen("✓ " + name)
+				ez.Kube.FmtGreen("✓ " + name)
 			}
 		}
 		running := func(containerID string) {
@@ -60,7 +59,13 @@ var statusCmd = &cobra.Command{
 
 		fmt.Println()
 		out.FmtGreen("Repository configuration")
-		na := len(ez.Kube.GetAddons())
+
+		addons, aerr := ez.Kube.GetAddons()
+		if aerr != nil {
+			out.FmtRed(aerr.Error())
+		}
+
+		na := len(addons)
 		if _, err := os.Stat(cfg.AddonDir); err == nil {
 			if na == 0 {
 				out.FmtYellow("⚠ %d Addons discovered, check if '%s' is an addon repository", na, cfg.AddonDir)

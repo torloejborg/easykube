@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
@@ -21,7 +20,7 @@ var createCmd = &cobra.Command{
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		appContext := ekctx.GetAppContext(cmd)
+		cmdHelper := CommandHelper(cmd)
 
 		if ez.Kube.IsContainerRunning(constants.KIND_CONTAINER) {
 			ez.Kube.FmtYellow("Cluster was already created, exiting.")
@@ -42,10 +41,16 @@ var createCmd = &cobra.Command{
 			ez.Kube.PullImage(constants.KIND_IMAGE, nil)
 		}
 
-		ez.Kube.EnsurePersistenceDirectory()
+		pdErr := ez.Kube.EnsurePersistenceDirectory()
+		if pdErr != nil {
+			ez.Kube.FmtRed("Error ensuring persistence directory", pdErr)
+		}
 		ez.Kube.CreateContainerRegistry()
-
-		occupiedPorts, _ := ensureClusterPortsFree(ez.Kube.GetAddons())
+		addons, aerr := ez.Kube.GetAddons()
+		if aerr != nil {
+			ez.Kube.FmtRed("Error getting addons", aerr)
+		}
+		occupiedPorts, _ := ensureClusterPortsFree(addons)
 		if nil != occupiedPorts {
 			ez.Kube.FmtGreen("Can not create easykube cluster")
 			fmt.Println()
@@ -57,10 +62,10 @@ var createCmd = &cobra.Command{
 			os.Exit(-1)
 		}
 
-		report := ez.Kube.CreateKindCluster(ez.Kube.GetAddons())
+		report := ez.Kube.CreateKindCluster(addons)
 
-		// The cluster is created, and so it will have a new context,
-		ez.Kube.UseK8sUtils(ez.NewK8SUtils(appContext))
+		// The cluster is created, and so it will have a new context will exist, We have to set a new instance
+		ez.Kube.UseK8sUtils(ez.NewK8SUtils())
 
 		ez.Kube.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 
@@ -77,7 +82,7 @@ var createCmd = &cobra.Command{
 		ez.Kube.EnsureLocalContext()
 
 		// ensure secret
-		createSecret := appContext.GetStringFlag("secret")
+		createSecret := cmdHelper.GetStringFlag("secret")
 		if len(createSecret) != 0 {
 
 			ez.Kube.FmtGreen("importing property %s file as secret %s containing:", createSecret, "easykube-secrets")

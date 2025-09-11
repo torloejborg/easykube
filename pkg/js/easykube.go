@@ -6,16 +6,16 @@ import (
 	"reflect"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type Easykube struct {
-	EKContext *ekctx.EKContext
+	EKContext *cmd.CobraCommandHelperImpl
 	AddonCtx  *AddonContext
 }
 
-func ConfigureEasykubeScript(ctx *ekctx.EKContext, addon *AddonContext) {
+func ConfigureEasykubeScript(ctx *cmd.CobraCommandHelperImpl, addon *AddonContext) {
 	check := func(e error) {
 		if e != nil {
 			panic(e)

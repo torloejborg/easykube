@@ -7,18 +7,24 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
+
 	Use:   "list",
 	Short: "lists available modules in the addon repository",
-	Long:  "installed addons are marked with tickmark",
+	Long:  "installed addons has a tick-mark",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := ekctx.GetAppContext(cmd)
-		modules := ez.Kube.GetAddons()
+
+		commandHelper := CommandHelper(cmd)
+
+		modules, aerr := ez.Kube.GetAddons()
+		if aerr != nil {
+			ez.Kube.FmtRed("list failed: %v", aerr)
+			os.Exit(1)
+		}
 		installed := make([]string, 0)
 		if ez.Kube.IsClusterRunning() {
 			i, err := ez.Kube.GetInstalledAddons()
@@ -36,7 +42,7 @@ var listCmd = &cobra.Command{
 		for k := range modules {
 
 			// Only listing installed addons
-			if ctx.GetBoolFlag("installed") {
+			if commandHelper.GetBoolFlag("installed") {
 				if slices.Contains(installed, k) {
 					keys = append(keys, k)
 				}
@@ -47,7 +53,7 @@ var listCmd = &cobra.Command{
 
 		sort.Strings(keys)
 
-		if ctx.GetBoolFlag("plain") {
+		if commandHelper.GetBoolFlag("plain") {
 			for _, pm := range keys {
 				ez.Kube.FmtGreen(pm)
 			}
@@ -68,11 +74,11 @@ var listCmd = &cobra.Command{
 					modules[m].Config.Description,
 				}
 
-				table.Append(row)
+				_ = table.Append(row)
 
 			}
 
-			table.Render() // Send output to stdout
+			_ = table.Render() // Send output to stdout
 		}
 	},
 }

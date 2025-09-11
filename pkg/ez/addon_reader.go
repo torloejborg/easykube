@@ -2,6 +2,7 @@ package ez
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -10,18 +11,18 @@ import (
 	"unicode"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/cmd"
 )
 
 type IAddonReader interface {
-	GetAddons() map[string]*Addon
+	GetAddons() (map[string]*Addon, error)
 	ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error)
 	ExtractJSON(input string) (string, bool)
 }
 
 type AddonReader struct {
 	EkConfig  *EasykubeConfigData
-	EkContext *ekctx.EKContext
+	EkContext *cmd.CobraCommandHelperImpl
 }
 
 func NewAddonReader(config IEasykubeConfig) IAddonReader {
@@ -35,7 +36,7 @@ func NewAddonReader(config IEasykubeConfig) IAddonReader {
 	}
 }
 
-func (adr *AddonReader) GetAddons() map[string]*Addon {
+func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {
 
 	addons := make(map[string]*Addon)
 	addonExpre, _ := regexp.Compile(`^.+\.(ek.js)$`)
@@ -45,14 +46,14 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 	}
 
 	if _, err := Kube.Stat(adr.EkConfig.AddonDir); err != nil {
-		return addons
+		return nil, err
 	}
 
 	walkFunc := func(path string, entry fs.FileInfo, err error) error {
 		if !entry.IsDir() && addonExpre.MatchString(entry.Name()) {
-			file, err := Kube.Fs.Open(path)
-			if err != nil {
-				return err
+			file, openErr := Kube.Fs.Open(path)
+			if openErr != nil {
+				return openErr
 			}
 
 			foundAddon := &Addon{
@@ -62,11 +63,10 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 				RootDir:   adr.EkConfig.AddonDir,
 			}
 
-			cfg, err := adr.ExtractConfiguration(foundAddon)
+			cfg, parseErr := adr.ExtractConfiguration(foundAddon)
 
-			if err != nil {
-				Kube.FmtRed("there is issue in %s", foundAddon.Name)
-				return err
+			if parseErr != nil {
+				return errors.Join(errors.New("problem in addon: "+foundAddon.Name), parseErr)
 			}
 
 			foundAddon.Config = *cfg
@@ -76,11 +76,12 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 		return nil
 	}
 
-	err := afero.Walk(Kube.Fs, adr.EkConfig.AddonDir, walkFunc)
-	if err != nil {
-		panic(err)
+	walkErr := afero.Walk(Kube.Fs, adr.EkConfig.AddonDir, walkFunc)
+	if walkErr != nil {
+		return nil, walkErr
 	}
-	return addons
+
+	return addons, nil
 }
 
 func (adr *AddonReader) resolveExecutionOrder(

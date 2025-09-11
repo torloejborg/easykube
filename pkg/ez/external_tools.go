@@ -7,12 +7,12 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 type ExternalToolsImpl struct {
-	ctx *ekctx.EKContext
+	ctx *cmd.CobraCommandHelperImpl
 }
 
 type IExternalTools interface {
@@ -26,10 +26,8 @@ type IExternalTools interface {
 	RunCommand(name string, args ...string) (stdout string, stderr string, err error)
 }
 
-func NewExternalTools(context *ekctx.EKContext) IExternalTools {
-	return &ExternalToolsImpl{
-		ctx: context,
-	}
+func NewExternalTools() IExternalTools {
+	return &ExternalToolsImpl{}
 }
 
 func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {

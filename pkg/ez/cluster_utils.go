@@ -8,7 +8,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"sigs.k8s.io/kind/pkg/cluster"
@@ -18,23 +18,22 @@ type IClusterUtils interface {
 	CreateKindCluster(modules map[string]*Addon) string
 	RenderToYAML(addonList []*Addon) string
 	ConfigurationReport(addonList []*Addon) string
-	EnsurePersistenceDirectory()
+	EnsurePersistenceDirectory() error
 }
 
 type ClusterUtils struct {
 	Debug     bool
 	EkConfig  *EasykubeConfigData
-	EkContext *ekctx.EKContext
+	EkContext *cmd.CobraCommandHelperImpl
 }
 
-func NewClusterUtils(ctx *ekctx.EKContext) IClusterUtils {
+func NewClusterUtils() IClusterUtils {
 	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 	return &ClusterUtils{
-		EkConfig:  cfg,
-		EkContext: ctx,
+		EkConfig: cfg,
 	}
 }
 
@@ -156,24 +155,28 @@ func (u *ClusterUtils) RenderToYAML(addonList []*Addon) string {
 	return buf.String()
 }
 
-func (u *ClusterUtils) EnsurePersistenceDirectory() {
+func (u *ClusterUtils) EnsurePersistenceDirectory() error {
 
-	addons := Kube.GetAddons()
+	addons, err := Kube.GetAddons()
+	if err != nil {
+		return err
+	}
 
 	for _, a := range addons {
 		if len(a.Config.ExtraMounts) > 0 {
 			mounts := a.Config.ExtraMounts
 			for m := range mounts {
 				path := filepath.Join(mounts[m].PersistenceDir, mounts[m].HostPath)
-				err := os.MkdirAll(path, 0777)
+				err := Kube.MkdirAll(path, 0777)
 				if err != nil {
 					panic(err)
 				}
-				err = os.Chmod(path, 0777)
+				err = Kube.Chmod(path, 0777)
 				if err != nil {
 					// ignore for now
 				}
 			}
 		}
 	}
+	return nil
 }

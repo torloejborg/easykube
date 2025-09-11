@@ -8,7 +8,7 @@ import (
 )
 
 func initCreateAddonsTest() {
-	Kube = &Toolbox{}
+	Kube = &EasykubeSingleton{}
 
 	y := &OsDetailsStub{CreateOsDetailsImpl()}
 	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}

@@ -48,17 +48,15 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			}
 		}
 
-		tool := ez.NewExternalTools(e.EKContext)
-
-		handleCmd(tool.RunCommand("git", "init"))
-		handleCmd(tool.RunCommand("git", "config", "core.sparsecheckout", "true"))
-		handleCmd(tool.RunCommand("git", "remote", "add", "-f", "origin", repo))
-		handleCmd(tool.RunCommand("git", "pull", "origin", branch))
+		handleCmd(ez.Kube.RunCommand("git", "init"))
+		handleCmd(ez.Kube.RunCommand("git", "config", "core.sparsecheckout", "true"))
+		handleCmd(ez.Kube.RunCommand("git", "remote", "add", "-f", "origin", repo))
+		handleCmd(ez.Kube.RunCommand("git", "pull", "origin", branch))
 
 		gitArgs := []string{"sparse-checkout", "set"}
 		allArgs := append(gitArgs, gitSparseDirectoryList...)
 
-		handleCmd(tool.RunCommand("git", allArgs...))
+		handleCmd(ez.Kube.RunCommand("git", allArgs...))
 
 		return call.This
 	}

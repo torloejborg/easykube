@@ -13,8 +13,8 @@ var versionCmd = &cobra.Command{
 	Short: "shows the version of easykube CLI",
 	Long:  `shows the version of easykube CLI`,
 	Run: func(cmd *cobra.Command, args []string) {
-		out := ez.Kube.PrinterImpl
-		out.FmtGreen(Version)
+
+		ez.Kube.FmtGreen(Version)
 	},
 }
 

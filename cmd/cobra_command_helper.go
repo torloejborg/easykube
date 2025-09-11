@@ -1,17 +1,19 @@
-package ekctx
+package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 )
 
-type EKContext struct {
-	Logger  *log.Logger
+type ICobraCommandHelper interface {
+	GetBoolFlag(name string) bool
+	GetStringFlag(name string) string
+}
+
+type CobraCommandHelperImpl struct {
 	Command *cobra.Command
 }
 
-func (e *EKContext) GetBoolFlag(name string) bool {
+func (e *CobraCommandHelperImpl) GetBoolFlag(name string) bool {
 
 	val, err := e.Command.Flags().GetBool(name)
 
@@ -22,7 +24,7 @@ func (e *EKContext) GetBoolFlag(name string) bool {
 	return val
 }
 
-func (e *EKContext) GetStringFlag(name string) string {
+func (e *CobraCommandHelperImpl) GetStringFlag(name string) string {
 
 	val, err := e.Command.Flags().GetString(name)
 
@@ -37,9 +39,9 @@ type ContextKey string
 
 const AppCtxKey = ContextKey("appContext")
 
-func GetAppContext(cmd *cobra.Command) *EKContext {
+func CommandHelper(cmd *cobra.Command) *CobraCommandHelperImpl {
 	val := cmd.Context().Value(AppCtxKey)
-	if appCtx, ok := val.(*EKContext); ok {
+	if appCtx, ok := val.(*CobraCommandHelperImpl); ok {
 		appCtx.Command = cmd
 		return appCtx
 	}

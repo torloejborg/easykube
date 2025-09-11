@@ -18,7 +18,7 @@ Compile with ```go build```, go will pull in dependencies from github, and a bin
 
 Next, you must have the follow set of programs installed, and available on your path.
 
-* docker (windows and mac, should use docker desktop)
+* docker (windows and mac, could use docker desktop. Docker on WSL2 works ok)
 * kustomize
 * kubectl
 * helm
@@ -56,7 +56,7 @@ By itself, easykube is not very exciting, it can only establish an empty cluster
 
 ## What it does
 
-It wraps Kind, and configures an opinionated default that works with a local docker registry.
+It basically wraps the awesome [Kind](https://kind.sigs.k8s.io/) and [Goja](https://github.com/dop251/goja) projects. It configures an opinionated default that works with a local docker registry.
 It provides a method of orchestrating installation of applications that has some form
 of dependency to other applications.
 

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/dop251/goja"
@@ -16,7 +16,7 @@ import (
 
 type JsUtils struct {
 	vm        *goja.Runtime
-	EKContext *ekctx.EKContext
+	EKContext *cmd.CobraCommandHelperImpl
 	AddonRoot string
 }
 
@@ -27,7 +27,7 @@ type IJsUtils interface {
 type AddonContext struct {
 	addon     *ez.Addon
 	vm        *goja.Runtime
-	EKContext *ekctx.EKContext
+	EKContext *cmd.CobraCommandHelperImpl
 }
 
 func (ac *AddonContext) ExportFunction(name string, action interface{}) {
@@ -41,7 +41,7 @@ func (ac *AddonContext) NewObject() *goja.Object {
 	return ac.vm.NewObject()
 }
 
-func NewJsUtils(ctx *ekctx.EKContext, source *ez.Addon) IJsUtils {
+func NewJsUtils(ctx *cmd.CobraCommandHelperImpl, source *ez.Addon) IJsUtils {
 
 	vm := goja.New()
 

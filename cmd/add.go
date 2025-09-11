@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 	jsutils "github.com/torloejborg/easykube/pkg/js"
@@ -19,15 +18,16 @@ var addCmd = &cobra.Command{
 	Long:  `by default addons also applies their dependencies`,
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
+		cmdHelper := CommandHelper(cmd)
 
-		// create a 'toolbox' of needed utilities for adding an addon
+		addons, err := ez.Kube.GetAddons()
+		if err != nil {
+			ez.Kube.FmtRed("Error getting addons: %v", err)
+			os.Exit(1)
+		}
 
-		addons := ez.Kube.GetAddons()
-
-		forceInstall := ekCtx.GetBoolFlag(constants.FLAG_FORCE)
-		//noDepends := ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS)
-		targetCluster := ekCtx.GetStringFlag(constants.FLAG_CLUSTER)
+		forceInstall := cmdHelper.GetBoolFlag(constants.FLAG_FORCE)
+		targetCluster := cmdHelper.GetStringFlag(constants.FLAG_CLUSTER)
 		installed, err := ez.Kube.GetInstalledAddons()
 		if err != nil {
 			ez.Kube.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
@@ -51,8 +51,8 @@ var addCmd = &cobra.Command{
 			defer ez.Kube.SwitchContext(constants.CLUSTER_CONTEXT)
 		}
 
-		if ekCtx.GetBoolFlag(constants.FLAG_NODEPENDS) {
-			jsutils.NewJsUtils(ekCtx, wanted[0]).ExecAddonScript(wanted[0])
+		if cmdHelper.GetBoolFlag(constants.FLAG_NODEPENDS) {
+			jsutils.NewJsUtils(cmdHelper, wanted[0]).ExecAddonScript(wanted[0])
 		} else {
 			toInstall, err := ez.ResolveDependencies(wanted, addons)
 			if err != nil {
@@ -67,7 +67,7 @@ var addCmd = &cobra.Command{
 					continue
 				}
 
-				jsutils.NewJsUtils(ekCtx, toInstall[idx]).ExecAddonScript(toInstall[idx])
+				jsutils.NewJsUtils(cmdHelper, toInstall[idx]).ExecAddonScript(toInstall[idx])
 			}
 		}
 
@@ -75,7 +75,11 @@ var addCmd = &cobra.Command{
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
 		addons := make([]string, 0)
-		for _, i := range ez.Kube.GetAddons() {
+		a, e := ez.Kube.GetAddons()
+		if e != nil {
+			// ignore for now
+		}
+		for _, i := range a {
 			addons = append(addons, i.ShortName)
 		}
 		return addons, cobra.ShellCompDirectiveNoFileComp

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/ekctx"
 )
 
 type EasykubeConfigStub struct {
@@ -25,7 +26,9 @@ func (o *OsDetailsStub) GetUserHomeDir() (string, error) {
 }
 
 func TestMain(m *testing.M) {
-	Kube = &Toolbox{}
+	Kube = &EasykubeSingleton{
+		IPrinter: ekctx.NewPrinter(),
+	}
 
 	y := &OsDetailsStub{CreateOsDetailsImpl()}
 	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}

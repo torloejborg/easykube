@@ -15,7 +15,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/ekctx"
+	"github.com/torloejborg/easykube/cmd"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
@@ -39,7 +39,7 @@ import (
 type K8SUtilsImpl struct {
 	Clientset  *kubernetes.Clientset
 	RestConfig *rest.Config
-	EKContext  *ekctx.EKContext
+	EKContext  *cmd.CobraCommandHelperImpl
 	Fs         afero.Fs
 }
 
@@ -106,7 +106,7 @@ type IK8SUtils interface {
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, namespace string) KubernetesSecret
 }
 
-func NewK8SUtils(ekContext *ekctx.EKContext) IK8SUtils {
+func NewK8SUtils() IK8SUtils {
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -129,7 +129,6 @@ func NewK8SUtils(ekContext *ekctx.EKContext) IK8SUtils {
 	return &K8SUtilsImpl{
 		Clientset:  clientset,
 		RestConfig: config,
-		EKContext:  ekContext,
 	}
 }
 

@@ -36,7 +36,10 @@ var removeCmd = &cobra.Command{
 		// switch to the easykube context
 		ez.Kube.EnsureLocalContext()
 
-		allAddons := ez.Kube.GetAddons()
+		allAddons, aerr := ez.Kube.GetAddons()
+		if aerr != nil {
+			ez.Kube.FmtRed("could not get addons %s", aerr.Error())
+		}
 		installedAddons, e := ez.Kube.GetInstalledAddons()
 		if e != nil {
 			ez.Kube.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
