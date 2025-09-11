@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-func init() {
+func initCreateAddonsTest() {
 	Kube = &Toolbox{}
 
 	y := &OsDetailsStub{CreateOsDetailsImpl()}
@@ -39,6 +39,8 @@ var expectedAddonFiles = []struct {
 }
 
 func TestCreateAddon(t *testing.T) {
+	initCreateAddonsTest()
+
 	Kube.MakeConfig()
 	config, _ := Kube.LoadConfig()
 

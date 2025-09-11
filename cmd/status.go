@@ -17,7 +17,7 @@ var statusCmd = &cobra.Command{
 	Short: "inspects you environment to see if prerequisites are met",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		out := ez.Kube.Printer
+		out := ez.Kube.PrinterImpl
 
 		cfg, _ := ez.Kube.LoadConfig()
 

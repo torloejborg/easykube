@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"unicode"
@@ -49,9 +48,12 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 		return addons
 	}
 
-	walkFunc := func(path string, entry fs.DirEntry, err error) error {
+	walkFunc := func(path string, entry fs.FileInfo, err error) error {
 		if !entry.IsDir() && addonExpre.MatchString(entry.Name()) {
-			file, _ := Kube.Fs.Open(path)
+			file, err := Kube.Fs.Open(path)
+			if err != nil {
+				return err
+			}
 
 			foundAddon := &Addon{
 				Name:      entry.Name(),
@@ -64,7 +66,7 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 
 			if err != nil {
 				Kube.FmtRed("there is issue in %s", foundAddon.Name)
-				panic(err)
+				return err
 			}
 
 			foundAddon.Config = *cfg
@@ -74,7 +76,10 @@ func (adr *AddonReader) GetAddons() map[string]*Addon {
 		return nil
 	}
 
-	filepath.WalkDir(adr.EkConfig.AddonDir, walkFunc)
+	err := afero.Walk(Kube.Fs, adr.EkConfig.AddonDir, walkFunc)
+	if err != nil {
+		panic(err)
+	}
 	return addons
 }
 
@@ -91,7 +96,7 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err := g.AddEdge(toInstall, next)
 
 		if err != nil {
-			Kube.Printer.FmtRed(err.Error())
+			Kube.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 
@@ -101,14 +106,14 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err = outgraph.AddEdge(toInstall, next)
 
 		if err != nil {
-			Kube.Printer.FmtRed(err.Error())
+			Kube.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 	}
 }
 
 func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error) {
-	out := Kube.Printer
+	out := Kube.IPrinter
 
 	code, err := afero.ReadFile(Kube.Fs, unconfigured.File)
 	if err != nil {

@@ -1,3 +1,3 @@
 let configuration = {
-    dependsOn: ["a"]
+
 }

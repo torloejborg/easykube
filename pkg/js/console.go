@@ -7,7 +7,7 @@ import (
 )
 
 type ConsImpl struct {
-	out *ekctx.Printer
+	out *ekctx.PrinterImpl
 }
 
 type ICons interface {
@@ -15,7 +15,7 @@ type ICons interface {
 }
 
 func NewCons(ctx *ekctx.EKContext) ICons {
-	return &ConsImpl{out: &ez.Kube.Printer}
+	return &ConsImpl{out: &ez.Kube.PrinterImpl}
 }
 
 func (cons *ConsImpl) Console() map[string]func(goja.FunctionCall) goja.Value {

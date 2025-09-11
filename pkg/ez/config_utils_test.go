@@ -3,21 +3,7 @@ package ez
 import (
 	"path/filepath"
 	"testing"
-
-	"github.com/spf13/afero"
 )
-
-func init() {
-	Kube = &Toolbox{}
-
-	y := &OsDetailsStub{CreateOsDetailsImpl()}
-	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
-
-	Kube.UseOsDetails(y)
-	Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	Kube.UseEasykubeConfig(x)
-
-}
 
 func TestMakeDefaultConfig(t *testing.T) {
 	cfgdir, _ := Kube.GetUserConfigDir()

@@ -6,18 +6,28 @@ import (
 	"github.com/gookit/color"
 )
 
-type Printer struct {
+type IPrinter interface {
+	FmtGreen(out string, args ...any)
+	FmtRed(out string, args ...any)
+	FmtYellow(out string, args ...any)
 }
 
-func (p *Printer) FmtGreen(out string, args ...any) {
+func NewPrinter() IPrinter {
+	return &PrinterImpl{}
+}
+
+type PrinterImpl struct {
+}
+
+func (p *PrinterImpl) FmtGreen(out string, args ...any) {
 	colorize(color.Green, ""+out, args...)
 }
 
-func (p *Printer) FmtRed(out string, args ...any) {
+func (p *PrinterImpl) FmtRed(out string, args ...any) {
 	colorize(color.Red, ""+out, args...)
 }
 
-func (p *Printer) FmtYellow(out string, args ...any) {
+func (p *PrinterImpl) FmtYellow(out string, args ...any) {
 	colorize(color.Yellow, "⚠ "+out, args...)
 }
 

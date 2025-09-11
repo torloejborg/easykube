@@ -44,13 +44,13 @@ type Toolbox struct {
 	IContainerRuntime
 	IClusterUtils
 	ekctx.EKContext
-	ekctx.Printer
+	ekctx.IPrinter
 	afero.Fs
 	OsDetails
 }
 
 var Kube = &Toolbox{
-	Printer: ekctx.Printer{},
+	IPrinter: ekctx.NewPrinter(),
 }
 
 func (t *Toolbox) UseK8sUtils(newUtils IK8SUtils) *Toolbox {
