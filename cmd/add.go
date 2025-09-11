@@ -18,37 +18,39 @@ var addCmd = &cobra.Command{
 	Long:  `by default addons also applies their dependencies`,
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		ezk := ez.Kube
+
 		cmdHelper := ez.CommandHelper(cmd)
 
-		addons, err := ez.Kube.GetAddons()
+		addons, err := ezk.GetAddons()
 		if err != nil {
-			ez.Kube.FmtRed("Error getting addons: %v", err)
+			ezk.FmtRed("Error getting addons: %v", err)
 			os.Exit(1)
 		}
 
 		forceInstall := cmdHelper.GetBoolFlag(constants.FLAG_FORCE)
 		targetCluster := cmdHelper.GetStringFlag(constants.FLAG_CLUSTER)
-		installed, err := ez.Kube.GetInstalledAddons()
+		installed, err := ezk.GetInstalledAddons()
 		if err != nil {
-			ez.Kube.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
+			ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
 			os.Exit(1)
 		}
 
 		// switch to the easykube context - this is purely to avoid trouble
 		// user might have switched to another context to do work and forgot to change
 		// context back to easykube. --context argument overrides this
-		ez.Kube.EnsureLocalContext()
+		ezk.EnsureLocalContext()
 
 		wanted, missing := pickAddons(args, addons)
 
 		if len(missing) > 0 {
-			ez.Kube.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
+			ezk.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
 			os.Exit(-1)
 		}
 
 		if len(targetCluster) > 0 {
-			ez.Kube.SwitchContext(targetCluster)
-			defer ez.Kube.SwitchContext(constants.CLUSTER_CONTEXT)
+			ezk.SwitchContext(targetCluster)
+			defer ezk.SwitchContext(constants.CLUSTER_CONTEXT)
 		}
 
 		if cmdHelper.GetBoolFlag(constants.FLAG_NODEPENDS) {
@@ -56,14 +58,14 @@ var addCmd = &cobra.Command{
 		} else {
 			toInstall, err := ez.ResolveDependencies(wanted, addons)
 			if err != nil {
-				ez.Kube.FmtRed("dependency resolution failed: %v", err)
+				ezk.FmtRed("dependency resolution failed: %v", err)
 			}
 
 			for idx := range toInstall {
 
 				current := toInstall[idx]
 				if slices.Contains(installed, current.ShortName) && !forceInstall {
-					ez.Kube.FmtYellow("%s already present in cluster", current.ShortName)
+					ezk.FmtYellow("%s already present in cluster", current.ShortName)
 					continue
 				}
 
