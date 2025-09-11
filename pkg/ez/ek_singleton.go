@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/ekctx"
 )
 
 type OsDetails interface {
@@ -44,11 +43,11 @@ type EasykubeSingleton struct {
 	afero.Fs
 	*cobra.Command
 	CobraCommandHelperImpl
-	ekctx.IPrinter
+	IPrinter
 }
 
 var Kube = &EasykubeSingleton{
-	IPrinter: ekctx.NewPrinter(),
+	IPrinter: NewPrinter(),
 }
 
 func (t *EasykubeSingleton) UseK8sUtils(newUtils IK8SUtils) *EasykubeSingleton {
@@ -94,13 +93,9 @@ func (t *EasykubeSingleton) UseOsDetails(ctx OsDetails) {
 	t.OsDetails = ctx
 }
 
-func (t *EasykubeSingleton) UsePrinter(printer ekctx.IPrinter) {
+func (t *EasykubeSingleton) UsePrinter(printer IPrinter) {
 	t.IPrinter = printer
 }
-
-//func (t *EasykubeSingleton) UseCobraCommand(cmd *cobra.Command) {
-//	t.Command = cmd
-//}
 
 func CreateK8sUtilsImpl() IK8SUtils {
 	return NewK8SUtils()
@@ -139,7 +134,7 @@ func InitializeKubeSingleton() {
 	osd := CreateOsDetailsImpl()
 	config := CreateEasykubeConfigImpl(osd)
 
-	Kube.UsePrinter(ekctx.NewPrinter())
+	Kube.UsePrinter(NewPrinter())
 	Kube.UseFilesystemLayer(afero.NewOsFs())
 	Kube.UseOsDetails(osd)
 	Kube.UseK8sUtils(CreateK8sUtilsImpl())

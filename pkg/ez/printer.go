@@ -1,4 +1,4 @@
-package ekctx
+package ez
 
 import (
 	"fmt"
