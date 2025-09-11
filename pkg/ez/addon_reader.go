@@ -11,7 +11,6 @@ import (
 	"unicode"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/cmd"
 )
 
 type IAddonReader interface {
@@ -22,7 +21,7 @@ type IAddonReader interface {
 
 type AddonReader struct {
 	EkConfig  *EasykubeConfigData
-	EkContext *cmd.CobraCommandHelperImpl
+	EkContext *CobraCommandHelperImpl
 }
 
 func NewAddonReader(config IEasykubeConfig) IAddonReader {

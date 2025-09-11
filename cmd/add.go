@@ -18,7 +18,7 @@ var addCmd = &cobra.Command{
 	Long:  `by default addons also applies their dependencies`,
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmdHelper := CommandHelper(cmd)
+		cmdHelper := ez.CommandHelper(cmd)
 
 		addons, err := ez.Kube.GetAddons()
 		if err != nil {

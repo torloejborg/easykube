@@ -7,12 +7,11 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 type ExternalToolsImpl struct {
-	ctx *cmd.CobraCommandHelperImpl
+	ctx *CobraCommandHelperImpl
 }
 
 type IExternalTools interface {

@@ -1,4 +1,4 @@
-package cmd
+package ez
 
 import (
 	"github.com/spf13/cobra"

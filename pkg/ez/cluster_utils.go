@@ -8,7 +8,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"sigs.k8s.io/kind/pkg/cluster"
@@ -24,7 +23,7 @@ type IClusterUtils interface {
 type ClusterUtils struct {
 	Debug     bool
 	EkConfig  *EasykubeConfigData
-	EkContext *cmd.CobraCommandHelperImpl
+	EkContext *CobraCommandHelperImpl
 }
 
 func NewClusterUtils() IClusterUtils {

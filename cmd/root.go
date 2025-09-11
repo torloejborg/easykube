@@ -5,10 +5,11 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func withAppContext(ctx context.Context, appCtx *CobraCommandHelperImpl) context.Context {
-	return context.WithValue(ctx, AppCtxKey, appCtx)
+func withAppContext(ctx context.Context, appCtx *ez.CobraCommandHelperImpl) context.Context {
+	return context.WithValue(ctx, ez.AppCtxKey, appCtx)
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -28,7 +29,7 @@ hint: start with 'easykube config'
 		}
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		ctx := CobraCommandHelperImpl{
+		ctx := ez.CobraCommandHelperImpl{
 			Command: cmd,
 		}
 

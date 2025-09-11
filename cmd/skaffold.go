@@ -21,7 +21,7 @@ var skaffoldCmd = &cobra.Command{
   Useful for starting a new addon.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		commandHelper := CommandHelper(cmd)
+		commandHelper := ez.CommandHelper(cmd)
 
 		addonName := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
 		addonDest := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)

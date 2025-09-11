@@ -2,7 +2,6 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
@@ -13,7 +12,7 @@ type ICons interface {
 	Console() map[string]func(goja.FunctionCall) goja.Value
 }
 
-func NewCons(ctx *cmd.CobraCommandHelperImpl) ICons {
+func NewCons(ctx *ez.CobraCommandHelperImpl) ICons {
 	return &ConsImpl{}
 }
 

@@ -6,12 +6,11 @@ import (
 	"os"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/pkg/ez"
 	"gopkg.in/yaml.v3"
 )
 
-func extractExternalSecrets(filePath string, ctx *cmd.CobraCommandHelperImpl) ([]ez.ExternalSecret, error) {
+func extractExternalSecrets(filePath string, ctx *ez.CobraCommandHelperImpl) ([]ez.ExternalSecret, error) {
 	// Read the YAML file
 	yamlFile, err := os.ReadFile(filePath)
 	if err != nil {

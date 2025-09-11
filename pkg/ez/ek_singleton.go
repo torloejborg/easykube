@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/cmd"
 	"github.com/torloejborg/easykube/ekctx"
 )
 
@@ -44,7 +43,7 @@ type EasykubeSingleton struct {
 	OsDetails
 	afero.Fs
 	*cobra.Command
-	cmd.CobraCommandHelperImpl
+	CobraCommandHelperImpl
 	ekctx.IPrinter
 }
 
@@ -87,7 +86,7 @@ func (t *EasykubeSingleton) UseFilesystemLayer(f afero.Fs) *EasykubeSingleton {
 	return t
 }
 
-func (t *EasykubeSingleton) UseCmdContext(ctx cmd.CobraCommandHelperImpl) {
+func (t *EasykubeSingleton) UseCmdContext(ctx CobraCommandHelperImpl) {
 	t.CobraCommandHelperImpl = ctx
 }
 

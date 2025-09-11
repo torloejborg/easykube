@@ -15,7 +15,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/cmd"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
@@ -39,7 +38,7 @@ import (
 type K8SUtilsImpl struct {
 	Clientset  *kubernetes.Clientset
 	RestConfig *rest.Config
-	EKContext  *cmd.CobraCommandHelperImpl
+	EKContext  *CobraCommandHelperImpl
 	Fs         afero.Fs
 }
 

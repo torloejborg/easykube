@@ -20,7 +20,7 @@ var createCmd = &cobra.Command{
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		cmdHelper := CommandHelper(cmd)
+		cmdHelper := ez.CommandHelper(cmd)
 
 		if ez.Kube.IsContainerRunning(constants.KIND_CONTAINER) {
 			ez.Kube.FmtYellow("Cluster was already created, exiting.")

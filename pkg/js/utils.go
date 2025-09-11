@@ -2,7 +2,7 @@ package jsutils
 
 import (
 	"github.com/google/uuid"
-	"github.com/torloejborg/easykube/cmd"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type IUtils interface {
@@ -10,10 +10,10 @@ type IUtils interface {
 }
 
 type Utils struct {
-	EKContext *cmd.CobraCommandHelperImpl
+	EKContext *ez.CobraCommandHelperImpl
 }
 
-func NewUtils(ctx *cmd.CobraCommandHelperImpl) IUtils {
+func NewUtils(ctx *ez.CobraCommandHelperImpl) IUtils {
 	return &Utils{EKContext: ctx}
 }
 

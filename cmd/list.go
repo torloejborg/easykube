@@ -18,7 +18,7 @@ var listCmd = &cobra.Command{
 	Long:  "installed addons has a tick-mark",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		commandHelper := CommandHelper(cmd)
+		commandHelper := ez.CommandHelper(cmd)
 
 		modules, aerr := ez.Kube.GetAddons()
 		if aerr != nil {
