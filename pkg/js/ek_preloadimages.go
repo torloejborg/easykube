@@ -15,8 +15,8 @@ import (
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-
-		mustPull := ctx.EKContext.GetBoolFlag(constants.FLAG_PULL)
+		ezk := ez.Kube
+		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FLAG_PULL)
 		ctx.checkArgs(call, PRELOAD)
 
 		var arg = call.Argument(0)
@@ -31,17 +31,17 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		var wg sync.WaitGroup
 
 		if mustPull {
-			ez.Kube.FmtYellow("🖼 will pull fresh images")
+			ezk.FmtYellow("🖼 will pull fresh images")
 		}
 
 		for source, dest := range result {
 			i++
 			wg.Add(1)
 			go func() {
-				if !ez.Kube.HasImageInKindRegistry(dest) || mustPull {
+				if !ezk.HasImageInKindRegistry(dest) || mustPull {
 
 					if strings.Contains(source, "ccta.dk") {
-						s, err := ez.CreateK8sUtilsImpl().GetSecret("easykube-secrets", "default")
+						s, err := ezk.GetSecret("easykube-secrets", "default")
 						if err != nil {
 							panic(err)
 						}
@@ -51,19 +51,19 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 							"password": string(s["artifactoryPassword"]),
 						})
 
-						ez.Kube.FmtGreen("🖼  pull from private registry %s", source)
-						ez.Kube.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
+						ezk.FmtGreen("🖼  pull from private registry %s", source)
+						ezk.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
 
 					} else {
-						ez.Kube.FmtGreen("🖼  pull %s", source)
-						ez.Kube.PullImage(source, nil)
+						ezk.FmtGreen("🖼  pull %s", source)
+						ezk.PullImage(source, nil)
 					}
 
-					ez.Kube.FmtGreen("🖼  tag %s to %s", source, dest)
-					ez.Kube.TagImage(source, dest)
+					ezk.FmtGreen("🖼  tag %s to %s", source, dest)
+					ezk.TagImage(source, dest)
 
-					ez.Kube.PushImage(dest)
-					ez.Kube.FmtGreen("🖼  push %s", dest)
+					ezk.PushImage(dest)
+					ezk.FmtGreen("🖼  push %s", dest)
 				}
 				defer wg.Done()
 			}()

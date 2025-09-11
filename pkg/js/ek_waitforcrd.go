@@ -10,13 +10,14 @@ import (
 func (ctx *Easykube) WaitForCRD() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, WAIT_FOR_CRD)
+		ezk := ez.Kube
 
 		group := call.Argument(0).String()
 		version := call.Argument(1).String()
 		kind := call.Argument(2).String()
 		timeout := call.Argument(3).ToInteger()
 
-		err := ez.Kube.WaitForCRD(group, version, kind, time.Duration(timeout)*time.Second)
+		err := ezk.WaitForCRD(group, version, kind, time.Duration(timeout)*time.Second)
 		if err != nil {
 			panic(err)
 		}

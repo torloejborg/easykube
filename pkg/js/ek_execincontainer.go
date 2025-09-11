@@ -10,6 +10,7 @@ import (
 
 func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
+		ezk := ez.Kube
 		ctx.checkArgs(call, EXEC_IN_CONTAINER)
 
 		deployment := call.Argument(0).String()
@@ -17,13 +18,13 @@ func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 		command := call.Argument(2).String()
 		args, _ := exportStringArray(call.Argument(3).Export())
 
-		pods, _ := ez.Kube.ListPods(namespace)
+		pods, _ := ezk.ListPods(namespace)
 		for i := range pods {
 			if strings.Contains(pods[i], deployment) {
 				stdout, stderr, err := ez.Kube.ExecInPod(namespace, pods[i], command, args)
 				if err != nil {
-					ez.Kube.FmtRed(stderr)
-					ez.Kube.FmtRed(err.Error())
+					ezk.FmtRed(stderr)
+					ezk.FmtRed(err.Error())
 					return ctx.AddonCtx.vm.ToValue(stderr)
 				}
 

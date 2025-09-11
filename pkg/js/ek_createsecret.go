@@ -13,8 +13,7 @@ func (ctx *Easykube) CreateSecret() func(goja.FunctionCall) goja.Value {
 		secret := make(map[string]string)
 		ctx.AddonCtx.vm.ExportTo(call.Argument(2), &secret)
 
-		k8 := ez.CreateK8sUtilsImpl()
-		k8.CreateSecret(namespace, name, secret)
+		ez.Kube.CreateSecret(namespace, name, secret)
 
 		return call.This
 	}

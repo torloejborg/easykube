@@ -10,11 +10,11 @@ type IUtils interface {
 }
 
 type Utils struct {
-	EKContext *ez.CobraCommandHelperImpl
+	CommandHelper *ez.CobraCommandHelperImpl
 }
 
-func NewUtils(ctx *ez.CobraCommandHelperImpl) IUtils {
-	return &Utils{EKContext: ctx}
+func NewUtils(commandHelper *ez.CobraCommandHelperImpl) IUtils {
+	return &Utils{CommandHelper: commandHelper}
 }
 
 func (u *Utils) UUID() string {

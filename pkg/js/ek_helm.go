@@ -9,7 +9,7 @@ import (
 
 func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-
+		ezk := ez.Kube
 		chart := call.Argument(0).String()
 		values := call.Argument(1).String()
 		destination := call.Argument(2).String()
@@ -21,7 +21,7 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 		}
 
 		if !ez.FileOrDirExists(values) {
-			ez.Kube.FmtRed("the value file %s does not exist", values)
+			ezk.FmtRed("the value file %s does not exist", values)
 			os.Exit(-1)
 		}
 
@@ -29,12 +29,12 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 			namespace = "default"
 		}
 
-		stdout, stderr, err := ez.Kube.RunCommand("helm", "template", chart,
+		stdout, stderr, err := ezk.RunCommand("helm", "template", chart,
 			"--values", values,
 			"--namespace", namespace)
 
 		if err != nil {
-			ez.Kube.FmtRed("helm failed %s", stderr)
+			ezk.FmtRed("helm failed %s", stderr)
 			os.Exit(-1)
 		}
 

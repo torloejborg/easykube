@@ -10,8 +10,8 @@ import (
 )
 
 type Easykube struct {
-	EKContext *ez.CobraCommandHelperImpl
-	AddonCtx  *AddonContext
+	CobraCommandHelder *ez.CobraCommandHelperImpl
+	AddonCtx           *AddonContext
 }
 
 func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext) {
@@ -21,7 +21,7 @@ func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext
 		}
 	}
 
-	e := &Easykube{EKContext: ctx, AddonCtx: addon}
+	e := &Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
 
 	easykubeObj := addon.NewObject()
 	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))

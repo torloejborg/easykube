@@ -11,6 +11,7 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 	return func(call goja.FunctionCall) goja.Value {
 		e.checkArgs(call, SPARSE_CHECKOUT)
+		ezk := ez.Kube
 
 		currentDir, _ := os.Getwd()
 		defer os.Chdir(currentDir)
@@ -23,11 +24,11 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 		destination := call.Argument(3).String()
 		if ez.FileOrDirExists(destination) {
-			ez.Kube.FmtYellow("Repository %s already checked out at %s", repo, destination)
+			ezk.FmtYellow("Repository %s already checked out at %s", repo, destination)
 			return call.This
 		}
 
-		err := ez.Kube.MkdirAll(destination, 0777)
+		err := ezk.MkdirAll(destination, 0777)
 		if err != nil {
 			panic(err)
 		}
@@ -40,23 +41,23 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			}
 
 			if stderr != "" {
-				ez.Kube.FmtGreen(stderr)
+				ezk.FmtGreen(stderr)
 			}
 
 			if stdout != "" {
-				ez.Kube.FmtGreen(stdout)
+				ezk.FmtGreen(stdout)
 			}
 		}
 
-		handleCmd(ez.Kube.RunCommand("git", "init"))
-		handleCmd(ez.Kube.RunCommand("git", "config", "core.sparsecheckout", "true"))
-		handleCmd(ez.Kube.RunCommand("git", "remote", "add", "-f", "origin", repo))
-		handleCmd(ez.Kube.RunCommand("git", "pull", "origin", branch))
+		handleCmd(ezk.RunCommand("git", "init"))
+		handleCmd(ezk.RunCommand("git", "config", "core.sparsecheckout", "true"))
+		handleCmd(ezk.RunCommand("git", "remote", "add", "-f", "origin", repo))
+		handleCmd(ezk.RunCommand("git", "pull", "origin", branch))
 
 		gitArgs := []string{"sparse-checkout", "set"}
 		allArgs := append(gitArgs, gitSparseDirectoryList...)
 
-		handleCmd(ez.Kube.RunCommand("git", allArgs...))
+		handleCmd(ezk.RunCommand("git", allArgs...))
 
 		return call.This
 	}

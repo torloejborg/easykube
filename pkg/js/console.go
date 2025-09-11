@@ -17,28 +17,29 @@ func NewCons(ctx *ez.CobraCommandHelperImpl) ICons {
 }
 
 func (cons *ConsImpl) Console() map[string]func(goja.FunctionCall) goja.Value {
-
+	ezk := ez.Kube.IPrinter
+	
 	return map[string]func(goja.FunctionCall) goja.Value{
 		"log": func(call goja.FunctionCall) goja.Value {
 			for _, arg := range call.Arguments {
-				ez.Kube.FmtGreen(arg.String())
+				ezk.FmtGreen(arg.String())
 			}
 			return goja.Undefined()
 		},
 		"info": func(call goja.FunctionCall) goja.Value {
 			for _, arg := range call.Arguments {
-				ez.Kube.FmtGreen(arg.String())
+				ezk.FmtGreen(arg.String())
 			}
 			return goja.Undefined()
 		},
 		"warn": func(call goja.FunctionCall) goja.Value {
 			for _, arg := range call.Arguments {
-				ez.Kube.FmtYellow(arg.String())
+				ezk.FmtYellow(arg.String())
 			}
 			return goja.Undefined()
 		}, "error": func(call goja.FunctionCall) goja.Value {
 			for _, arg := range call.Arguments {
-				ez.Kube.FmtRed(arg.String())
+				ezk.FmtRed(arg.String())
 			}
 			return goja.Undefined()
 		},

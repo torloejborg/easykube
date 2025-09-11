@@ -14,9 +14,9 @@ import (
 )
 
 type JsUtils struct {
-	vm        *goja.Runtime
-	EKContext *ez.CobraCommandHelperImpl
-	AddonRoot string
+	vm                 *goja.Runtime
+	CobraCommandHelper *ez.CobraCommandHelperImpl
+	AddonRoot          string
 }
 
 type IJsUtils interface {
@@ -24,9 +24,9 @@ type IJsUtils interface {
 }
 
 type AddonContext struct {
-	addon     *ez.Addon
-	vm        *goja.Runtime
-	EKContext *ez.CobraCommandHelperImpl
+	addon              *ez.Addon
+	vm                 *goja.Runtime
+	CobraCommandHelper *ez.CobraCommandHelperImpl
 }
 
 func (ac *AddonContext) ExportFunction(name string, action interface{}) {
@@ -40,14 +40,13 @@ func (ac *AddonContext) NewObject() *goja.Object {
 	return ac.vm.NewObject()
 }
 
-func NewJsUtils(ctx *ez.CobraCommandHelperImpl, source *ez.Addon) IJsUtils {
-
+func NewJsUtils(commandHelper *ez.CobraCommandHelperImpl, source *ez.Addon) IJsUtils {
 	vm := goja.New()
 
 	ac := &AddonContext{
-		addon:     source,
-		vm:        vm,
-		EKContext: ctx,
+		addon:              source,
+		vm:                 vm,
+		CobraCommandHelper: commandHelper,
 	}
 
 	export := func(name string, action interface{}) {
@@ -57,28 +56,28 @@ func NewJsUtils(ctx *ez.CobraCommandHelperImpl, source *ez.Addon) IJsUtils {
 		}
 	}
 
-	ConfigureEasykubeScript(ctx, ac)
+	ConfigureEasykubeScript(commandHelper, ac)
 
-	export("console", NewCons(ctx).Console())
-	export("_utils", NewUtils(ctx))
+	export("console", NewCons(commandHelper).Console())
+	export("_utils", NewUtils(commandHelper))
 
 	return &JsUtils{
-		vm:        vm,
-		AddonRoot: source.RootDir,
-		EKContext: ctx,
+		vm:                 vm,
+		AddonRoot:          source.RootDir,
+		CobraCommandHelper: commandHelper,
 	}
 }
 
 func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
 	script := a.ReadScriptFile(ez.Kube.Fs)
+	ezk := ez.Kube
 
-	// Before we execute the addon javascript, set the working directory, such that all fileoperations for
+	// Before we execute the addon javascript, set the working directory, such that all file operations for
 	// the addon will be relative to the addon directory, when we are done, go back where we came from.
-
 	ez.PushDir(filepath.Dir(a.File))
 	defer ez.PopDir()
 
-	ez.Kube.FmtGreen("🔧 Processing %s", a.Name)
+	ezk.FmtGreen("🔧 Processing %s", a.Name)
 
 	// Wrap the JavaScript execution in a deferred function
 	err := func() (err error) {
@@ -93,8 +92,8 @@ func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
 	}()
 
 	if err != nil {
-		fmt.Printf("Error in %s addon!\n", a.Name)
-		fmt.Printf("Cause: %s\n", err)
+		ezk.FmtRed("Error in %s addon!\n", a.Name)
+		ezk.FmtRed("Cause: %s\n", err)
 		os.Exit(-1)
 	}
 }

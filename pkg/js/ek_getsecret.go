@@ -12,8 +12,7 @@ func (ctx *Easykube) GetSecret() func(goja.FunctionCall) goja.Value {
 		namespace := call.Argument(0).String()
 		name := call.Argument(1).String()
 
-		k8 := ez.CreateK8sUtilsImpl()
-		res, err := k8.GetSecret(name, namespace)
+		res, err := ez.Kube.GetSecret(name, namespace)
 
 		m := make(map[string]string)
 

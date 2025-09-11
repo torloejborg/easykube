@@ -11,6 +11,7 @@ import (
 )
 
 func extractExternalSecrets(filePath string, ctx *ez.CobraCommandHelperImpl) ([]ez.ExternalSecret, error) {
+	ezk := ez.Kube
 	// Read the YAML file
 	yamlFile, err := os.ReadFile(filePath)
 	if err != nil {
@@ -24,8 +25,8 @@ func extractExternalSecrets(filePath string, ctx *ez.CobraCommandHelperImpl) ([]
 	decoder := yaml.NewDecoder(yamlReader)
 	for {
 		var item map[string]interface{}
-		err := decoder.Decode(&item)
-		if err != nil {
+		decodeErr := decoder.Decode(&item)
+		if decodeErr != nil {
 			break // Exit loop on error (e.g., EOF)
 		}
 
@@ -34,12 +35,12 @@ func extractExternalSecrets(filePath string, ctx *ez.CobraCommandHelperImpl) ([]
 			var es ez.ExternalSecret
 			itemBytes, err := yaml.Marshal(item)
 			if err != nil {
-				ez.Kube.FmtRed("error marshaling item: %v", err)
+				ezk.FmtRed("error marshaling item: %v", err)
 				continue
 			}
 			err = yaml.Unmarshal(itemBytes, &es)
 			if err != nil {
-				ez.Kube.FmtRed("error unmarshaling item into ExternalSecret: %v", err)
+				ezk.FmtRed("error unmarshaling item into ExternalSecret: %v", err)
 				continue
 			}
 			externalSecrets = append(externalSecrets, es)
@@ -52,6 +53,7 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 	return func(call goja.FunctionCall) goja.Value {
 
 		ctx.checkArgs(call, PROCESS_SECRETS)
+		ezk := ez.Kube
 
 		var arg = call.Argument(0)
 		var namespace = call.Argument(1).String()
@@ -64,22 +66,22 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 			panic(err)
 		}
 
-		ez.Kube.FmtGreen("Processing secrets and applying to %s", namespace)
+		ezk.FmtGreen("Processing secrets and applying to %s", namespace)
 
 		filePath := manifest
-		externalSecrets, err := extractExternalSecrets(filePath, ctx.EKContext)
+		externalSecrets, err := extractExternalSecrets(filePath, ctx.CobraCommandHelder)
 
 		for i := range externalSecrets {
-			secret := ez.Kube.TransformExternalSecret(externalSecrets[i], secretSource, namespace)
-			ez.Kube.CreateSecret(namespace, externalSecrets[i].Metadata.Name, secret.Data)
+			secret := ezk.TransformExternalSecret(externalSecrets[i], secretSource, namespace)
+			ezk.CreateSecret(namespace, externalSecrets[i].Metadata.Name, secret.Data)
 		}
 
 		if err != nil {
-			ez.Kube.FmtRed("Error extracting ExternalSecrets: %v", err)
+			ezk.FmtRed("Error extracting ExternalSecrets: %v", err)
 		}
 
 		for _, es := range externalSecrets {
-			ez.Kube.FmtGreen("Found ExternalSecret: %s", es.Metadata.Name)
+			ezk.FmtGreen("Found ExternalSecret: %s", es.Metadata.Name)
 		}
 
 		return goja.Undefined()
