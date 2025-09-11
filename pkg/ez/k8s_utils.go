@@ -445,7 +445,7 @@ func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 }
 
 func (k *K8SUtilsImpl) CopyFileToPod(namespace, pod, container, localPath, remotePath string) error {
-	file, err := k.Fs.Open(localPath)
+	file, err := Kube.Open(localPath)
 	if err != nil {
 		return fmt.Errorf("failed to open local file: %w", err)
 	}
