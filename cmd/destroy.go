@@ -1,11 +1,10 @@
 package cmd
 
 import (
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // destroyCmd represents the destroy command
@@ -14,19 +13,16 @@ var destroyCmd = &cobra.Command{
 	Short: "kills the current easykube cluster",
 	Long:  `stops and removes the easykube container, leaves the registry running`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ekCtx := ekctx.GetAppContext(cmd)
-		out := ekCtx.Printer
-
-		cru := ek.NewContainerRuntime(ekCtx)
-		search := cru.FindContainer(constants.KIND_CONTAINER)
+		ezk := ez.Kube
+		search := ezk.FindContainer(constants.KIND_CONTAINER)
 
 		if search.Found {
-			out.FmtYellow("Stopping %s", constants.KIND_CONTAINER)
+			ezk.FmtYellow("Stopping %s", constants.KIND_CONTAINER)
 			if search.IsRunning {
-				cru.StopContainer(search.ContainerID)
+				ezk.StopContainer(search.ContainerID)
 			}
-			cru.RemoveContainer(search.ContainerID)
-			out.FmtYellow("Removing %s", constants.KIND_CONTAINER)
+			ezk.RemoveContainer(search.ContainerID)
+			ezk.FmtYellow("Removing %s", constants.KIND_CONTAINER)
 		}
 	},
 }

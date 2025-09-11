@@ -4,18 +4,18 @@ import (
 	"os"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 	return func(call goja.FunctionCall) goja.Value {
 		e.checkArgs(call, SPARSE_CHECKOUT)
+		ezk := ez.Kube
 
 		currentDir, _ := os.Getwd()
 		defer os.Chdir(currentDir)
 
-		out := e.EKContext.Printer
 		repo := call.Argument(0).String()
 		branch := call.Argument(1).String()
 		source := call.Argument(2)
@@ -23,13 +23,12 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
 
 		destination := call.Argument(3).String()
-
-		if ek.FileOrDirExists(destination) {
-			out.FmtYellow("Repository %s already checked out at %s", repo, destination)
+		if ez.FileOrDirExists(destination) {
+			ezk.FmtYellow("Repository %s already checked out at %s", repo, destination)
 			return call.This
 		}
 
-		err := os.MkdirAll(destination, 0777)
+		err := ezk.MkdirAll(destination, 0777)
 		if err != nil {
 			panic(err)
 		}
@@ -42,25 +41,23 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			}
 
 			if stderr != "" {
-				out.FmtGreen(stderr)
+				ezk.FmtGreen(stderr)
 			}
 
 			if stdout != "" {
-				out.FmtGreen(stdout)
+				ezk.FmtGreen(stdout)
 			}
 		}
 
-		tool := ek.NewExternalTools(e.EKContext)
-
-		handleCmd(tool.RunCommand("git", "init"))
-		handleCmd(tool.RunCommand("git", "config", "core.sparsecheckout", "true"))
-		handleCmd(tool.RunCommand("git", "remote", "add", "-f", "origin", repo))
-		handleCmd(tool.RunCommand("git", "pull", "origin", branch))
+		handleCmd(ezk.RunCommand("git", "init"))
+		handleCmd(ezk.RunCommand("git", "config", "core.sparsecheckout", "true"))
+		handleCmd(ezk.RunCommand("git", "remote", "add", "-f", "origin", repo))
+		handleCmd(ezk.RunCommand("git", "pull", "origin", branch))
 
 		gitArgs := []string{"sparse-checkout", "set"}
 		allArgs := append(gitArgs, gitSparseDirectoryList...)
 
-		handleCmd(tool.RunCommand("git", allArgs...))
+		handleCmd(ezk.RunCommand("git", allArgs...))
 
 		return call.This
 	}

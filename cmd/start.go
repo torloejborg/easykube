@@ -1,11 +1,10 @@
 package cmd
 
 import (
-	"github.com/torloejborg/easykube/ekctx"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/ez"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ek"
 )
 
 // startCmd represents the start command
@@ -13,9 +12,7 @@ var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "starts the cluster node and registry container",
 	Long:  "", Run: func(cmd *cobra.Command, args []string) {
-		ctx := ekctx.GetAppContext(cmd)
-		cru := ek.NewContainerRuntime(ctx)
-
+		ezk := ez.Kube
 		type StartStatus struct {
 			Name    string
 			Message string
@@ -23,7 +20,7 @@ var startCmd = &cobra.Command{
 		}
 
 		x := func(container string) StartStatus {
-			f := cru.FindContainer(container)
+			f := ez.Kube.FindContainer(container)
 			if !f.Found {
 				return StartStatus{
 					Name:    container,
@@ -37,7 +34,7 @@ var startCmd = &cobra.Command{
 					OK:      true,
 				}
 			} else if !f.IsRunning {
-				cru.StartContainer(container)
+				ezk.StartContainer(container)
 				return StartStatus{
 					Name:    container,
 					Message: container + " started",
@@ -51,19 +48,19 @@ var startCmd = &cobra.Command{
 		registry := x(constants.REGISTRY_CONTAINER)
 
 		if cluster.OK {
-			ctx.Printer.FmtGreen(cluster.Message)
+			ezk.FmtGreen(cluster.Message)
 		} else {
-			ctx.Printer.FmtRed(cluster.Message)
+			ezk.FmtRed(cluster.Message)
 		}
 
 		if registry.OK {
-			ctx.Printer.FmtGreen(registry.Message)
+			ezk.FmtGreen(registry.Message)
 		} else {
-			ctx.Printer.FmtRed(registry.Message)
+			ezk.FmtRed(registry.Message)
 		}
 
 		if !registry.OK && !cluster.OK {
-			ctx.Printer.FmtYellow("Hint:\n")
+			ezk.FmtYellow("Hint:\n")
 			createCmd.Help()
 		}
 

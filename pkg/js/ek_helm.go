@@ -4,26 +4,24 @@ import (
 	"os"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ek"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-
-		out := ctx.EKContext.Printer
-
+		ezk := ez.Kube
 		chart := call.Argument(0).String()
 		values := call.Argument(1).String()
 		destination := call.Argument(2).String()
 		namespace := call.Argument(3).String()
 
-		if !ek.FileOrDirExists(chart) {
-			out.FmtRed("specified chart %s does not exist", chart)
+		if !ez.FileOrDirExists(chart) {
+			ez.Kube.FmtRed("specified chart %s does not exist", chart)
 			os.Exit(-1)
 		}
 
-		if !ek.FileOrDirExists(values) {
-			out.FmtRed("the value file %s does not exist", values)
+		if !ez.FileOrDirExists(values) {
+			ezk.FmtRed("the value file %s does not exist", values)
 			os.Exit(-1)
 		}
 
@@ -31,17 +29,16 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 			namespace = "default"
 		}
 
-		tools := ek.NewExternalTools(ctx.EKContext)
-		stdout, stderr, err := tools.RunCommand("helm", "template", chart,
+		stdout, stderr, err := ezk.RunCommand("helm", "template", chart,
 			"--values", values,
 			"--namespace", namespace)
 
 		if err != nil {
-			out.FmtRed("helm failed %s", stderr)
+			ezk.FmtRed("helm failed %s", stderr)
 			os.Exit(-1)
 		}
 
-		ek.SaveFile(stdout, destination)
+		ez.SaveFile(stdout, destination)
 
 		return call.This
 	}

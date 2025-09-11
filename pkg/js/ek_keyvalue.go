@@ -11,7 +11,7 @@ func (ctx *Easykube) KeyValue() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, KEY_VALUE)
 		key := call.Argument(0).String()
-		kvmap := parseKeyValuePairs(ctx.EKContext.GetStringFlag(constants.FLAG_KEYVALUE))
+		kvmap := parseKeyValuePairs(ctx.CobraCommandHelder.GetStringFlag(constants.FLAG_KEYVALUE))
 
 		if kvmap[key] == "" {
 			return goja.Undefined()
