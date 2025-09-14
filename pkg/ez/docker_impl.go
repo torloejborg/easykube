@@ -142,7 +142,7 @@ func (cr *DockerImpl) PullImage(image string, privateRegistryCredentials *string
 
 }
 
-func (cr *DockerImpl) FindContainer(name string) ContainerSearch {
+func (cr *DockerImpl) FindContainer(name string) (*ContainerSearch, error) {
 
 	f := filters.NewArgs()
 	f.Add("name", name)
@@ -153,24 +153,24 @@ func (cr *DockerImpl) FindContainer(name string) ContainerSearch {
 
 	resp, err := cr.Docker.ContainerList(cr.ctx, opts)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if len(resp) == 1 {
 
 		state := resp[0].State == "running"
 
-		return ContainerSearch{
+		return &ContainerSearch{
 			Found:       true,
 			IsRunning:   state,
 			ContainerID: resp[0].ID,
-		}
+		}, nil
 	} else {
-		return ContainerSearch{
+		return &ContainerSearch{
 			Found:       false,
 			IsRunning:   false,
 			ContainerID: "",
-		}
+		}, nil
 	}
 }
 
@@ -259,23 +259,38 @@ func (cr *DockerImpl) IsContainerRuntimeAvailable() bool {
 	return err == nil
 }
 
-func (cr *DockerImpl) CreateContainerRegistry() {
+func (cr *DockerImpl) CreateContainerRegistry() error {
 
 	registry := constants.REGISTRY_IMAGE
 	containerName := constants.REGISTRY_CONTAINER
 
 	// make sure that the registry-config file exists
 	configDir, _ := os.UserConfigDir()
-	CopyResource("registry-config.yaml", "registry-config.yaml")
-	CopyResource("cert/server.crt", "localtest.me.crt")
-	CopyResource("cert/server.key", "localtest.me.key")
+	err := CopyResource("registry-config.yaml", "registry-config.yaml")
+	if err != nil {
+		return err
+	}
+
+	err = CopyResource("cert/server.crt", "localtest.me.crt")
+	if err != nil {
+		return err
+	}
+
+	err = CopyResource("cert/server.key", "localtest.me.key")
+	if err != nil {
+		return err
+	}
 
 	imageSearch := cr.HasImage(registry)
 	if !imageSearch {
 		cr.PullImage(registry, nil)
 	}
 
-	containerSearch := cr.FindContainer(containerName)
+	containerSearch, err := cr.FindContainer(containerName)
+	if err != nil {
+		return err
+	}
+
 	if !containerSearch.Found {
 
 		//registryPort := fmt.Sprintf("%d", constants.LOCAL_REGISTRY_PORT)
@@ -315,6 +330,8 @@ func (cr *DockerImpl) CreateContainerRegistry() {
 	if containerSearch.Found && !containerSearch.IsRunning {
 		cr.StartContainer(containerSearch.ContainerID)
 	}
+
+	return nil
 }
 
 func (cr *DockerImpl) Commit(containerID string) {

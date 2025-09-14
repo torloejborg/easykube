@@ -10,10 +10,16 @@ import (
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "edits your easykube configuration file",
-	Long:  "editor is chosen via VISUAL or EDITOR environment variable", Run: func(cmd *cobra.Command, args []string) {
+	Long:  "editor is chosen via VISUAL or EDITOR environment variable",
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ezk := ez.Kube
-		ezk.MakeConfig()
+		err := ezk.MakeConfig()
+		if err != nil {
+			return err
+		}
 		ezk.EditConfig()
+
+		return nil
 	},
 }
 

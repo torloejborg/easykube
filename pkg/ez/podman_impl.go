@@ -82,7 +82,7 @@ func (cr *PodmanImpl) PullImage(image string, privateRegistryCredentials *string
 		}*/
 }
 
-func (cr *PodmanImpl) FindContainer(containerName string) ContainerSearch {
+func (cr *PodmanImpl) FindContainer(containerName string) (*ContainerSearch, error) {
 	/*
 		opts := containers.ListOptions{
 			All: ptr.To(true),
@@ -107,10 +107,10 @@ func (cr *PodmanImpl) FindContainer(containerName string) ContainerSearch {
 			}
 		}
 	*/
-	return ContainerSearch{
+	return &ContainerSearch{
 		Found:     false,
 		IsRunning: false,
-	}
+	}, nil
 }
 
 func (cr *PodmanImpl) StartContainer(id string) {
@@ -160,7 +160,7 @@ func (cr *PodmanImpl) IsContainerRuntimeAvailable() bool {
 	return false
 }
 
-func (cr *PodmanImpl) CreateContainerRegistry() {
+func (cr *PodmanImpl) CreateContainerRegistry() error {
 	/*
 		// If we alreday have the image don't pull it
 
@@ -218,7 +218,7 @@ func (cr *PodmanImpl) CreateContainerRegistry() {
 		if !search.IsRunning {
 			cr.StartContainer(search.ContainerID)
 		}*/
-
+	return nil
 }
 
 func (cr *PodmanImpl) Commit(containerID string) {

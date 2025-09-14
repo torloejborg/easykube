@@ -12,9 +12,12 @@ var destroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "kills the current easykube cluster",
 	Long:  `stops and removes the easykube container, leaves the registry running`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ezk := ez.Kube
-		search := ezk.FindContainer(constants.KIND_CONTAINER)
+		search, err := ezk.FindContainer(constants.KIND_CONTAINER)
+		if err != nil {
+			return err
+		}
 
 		if search.Found {
 			ezk.FmtYellow("Stopping %s", constants.KIND_CONTAINER)
@@ -24,6 +27,8 @@ var destroyCmd = &cobra.Command{
 			ezk.RemoveContainer(search.ContainerID)
 			ezk.FmtYellow("Removing %s", constants.KIND_CONTAINER)
 		}
+
+		return nil
 	},
 }
 

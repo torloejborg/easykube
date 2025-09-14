@@ -79,7 +79,7 @@ type ContainerImageManager interface {
 }
 
 type ContainerContainerManager interface {
-	FindContainer(name string) ContainerSearch
+	FindContainer(name string) (*ContainerSearch, error)
 	StartContainer(id string)
 	StopContainer(id string)
 	RemoveContainer(id string)
@@ -104,7 +104,7 @@ type IContainerRuntime interface {
 
 	CloseContainerRuntime()
 	IsContainerRuntimeAvailable() bool
-	CreateContainerRegistry()
+	CreateContainerRegistry() error
 	Commit(containerID string)
 }
 

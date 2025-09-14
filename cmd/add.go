@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"os"
+	"errors"
+	"fmt"
 	"slices"
 	"strings"
 
@@ -17,23 +18,27 @@ var addCmd = &cobra.Command{
 	Short: "applies one or more addons located in the addon repository",
 	Long:  `by default addons also applies their dependencies`,
 	Args:  cobra.ArbitraryArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ezk := ez.Kube
 
 		cmdHelper := ez.CommandHelper(cmd)
 
 		addons, err := ezk.GetAddons()
 		if err != nil {
-			ezk.FmtRed("Error getting addons: %v", err)
-			os.Exit(1)
+			return err
 		}
 
 		forceInstall := cmdHelper.GetBoolFlag(constants.FLAG_FORCE)
 		targetCluster := cmdHelper.GetStringFlag(constants.FLAG_CLUSTER)
+
+		if !ezk.IsClusterRunning() {
+			return errors.New("please create or start the cluster before installing addons")
+		}
+
 		installed, err := ezk.GetInstalledAddons()
+
 		if err != nil {
-			ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
-			os.Exit(1)
+			return err
 		}
 
 		// switch to the easykube context - this is purely to avoid trouble
@@ -44,8 +49,7 @@ var addCmd = &cobra.Command{
 		wanted, missing := pickAddons(args, addons)
 
 		if len(missing) > 0 {
-			ezk.FmtRed("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
-			os.Exit(-1)
+			return fmt.Errorf("%d unknown addon(s) specified; %v", len(missing), strings.Join(missing, ", "))
 		}
 
 		if len(targetCluster) > 0 {
@@ -58,7 +62,7 @@ var addCmd = &cobra.Command{
 		} else {
 			toInstall, err := ez.ResolveDependencies(wanted, addons)
 			if err != nil {
-				ezk.FmtRed("dependency resolution failed: %v", err)
+				return err
 			}
 
 			for idx := range toInstall {
@@ -69,10 +73,13 @@ var addCmd = &cobra.Command{
 					continue
 				}
 
-				jsutils.NewJsUtils(cmdHelper, toInstall[idx]).ExecAddonScript(toInstall[idx])
+				jserr := jsutils.NewJsUtils(cmdHelper, toInstall[idx]).ExecAddonScript(toInstall[idx])
+				if jserr != nil {
+					return jserr
+				}
 			}
 		}
-
+		return nil
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
