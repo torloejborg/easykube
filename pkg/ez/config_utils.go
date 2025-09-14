@@ -24,7 +24,7 @@ type EasykubeConfigData struct {
 
 type IEasykubeConfig interface {
 	LoadConfig() (*EasykubeConfigData, error)
-	MakeConfig()
+	MakeConfig() error
 	EditConfig()
 	LaunchEditor(config, editor string)
 }
@@ -111,10 +111,10 @@ func (ec *EasykubeConfig) EditConfig() {
 	}
 }
 
-func (ec *EasykubeConfig) MakeConfig() {
+func (ec *EasykubeConfig) MakeConfig() error {
 	userConfigDir, err := Kube.GetUserConfigDir()
 	if nil != err {
-		log.Fatal(err)
+		return err
 	}
 
 	pathToConfigFile := filepath.Join(userConfigDir, ec.ConfigDirName, "config.yaml")
@@ -131,35 +131,48 @@ func (ec *EasykubeConfig) MakeConfig() {
 
 		file, err := Kube.Fs.Create(pathToConfigFile)
 		if nil != err {
-			log.Panic(err)
+			return err
 		}
 
 		configData, err := resources.AppResources.ReadFile("data/config.template")
 		if nil != err {
-			log.Panic(err)
+			return err
 		}
 
 		templ := template.New("config")
 		templ, err = templ.Parse(string(configData))
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		buf := &bytes.Buffer{}
 
 		err = templ.Execute(buf, model)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		_, err = file.WriteString(buf.String())
 		if nil != err {
-			log.Panic(err)
+			return err
 		}
 
-		CopyResource("cert/localtest.me.crt", "localtest.me.crt")
-		CopyResource("cert/localtest.me.key", "localtest.me.key")
-		CopyResource("registry-config.yaml", "registry-config.yaml")
+		err = CopyResource("cert/localtest.me.crt", "localtest.me.crt")
+		if nil != err {
+			return err
+		}
+
+		err = CopyResource("cert/localtest.me.key", "localtest.me.key")
+		if nil != err {
+			return err
+		}
+
+		err = CopyResource("registry-config.yaml", "registry-config.yaml")
+		if nil != err {
+			return err
+		}
 
 	}
+
+	return nil
 }

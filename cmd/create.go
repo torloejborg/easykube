@@ -18,18 +18,20 @@ var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "creates the easykube cluster",
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ezk := ez.Kube
 		cmdHelper := ez.CommandHelper(cmd)
 
 		if ezk.IsContainerRunning(constants.KIND_CONTAINER) {
-			ezk.FmtYellow("Cluster was already created, exiting.")
-			os.Exit(0)
+			return errors.New("cluster already running")
 		}
 
 		ezk.FmtGreen("Bootstrapping easykube single node cluster")
 		// Ensure configation exists
-		ezk.MakeConfig()
+		err := ezk.MakeConfig()
+		if err != nil {
+			return err
+		}
 
 		if !ezk.HasImage(constants.REGISTRY_IMAGE) {
 			ezk.FmtYellow("Pulling docker registry image")
@@ -43,16 +45,18 @@ var createCmd = &cobra.Command{
 
 		pdErr := ez.Kube.EnsurePersistenceDirectory()
 		if pdErr != nil {
-			ezk.FmtRed("Error ensuring persistence directory", pdErr)
+			return pdErr
 		}
+
 		ez.Kube.CreateContainerRegistry()
 		addons, aerr := ez.Kube.GetAddons()
 		if aerr != nil {
-			ezk.FmtRed("Error getting addons", aerr)
+			return aerr
 		}
+
 		occupiedPorts, _ := ensureClusterPortsFree(addons)
 		if nil != occupiedPorts {
-			ezk.FmtGreen("Can not create easykube cluster")
+			ezk.FmtYellow("Can not create easykube cluster")
 			fmt.Println()
 			for k, v := range occupiedPorts {
 				ez.Kube.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.Name, strings.Join(ez.IntSliceToStrings(v), ","))
@@ -70,9 +74,9 @@ var createCmd = &cobra.Command{
 		ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 		ezk.PatchCoreDNS()
 
-		err := ezk.CreateConfigmap(constants.ADDON_CM, "default")
+		err = ezk.CreateConfigmap(constants.ADDON_CM, "default")
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		ezk.FmtGreen(report)
@@ -93,14 +97,15 @@ var createCmd = &cobra.Command{
 			}
 
 			if err != nil {
-				ezk.FmtRed("Did not locate %s\n", createSecret)
-				os.Exit(-1)
+				return errors.New(fmt.Sprintf("Error reading property file %s, %v", createSecret, err.Error()))
 			}
 
 			ezk.CreateSecret("default", "easykube-secrets", configmap)
 		} else {
 			ezk.FmtYellow("Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries.")
 		}
+		
+		return nil
 	},
 }
 

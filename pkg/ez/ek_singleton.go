@@ -100,15 +100,15 @@ func CreateOsDetailsImpl() OsDetails {
 
 func InitializeKubeSingleton() {
 
-	// I'm damaged by Java, We could inject anything anywhere, now this is my attempt at destructuring
+	// I'm damaged by Java, there we could inject anything anywhere, now this is my attempt at destructuring
 	// the application into smaller parts and assembling it with an initialization function. This allows
 	// parts or aspects of the application to be configured differently for tests.
 
 	osd := CreateOsDetailsImpl()
 	config := CreateEasykubeConfigImpl(osd)
 
-	Kube.UsePrinter(NewPrinter())
 	Kube.UseFilesystemLayer(afero.NewOsFs())
+	Kube.UsePrinter(NewPrinter())
 	Kube.UseOsDetails(osd)
 	Kube.UseK8sUtils(CreateK8sUtilsImpl())
 	Kube.UseEasykubeConfig(config)

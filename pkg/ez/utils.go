@@ -42,17 +42,13 @@ func FileOrDirExists(path string) bool {
 	return err == nil || os.IsExist(err)
 }
 
-func Check(err error) {
-	log.Fatal(err)
-}
-
 // Copies an embedded resource from src into the user configuration directory
 // dest is a relative path to ~/.config/easykube
-func CopyResource(src, dest string) {
+func CopyResource(src, dest string) error {
 
 	configDir, err := Kube.GetUserConfigDir()
 	if nil != err {
-		panic(err)
+		return err
 	}
 
 	configDir = filepath.Join(configDir, "easykube")
@@ -69,14 +65,16 @@ func CopyResource(src, dest string) {
 
 		sourceData, err := resources.AppResources.ReadFile("data/" + src)
 		if nil != err {
-			panic(err)
+			return err
 		}
 
 		_, err = f.WriteString(string(sourceData))
 		if nil != err {
-			panic(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func SaveFile(data string, dest string) {

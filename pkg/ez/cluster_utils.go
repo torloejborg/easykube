@@ -50,7 +50,7 @@ func (u *ClusterUtils) ConfigurationReport(addonList []*Addon) string {
 func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 
 	// kind already exists, but not started
-	search := Kube.FindContainer("kind-control-plane")
+	search, _ := Kube.FindContainer("kind-control-plane")
 
 	addonList := make([]*Addon, 0)
 	for _, addon := range modules {
@@ -108,7 +108,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		}
 
 		// initial cluster should be running now
-		search = Kube.FindContainer(constants.KIND_CONTAINER)
+		search, _ = Kube.FindContainer(constants.KIND_CONTAINER)
 
 		if search.IsRunning {
 			Kube.FmtGreen("Configuring containerd")

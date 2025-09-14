@@ -1,12 +1,14 @@
 package jsutils
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/dop251/goja"
@@ -20,7 +22,7 @@ type JsUtils struct {
 }
 
 type IJsUtils interface {
-	ExecAddonScript(a *ez.Addon)
+	ExecAddonScript(a *ez.Addon) error
 }
 
 type AddonContext struct {
@@ -67,7 +69,7 @@ func NewJsUtils(commandHelper *ez.CobraCommandHelperImpl, source *ez.Addon) IJsU
 	}
 }
 
-func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
+func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) error {
 	script := a.ReadScriptFile(ez.Kube.Fs)
 	ezk := ez.Kube
 
@@ -91,10 +93,11 @@ func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
 	}()
 
 	if err != nil {
-		ezk.FmtRed("Error in %s addon!\n", a.Name)
-		ezk.FmtRed("Cause: %s\n", err)
-		os.Exit(-1)
+		e := errors.New("in addon " + a.Name)
+		return errors.Join(e, err)
 	}
+
+	return nil
 }
 
 // GetPseudoJsIncludes Concatenates all the library javascript functions found in the _jslib directory into
@@ -102,8 +105,10 @@ func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) {
 func (jsu *JsUtils) GetPseudoJsIncludes() string {
 	jsScriptDir := filepath.Join(jsu.AddonRoot, constants.JS_LIB)
 	data := make([]string, 0)
+
 	if directoryExists(jsScriptDir) {
-		err := filepath.Walk(jsScriptDir, func(path string, info fs.FileInfo, err error) error {
+
+		walkFunc := func(path string, info fs.FileInfo, err error) error {
 			if !info.IsDir() && strings.HasSuffix(info.Name(), ".js") {
 				dat, err := os.ReadFile(filepath.Join(jsScriptDir, info.Name()))
 				if err != nil {
@@ -113,7 +118,10 @@ func (jsu *JsUtils) GetPseudoJsIncludes() string {
 				clear(dat)
 			}
 			return nil
-		})
+		}
+
+		err := afero.Walk(ez.Kube.Fs, jsScriptDir, walkFunc)
+
 		if err != nil {
 			panic(err)
 		}
@@ -125,7 +133,7 @@ func (jsu *JsUtils) GetPseudoJsIncludes() string {
 }
 
 func directoryExists(dirName string) bool {
-	info, err := os.Stat(dirName)
+	info, err := ez.Kube.Stat(dirName)
 	if os.IsNotExist(err) {
 		return false
 	}
