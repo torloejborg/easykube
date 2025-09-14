@@ -48,7 +48,7 @@ func TestDiscoverAddons(t *testing.T) {
 	}
 }
 
-func TestABrokenAddon(t *testing.T) {
+func TestBrokenAddon(t *testing.T) {
 
 	initAddonReaderTest()
 	Kube.MakeConfig()

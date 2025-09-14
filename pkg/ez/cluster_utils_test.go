@@ -2,132 +2,89 @@ package ez
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/spf13/afero"
 )
 
-func TestRenderYaml(t *testing.T) {
+func initClusterUtilsTest() {
 
-	a := &Addon{
-		Name: "foo",
-		Config: AddonConfig{
-			ExtraPorts: []PortConfig{
-				{
-					HostPort: 9000,
-					Protocol: "TCP",
-				},
-			},
-			ExtraMounts: []MountConfig{
-				{
-					ContainerPath: "pgdata",
-					HostPath:      "postgres",
-				},
-			},
-		},
-	}
+	y := &OsDetailsStub{CreateOsDetailsImpl()}
+	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
 
-	al := []*Addon{a}
-
-	fmt.Println(al)
-
+	Kube.UseOsDetails(y)
+	Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	Kube.UseEasykubeConfig(x)
+	Kube.UseAddonReader(CreateAddonReaderImpl(x))
+	Kube.UseClusterUtils(CreateClusterUtilsImpl())
 }
 
-func TestConfigGeneratedFromAddons(t *testing.T) {
-
-}
-
-func TestCreateCluster(*testing.T) {
-
-	Kube.EnsurePersistenceDirectory()
-
-}
-
-func TestClusterCreateReport(*testing.T) {
-
-	a := &Addon{
-		Name: "alpha",
-		Config: AddonConfig{
-			ExtraPorts: []PortConfig{
-				{
-					HostPort: 9000,
-					Protocol: "TCP",
-					NodePort: 234524,
-				},
-				{
-					HostPort: 5432,
-					NodePort: 123144,
-				},
-				{
-					HostPort: 7777,
-					Protocol: "UDP",
-					NodePort: 531144,
-				},
-			},
-		},
-	}
-
-	b := &Addon{
-		Name: "bravo",
-		Config: AddonConfig{
-			ExtraPorts: []PortConfig{
-				{
-					HostPort: 443,
-					Protocol: "TCP",
-					NodePort: 4342,
-				},
-				{
-					HostPort: 80,
-					Protocol: "TCP",
-					NodePort: 8080,
-				},
-			},
-		},
-	}
-
-	c := &Addon{
-		Name: "charlie", Config: AddonConfig{
-			ExtraMounts: []MountConfig{
-				{
-					PersistenceDir: "/some/other/location",
-					ContainerPath:  "/mnt/foo-a",
-					HostPath:       "docker-a",
-				},
-				{
-					ContainerPath: "/mnt/foo-b",
-					HostPath:      "docker-b",
-				},
-				{
-					ContainerPath: "/mnt/foo-c",
-					HostPath:      "docker-c",
-				},
-				{
-					ContainerPath: "/mnt/foo-d",
-					HostPath:      "/some/abs/dir/docker-d",
-				},
-			},
-			ExtraPorts: []PortConfig{
-				{
-					HostPort: 7743,
-					Protocol: "TCP",
-					NodePort: 38475,
-				},
-			},
-		},
-	}
-
-	var addons []*Addon
-	addons = append(addons, a)
-	addons = append(addons, b)
-	addons = append(addons, c)
-
-}
-
-func TestUpdateConfigmap(t *testing.T) {
-}
-
-func TestGetInstalledAddons(t *testing.T) {
-
+var expectedPersistenceDirectories = []struct {
+	dir string
+}{
+	{"addon-a"},
+	{"addon-b"},
+	{"addon-c"},
+	{"addon-d"},
 }
 
 func TestCreatePersistenceDirectories(t *testing.T) {
+	initClusterUtilsTest()
+	Kube.MakeConfig()
+	CopyTestAddonToMemFs("diamond", "./addons")
 
+	err := Kube.EnsurePersistenceDirectory()
+
+	if err != nil {
+		t.Errorf("Failed to create directories %v", err)
+	}
+
+	for _, tt := range expectedPersistenceDirectories {
+		t.Run(tt.dir, func(t *testing.T) {
+			cfg, _ := Kube.GetUserConfigDir()
+			persistenceDir := filepath.Join(cfg, "easykube", "persistence", tt.dir)
+			exists := FileOrDirExists(persistenceDir)
+			if !exists {
+				t.Errorf("expected %v to exist", persistenceDir)
+			}
+		})
+	}
+}
+
+func TestRenderKindConfigurationFromSetOfAddons(t *testing.T) {
+	initClusterUtilsTest()
+	Kube.MakeConfig()
+	CopyTestAddonToMemFs("diamond", "./addons")
+	addons, err := Kube.GetAddons()
+	if err != nil {
+		t.Errorf("Failed to get addons %v", err)
+	}
+	addonList := make([]*Addon, 0)
+	// unmap addons
+	for _, addon := range addons {
+		addonList = append(addonList, addon)
+	}
+
+	result := Kube.RenderToYAML(addonList)
+
+	fmt.Println(result)
+}
+
+func TestWrongPortConfigShouldFail(t *testing.T) {
+
+	initClusterUtilsTest()
+	Kube.MakeConfig()
+	CopyTestAddonToMemFs("portconfig", "./addons")
+
+	_, err := Kube.GetAddons()
+	if err != nil {
+
+		expectedContains := "requires both hostPort and nodePort to be set"
+
+		if !strings.Contains(err.Error(), expectedContains) {
+			t.Errorf("Got error %v, expected '%v' in errormessage", err, expectedContains)
+		}
+	}
 }

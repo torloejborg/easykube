@@ -1,3 +1,9 @@
 let configuration = {
-    "dependsOn": ["d"]
+    "dependsOn": ["d"],
+    "extraMounts" : [
+        {
+            "hostPath" : "addon-b",
+            "containerPath" : "/mount-point"
+        }
+    ]
 }

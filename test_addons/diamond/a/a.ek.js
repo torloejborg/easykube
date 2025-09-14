@@ -8,8 +8,8 @@ let configuration = {
     ],
     "extraMounts" : [
         {
-            "hostPath" : "/foo",
-            "containerPath" : "/bar"
+            "hostPath" : "addon-a",
+            "containerPath" : "/mount-point"
         }
     ]
 }

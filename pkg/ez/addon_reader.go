@@ -150,7 +150,13 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig,
 				cfg.ExtraMounts[idx].PersistenceDir = cfg.ExtraMounts[idx].HostPath
 				cfg.ExtraMounts[idx].HostPath = ""
 			}
+		}
 
+		// validate port configuration
+		for _, port := range cfg.ExtraPorts {
+			if port.NodePort == 0 || port.HostPort == 0 {
+				return nil, fmt.Errorf("%s configuration of extraPorts requires both hostPort and nodePort to be set", unconfigured.Name)
+			}
 		}
 
 		return cfg, jsonErr
