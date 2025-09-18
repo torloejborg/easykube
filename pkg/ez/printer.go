@@ -33,7 +33,7 @@ func (p *PrinterImpl) FmtYellow(out string, args ...any) {
 }
 
 func (p *PrinterImpl) FmtVerbose(out string, args ...any) {
-	colorize(color.LightBlue, "» "+out, args...)
+	colorize(color.LightBlue, "⟶ "+out, args...)
 }
 
 func colorize(col color.Color, out string, args ...any) {
