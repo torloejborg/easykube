@@ -18,7 +18,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 
 		ezk := ez.Kube
 		if ezk.IsDryRun() {
-			ezk.FmtDryRun("not preloading images")
+			ezk.FmtDryRun("skipping preload")
 			return goja.Undefined()
 		}
 
@@ -69,7 +69,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 					ezk.TagImage(source, dest)
 
 					ezk.PushImage(dest)
-					ezk.FmtGreen("🖼  push %s", dest)
+					ezk.FmtGreen("🖼  pushed %s", dest)
 				}
 				defer wg.Done()
 			}()

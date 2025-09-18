@@ -11,6 +11,11 @@ import (
 func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun("skipping execInContainer")
+			return goja.Undefined()
+		}
+
 		ctx.checkArgs(call, EXEC_IN_CONTAINER)
 
 		deployment := call.Argument(0).String()

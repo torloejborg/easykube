@@ -10,8 +10,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func extractExternalSecrets(filePath string, ctx *ez.CobraCommandHelperImpl) ([]ez.ExternalSecret, error) {
+func extractExternalSecrets(filePath string) ([]ez.ExternalSecret, error) {
 	ezk := ez.Kube
+
 	// Read the YAML file
 	yamlFile, err := os.ReadFile(filePath)
 	if err != nil {
@@ -52,9 +53,12 @@ func extractExternalSecrets(filePath string, ctx *ez.CobraCommandHelperImpl) ([]
 func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
-		ctx.checkArgs(call, PROCESS_SECRETS)
 		ezk := ez.Kube
-
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun("skipping extractExternalSecrets")
+		}
+		
+		ctx.checkArgs(call, PROCESS_SECRETS)
 		var arg = call.Argument(0)
 		var namespace = call.Argument(1).String()
 		manifest := call.Argument(2).String() // defaults to ".out.yaml"
@@ -69,7 +73,7 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 		ezk.FmtGreen("Processing secrets and applying to %s", namespace)
 
 		filePath := manifest
-		externalSecrets, err := extractExternalSecrets(filePath, ctx.CobraCommandHelder)
+		externalSecrets, err := extractExternalSecrets(filePath)
 
 		for i := range externalSecrets {
 			secret := ezk.TransformExternalSecret(externalSecrets[i], secretSource, namespace)
