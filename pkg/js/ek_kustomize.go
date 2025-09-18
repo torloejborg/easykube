@@ -11,6 +11,7 @@ import (
 func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
+
 		yamlFile := ez.Kube.KustomizeBuild(".")
 		ezk.ApplyYaml(yamlFile)
 

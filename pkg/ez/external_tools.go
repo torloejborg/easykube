@@ -11,7 +11,6 @@ import (
 )
 
 type ExternalToolsImpl struct {
-	ctx *CobraCommandHelperImpl
 }
 
 type IExternalTools interface {
@@ -30,6 +29,10 @@ func NewExternalTools() IExternalTools {
 }
 
 func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
+
+	if Kube.CobraCommandHelperImpl.IsVerbose() {
+		Kube.FmtVerbose("running KustomizeBuild")
+	}
 
 	kustomize := exec.Command(
 		"kustomize",
