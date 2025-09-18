@@ -31,12 +31,23 @@ func NewExternalTools() IExternalTools {
 
 func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
-	stdout, stderr, err := et.RunCommand(
-		"kustomize",
+	cmd := "kustomize"
+	args := []string{
 		"build",
 		"-enable-helm",
 		"--enable-alpha-plugins",
-		"--enable-exec", dir)
+		"--enable-exec", dir}
+
+	stdout, stderr, err := et.RunCommand(cmd, args...)
+	cmdline := strings.Split(stdout, "\n")
+	if Kube.IsDryRun() {
+		Kube.FmtDryRun("%s", cmd, strings.Join(args, " "))
+		return ""
+	}
+
+	if Kube.IsVerbose() {
+		Kube.FmtVerbose("%s", cmd, strings.Join(args, " "))
+	}
 
 	if err != nil {
 		Kube.FmtRed("kustomize failed with %s", stderr)
@@ -66,20 +77,35 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
 func (et *ExternalToolsImpl) ApplyYaml(yamlFile string) {
 
-	_, stderr, err := et.RunCommand("kubectl", "apply", "-f", yamlFile)
+	cmd := "kubectl"
+	args := []string{"apply", "-f", yamlFile}
 
-	if err != nil {
-		Kube.FmtRed("kubectl failed with %s", stderr)
-		os.Exit(-1)
+	if Kube.IsDryRun() {
+		Kube.FmtDryRun(cmd, strings.Join(args, " "))
+	} else {
+		_, stderr, err := et.RunCommand(cmd, args...)
+
+		if err != nil {
+			Kube.FmtRed("kubectl failed with %s", stderr)
+			os.Exit(-1)
+		}
 	}
 
 }
 
 func (et *ExternalToolsImpl) DeleteYaml(yamlFile string) {
-	_, stderr, err := et.RunCommand("kubectl", "delete", "-f", yamlFile)
-	if err != nil {
-		Kube.FmtRed("kubectl failed with %s", stderr)
-		os.Exit(-1)
+
+	cmd := "kubectl"
+	args := []string{"delete", "-f", yamlFile}
+
+	if Kube.IsDryRun() {
+		Kube.FmtDryRun(cmd, strings.Join(args, " "))
+	} else {
+		_, stderr, err := et.RunCommand(cmd, args...)
+		if err != nil {
+			Kube.FmtRed("kubectl failed with %s", stderr)
+			os.Exit(-1)
+		}
 	}
 
 }
@@ -117,10 +143,6 @@ func (et *ExternalToolsImpl) SwitchContext(name string) {
 
 func (et *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout string, stderr string, err error) {
 	var outBuf, errBuf bytes.Buffer
-
-	if Kube.IsVerbose() {
-		Kube.FmtVerbose("%s %s", name, strings.Join(args, " "))
-	}
 
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = &outBuf

@@ -34,7 +34,7 @@ func (e *CobraCommandHelperImpl) IsVerbose() bool {
 }
 
 func (e *CobraCommandHelperImpl) IsDryRun() bool {
-	val, err := e.Command.Flags().GetBool("verbose")
+	val, err := e.Command.Flags().GetBool("dry-run")
 	if err != nil {
 		panic(err)
 	}

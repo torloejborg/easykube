@@ -25,7 +25,6 @@ func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext
 
 	easykubeObj := addon.NewObject()
 	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
-	check(easykubeObj.Set(KUSTOMIZE_WITH_OVERLAY, e.KustomizeWithOverlay()))
 	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
 	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
 	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
