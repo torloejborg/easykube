@@ -12,6 +12,11 @@ func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, COPY_TO)
 		ezk := ez.Kube
 
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun("skipping copyTo")
+			return call.This
+		}
+
 		deployment := call.Argument(0).String()
 		namespace := call.Argument(1).String()
 		containerLike := call.Argument(2).String()
@@ -33,7 +38,7 @@ func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
 			ezk.FmtRed("%s failed: %v", COPY_TO, err)
 		}
 
-		return goja.Undefined()
+		return call.This
 	}
 
 }

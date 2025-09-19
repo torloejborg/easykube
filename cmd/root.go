@@ -19,22 +19,14 @@ var rootCmd = &cobra.Command{
 	Long: `
 bootstrap a single node kubernetes cluster, install development platforms via addon-repositories
 
-hint: start with 'easykube config'
-`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//Run: func(cmd *cobra.Command, args []string) {
-	//	if len(args) == 0 {
-	//		_ = cmd.Help()
-	//	}
-	//},
+hint: start with 'easykube config'`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		ctx := ez.CobraCommandHelperImpl{
 			Command: cmd,
 		}
 
 		cmd.SetContext(withAppContext(cmd.Context(), &ctx))
-
+		ez.Kube.UseCmdContext(ez.CobraCommandHelperImpl{Command: cmd})
 	},
 }
 
@@ -48,5 +40,6 @@ func Execute() {
 }
 
 func init() {
-
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
+	rootCmd.PersistentFlags().BoolP("dry-run", "d", false, "dry-run")
 }

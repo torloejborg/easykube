@@ -31,14 +31,22 @@ var addCmd = &cobra.Command{
 		forceInstall := cmdHelper.GetBoolFlag(constants.FLAG_FORCE)
 		targetCluster := cmdHelper.GetStringFlag(constants.FLAG_CLUSTER)
 
-		if !ezk.IsClusterRunning() {
-			return errors.New("please create or start the cluster before installing addons")
+		if !ezk.IsDryRun() {
+			// ignore this check when in dry-run mode
+			if !ezk.IsClusterRunning() {
+				return errors.New("please create or start the cluster before installing addons")
+			}
 		}
 
-		installed, err := ezk.GetInstalledAddons()
+		var installed []string
 
-		if err != nil {
-			return err
+		if ezk.IsDryRun() {
+			installed = make([]string, 0)
+		} else {
+			installed, err = ezk.GetInstalledAddons()
+			if err != nil {
+				return err
+			}
 		}
 
 		// switch to the easykube context - this is purely to avoid trouble

@@ -15,7 +15,13 @@ import (
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
+
 		ezk := ez.Kube
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun("skipping preload")
+			return goja.Undefined()
+		}
+
 		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FLAG_PULL)
 		ctx.checkArgs(call, PRELOAD)
 
@@ -63,7 +69,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 					ezk.TagImage(source, dest)
 
 					ezk.PushImage(dest)
-					ezk.FmtGreen("🖼  push %s", dest)
+					ezk.FmtGreen("🖼  pushed %s", dest)
 				}
 				defer wg.Done()
 			}()

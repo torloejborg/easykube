@@ -1,7 +1,9 @@
 package jsutils
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/ez"
@@ -29,9 +31,17 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 			namespace = "default"
 		}
 
-		stdout, stderr, err := ezk.RunCommand("helm", "template", chart,
+		cmd := "helm"
+		args := []string{"template", chart,
 			"--values", values,
-			"--namespace", namespace)
+			"--namespace", namespace}
+
+		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
+		if ezk.IsVerbose() {
+			ezk.FmtVerbose(cmdStr)
+		}
+
+		stdout, stderr, err := ezk.RunCommand(cmd, args...)
 
 		if err != nil {
 			ezk.FmtRed("helm failed %s", stderr)
