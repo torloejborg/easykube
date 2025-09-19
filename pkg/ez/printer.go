@@ -10,6 +10,8 @@ type IPrinter interface {
 	FmtGreen(out string, args ...any)
 	FmtRed(out string, args ...any)
 	FmtYellow(out string, args ...any)
+	FmtVerbose(out string, args ...any)
+	FmtDryRun(out string, args ...any)
 }
 
 func NewPrinter() IPrinter {
@@ -31,6 +33,13 @@ func (p *PrinterImpl) FmtYellow(out string, args ...any) {
 	colorize(color.Yellow, "⚠ "+out, args...)
 }
 
+func (p *PrinterImpl) FmtVerbose(out string, args ...any) {
+	colorize(color.LightBlue, "⟶ "+out, args...)
+}
+
+func (p *PrinterImpl) FmtDryRun(out string, args ...any) {
+	colorize(color.LightBlue, "️(dry) "+out, args...)
+}
 func colorize(col color.Color, out string, args ...any) {
 	_, err := color.Set(col)
 	if err != nil {

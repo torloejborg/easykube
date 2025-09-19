@@ -9,8 +9,11 @@ import (
 
 func (ctx *Easykube) WaitForCRD() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, WAIT_FOR_CRD)
 		ezk := ez.Kube
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun("skipping waitForCRD")
+		}
+		ctx.checkArgs(call, WAIT_FOR_CRD)
 
 		group := call.Argument(0).String()
 		version := call.Argument(1).String()

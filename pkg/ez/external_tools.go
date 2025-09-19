@@ -6,12 +6,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 type ExternalToolsImpl struct {
-	ctx *CobraCommandHelperImpl
 }
 
 type IExternalTools interface {
@@ -31,20 +31,22 @@ func NewExternalTools() IExternalTools {
 
 func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
-	kustomize := exec.Command(
-		"kustomize",
+	cmd := "kustomize"
+	args := []string{
 		"build",
 		"-enable-helm",
 		"--enable-alpha-plugins",
-		"--enable-exec", dir)
+		"--enable-exec", dir}
 
-	var stdout, stderr bytes.Buffer
-	kustomize.Stdout = &stdout
-	kustomize.Stderr = &stderr
+	outCmd := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
+	stdout, stderr, err := et.RunCommand(cmd, args...)
 
-	var err = kustomize.Run()
+	if Kube.IsVerbose() {
+		Kube.FmtVerbose(outCmd)
+	}
+
 	if err != nil {
-		Kube.FmtRed("kustomize failed with %s", string(stderr.Bytes()))
+		Kube.FmtRed("kustomize failed with %s", stderr)
 		panic(err)
 	} else {
 		// save output to file
@@ -53,7 +55,7 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 			panic(err)
 		}
 
-		_, err = f.Write(stdout.Bytes())
+		_, err = f.WriteString(stdout)
 		if err != nil {
 			panic(err)
 		}
@@ -70,71 +72,98 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 }
 
 func (et *ExternalToolsImpl) ApplyYaml(yamlFile string) {
-	kubectl := exec.Command("kubectl", "apply", "-f", yamlFile)
-	var stdout, stderr bytes.Buffer
-	kubectl.Stdout = &stdout
-	kubectl.Stderr = &stderr
 
-	err := kubectl.Run()
+	cmd := "kubectl"
+	args := []string{"apply", "-f", yamlFile}
+	outCmd := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 
-	if err != nil {
-		Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
-		os.Exit(-1)
+	if Kube.IsDryRun() {
+		Kube.FmtDryRun(outCmd)
+	} else {
+		if Kube.IsVerbose() {
+			Kube.FmtVerbose(outCmd)
+		}
+		_, stderr, err := et.RunCommand(cmd, args...)
+
+		if err != nil {
+			Kube.FmtRed("kubectl failed with %s", stderr)
+			os.Exit(-1)
+		}
 	}
 
 }
 
 func (et *ExternalToolsImpl) DeleteYaml(yamlFile string) {
-	kubectl := exec.Command("kubectl", "delete", "-f", yamlFile)
-	var stdout, stderr bytes.Buffer
-	kubectl.Stdout = &stdout
-	kubectl.Stderr = &stderr
 
-	err := kubectl.Run()
-	if err != nil {
-		Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
-		os.Exit(-1)
+	cmd := "kubectl"
+	args := []string{"delete", "-f", yamlFile}
+
+	if Kube.IsDryRun() {
+		Kube.FmtDryRun(cmd, strings.Join(args, " "))
+	} else {
+		_, stderr, err := et.RunCommand(cmd, args...)
+		if err != nil {
+			Kube.FmtRed("kubectl failed with %s", stderr)
+			os.Exit(-1)
+		}
 	}
 
 }
 
 func (et *ExternalToolsImpl) EnsureLocalContext() {
-	kubectl := exec.Command("kubectl", "config", "use-context", constants.CLUSTER_CONTEXT)
-
-	var stdout, stderr bytes.Buffer
-	kubectl.Stdout = &stdout
-	kubectl.Stderr = &stderr
-
+	k := Kube
 	if len(os.Getenv("KUBECONFIG")) == 0 {
-		Kube.FmtGreen("Please configure the KUBECONFIG environment variable to include .kube/easykube configuration file")
+		k.FmtGreen("Please configure the KUBECONFIG environment variable to include .kube/easykube configuration file")
 		fmt.Println()
-		Kube.FmtGreen("https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable")
+		k.FmtGreen("https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable")
 		fmt.Println()
-		Kube.FmtYellow("(The cluster is running, but you cannot manage it yet)")
+		k.FmtYellow("(The cluster is running, but you cannot manage it yet)")
+
 		home, _ := os.UserHomeDir()
 		_ = os.Setenv("KUBECONFIG", filepath.Join(home, ".kube", constants.CLUSTER_NAME))
 	} else {
-		err := kubectl.Run()
-		if err != nil {
-			Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
-			os.Exit(-1)
+
+		cmd := "kubectl"
+		args := []string{"config", "use-context", constants.CLUSTER_CONTEXT}
+		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
+		if k.IsDryRun() && k.IsVerbose() {
+			k.FmtDryRun(cmdStr)
+
+		} else {
+			if k.IsVerbose() {
+				k.FmtVerbose(cmdStr)
+			}
+			_, stderr, err := et.RunCommand(cmd, args...)
+
+			if err != nil {
+				Kube.FmtRed("kubectl failed with %s", stderr)
+				os.Exit(-1)
+			}
 		}
 	}
 }
 
 func (et *ExternalToolsImpl) SwitchContext(name string) {
+	k := Kube
+	cmd := "kubectl"
+	args := []string{"config", "use-context", name}
+	cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 
-	kubectl := exec.Command("kubectl", "config", "use-context", name)
-	var stdout, stderr bytes.Buffer
-	kubectl.Stdout = &stdout
-	kubectl.Stderr = &stderr
+	if k.IsDryRun() {
+		k.FmtDryRun(cmdStr)
+	} else {
 
-	err := kubectl.Run()
-	if err != nil {
-		Kube.FmtRed("kubectl failed with %s", string(stderr.Bytes()))
-		os.Exit(-1)
+		if k.IsVerbose() {
+			k.FmtVerbose(cmdStr)
+		}
+		_, stderr, err := et.RunCommand(cmd, args...)
+
+		if err != nil {
+			Kube.FmtRed("kubectl failed with %s", stderr)
+			os.Exit(-1)
+		}
+		Kube.FmtYellow("operating in context '%s'", name)
 	}
-	Kube.FmtYellow("operating in context '%s'", name)
 }
 
 func (et *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout string, stderr string, err error) {

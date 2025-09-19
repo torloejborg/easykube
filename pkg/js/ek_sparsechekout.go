@@ -1,7 +1,9 @@
 package jsutils
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/ez"
@@ -35,29 +37,32 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 		os.Chdir(destination)
 
-		handleCmd := func(stdout, stderr string, err error) {
+		gitCmd := func(args []string) {
+
+			git := "git"
+			cmdStr := fmt.Sprintf("%s %s", git, strings.Join(args, " "))
+
+			if ezk.IsVerbose() {
+				ezk.FmtVerbose(cmdStr)
+			}
+
+			_, stderr, err := ezk.RunCommand("git", args...)
+
 			if err != nil {
-				panic(err)
-			}
-
-			if stderr != "" {
-				ezk.FmtGreen(stderr)
-			}
-
-			if stdout != "" {
-				ezk.FmtGreen(stdout)
+				ezk.FmtRed(stderr, err.Error())
+				os.Exit(1)
 			}
 		}
 
-		handleCmd(ezk.RunCommand("git", "init"))
-		handleCmd(ezk.RunCommand("git", "config", "core.sparsecheckout", "true"))
-		handleCmd(ezk.RunCommand("git", "remote", "add", "-f", "origin", repo))
-		handleCmd(ezk.RunCommand("git", "pull", "origin", branch))
+		gitCmd([]string{"init"})
+		gitCmd([]string{"config", "core.sparsecheckout", "true"})
+		gitCmd([]string{"remote", "add", "-f", "origin", repo})
+		gitCmd([]string{"pull", "origin", branch})
 
 		gitArgs := []string{"sparse-checkout", "set"}
 		allArgs := append(gitArgs, gitSparseDirectoryList...)
 
-		handleCmd(ezk.RunCommand("git", allArgs...))
+		gitCmd(allArgs)
 
 		return call.This
 	}

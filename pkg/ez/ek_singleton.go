@@ -82,10 +82,6 @@ func CreateAddonReaderImpl(config IEasykubeConfig) IAddonReader {
 	return NewAddonReader(config)
 }
 
-func CreateExternalToolsImpl() IExternalTools {
-	return NewExternalTools()
-}
-
 func CreateContainerRuntimeImpl() IContainerRuntime {
 	return NewContainerRuntime()
 }
@@ -113,7 +109,7 @@ func InitializeKubeSingleton() {
 	Kube.UseK8sUtils(CreateK8sUtilsImpl())
 	Kube.UseEasykubeConfig(config)
 	Kube.UseAddonReader(CreateAddonReaderImpl(config))
-	Kube.UseExternalTools(CreateExternalToolsImpl())
+	Kube.UseExternalTools(NewExternalTools())
 	Kube.UseContainerRuntime(CreateContainerRuntimeImpl())
 	Kube.UseClusterUtils(CreateClusterUtilsImpl())
 }

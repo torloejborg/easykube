@@ -7,6 +7,7 @@ import (
 type ICobraCommandHelper interface {
 	GetBoolFlag(name string) bool
 	GetStringFlag(name string) string
+	IsVerbose() bool
 }
 
 type CobraCommandHelperImpl struct {
@@ -21,6 +22,22 @@ func (e *CobraCommandHelperImpl) GetBoolFlag(name string) bool {
 		panic(err)
 	}
 
+	return val
+}
+
+func (e *CobraCommandHelperImpl) IsVerbose() bool {
+	val, err := e.Command.Flags().GetBool("verbose")
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (e *CobraCommandHelperImpl) IsDryRun() bool {
+	val, err := e.Command.Flags().GetBool("dry-run")
+	if err != nil {
+		panic(err)
+	}
 	return val
 }
 

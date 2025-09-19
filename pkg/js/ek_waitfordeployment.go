@@ -10,6 +10,11 @@ func (ctx *Easykube) WaitForDeployment() func(goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, WAIT_FOR_DEPLOYMENT)
 		ezk := ez.Kube
 
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun("skipping waitForDeployment")
+			return call.This
+		}
+
 		deployment := call.Arguments[0].ToString().String()
 		namespace := call.Arguments[1].ToString().String()
 
