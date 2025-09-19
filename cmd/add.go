@@ -44,7 +44,7 @@ var addCmd = &cobra.Command{
 			installed = make([]string, 0)
 		} else {
 			installed, err = ezk.GetInstalledAddons()
-			if err != nil || !ezk.IsDryRun() {
+			if err != nil {
 				return err
 			}
 		}
