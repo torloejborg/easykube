@@ -56,8 +56,9 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 		ezk := ez.Kube
 		if ezk.IsDryRun() {
 			ezk.FmtDryRun("skipping extractExternalSecrets")
+			return call.This
 		}
-		
+
 		ctx.checkArgs(call, PROCESS_SECRETS)
 		var arg = call.Argument(0)
 		var namespace = call.Argument(1).String()
@@ -88,6 +89,6 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 			ezk.FmtGreen("Found ExternalSecret: %s", es.Metadata.Name)
 		}
 
-		return goja.Undefined()
+		return call.This
 	}
 }
