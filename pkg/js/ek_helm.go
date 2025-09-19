@@ -31,7 +31,7 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 		}
 
 		cmd := "helm"
-		args := []string{"helm", "template", chart,
+		args := []string{"template", chart,
 			"--values", values,
 			"--namespace", namespace}
 
