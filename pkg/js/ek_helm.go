@@ -35,7 +35,7 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 			"--values", values,
 			"--namespace", namespace}
 
-		cmdStr := fmt.Sprintf("%s %s", cmd, args)
+		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 		if ezk.IsVerbose() {
 			ezk.FmtVerbose(cmdStr)
 		}
