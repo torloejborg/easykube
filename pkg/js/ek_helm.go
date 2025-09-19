@@ -3,6 +3,7 @@ package jsutils
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/ez"
