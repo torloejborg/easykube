@@ -11,16 +11,16 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/vars"
 )
 
 type IAddonReader interface {
 	GetAddons() (map[string]*Addon, error)
 	ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error)
 	ExtractJSON(input string) (string, bool)
-	EnsureAddonCompatibility() (string, error)
+	CheckAddonCompatibility() (string, error)
 }
 
 type AddonReader struct {
@@ -39,51 +39,34 @@ func NewAddonReader(config IEasykubeConfig) IAddonReader {
 	}
 }
 
-func (adr *AddonReader) EnsureAddonCompatibility() (string, error) {
+func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 
 	// extract version from 1_easykube.js
-	code, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JS_LIB, "1-easykube.js"))
+	haystack, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JS_LIB, "1-easykube.js"))
 	if err != nil {
 		return "", err
 	}
-	re := regexp.MustCompile(`([~^]|>=|=)?\s*(\d+(?:\.\d+){0,2})`)
-	match := re.FindStringSubmatch(string(code))
 
-	if strings.Contains(constants.Version, "latest") {
-		// development build - skip check
-		Kube.FmtYellow("development build, will not check for addon catalog compatibility")
-		return "lastest", nil
+	if strings.Contains(vars.Version, "latest") {
+		return "dev build, skipping addon catalog compatibility check", nil
 	}
 
-	if len(match) == 3 {
-		op := match[1]
-		version := match[2]
-		if op == "" {
-			fmt.Printf("Operator: (none) | Version: %s\n", version)
-		} else {
-			fmt.Printf("Operator: %-2s | Version: %s\n", op, version)
+	vu := NewVersionUtils()
+	constraint, err := vu.ExtractConstraint(string(haystack))
 
-			current, err := semver.NewVersion(constants.Version)
-			if err != nil {
-				panic(err)
-			}
-
-			vstr := fmt.Sprintf("%s%s", op, version)
-			jsLib, err := semver.NewConstraint(vstr)
-
-			if err != nil {
-				panic(err)
-			}
-			if !jsLib.Check(current) {
-				fmt.Printf("Addon repository wants easykube %s but easykube is %s\n", vstr, current)
-			}
-		}
-
-	} else {
-		return "", errors.New("unable to determine addon catalog compatibility")
+	if err != nil {
+		return "", errors.New("semver version constraint on easykube not defined in addon repository")
 	}
 
-	return "", nil
+	ekVersion, _ := vu.ExtractVersion(vars.Version)
+
+	if !constraint.Check(ekVersion) {
+		msg := fmt.Sprintf("addon repository want easykube %s but easykube is %s\n", constraint.String(), ekVersion.String())
+		return "", errors.New(msg)
+	}
+
+	msg := fmt.Sprintf("addon repository requires easykube %s easykube is %s\n", constraint.String(), ekVersion.String())
+	return msg, nil
 }
 
 func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {

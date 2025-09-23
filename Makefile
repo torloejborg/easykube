@@ -1,6 +1,6 @@
 VERSION     ?= $(shell git describe --tags --dirty --always)
 MODULE_PATH := $(shell grep '^module ' go.mod | cut -d' ' -f2)
-LDFLAGS     = -ldflags "-X $(MODULE_PATH)/cmd.Version=$(VERSION)"
+LDFLAGS     = -ldflags "-X $(MODULE_PATH)/pkg/vars.Version=$(VERSION)"
 
 linux:
 	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o build/easykube-linux-amd64

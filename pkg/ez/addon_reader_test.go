@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/vars"
 )
 
 func initAddonReaderTest() {
@@ -75,11 +75,13 @@ func TestVersionCompatibilityReader(t *testing.T) {
 
 	CopyTestAddonToMemFs("diamond", "./addons")
 
-	constants.Version = "1.1.4"
+	vars.Version = "1.4.4"
 
-	version, err := Kube.EnsureAddonCompatibility()
+	version, err := Kube.CheckAddonCompatibility()
 	if err != nil {
-		t.Fatal(err)
+		if !strings.Contains(err.Error(), "addon repository want easykube ~1.1.4 but easykube is 1.4.4") {
+			t.Fail()
+		}
 	}
 
 	fmt.Println(version)
