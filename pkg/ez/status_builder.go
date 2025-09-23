@@ -8,6 +8,7 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/textutils"
 )
 
 type StatusBuilderImpl struct {
@@ -23,6 +24,10 @@ type IStatusBuilder interface {
 	getKubectlVersion() string
 	getKustomizeVersion() string
 	getVersionStr(in, wants string, inErr error) string
+}
+
+type binaryCheckStatus struct {
+	HasVersionMismatch bool
 }
 
 func NewStatusBuilder() IStatusBuilder {
@@ -60,26 +65,46 @@ func (s *StatusBuilderImpl) DoContainerCheck() error {
 
 func (s *StatusBuilderImpl) DoBinaryCheck() error {
 
-	hasBinary := func(name string, vFunc func() string) {
+	checkBinary := func(name string, vFunc func() string) binaryCheckStatus {
 		_, err := exec.LookPath(name)
 		if err != nil {
 			Kube.FmtRed("⚠ " + name)
+			return binaryCheckStatus{HasVersionMismatch: false}
 		} else {
 
 			version := vFunc()
 			if strings.Contains(version, "easykube") {
 				Kube.FmtYellow("%s %s", name, version)
+				return binaryCheckStatus{HasVersionMismatch: true}
 			} else {
 				Kube.FmtGreen("✓ %s %s", name, version)
+				return binaryCheckStatus{HasVersionMismatch: false}
 			}
 		}
 	}
 
 	Kube.FmtGreen("Inspecting binary dependencies")
-	hasBinary("kubectl", s.getKubectlVersion)
-	hasBinary("docker", s.getDockerVersion)
-	hasBinary("helm", s.getHelmVersion)
-	hasBinary("kustomize", s.getKustomizeVersion)
+	versionCheck := make([]binaryCheckStatus, 0)
+	versionCheck = append(versionCheck, checkBinary("kubectl", s.getKubectlVersion))
+	versionCheck = append(versionCheck, checkBinary("docker", s.getDockerVersion))
+	versionCheck = append(versionCheck, checkBinary("helm", s.getHelmVersion))
+	versionCheck = append(versionCheck, checkBinary("kustomize", s.getKustomizeVersion))
+
+	for i := range versionCheck {
+		if versionCheck[i].HasVersionMismatch {
+
+			msg := `
+			|Attention
+			|  
+			|  One or more binary dependencies did not meet their requirements, dont panic. Things still might work 
+			|  as expected, however, if strange or unexpected errors occur - this could be a reason.
+			|
+  			|  Your mileage may vary :)
+			`
+			Kube.FmtYellow(textutils.TrimMargin(msg, "|"))
+			break
+		}
+	}
 
 	return nil
 }
@@ -154,6 +179,6 @@ func (s *StatusBuilderImpl) getVersionStr(in, wants string, inErr error) string 
 			return fmt.Sprintf("(easykube want %s, actual is %s)", semv.String(), v.String())
 		}
 
-		return v.String()
+		return fmt.Sprintf("%s (%s)", v.String(), semv.String())
 	}
 }
