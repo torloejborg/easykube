@@ -6,17 +6,21 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"unicode"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 type IAddonReader interface {
 	GetAddons() (map[string]*Addon, error)
 	ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error)
 	ExtractJSON(input string) (string, bool)
+	EnsureAddonCompatibility() (string, error)
 }
 
 type AddonReader struct {
@@ -33,6 +37,53 @@ func NewAddonReader(config IEasykubeConfig) IAddonReader {
 	return &AddonReader{
 		EkConfig: cfg,
 	}
+}
+
+func (adr *AddonReader) EnsureAddonCompatibility() (string, error) {
+
+	// extract version from 1_easykube.js
+	code, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JS_LIB, "1-easykube.js"))
+	if err != nil {
+		return "", err
+	}
+	re := regexp.MustCompile(`([~^]|>=|=)?\s*(\d+(?:\.\d+){0,2})`)
+	match := re.FindStringSubmatch(string(code))
+
+	if strings.Contains(constants.Version, "latest") {
+		// development build - skip check
+		Kube.FmtYellow("development build, will not check for addon catalog compatibility")
+		return "lastest", nil
+	}
+
+	if len(match) == 3 {
+		op := match[1]
+		version := match[2]
+		if op == "" {
+			fmt.Printf("Operator: (none) | Version: %s\n", version)
+		} else {
+			fmt.Printf("Operator: %-2s | Version: %s\n", op, version)
+
+			current, err := semver.NewVersion(constants.Version)
+			if err != nil {
+				panic(err)
+			}
+
+			vstr := fmt.Sprintf("%s%s", op, version)
+			jsLib, err := semver.NewConstraint(vstr)
+
+			if err != nil {
+				panic(err)
+			}
+			if !jsLib.Check(current) {
+				fmt.Printf("Addon repository wants easykube %s but easykube is %s\n", vstr, current)
+			}
+		}
+
+	} else {
+		return "", errors.New("unable to determine addon catalog compatibility")
+	}
+
+	return "", nil
 }
 
 func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {

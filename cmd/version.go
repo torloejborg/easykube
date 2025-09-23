@@ -2,10 +2,9 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
-
-var Version = "latest" // set by linker flag
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
@@ -14,7 +13,7 @@ var versionCmd = &cobra.Command{
 	Long:  `shows the version of easykube CLI`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		ez.Kube.FmtGreen(Version)
+		ez.Kube.FmtGreen(constants.Version)
 	},
 }
 

@@ -1,10 +1,12 @@
 package ez
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 func initAddonReaderTest() {
@@ -64,4 +66,21 @@ func TestBrokenAddon(t *testing.T) {
 	} else {
 		t.Error("expected error, the broken addon should not parse it's configuration")
 	}
+}
+
+func TestVersionCompatibilityReader(t *testing.T) {
+
+	initAddonReaderTest()
+	Kube.MakeConfig()
+
+	CopyTestAddonToMemFs("diamond", "./addons")
+
+	constants.Version = "1.1.4"
+
+	version, err := Kube.EnsureAddonCompatibility()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(version)
 }

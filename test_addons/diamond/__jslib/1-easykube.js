@@ -5,7 +5,7 @@ class Easykube {
 
     /**
      * Defines compatibility with the easykube binary. EK will extract this version and compare it to its own.
-     * If a mismatch is detected a warning will be givenc
+     * If a mismatch is detected a warning will be given
      * @type {string} compat version, follows semver, we trust patch versions.
      */
     EK_COMPATIBLE_VERSION = "~1.1.4";
