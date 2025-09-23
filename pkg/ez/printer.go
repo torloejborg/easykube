@@ -34,11 +34,11 @@ func (p *PrinterImpl) FmtYellow(out string, args ...any) {
 }
 
 func (p *PrinterImpl) FmtVerbose(out string, args ...any) {
-	colorize(color.LightBlue, "⟶ "+out, args...)
+	colorize(color.LightBlue, "(ver) "+out, args...)
 }
 
 func (p *PrinterImpl) FmtDryRun(out string, args ...any) {
-	colorize(color.LightBlue, "️(dry) "+out, args...)
+	colorize(color.LightMagenta, "(dry) "+out, args...)
 }
 func colorize(col color.Color, out string, args ...any) {
 	_, err := color.Set(col)

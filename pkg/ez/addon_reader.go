@@ -6,17 +6,21 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"unicode"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/vars"
 )
 
 type IAddonReader interface {
 	GetAddons() (map[string]*Addon, error)
 	ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error)
 	ExtractJSON(input string) (string, bool)
+	CheckAddonCompatibility() (string, error)
 }
 
 type AddonReader struct {
@@ -33,6 +37,36 @@ func NewAddonReader(config IEasykubeConfig) IAddonReader {
 	return &AddonReader{
 		EkConfig: cfg,
 	}
+}
+
+func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
+
+	// extract version from 1_easykube.js
+	haystack, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JS_LIB, "1-easykube.js"))
+	if err != nil {
+		return "", err
+	}
+
+	if strings.Contains(vars.Version, "latest") {
+		return "dev build, skipping addon catalog compatibility check", nil
+	}
+
+	vu := NewVersionUtils()
+	constraint, err := vu.ExtractConstraint(string(haystack))
+
+	if err != nil {
+		return "", errors.New("semver version constraint on easykube not defined in addon repository")
+	}
+
+	ekVersion, _ := vu.ExtractVersion(vars.Version)
+
+	if !constraint.Check(ekVersion) {
+		msg := fmt.Sprintf("addon repository want easykube %s but easykube is %s\n", constraint.String(), ekVersion.String())
+		return "", errors.New(msg)
+	}
+
+	msg := fmt.Sprintf("addon repository requires easykube %s easykube is %s\n", constraint.String(), ekVersion.String())
+	return msg, nil
 }
 
 func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {
