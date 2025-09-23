@@ -1,6 +1,6 @@
 package constants
 
-const KIND_IMAGE = "kindest/node:v1.30.13"
+const KIND_IMAGE = "kindest/node:v1.34.0"
 const KIND_CONTAINER = "easykube-control-plane"
 const CLUSTER_NAME = "easykube"
 const CLUSTER_CONTEXT = "kind-easykube"
@@ -27,3 +27,12 @@ const ARG_SKAFFOLD_NAME = "name"
 const ARG_SKAFFOLD_LOCATION = "location"
 const FLAG_KEYVALUE = "kv"
 const FLAG_CLUSTER = "cluster"
+
+//
+// Binary dependencies
+//
+
+const KUBECTL_SEMVER = "~1.34"
+const DOCKER_SEMVER = "^28"
+const HELM_SEMVER = "~3.19"
+const KUSTOMIZE_SEMVER = "~5.7"

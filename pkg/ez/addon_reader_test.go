@@ -1,10 +1,12 @@
 package ez
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/vars"
 )
 
 func initAddonReaderTest() {
@@ -64,4 +66,23 @@ func TestBrokenAddon(t *testing.T) {
 	} else {
 		t.Error("expected error, the broken addon should not parse it's configuration")
 	}
+}
+
+func TestVersionCompatibilityReader(t *testing.T) {
+
+	initAddonReaderTest()
+	Kube.MakeConfig()
+
+	CopyTestAddonToMemFs("diamond", "./addons")
+
+	vars.Version = "1.4.4"
+
+	version, err := Kube.CheckAddonCompatibility()
+	if err != nil {
+		if !strings.Contains(err.Error(), "addon repository want easykube ~1.1.4 but easykube is 1.4.4") {
+			t.Fail()
+		}
+	}
+
+	fmt.Println(version)
 }
