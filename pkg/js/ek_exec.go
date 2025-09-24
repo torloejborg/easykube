@@ -52,7 +52,7 @@ func (ctx *Easykube) Exec() func(goja.FunctionCall) goja.Value {
 			er.output = notfoundErr.Error()
 			er.success = false
 			return obj
-			
+
 		} else {
 
 			var outBuf, errBuf bytes.Buffer
