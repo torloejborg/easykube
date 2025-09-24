@@ -1,4 +1,4 @@
-package ez
+package textutils
 
 import (
 	"fmt"

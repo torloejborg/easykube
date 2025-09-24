@@ -1,48 +1,71 @@
 package jsutils
 
 import (
-	"fmt"
+	"bytes"
 	"os/exec"
-	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
+
+type ExecResult struct {
+	runtime *goja.Runtime
+	self    goja.Value // the JS "this" object for chaining
+	success bool
+	output  string
+}
+
+func (er *ExecResult) OnSuccess(call goja.FunctionCall) goja.Value {
+	if er.success && len(call.Arguments) == 1 {
+		if fn, ok := goja.AssertFunction(call.Arguments[0]); ok {
+			_, _ = fn(nil, er.runtime.ToValue(er.output))
+		}
+	}
+	return er.self
+}
+
+func (er *ExecResult) OnFail(call goja.FunctionCall) goja.Value {
+	if !er.success && len(call.Arguments) == 1 {
+		if fn, ok := goja.AssertFunction(call.Arguments[0]); ok {
+			_, _ = fn(nil, er.runtime.ToValue(er.output))
+		}
+	}
+	return er.self
+}
 
 func (ctx *Easykube) Exec() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
+		er := &ExecResult{runtime: ctx.AddonCtx.vm}
+		obj := ctx.AddonCtx.NewObject()
+		er.self = obj
 
-		ezk := ez.Kube
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun("skipping exec")
-			return goja.Undefined()
-		}
+		// bind methods
+		_ = obj.Set("onSuccess", er.OnSuccess)
+		_ = obj.Set("onFail", er.OnFail)
 
+		// run the command immediately
 		osCommand := call.Argument(0).String()
 		args, _ := exportStringArray(call.Argument(1).Export())
 
-		if ezk.IsVerbose() {
-			ezk.FmtVerbose(fmt.Sprintf("%s %s", osCommand, strings.Join(args, " ")))
+		_, notfoundErr := exec.LookPath(osCommand)
+
+		if notfoundErr != nil {
+			er.output = notfoundErr.Error()
+			er.success = false
+			return obj
+			
+		} else {
+
+			var outBuf, errBuf bytes.Buffer
+			cmd := exec.Command(osCommand, args...)
+			cmd.Stdout = &outBuf
+			cmd.Stderr = &errBuf
+
+			_ = cmd.Run()
+
+			er.output = outBuf.String() + errBuf.String()
+			er.success = cmd.ProcessState.Success()
+
+			return obj
 		}
-
-		_, err := exec.LookPath(osCommand)
-		if err != nil {
-			ezk.FmtRed("⚠ %s could not execute (not found)", osCommand)
-			return goja.Undefined()
-		}
-
-		stdout, stderr, errx := ezk.RunCommand(osCommand, args...)
-
-		if errx != nil {
-			panic(errx)
-		}
-
-		fmt.Println(stdout)
-		fmt.Println(stderr)
-
-		obj := ctx.AddonCtx.vm.NewObject()
-		obj.Set("stdout", stdout)
-		obj.Set("stderr", stderr)
-		return obj
 	}
 }
