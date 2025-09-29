@@ -42,6 +42,10 @@ type K8SUtilsImpl struct {
 	Fs         afero.Fs
 }
 
+func (k *K8SUtilsImpl) HasKubeConfig() bool {
+	return k.Clientset != nil && k.RestConfig != nil
+}
+
 // Define a struct to capture the structure of an ExternalSecret
 type ExternalSecret struct {
 	ApiVersion string `yaml:"apiVersion"`
@@ -85,6 +89,7 @@ type K8sConfigManager interface {
 	DeleteKeyFromConfigmap(name, namespace, key string)
 	ReadConfigmap(name string, namespace string) (map[string]string, error)
 	UpdateConfigMap(name, namespace, key string, data []byte)
+	HasKubeConfig() bool
 }
 
 type K8sPodManager interface {
@@ -110,10 +115,19 @@ func NewK8SUtils() IK8SUtils {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		Kube.FmtRed("cannot determine homedir")
-		panic(err)
+		os.Exit(-1)
 	}
 
 	kubeconfigPath := filepath.Join(homeDir, ".kube", "easykube")
+
+	if !FileOrDirExists(kubeconfigPath) {
+		Kube.FmtYellow("expecting %s to exist, create the cluster and this message will disappear", kubeconfigPath)
+		return &K8SUtilsImpl{
+			Clientset:  nil,
+			RestConfig: nil,
+		}
+	}
+
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 
 	if err != nil {
