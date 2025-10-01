@@ -212,7 +212,7 @@ func (cr *DockerImpl) Exec(containerId string, cmd []string) {
 	}
 
 	err = cr.Docker.ContainerExecStart(cr.ctx, x.ID, container.ExecStartOptions{
-		Detach: true,
+		Detach: false,
 	})
 
 	if err != nil {

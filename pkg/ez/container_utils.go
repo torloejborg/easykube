@@ -95,13 +95,9 @@ type IContainerRuntime interface {
 	ContainerImageManager
 	ContainerContainerManager
 	ContainerNetworkManager
-
 	IsClusterRunning() bool
-
 	HasImageInKindRegistry(name string) bool
-
 	Exec(containerId string, cmd []string)
-
 	CloseContainerRuntime()
 	IsContainerRuntimeAvailable() bool
 	CreateContainerRegistry() error
