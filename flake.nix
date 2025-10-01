@@ -27,6 +27,7 @@
           kustomize
           jq
           yq
+          (self.packages.${system}.default)
         ] ++ [
           pkgsUnstable.go_1_24
         ];
