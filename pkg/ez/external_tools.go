@@ -174,5 +174,7 @@ func (et *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout str
 	cmd.Stderr = &errBuf
 
 	err = cmd.Run()
+
+	cmd.Process.Wait()
 	return outBuf.String(), errBuf.String(), err
 }

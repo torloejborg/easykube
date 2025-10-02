@@ -3,6 +3,7 @@ package ez
 import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/pkg/textutils"
 )
 
 type EasykubeSingleton struct {
@@ -16,11 +17,11 @@ type EasykubeSingleton struct {
 	afero.Fs
 	*cobra.Command
 	CobraCommandHelperImpl
-	IPrinter
+	textutils.IPrinter
 }
 
 var Kube = &EasykubeSingleton{
-	IPrinter: NewPrinter(),
+	IPrinter: textutils.NewPrinter(),
 }
 
 func (t *EasykubeSingleton) UseK8sUtils(newUtils IK8SUtils) *EasykubeSingleton {
@@ -66,7 +67,7 @@ func (t *EasykubeSingleton) UseOsDetails(ctx OsDetails) {
 	t.OsDetails = ctx
 }
 
-func (t *EasykubeSingleton) UsePrinter(printer IPrinter) {
+func (t *EasykubeSingleton) UsePrinter(printer textutils.IPrinter) {
 	t.IPrinter = printer
 }
 
@@ -104,7 +105,7 @@ func InitializeKubeSingleton() {
 	config := CreateEasykubeConfigImpl(osd)
 
 	Kube.UseFilesystemLayer(afero.NewOsFs())
-	Kube.UsePrinter(NewPrinter())
+	Kube.UsePrinter(textutils.NewPrinter())
 	Kube.UseOsDetails(osd)
 	Kube.UseK8sUtils(CreateK8sUtilsImpl())
 	Kube.UseEasykubeConfig(config)

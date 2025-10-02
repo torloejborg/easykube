@@ -38,7 +38,10 @@ func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext
 	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
 	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
 	check(easykubeObj.Set(KEY_ENV, e.Env()))
+	check(easykubeObj.Set(HTTP, e.Http()))
+	check(easykubeObj.Set(EXEC, e.Exec()))
 	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
+
 
 	addon.ExportFunction("_ek", easykubeObj)
 
