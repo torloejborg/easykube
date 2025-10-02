@@ -17,20 +17,36 @@
         version = "1.1.5";
         src = self;
 
-        vendorHash = "sha256-XA0kCP+pe1ZmsOdjT/HRUi5XzDg0/yEz0EupKVL/GQg="; # will be filled after first build
+        vendorHash = "sha256-XA0kCP+pe1ZmsOdjT/HRUi5XzDg0/yEz0EupKVL/GQg=";
       };
 
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
-          kubectl
-          helm
-          kustomize
           jq
           yq
+          zsh
           (self.packages.${system}.default)
         ] ++ [
+          pkgsUnstable.kubectl
+          pkgsUnstable.kubernetes-helm
+          pkgsUnstable.kustomize
           pkgsUnstable.go_1_24
         ];
+
+        shell = pkgs.zsh;
+
+        shellHook = ''
+
+          # Aliases
+          alias k="kubectl"
+          alias h="helm"
+          alias ek="easykube"
+
+          echo "Welcome to easykube dev shell!"
+          echo "Run 'easykube --help' to get started"
+        '';
       };
+
+
     };
 }
