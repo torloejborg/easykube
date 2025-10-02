@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/textutils"
 )
 
 type EasykubeConfigStub struct {
@@ -26,7 +27,7 @@ func (o *OsDetailsStub) GetUserHomeDir() (string, error) {
 
 func TestMain(m *testing.M) {
 	Kube = &EasykubeSingleton{
-		IPrinter: NewPrinter(),
+		IPrinter: textutils.NewPrinter(),
 	}
 
 	y := &OsDetailsStub{CreateOsDetailsImpl()}
