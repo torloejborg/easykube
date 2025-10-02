@@ -70,7 +70,7 @@ var startCmd = &cobra.Command{
 		}
 
 		if !registry.OK && !cluster.OK {
-			ezk.FmtYellow("Hint:\n")
+			ezk.FmtGreen("Hint:\n")
 			createCmd.Help()
 		}
 

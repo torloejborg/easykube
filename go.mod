@@ -3,7 +3,7 @@ module github.com/torloejborg/easykube
 go 1.24.0
 
 require (
-	github.com/Masterminds/semver/v3 v3.2.1
+	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/docker/docker v28.4.0+incompatible
 	github.com/docker/go-connections v0.6.0
 	github.com/dop251/goja v0.0.0-20250630131328-58d95d85e994
