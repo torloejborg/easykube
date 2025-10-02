@@ -10,8 +10,9 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "starts the embedded webserver",
 	Long:  `embedded webserver which provides API access to easykube`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ez.Kube.FmtGreen("todo: implement api server")
+		return nil
 	},
 }
 

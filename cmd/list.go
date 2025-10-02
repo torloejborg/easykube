@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"slices"
 	"sort"
@@ -16,21 +18,20 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "lists available modules in the addon repository",
 	Long:  "installed addons has a tick-mark",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ezk := ez.Kube
 		commandHelper := ez.CommandHelper(cmd)
 
 		modules, aerr := ez.Kube.GetAddons()
 		if aerr != nil {
-			ezk.FmtRed("list failed: %v", aerr)
-			os.Exit(1)
+			return errors.New(fmt.Sprintf("list failed: %s", aerr.Error()))
 		}
 		installed := make([]string, 0)
 		if ezk.IsClusterRunning() {
 			i, err := ez.Kube.GetInstalledAddons()
 			if err != nil {
-				ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", err)
-				os.Exit(1)
+				errMsg := fmt.Sprintf("list failed, cannot get installed addons: %s (was the configmap deleted by accident?)", err.Error())
+				return errors.New(errMsg)
 			}
 			installed = append(installed, i...)
 		} else {
@@ -80,6 +81,7 @@ var listCmd = &cobra.Command{
 
 			_ = table.Render() // Send output to stdout
 		}
+		return nil
 	},
 }
 

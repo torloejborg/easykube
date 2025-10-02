@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"os"
+	"errors"
+	"fmt"
 	"path/filepath"
 	"slices"
 
@@ -33,7 +34,7 @@ var removeCmd = &cobra.Command{
 	Use:   "remove [addon...]",
 	Short: "removes a previously installed addon",
 	Long:  "",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ezk := ez.Kube
 		// switch to the easykube context
 		ezk.EnsureLocalContext()
@@ -45,17 +46,16 @@ var removeCmd = &cobra.Command{
 
 		installedAddons, e := ezk.GetInstalledAddons()
 		if e != nil {
-			ezk.FmtRed("Cannot get installed addons: %v (was the configmap deleted by accident?)", e)
-			os.Exit(1)
+			eMsg := fmt.Sprintf("Cannot get installed addons: %s (was the configmap deleted by accident?)", e.Error())
+			return errors.New(eMsg)
 		}
 
 		if len(args) == 0 {
 			ez.Kube.FmtRed("Please specify one or more addons to remove, usage below\n")
 			err := cmd.Help()
 			if err != nil {
-				// ignore
+				return err
 			}
-			os.Exit(-1)
 		}
 
 		for i := range args {
@@ -66,6 +66,8 @@ var removeCmd = &cobra.Command{
 				ez.Kube.FmtYellow("%s is not installed", args[i])
 			}
 		}
+
+		return nil
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		k8sutils := ez.CreateK8sUtilsImpl()
