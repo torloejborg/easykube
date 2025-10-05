@@ -52,13 +52,11 @@ func TestAdd(t *testing.T) {
 		DryRun:        true,
 	}
 
-	osf := afero.NewOsFs()
-
 	// load some addons
-	test.CopyTestAddonToMemFs("../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
+	test.CopyTestAddonToMemFs("../test_addons", "exec", "/home/some-user/addons", ez.Kube.Fs)
 	_ = test.PrintFiles(ez.Kube.Fs, "/")
 
-	res, _ := ez.ReadFileToBytes("/home/some-user/addons/diamond/d/d.ek.js")
+	res, _ := ez.ReadFileToBytes("/home/some-user/addons/exec/b/b.ek.js")
 	fmt.Println(string(res))
 
 	err := addActual(addOpts, commandHelper)
