@@ -79,6 +79,7 @@ func TestVersionCompatibilityReader(t *testing.T) {
 
 	version, err := Kube.CheckAddonCompatibility()
 	if err != nil {
+		fmt.Println(err.Error())
 		if !strings.Contains(err.Error(), "addon repository want easykube ~1.1.4 but easykube is 1.4.4") {
 			t.Fail()
 		}

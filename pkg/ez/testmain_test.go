@@ -41,7 +41,14 @@ func TestMain(m *testing.M) {
 }
 
 func CopyTestAddonToMemFs(src, dest string) {
-	err := copyDirToMemFS(afero.NewOsFs(), Kube.Fs, filepath.Join("../../test_addons", src), dest)
+
+	osfs := afero.NewOsFs()
+
+	err := copyDirToMemFS(osfs, Kube.Fs, filepath.Join("../../test_addons", src), dest)
+	if err != nil {
+		panic(err)
+	}
+	err = copyDirToMemFS(osfs, Kube.Fs, filepath.Join("../../test_addons", "__jslib"), filepath.Join(dest, "__jslib"))
 	if err != nil {
 		panic(err)
 	}
