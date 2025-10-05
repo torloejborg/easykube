@@ -12,27 +12,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
-var dirstack = &Stack[string]{}
-
-func PushDir(dir string) {
-	//fmt.Println("pushdir " + dir)
-	err := os.Chdir(dir)
-	if err != nil {
-		panic(err)
-	}
-	dirstack.Push(dir)
-}
-
-func PopDir() {
-	dir, result := dirstack.Pop()
-	if result {
-		//fmt.Println("popped dir " + dir)
-		err := os.Chdir(dir)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
+var dirstack = &DirStack{}
 
 func FileOrDirExists(path string) bool {
 

@@ -117,6 +117,11 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		return err
 	}
 
+	userHomeDir, err := Kube.GetUserHomeDir()
+	if nil != err {
+		return err
+	}
+
 	pathToConfigFile := filepath.Join(userConfigDir, ec.ConfigDirName, "config.yaml")
 	_, err = Kube.Fs.Stat(pathToConfigFile)
 
@@ -124,7 +129,7 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
 
 		model := EasykubeConfigData{
-			AddonDir:         "./addons",
+			AddonDir:         filepath.Join(userHomeDir, "addons"),
 			ConfigurationDir: filepath.Join(ec.UserConfigDir, ec.ConfigDirName),
 			PersistenceDir:   filepath.Join(ec.UserConfigDir, ec.ConfigDirName, "persistence"),
 		}

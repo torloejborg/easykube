@@ -40,11 +40,11 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func CopyTestAddonToMemFs(src, dest string) {
+func CopyTestAddonToMemFs(testAddonName, dest string) {
 
 	osfs := afero.NewOsFs()
 
-	err := copyDirToMemFS(osfs, Kube.Fs, filepath.Join("../../test_addons", src), dest)
+	err := copyDirToMemFS(osfs, Kube.Fs, filepath.Join("../../test_addons", testAddonName), filepath.Join(dest, testAddonName))
 	if err != nil {
 		panic(err)
 	}
