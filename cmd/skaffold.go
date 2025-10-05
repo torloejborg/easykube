@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"errors"
-
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
@@ -21,23 +19,14 @@ var skaffoldCmd = &cobra.Command{
   Useful for starting a new addon.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ezk := ez.Kube
+
 		commandHelper := ez.CommandHelper(cmd)
-
-		addonName := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
-		addonDest := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
-
-		ekc, err := ez.Kube.LoadConfig()
-		if nil != err {
-			return errors.New("cannot proceed without easykube configuration")
+		opts := SkaffoldOpts{
+			AddonName:     commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME),
+			AddonLocation: commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION),
 		}
 
-		skaf := ez.NewSkaffold(ekc.AddonDir)
-		skaf.CreateNewAddon(addonName, addonDest)
-
-		ezk.FmtGreen("addon '%s' created in '%s'", addonName, addonDest)
-
-		return nil
+		return skaffoldActual(opts)
 	},
 }
 

@@ -17,7 +17,7 @@ import (
 
 type JsUtils struct {
 	vm                 *goja.Runtime
-	CobraCommandHelper *ez.CobraCommandHelperImpl
+	CobraCommandHelper ez.ICobraCommandHelper
 	AddonRoot          string
 }
 
@@ -26,9 +26,9 @@ type IJsUtils interface {
 }
 
 type AddonContext struct {
-	addon              *ez.Addon
-	vm                 *goja.Runtime
-	CobraCommandHelper *ez.CobraCommandHelperImpl
+	addon               *ez.Addon
+	vm                  *goja.Runtime
+	ICobraCommandHelper ez.ICobraCommandHelper
 }
 
 func (ac *AddonContext) ExportFunction(name string, action interface{}) {
@@ -42,13 +42,13 @@ func (ac *AddonContext) NewObject() *goja.Object {
 	return ac.vm.NewObject()
 }
 
-func NewJsUtils(commandHelper *ez.CobraCommandHelperImpl, source *ez.Addon) IJsUtils {
+func NewJsUtils(commandHelper ez.ICobraCommandHelper, source *ez.Addon) IJsUtils {
 	vm := goja.New()
 
 	ac := &AddonContext{
-		addon:              source,
-		vm:                 vm,
-		CobraCommandHelper: commandHelper,
+		addon:               source,
+		vm:                  vm,
+		ICobraCommandHelper: commandHelper,
 	}
 
 	export := func(name string, action interface{}) {

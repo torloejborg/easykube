@@ -79,30 +79,18 @@ type KubernetesSecret struct {
 	Type       string            `yaml:"type"`
 }
 
-type K8sSecretManager interface {
+type IK8SUtils interface {
 	CreateSecret(namespace, secretName string, data map[string]string)
 	GetSecret(name, namespace string) (map[string][]byte, error)
-}
-
-type K8sConfigManager interface {
 	CreateConfigmap(name, namespace string) error
 	DeleteKeyFromConfigmap(name, namespace, key string)
 	ReadConfigmap(name string, namespace string) (map[string]string, error)
 	UpdateConfigMap(name, namespace, key string, data []byte)
 	HasKubeConfig() bool
-}
-
-type K8sPodManager interface {
 	FindContainerInPod(deploymentName, namespace, containerPartialName string) (string, string, error)
 	ExecInPod(namespace, pod, command string, args []string) (string, string, error)
 	CopyFileToPod(namespace, pod, container, localPath, remotePath string) error
 	ListPods(namespace string) ([]string, error)
-}
-
-type IK8SUtils interface {
-	K8sSecretManager
-	K8sConfigManager
-	K8sPodManager
 	GetInstalledAddons() ([]string, error)
 	PatchCoreDNS()
 	WaitForDeploymentReadyWatch(name, namespace string) error

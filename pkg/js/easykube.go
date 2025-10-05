@@ -10,11 +10,11 @@ import (
 )
 
 type Easykube struct {
-	CobraCommandHelder *ez.CobraCommandHelperImpl
+	CobraCommandHelder ez.ICobraCommandHelper
 	AddonCtx           *AddonContext
 }
 
-func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext) {
+func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 	check := func(e error) {
 		if e != nil {
 			panic(e)
@@ -41,7 +41,6 @@ func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext
 	check(easykubeObj.Set(HTTP, e.Http()))
 	check(easykubeObj.Set(EXEC, e.Exec()))
 	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
-
 
 	addon.ExportFunction("_ek", easykubeObj)
 

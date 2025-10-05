@@ -55,7 +55,7 @@ func TestCreatePersistenceDirectories(t *testing.T) {
 
 func TestRenderKindConfigurationFromSetOfAddons(t *testing.T) {
 	initClusterUtilsTest()
-	Kube.MakeConfig()
+	_ = Kube.MakeConfig()
 	CopyTestAddonToMemFs("diamond", "./addons")
 	addons, err := Kube.GetAddons()
 	if err != nil {

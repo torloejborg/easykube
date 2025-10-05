@@ -24,3 +24,12 @@ dist: linux windows osx_amd64 osx_arm64
 	zip -jv dist/easykube-windows-amd64.zip build/easykube-windows-amd64.exe
 	zip -jv dist/easykube-darwin-amd64.zip build/easykube-darwin-amd64
 	zip -jv dist/easykube-darwin-arm64.zip build/easykube-darwin-arm64
+mock:
+	$(shell mockgen -typed --source pkg/ez/addon_reader.go --destination mock/m_addon_reader.go)
+	$(shell mockgen -typed --source pkg/ez/container_runtime.go --destination mock/m_container_runtime.go)
+	$(shell mockgen -typed --source pkg/ez/config_utils.go --destination mock/m_config_utils.go)
+	$(shell mockgen -typed --source pkg/ez/cobra_command_helper.go --destination mock/m_cobra_command_helper.go)
+	$(shell mockgen -typed --source pkg/ez/cluster_utils.go --destination mock/m_cluster_utils.go)
+	$(shell mockgen -typed --source pkg/ez/external_tools.go --destination mock/m_external_m.go)
+	$(shell mockgen -typed --source pkg/ez/k8s_utils.go --destination mock/m_k8s_utils.go)
+	$(shell mockgen -typed --source pkg/ez/os_details.go --destination mock/m_os_details.go)
