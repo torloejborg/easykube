@@ -45,7 +45,11 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 		return pdErr
 	}
 
-	ez.Kube.CreateContainerRegistry()
+	regerr := ez.Kube.CreateContainerRegistry()
+	if regerr != nil {
+		return regerr
+	}
+
 	addons, aerr := ez.Kube.GetAddons()
 	if aerr != nil {
 		return aerr
@@ -65,13 +69,17 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 
 	report := ezk.CreateKindCluster(addons)
 
-	// The cluster is created, and so it will have a new context will exist, We have to set a new instance
-	ezk.UseK8sUtils(ez.NewK8SUtils())
+	// The cluster is created, and so a new context will exist, tell the k8sutils to
+	// create a new ClientSet, so we can bootstrap
+	cerr := ezk.ReloadClientSet()
+	if cerr != nil {
+		return cerr
+	}
 
 	ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 	ezk.PatchCoreDNS()
 
-	err = ezk.CreateConfigmap(constants.ADDON_CM, "default")
+	err = ezk.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
 	if err != nil {
 		return err
 	}
@@ -82,10 +90,9 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 	ezk.EnsureLocalContext()
 
 	// ensure secret
-
 	if len(opts.Secrets) != 0 {
 
-		ezk.FmtGreen("importing property %s file as secret %s containing:", opts.Secrets, "easykube-secrets")
+		ezk.FmtGreen("importing property %s file as secret %s containing:", opts.Secrets, constants.EASYKUBE_SECRET_NAME)
 		fmt.Println()
 		configmap, err := ez.ReadPropertyFile(opts.Secrets)
 
@@ -97,7 +104,7 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 			return errors.New(fmt.Sprintf("Error reading property file %s, %v", opts.Secrets, err.Error()))
 		}
 
-		ezk.CreateSecret("default", "easykube-secrets", configmap)
+		ezk.CreateSecret("default", constants.EASYKUBE_SECRET_NAME, configmap)
 	} else {
 		ezk.FmtYellow("Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries.")
 	}

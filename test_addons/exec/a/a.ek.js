@@ -2,5 +2,5 @@ let configuration = {}
 
 easykube.kustomize()
 
-easykube.exec("cat",["/proc/cpuinfo"])
+easykube.exec("ls",["."])
     .onSuccess((s)=> {console.info(s)})

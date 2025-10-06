@@ -501,6 +501,44 @@ func (c *MockIK8SUtilsReadConfigmapCall) DoAndReturn(f func(string, string) (map
 	return c
 }
 
+// ReloadClientSet mocks base method.
+func (m *MockIK8SUtils) ReloadClientSet() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReloadClientSet")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReloadClientSet indicates an expected call of ReloadClientSet.
+func (mr *MockIK8SUtilsMockRecorder) ReloadClientSet() *MockIK8SUtilsReloadClientSetCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReloadClientSet", reflect.TypeOf((*MockIK8SUtils)(nil).ReloadClientSet))
+	return &MockIK8SUtilsReloadClientSetCall{Call: call}
+}
+
+// MockIK8SUtilsReloadClientSetCall wrap *gomock.Call
+type MockIK8SUtilsReloadClientSetCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIK8SUtilsReloadClientSetCall) Return(arg0 error) *MockIK8SUtilsReloadClientSetCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIK8SUtilsReloadClientSetCall) Do(f func() error) *MockIK8SUtilsReloadClientSetCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIK8SUtilsReloadClientSetCall) DoAndReturn(f func() error) *MockIK8SUtilsReloadClientSetCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // TransformExternalSecret mocks base method.
 func (m *MockIK8SUtils) TransformExternalSecret(secret ez.ExternalSecret, mockData map[string]map[string]string, namespace string) ez.KubernetesSecret {
 	m.ctrl.T.Helper()

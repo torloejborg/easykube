@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -80,6 +79,7 @@ type KubernetesSecret struct {
 }
 
 type IK8SUtils interface {
+	ReloadClientSet() error
 	CreateSecret(namespace, secretName string, data map[string]string) error
 	GetSecret(name, namespace string) (map[string][]byte, error)
 	CreateConfigmap(name, namespace string) error
@@ -100,6 +100,20 @@ type IK8SUtils interface {
 
 func NewK8SUtils() IK8SUtils {
 
+	impl := &K8SUtilsImpl{
+		Clientset:  nil,
+		RestConfig: nil,
+	}
+
+	err := impl.ReloadClientSet()
+	if err != nil {
+		Kube.FmtRed("Failed to create Kubernetes client: %v", err)
+	}
+
+	return impl
+}
+
+func (k *K8SUtilsImpl) ReloadClientSet() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		Kube.FmtRed("cannot determine homedir")
@@ -110,27 +124,22 @@ func NewK8SUtils() IK8SUtils {
 
 	if !FileOrDirExists(kubeconfigPath) {
 		Kube.FmtYellow("expecting %s to exist, create the cluster and this message will disappear", kubeconfigPath)
-		return &K8SUtilsImpl{
-			Clientset:  nil,
-			RestConfig: nil,
-		}
 	}
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	k.RestConfig = config
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	return &K8SUtilsImpl{
-		Clientset:  clientset,
-		RestConfig: config,
-	}
+	k.Clientset = clientset
+	return nil
 }
 
 func (k *K8SUtilsImpl) GetSecret(name, namespace string) (map[string][]byte, error) {

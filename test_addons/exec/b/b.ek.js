@@ -1,5 +1,14 @@
 let configuration = {
-    "dependsOn": ["a"]
+    "dependsOn": ["a"],
+    "extraPorts": [{
+        "nodePort": 32000,
+        "hostPort": 9999,
+        "protocol": "TCP"
+    }],
+    "extraMounts": [{
+        "hostPath": "addon-a-data",
+        "containerPath": "/storage/addon-a"
+    }]
 }
 
 console.info("B addon is being processed in JS")

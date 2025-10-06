@@ -126,7 +126,10 @@ func (ec *EasykubeConfig) MakeConfig() error {
 	_, err = Kube.Fs.Stat(pathToConfigFile)
 
 	if os.IsNotExist(err) {
-		Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
+		merr := Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
+		if merr != nil {
+			return merr
+		}
 
 		model := EasykubeConfigData{
 			AddonDir:         filepath.Join(userHomeDir, "addons"),
