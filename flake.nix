@@ -26,7 +26,7 @@
           yq
           pkgs.gnumake
           pkgs.glibcLocales
-#          (self.packages.${system}.default)
+          (self.packages.${system}.default)
         ] ++ [
           pkgsUnstable.upx
           pkgsUnstable.mockgen
