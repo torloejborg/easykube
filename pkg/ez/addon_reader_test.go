@@ -73,7 +73,7 @@ func TestVersionCompatibilityReader(t *testing.T) {
 
 	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
 
-	vars.Version = "1.4.4"
+	vars.Version = "1.1.9"
 
 	version, err := ez.Kube.CheckAddonCompatibility()
 	if err != nil {

@@ -14,19 +14,22 @@
     in {
       packages.${system}.default = pkgsUnstable.buildGoModule {
         pname = "easykube";
-        version = "1.1.5";
+        version = "latest";
         src = self;
 
-        vendorHash = "sha256-XA0kCP+pe1ZmsOdjT/HRUi5XzDg0/yEz0EupKVL/GQg=";
+        vendorHash = "sha256-K3R8blmcMf67ztFS4TbpnrqVHhjotX0jRiWXttfdJSE=";
       };
 
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
           jq
           yq
-          zsh
-          (self.packages.${system}.default)
+          pkgs.gnumake
+          pkgs.glibcLocales
+#          (self.packages.${system}.default)
         ] ++ [
+          pkgsUnstable.upx
+          pkgsUnstable.mockgen
           pkgsUnstable.kubectl
           pkgsUnstable.kubernetes-helm
           pkgsUnstable.kustomize
@@ -34,19 +37,17 @@
         ];
 
         shell = pkgs.zsh;
-
+        impureEnv = true;  # Allow access to system environment variables
         shellHook = ''
+              export LC_ALL=C.UTF-8
+              export LANG=C.UTF-8
+              export PS1="[ek-dev] >"
+              source <(easykube completion bash)
 
-          # Aliases
-          alias k="kubectl"
-          alias h="helm"
-          alias ek="easykube"
-
-          echo "Welcome to easykube dev shell!"
-          echo "Run 'easykube --help' to get started"
+              echo "Welcome to the easykube dev shell"
+              echo
+              easykube
         '';
       };
-
-
     };
 }

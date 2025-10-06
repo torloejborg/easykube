@@ -13,6 +13,7 @@ import (
 )
 
 func setupMockForCreate(ctrl *gomock.Controller) {
+	ez.Kube = &ez.EasykubeSingleton{}
 
 	// set up user details
 	osd := mock_ez.NewMockOsDetails(ctrl)
@@ -48,6 +49,8 @@ func setupMockForCreate(ctrl *gomock.Controller) {
 	clusterUtils.EXPECT().CreateKindCluster(gomock.Any())
 
 	commandHelper := mock_ez.NewMockICobraCommandHelper(ctrl)
+	commandHelper.EXPECT().IsDryRun().Return(true).AnyTimes()
+	commandHelper.EXPECT().IsVerbose().Return(true).AnyTimes()
 	config := ez.NewEasykubeConfig(osd)
 
 	ez.Kube.ICobraCommandHelper = commandHelper
@@ -59,6 +62,7 @@ func setupMockForCreate(ctrl *gomock.Controller) {
 	ez.Kube.IContainerRuntime = containerRuntime
 	ez.Kube.IAddonReader = ez.NewAddonReader(config)
 	ez.Kube.IExternalTools = ez.NewExternalTools()
+	ez.Kube.IPrinter = textutils.NewPrinter()
 	_ = ez.Kube.MakeConfig()
 }
 
