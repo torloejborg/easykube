@@ -17,7 +17,7 @@ func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 		ezk.ApplyYaml(yamlFile)
 
 		if ezk.IsDryRun() {
-			ezk.FmtDryRun("kustomize not applied for %s", ctx.AddonCtx.addon.ShortName)
+			return call.This
 		} else {
 			ezk.UpdateConfigMap(constants.ADDON_CM,
 				constants.DEFAULT_NS,
