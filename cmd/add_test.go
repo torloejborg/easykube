@@ -11,7 +11,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func setupForDryRun(ctrl *gomock.Controller) {
+func setupForDryRun(ctrl *gomock.Controller, t *testing.T) {
 	os.Setenv("KUBECONFIG", "mock-kubeconfig")
 	osd := mock_ez.NewMockOsDetails(ctrl)
 	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
@@ -47,7 +47,7 @@ func setupForDryRun(ctrl *gomock.Controller) {
 
 func TestAdd(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	setupForDryRun(ctrl)
+	setupForDryRun(ctrl, t)
 
 	addOpts := AddOptions{
 		Args:          []string{"a", "b"},

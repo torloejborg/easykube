@@ -12,8 +12,6 @@ import (
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
-var dirstack = &DirStack{}
-
 func FileOrDirExists(path string) bool {
 
 	path = filepath.Clean(path)

@@ -1,7 +1,9 @@
-package ez
+package ez_test
 
 import (
 	"testing"
+
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 var versionData = []struct {
@@ -18,12 +20,9 @@ var versionData = []struct {
 }
 
 func TestVersionUtils_ExtractVersion(t *testing.T) {
-	vut := NewVersionUtils()
-
+	vut := ez.NewVersionUtils()
 	for _, tt := range versionData {
-
 		compat, err := vut.IsCompatible(tt.version, tt.constraint)
-
 		if err != nil {
 			t.Error(err)
 		}
@@ -31,7 +30,5 @@ func TestVersionUtils_ExtractVersion(t *testing.T) {
 		if compat == tt.fail {
 			t.Errorf("expected %s and %s to fail", tt.version, tt.constraint)
 		}
-
 	}
-
 }
