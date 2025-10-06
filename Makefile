@@ -24,6 +24,8 @@ dist: linux windows osx_amd64 osx_arm64
 	zip -jv dist/easykube-windows-amd64.zip build/easykube-windows-amd64.exe
 	zip -jv dist/easykube-darwin-amd64.zip build/easykube-darwin-amd64
 	zip -jv dist/easykube-darwin-arm64.zip build/easykube-darwin-arm64
+
+.PHONY: mock
 mock:
 	$(shell mockgen -typed --source pkg/ez/addon_reader.go --destination mock/m_addon_reader.go)
 	$(shell mockgen -typed --source pkg/ez/container_runtime.go --destination mock/m_container_runtime.go)

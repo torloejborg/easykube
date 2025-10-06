@@ -3,8 +3,10 @@ package jsutils
 import (
 	"bytes"
 	"os/exec"
+	"strings"
 
 	"github.com/dop251/goja"
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type ExecResult struct {
@@ -42,30 +44,35 @@ func (ctx *Easykube) Exec() func(goja.FunctionCall) goja.Value {
 		_ = obj.Set("onSuccess", er.OnSuccess)
 		_ = obj.Set("onFail", er.OnFail)
 
-		// run the command immediately
 		osCommand := call.Argument(0).String()
 		args, _ := exportStringArray(call.Argument(1).Export())
 
-		_, notfoundErr := exec.LookPath(osCommand)
-
-		if notfoundErr != nil {
-			er.output = notfoundErr.Error()
-			er.success = false
+		if ez.Kube.IsDryRun() {
+			ez.Kube.FmtDryRun("%s %s", osCommand, strings.Join(args, " "))
 			return obj
-
 		} else {
 
-			var outBuf, errBuf bytes.Buffer
-			cmd := exec.Command(osCommand, args...)
-			cmd.Stdout = &outBuf
-			cmd.Stderr = &errBuf
+			_, notfoundErr := exec.LookPath(osCommand)
 
-			_ = cmd.Run()
+			if notfoundErr != nil {
+				er.output = notfoundErr.Error()
+				er.success = false
+				return obj
 
-			er.output = outBuf.String() + errBuf.String()
-			er.success = cmd.ProcessState.Success()
+			} else {
 
-			return obj
+				var outBuf, errBuf bytes.Buffer
+				cmd := exec.Command(osCommand, args...)
+				cmd.Stdout = &outBuf
+				cmd.Stderr = &errBuf
+
+				_ = cmd.Run()
+
+				er.output = outBuf.String() + errBuf.String()
+				er.success = cmd.ProcessState.Success()
+
+				return obj
+			}
 		}
 	}
 }

@@ -4,10 +4,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"testing"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/pkg/textutils"
 )
 
 type EasykubeConfigStub struct {
@@ -25,20 +23,20 @@ func (o *OsDetailsStub) GetUserHomeDir() (string, error) {
 	return "/home/some-user", nil
 }
 
-func TestMain(m *testing.M) {
-	Kube = &EasykubeSingleton{
-		IPrinter: textutils.NewPrinter(),
-	}
-
-	y := &OsDetailsStub{CreateOsDetailsImpl()}
-	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
-
-	Kube.UseOsDetails(y)
-	Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	Kube.UseEasykubeConfig(x)
-
-	m.Run()
-}
+//func TestMain(m *testing.M) {
+//	Kube = &EasykubeSingleton{
+//		IPrinter: textutils.NewPrinter(),
+//	}
+//
+//	y := &OsDetailsStub{CreateOsDetailsImpl()}
+//	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
+//
+//	Kube.UseOsDetails(y)
+//	Kube.UseFilesystemLayer(afero.NewMemMapFs())
+//	Kube.UseEasykubeConfig(x)
+//
+//	m.Run()
+//}
 
 func CopyTestAddonToMemFs(testAddonName, dest string) {
 

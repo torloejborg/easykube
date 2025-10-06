@@ -80,7 +80,7 @@ type KubernetesSecret struct {
 }
 
 type IK8SUtils interface {
-	CreateSecret(namespace, secretName string, data map[string]string)
+	CreateSecret(namespace, secretName string, data map[string]string) error
 	GetSecret(name, namespace string) (map[string][]byte, error)
 	CreateConfigmap(name, namespace string) error
 	DeleteKeyFromConfigmap(name, namespace, key string)
@@ -402,7 +402,7 @@ func (k *K8SUtilsImpl) WaitForCRD(
 	})
 }
 
-func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[string]string) {
+func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[string]string) error {
 
 	var isProbablyBase64 = func(s string) bool {
 		decoded, err := base64.StdEncoding.DecodeString(s)
@@ -442,7 +442,9 @@ func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 
 	// todo: better err handling
 	if e != nil {
-		panic(e)
+		return e
+	} else {
+		return nil
 	}
 }
 

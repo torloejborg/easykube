@@ -11,10 +11,8 @@ import (
 
 func remove(addon *ez.Addon) {
 	// enter the addon directory
-	ez.PushDir(filepath.Dir(addon.File))
-	defer ez.PopDir()
-
-	yamlFile := ez.Kube.KustomizeBuild(".")
+	addonDir := filepath.Dir(addon.File)
+	yamlFile := ez.Kube.KustomizeBuild(addonDir)
 	ezk := ez.Kube
 	ezk.DeleteYaml(yamlFile)
 	ezk.FmtGreen("removed %s", addon.ShortName)

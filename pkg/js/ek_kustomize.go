@@ -1,6 +1,7 @@
 package jsutils
 
 import (
+	"path/filepath"
 	"time"
 
 	"github.com/dop251/goja"
@@ -11,7 +12,7 @@ import (
 func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		yamlFile := ez.Kube.KustomizeBuild(".")
+		yamlFile := ez.Kube.KustomizeBuild(filepath.Dir(ctx.AddonCtx.addon.File))
 
 		ezk.ApplyYaml(yamlFile)
 

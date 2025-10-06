@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 func CopyTestAddonToMemFs(addonDir, testAddonName, dest string, destFs afero.Fs) {
@@ -17,7 +18,8 @@ func CopyTestAddonToMemFs(addonDir, testAddonName, dest string, destFs afero.Fs)
 	if err != nil {
 		panic(err)
 	}
-	err = copyDirToMemFS(osfs, destFs, filepath.Join(addonDir, "__jslib"), filepath.Join(dest, "__jslib"))
+
+	err = copyDirToMemFS(osfs, destFs, filepath.Join(addonDir, constants.JS_LIB), filepath.Join(dest, constants.JS_LIB))
 	if err != nil {
 		panic(err)
 	}

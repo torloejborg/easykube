@@ -39,33 +39,39 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 		"--enable-exec", dir}
 
 	outCmd := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
-	stdout, stderr, err := et.RunCommand(cmd, args...)
 
 	if Kube.IsVerbose() {
 		Kube.FmtVerbose(outCmd)
 	}
 
-	if err != nil {
-		Kube.FmtRed("kustomize failed with %s", stderr)
-		panic(err)
+	if Kube.IsDryRun() {
+		Kube.FmtDryRun(outCmd)
 	} else {
-		// save output to file
-		f, err := os.Create(constants.KUSTOMIZE_TARGET_OUTPUT)
-		if err != nil {
-			panic(err)
-		}
 
-		_, err = f.WriteString(stdout)
-		if err != nil {
-			panic(err)
-		}
+		stdout, stderr, err := et.RunCommand(cmd, args...)
 
-		defer func(f *os.File) {
-			err := f.Close()
+		if err != nil {
+			Kube.FmtRed("kustomize failed with %s", stderr)
+			panic(err)
+		} else {
+			// save output to file
+			f, err := os.Create(filepath.Join(dir, constants.KUSTOMIZE_TARGET_OUTPUT))
 			if err != nil {
 				panic(err)
 			}
-		}(f)
+
+			_, err = f.WriteString(stdout)
+			if err != nil {
+				panic(err)
+			}
+
+			defer func(f *os.File) {
+				err := f.Close()
+				if err != nil {
+					panic(err)
+				}
+			}(f)
+		}
 	}
 
 	return filepath.Join(dir, constants.KUSTOMIZE_TARGET_OUTPUT)
@@ -126,9 +132,8 @@ func (et *ExternalToolsImpl) EnsureLocalContext() {
 		cmd := "kubectl"
 		args := []string{"config", "use-context", constants.CLUSTER_CONTEXT}
 		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
-		if k.IsDryRun() && k.IsVerbose() {
+		if k.IsDryRun() {
 			k.FmtDryRun(cmdStr)
-
 		} else {
 			if k.IsVerbose() {
 				k.FmtVerbose(cmdStr)

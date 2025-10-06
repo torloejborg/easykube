@@ -1,4 +1,6 @@
 let configuration = {}
 
+easykube.kustomize()
 
-console.info("A addon is being processed in JS")
+easykube.exec("cat",["/proc/cpuinfo"])
+    .onSuccess((s)=> {console.info(s)})

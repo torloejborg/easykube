@@ -26,7 +26,8 @@ hint: start with 'easykube config'`,
 		}
 
 		cmd.SetContext(WithAppContext(cmd.Context(), &ctx))
-		ez.Kube.UseCmdContext(ez.CobraCommandHelperImpl{Command: cmd})
+
+		ez.Kube.UseCmdContext(&ez.CobraCommandHelperImpl{Command: cmd})
 	},
 }
 
