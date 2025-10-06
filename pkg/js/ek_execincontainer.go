@@ -11,22 +11,28 @@ import (
 func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun("skipping execInContainer")
-			return goja.Undefined()
-		}
 
 		ctx.checkArgs(call, EXEC_IN_CONTAINER)
 
 		deployment := call.Argument(0).String()
 		namespace := call.Argument(1).String()
 		command := call.Argument(2).String()
-		args, _ := exportStringArray(call.Argument(3).Export())
+		args := ctx.extractStringSliceFromArgument(call.Argument(3))
+		infostr := fmt.Sprintf("docker exec (in %s) %s %s ", deployment, command, strings.Join(args, " "))
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun(infostr)
+			return goja.Undefined()
+		}
 
 		pods, _ := ezk.ListPods(namespace)
 		for i := range pods {
 			if strings.Contains(pods[i], deployment) {
+
+				if ezk.IsVerbose() {
+					ezk.FmtVerbose(infostr)
+				}
 				stdout, stderr, err := ez.Kube.ExecInPod(namespace, pods[i], command, args)
+
 				if err != nil {
 					ezk.FmtRed(stderr)
 					ezk.FmtRed(err.Error())
@@ -40,21 +46,4 @@ func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 		return goja.Undefined()
 
 	}
-}
-
-func exportStringArray(val interface{}) ([]string, error) {
-	items, ok := val.([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("not an array")
-	}
-
-	result := make([]string, 0, len(items))
-	for _, item := range items {
-		str, ok := item.(string)
-		if !ok {
-			return nil, fmt.Errorf("element is not a string: %v", item)
-		}
-		result = append(result, str)
-	}
-	return result, nil
 }

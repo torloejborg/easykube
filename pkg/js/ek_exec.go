@@ -45,7 +45,7 @@ func (ctx *Easykube) Exec() func(goja.FunctionCall) goja.Value {
 		_ = obj.Set("onFail", er.OnFail)
 
 		osCommand := call.Argument(0).String()
-		args, _ := exportStringArray(call.Argument(1).Export())
+		args := ctx.extractStringSliceFromArgument(call.Argument(1))
 
 		if ez.Kube.IsDryRun() {
 			ez.Kube.FmtDryRun("%s %s", osCommand, strings.Join(args, " "))

@@ -43,15 +43,18 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 			ezk.FmtVerbose(cmdStr)
 		}
 
-		stdout, stderr, err := ezk.RunCommand(cmd, args...)
+		if ezk.IsDryRun() {
+			ezk.FmtDryRun(cmdStr)
+		} else {
+			stdout, stderr, err := ezk.RunCommand(cmd, args...)
 
-		if err != nil {
-			ezk.FmtRed("helm failed %s", stderr)
-			os.Exit(-1)
+			if err != nil {
+				ezk.FmtRed("helm failed %s", stderr)
+				os.Exit(-1)
+			}
+
+			ez.SaveFile(stdout, destination)
 		}
-
-		ez.SaveFile(stdout, destination)
-
 		return call.This
 	}
 }

@@ -34,11 +34,6 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 		addonDir := filepath.Dir(e.AddonCtx.addon.File)
 		destination := filepath.Join(addonDir, call.Argument(3).String())
 
-		if ez.FileOrDirExists(destination) {
-			ezk.FmtYellow("Repository %s already checked out at %s", repo, destination)
-			return call.This
-		}
-
 		if !ezk.IsDryRun() {
 			err := ezk.MkdirAll(destination, 0777)
 			if err != nil {
