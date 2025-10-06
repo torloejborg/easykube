@@ -27,7 +27,7 @@ func setupForDryRun(ctrl *gomock.Controller) {
 
 	commandHelper := mock_ez.NewMockICobraCommandHelper(ctrl)
 	commandHelper.EXPECT().IsDryRun().Return(true).AnyTimes()
-	commandHelper.EXPECT().IsVerbose().Return(false).AnyTimes()
+	commandHelper.EXPECT().IsVerbose().Return(true).AnyTimes()
 
 	config := ez.NewEasykubeConfig(osd)
 
