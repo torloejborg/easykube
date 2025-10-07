@@ -124,6 +124,7 @@ func (k *K8SUtilsImpl) ReloadClientSet() error {
 
 	if !FileOrDirExists(kubeconfigPath) {
 		Kube.FmtYellow("expecting %s to exist, create the cluster and this message will disappear", kubeconfigPath)
+		return nil
 	}
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)

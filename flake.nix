@@ -41,7 +41,7 @@
         shellHook = ''
               export LC_ALL=C.UTF-8
               export LANG=C.UTF-8
-              export PS1="[ek-dev] >"
+              export PS1="[ek-dev]> "
               source <(easykube completion bash)
 
               echo "Welcome to the easykube dev shell"

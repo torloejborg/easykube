@@ -24,7 +24,7 @@ Is built on top of the awesome Kind project (Kubernetes In Docker) and the Goja 
 * Break things, it's OK. Just start over.
 * Effortlessly spin up a local development stack; databases, webservers, caches, workflow-engines, OAuth servers, S3 compatible storage, etc.
 * Use as a learning/teaching aid for Kubernetes.
-* Enable your team to install and run your cloud-native application(s) locally
+* Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful if combined with tools like https://metalbear.com/mirrord/[mirrord].
 
 == Please do not
 * Use in a production setting, run your real workloads on a secured cluster. Easykube is not built with security in mind, only for local workloads.
