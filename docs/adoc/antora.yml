@@ -1,5 +1,5 @@
 name: easykube
-title: Easykube
 version: latest
+title: EasyKube
 nav:
   - modules/ROOT/nav.adoc
