@@ -3,6 +3,10 @@ site:
   url: https://torloejborg.github.io/easykube
   start_page: easykube::index.adoc
 
+urls:
+  html_extension_style: default  # keep .html
+  redirect_facility: disabled    # disable redirects for now
+
 content:
   sources:
     - url: https://github.com/torloejborg/easykube
