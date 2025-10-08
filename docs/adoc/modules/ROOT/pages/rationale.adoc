@@ -3,8 +3,13 @@ Easykube aims to enable sharing and distribution of development "platforms" via 
 
 It's meant as a team and individual enabler, everyone can install and work with an application's particular stack locally, without breaking a shared environment.
 
+This is certainly doable with existing tooling, docker-compose and friends are popular choices. So what's the point of another tool?
+
+* Kubernetes is also an orchestration platform
+* If you use kubernetes for your workloads, why not re-use the deployments which already exists?
+
 == Easykube[[rationale-easykube]]
-Is built on top of the awesome Kind project (Kubernetes In Docker) and the Goja javascript runtime go library.
+Is built on top of the awesome https://kind.sigs.k8s.io/[Kind] project (Kubernetes In Docker) and the incredible https://github.com/dop251/goja[Goja] javascript runtime go library.
 
 * It bootstraps a single-node kind-cluster with some small modifications
 * It automatically sets up a local docker registry for the cluster and connects it, we can build air-gapped environments.
@@ -15,12 +20,11 @@ Is built on top of the awesome Kind project (Kubernetes In Docker) and the Goja 
 * A CoreDNS hack lets you access everything from "localtest.me" - Never edit that /etc/hosts file again!
 
 == What you can do with it [[rationale-dowithit]]
-* Define complex, reproducible environments.
-* If a spiderweb of microservices spins up on Easykube, chances are improved when the time comes to shelve out hard cash on an actual cloud-provider.
+* Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful when combined with tools like https://metalbear.com/mirrord/[mirrord].
 * Break things, it's OK. Just start over.
 * Effortlessly spin up a local development stack; databases, webservers, caches, workflow-engines, OAuth servers, S3 compatible storage, etc.
-* Use as a learning/teaching aid for Kubernetes.
-* Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful if combined with tools like https://metalbear.com/mirrord/[mirrord].
+* Use as a learning/teaching tool for Kubernetes.
+* Perhaps some team members simply don't care about this kubernetes stuff - That's ok, nobody can be forced to fall in love with YAML, instead `$ easykube add mystack` will have stuff running with minimal effort.
 
 == Please do not [[rationale-dontdo]]
 * Use in a production setting, run your real workloads on a secured cluster. Easykube is not built with security in mind, only for local workloads.

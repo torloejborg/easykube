@@ -4,12 +4,12 @@ site:
 
 content:
   sources:
-    - url: .
-      branches: HEAD
+    - url: https://github.com/torloejborg/easykube
+      branches: refac/improvements
       start_path: docs/adoc
 
 output:
-  dir: docs/site
+  dir: ./site
 
 runtime:
   fetch: true
@@ -20,3 +20,20 @@ asciidoc:
     toclevels: 3
     sectanchors: ''
     sectnums: ''
+
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+  supplemental_files:
+    # disable the component and version selectors
+    - path: partials/header-content.hbs
+      contents: |
+        {{!-- custom header with no component/version dropdowns --}}
+        <header class="navbar">
+          <div class="navbar-brand">
+            <a class="navbar-item" href="{{@root.page.url}}">
+              {{@root.site.title}}
+            </a>
+          </div>
+        </header>

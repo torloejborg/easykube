@@ -1,2 +1,5 @@
 * xref:index.adoc[Home]
-* xref:install.adoc[Install]
+* xref:rationale.adoc[Why Easykube?]
+* xref:install.adoc[Install Easykube]
+* xref:addons.adoc[About addons]
+* xref:extend.adoc[Extend]

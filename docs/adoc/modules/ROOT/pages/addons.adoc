@@ -88,3 +88,11 @@ It may appear that the `jslib` is some sort of global context, this is not the c
 
 This means; You cannot share, or have a global state during script execution.
 
+== Author a new addon [[addons-author]]
+
+To write your own addon, copy/paste is a viable strategy. Or you can use the built in `skaffold` feature.
+----
+$ easkube skaffold --name myaddon --location utils
+----
+
+This generates a simple addon you can adapt for your own purposes. `location` is relative from the root of the addon repository.

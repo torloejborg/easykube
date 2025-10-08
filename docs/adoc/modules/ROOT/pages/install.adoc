@@ -25,8 +25,15 @@ extra-experimental-features = flakes
 ----
 ====
 
-=== Manual[[install-manual]]
-Use a package manager, or download the following software
+The Nix flake has two shells, the default shell will build easykube and use the built version.
+
+`nix develop .#light` will drop you into the shell with supporting tools _without building_. Useful if you cloned the repository.
+
+=== Manual installation[[install-manual]]
+
+Obtain the easykube binary from https://github.com/torloejborg/easykube/releases[here]
+
+Use a package manager, or download the following software yourself
 
 * https://www.docker.com/[docker]
 * https://kubernetes.io/docs/tasks/tools/[kubectl]
@@ -126,8 +133,8 @@ easykube:
 
 Save the file, and we'll be ready for the next step.
 
-== Creation [[install-create]]
-Installation and configuration is done, now it's time to create the cluster, do that with;
+== Create cluster [[install-create]]
+With installation and configuration done, it's time to create a cluster, do that with;
 
 `easykube create`
 
@@ -199,6 +206,8 @@ Repository configuration
 
 All good. Easykube is ready for usage.
 
+NOTE: You might get a warning where easykube complains about a KUBECONFIG environment variable not being set. The warning provides a link on how to configure that.
+
 Since easykube uses Kind, lets examine the running docker containers.
 
 `docker ps`
@@ -213,4 +222,4 @@ a81acb9b11c9   kindest/node:v1.34.0   "/usr/local/bin/entr…"   29 minutes ago 
 
 We can see that kindest/node is running with a bunch of port-forwards, they were defined by the addons.
 
-The registry is a local docker-registry. Most easykube addons will pull from that registry to avoid exessive bandwidth consumption.
+The registry is a local docker-registry. Most easykube addons should pull from that registry to avoid exessive bandwidth consumption.
