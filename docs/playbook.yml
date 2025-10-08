@@ -1,6 +1,5 @@
 site:
   title: EasyKube Documentation
-  start_page: easykube::index.adoc
 content:
   sources:
     - url: https://github.com/torloejborg/easykube
