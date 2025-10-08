@@ -1,0 +1,28 @@
+site:
+  title: EasyKube Documentation
+  start_page: easykube::index.adoc
+
+content:
+  sources:
+    - url: .git
+      branches: HEAD
+      start_path: docs/adoc
+
+output:
+  dir: docs/site
+
+runtime:
+  fetch: true
+
+asciidoc:
+  attributes:
+    page-pagination: ''
+    sectanchors: ''
+    sectnums: ''
+    toc: left
+    toclevels: 3
+    experimental: ''
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true

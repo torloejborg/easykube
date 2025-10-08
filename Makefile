@@ -39,3 +39,11 @@ mock:
 	mockgen -typed --source pkg/ez/external_tools.go --destination mock/m_external_m.go
 	mockgen -typed --source pkg/ez/k8s_utils.go --destination mock/m_k8s_utils.go
 	mockgen -typed --source pkg/ez/os_details.go --destination mock/m_os_details.go
+
+.PHONY:docs
+docs:
+	asciidoctor -D . --backend=html5 -o docs/site/index.html docs/adoc/index.adoc
+	asciidoctor -D . --backend=html5 -o docs/site/addons.html docs/adoc/addons.adoc
+	asciidoctor -D . --backend=html5 -o docs/site/extend.html docs/adoc/extend.adoc
+	asciidoctor -D . --backend=html5 -o docs/site/install.html docs/adoc/install.adoc
+	asciidoctor -D . --backend=html5 -o docs/site/rationale.html docs/adoc/rationale.adoc

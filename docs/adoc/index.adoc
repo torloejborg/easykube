@@ -1,0 +1,12 @@
+= Easykube documentation site
+
+Welcome!
+
+These pages contain more detailed information about easykube.
+
+If you want to know why easykube exists and what is's all about, read the xref:rationale.adoc#rationale-rationale[rationale] page.
+New uses should catch up with the xref:install.adoc[installation] page.
+
+Read about addons here xref:addons.adoc[Addons]
+
+

@@ -1,24 +1,20 @@
-= Easykube
-
-"An opinionated take on local development with kubernetes"
-
-== Rationale
+== Rationale [[rationale-rationale]]
 Easykube aims to enable sharing and distribution of development "platforms" via it's companion addon-repositories.
 
 It's meant as a team and individual enabler, everyone can install and work with an application's particular stack locally, without breaking a shared environment.
 
-== Easykube
+== Easykube[[rationale-easykube]]
 Is built on top of the awesome Kind project (Kubernetes In Docker) and the Goja javascript runtime go library.
 
 * It bootstraps a single-node kind-cluster with some small modifications
-* It automatically sets up a local docker registry for the cluster and connects it
+* It automatically sets up a local docker registry for the cluster and connects it, we can build air-gapped environments.
 * Based on discovered addons, a kind-cluster configuration is generated for the particular addon repository's use-case (host-ports and extra-mounts)
 * Persistent data (if used) survives after cluster deletion
 * Addon dependency resolution
 * Addon installation is programmable via embedded Javascript runtime, highly customizable.
 * A CoreDNS hack lets you access everything from "localtest.me" - Never edit that /etc/hosts file again!
 
-== What you can do with it
+== What you can do with it [[rationale-dowithit]]
 * Define complex, reproducible environments.
 * If a spiderweb of microservices spins up on Easykube, chances are improved when the time comes to shelve out hard cash on an actual cloud-provider.
 * Break things, it's OK. Just start over.
@@ -26,5 +22,5 @@ Is built on top of the awesome Kind project (Kubernetes In Docker) and the Goja 
 * Use as a learning/teaching aid for Kubernetes.
 * Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful if combined with tools like https://metalbear.com/mirrord/[mirrord].
 
-== Please do not
+== Please do not [[rationale-dontdo]]
 * Use in a production setting, run your real workloads on a secured cluster. Easykube is not built with security in mind, only for local workloads.

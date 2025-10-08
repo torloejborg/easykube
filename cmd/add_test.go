@@ -12,7 +12,8 @@ import (
 )
 
 func setupForDryRun(ctrl *gomock.Controller, t *testing.T) {
-	os.Setenv("KUBECONFIG", "mock-kubeconfig")
+	_ = os.Setenv("KUBECONFIG", "mock-kubeconfig")
+
 	osd := mock_ez.NewMockOsDetails(ctrl)
 	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
 	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
@@ -41,7 +42,7 @@ func setupForDryRun(ctrl *gomock.Controller, t *testing.T) {
 	ez.Kube.IAddonReader = ez.NewAddonReader(config)
 	ez.Kube.IExternalTools = ez.NewExternalTools()
 
-	ez.Kube.MakeConfig()
+	_ = ez.Kube.MakeConfig()
 
 }
 

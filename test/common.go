@@ -15,3 +15,7 @@ func CreateOsDetailsMock(t *testing.T) *mock_ez.MockOsDetails {
 
 	return osd
 }
+
+func SetupKubeForJSTesting(t *testing.T) {
+
+}
