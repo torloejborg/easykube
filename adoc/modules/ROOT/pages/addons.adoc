@@ -1,8 +1,6 @@
 = Addons [[addons-addons]]
 :icons: font
 
-The sections below will foucs on how to use easykube, general usage and addons are explained. To understand what problem easykube solves, we must first visit the _addon_.
-
 == Addon repositories [[addons-repositories]]
 In essence, an addon is a collection of kubernetes yaml files, kustomize files or helm charts, orchestrated by a javascript, with _built-in dependency management_ and convenient tooling.
 
@@ -73,7 +71,7 @@ easykube.runCommand(deployment,namespace,"tctl", ["--ns", "namespace-b", "n" ,"r
 So, lots of stuff is going on here, lets break it down;
 
 <1> Every addon has a configuration directive, this json structure is extracted by the main easykube program. This is used to construct a Kind cluster configuration.
-<2> Addons lets you express dependencies to other addons, in the case of temporal, it needs a database, and an ingress controller for its UI. Internally during addon scan, a graph is created and a topological sort determines the order of installation - just like a build system where tasks depend on other tasks.
+<2> [[addons-dependencies]]Addons lets you express dependencies to other addons, in the case of temporal, it needs a database, and an ingress controller for its UI. Internally during addon scan, a graph is created and a topological sort determines the order of installation - just like a build system where tasks depend on other tasks.
 <3> The extraPorts contributes to cluster configuration, your deployments should define a NodePort service with the same values. But only if the deployment should be accessible from your host machine (localhost) - In this case we can talk to temporal on `127.0.0.1:7233`
 <4> Easykube's public addon repository includes a Postgres database server. This tells postgres to create a database named 'temporal' (if it not already exists). Postgres utility functions lives in the `2-postgres.js` script.
 <5> A map if images defines a source and destination.

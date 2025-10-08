@@ -1,0 +1,117 @@
+= Using Easykube
+
+Prerequisites; Easykube is xref:install.adoc#install-install[installed], xref:install.adoc#install-configuration[configured] and xref:install.adoc#install-postcheck[running]
+
+== Adding software
+
+Examine what the repository provides
+
+`$ easykube list`
+
+This prints a table of available addons
+
+----
+┌──────────┬────────────────────────────────────────────────────────┐
+│  ADDON   │                      DESCRIPTION                       │
+├──────────┼────────────────────────────────────────────────────────┤
+│ debugpod │ Swiss-army knife of useful tools                       │
+│ elk-crds │ Applies ELK custom resource definitions to the cluster │
+│ gitea    │ Github-ish repository manager, lighter and open-source │
+│ immich   │ Self hosted photo manager                              │
+│ ingress  │ The NGinx ingress controller                           │
+│ keycloak │ OpenIdConnect gateway                                  │
+│ loglab   │ The Elastic, Logstash, Kibana (ELK) stack              │
+│ minio    │ S3 compatible storage server                           │
+│ pgadmin  │ Administrative UI for postgres                         │
+│ postgres │ Advanced Open Source RDBMS (tensorchord) variant       │
+│ rabbitmq │ A message queue system implemented in Erlang           │
+│ redis    │ Memory cache                                           │
+│ temporal │ An opensource workflow engine                          │
+└──────────┴────────────────────────────────────────────────────────┘
+----
+
+Let's install the temporal workflow engine
+
+`$ easykube add temporal`
+
+----
+ Processing postgres.ek.js
+🖼  pull ghcr.io/tensorchord/vchord-postgres:pg17-v0.3.0
+🖼  tag ghcr.io/tensorchord/vchord-postgres:pg17-v0.3.0 to localhost:5001/postgres:x
+🖼  pushed localhost:5001/postgres:x
+kustomize applied for postgres
+Waiting for deployment "postgres" in namespace "default" to become ready...
+Deployment is ready!
+🔧 Processing ingress.ek.js
+🖼  pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼  pull registry.k8s.io/ingress-nginx/controller:v1.12.1
+🖼  tag registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4 to localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼  tag registry.k8s.io/ingress-nginx/controller:v1.12.1 to localhost:5001/ingress-nginx/controller:v1.12.1
+🖼  pushed localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼  pushed localhost:5001/ingress-nginx/controller:v1.12.1
+kustomize applied for ingress
+Waiting for deployment "ingress-nginx-controller" in namespace "ingress-nginx" to become ready...
+Deployment is ready!
+🔧 Processing temporal.ek.js
+DROP DATABASE
+NOTICE:  database "temporal" does not exist, skipping
+
+DROP ROLE
+NOTICE:  role "temporal" does not exist, skipping
+
+CREATE ROLE
+
+CREATE DATABASE
+
+🖼  pull temporalio/auto-setup:1.22.1.0
+🖼  pull temporalio/ui:2.19.0
+🖼  tag temporalio/ui:2.19.0 to localhost:5001/temporalio/ui:2.19.0
+🖼  tag temporalio/auto-setup:1.22.1.0 to localhost:5001/temporalio/auto-setup:1.22.1.0
+🖼  pushed localhost:5001/temporalio/ui:2.19.0
+🖼  pushed localhost:5001/temporalio/auto-setup:1.22.1.0
+kustomize applied for temporal
+Waiting for deployment "temporal-server" in namespace "default" to become ready...
+Deployment is ready!
+----
+
+So, now temporal claims it's installed, but postgres and an ingress controller was also installed, that happened because of the
+xref:addons.adoc#addons-dependencies["dependsOn"] declaraion in the addon.
+
+If all went well you should be able to visit the temporal ui at https://temporal.localtest.me
+
+Try adding temporal again with `$ easykube add temporal`
+
+We get this result
+
+----
+⚠ postgres already present in cluster
+⚠ ingress already present in cluster
+⚠ temporal already present in cluster
+----
+
+When an addon is added/installed, an entry in a configmap is created with the addon's name and a timestamp.
+
+We can override this behavior by passing force flags `$ easykube add --help`
+
+----
+by default addons also applies their dependencies
+
+Usage:
+  easykube add [addon...] [flags]
+
+Flags:
+      --cluster string   Specify a different kube-context for installation
+  -f, --force            If already applied, force
+  -h, --help             help for add
+      --kv string        pass key/value pairs into script context
+  -n, --nodepends        Do not apply dependent addons
+  -p, --pull             Download newer local images
+
+Global Flags:
+  -d, --dry-run   dry-run
+  -v, --verbose   verbose output
+----
+
+TIP: By passing `--force` or `-f` you force the entire dependency tree to be added again. During development, one addon is typically iterated over, so its natural to use `$ easkube add foo --force --nodepends` or `$ easykube add -fn`
+
+That's basically it! You can now build or use software catalogues that runs on a local kubernetes single node cluster.
