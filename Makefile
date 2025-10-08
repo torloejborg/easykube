@@ -42,8 +42,4 @@ mock:
 
 .PHONY:docs
 docs:
-	asciidoctor -D . --backend=html5 -o docs/site/index.html docs/adoc/index.adoc
-	asciidoctor -D . --backend=html5 -o docs/site/addons.html docs/adoc/addons.adoc
-	asciidoctor -D . --backend=html5 -o docs/site/extend.html docs/adoc/extend.adoc
-	asciidoctor -D . --backend=html5 -o docs/site/install.html docs/adoc/install.adoc
-	asciidoctor -D . --backend=html5 -o docs/site/rationale.html docs/adoc/rationale.adoc
+	antora generate docs/antora-playbook.yml
