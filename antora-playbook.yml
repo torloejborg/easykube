@@ -9,7 +9,7 @@ content:
       start_path: docs/adoc
 
 output:
-  dir: ./site
+  dir: ./docs
 
 runtime:
   fetch: true

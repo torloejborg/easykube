@@ -42,4 +42,4 @@ mock:
 
 .PHONY:docs
 docs:
-	antora generate docs/antora-playbook.yml
+	antora generate antora-playbook.yml
