@@ -1,15 +1,14 @@
 site:
   title: EasyKube Documentation
   start_page: easykube::index.adoc
-
 content:
   sources:
-    - url: .git
-      branches: HEAD
-      start_path: docs/adoc
+    - url: https://github.com/torloejborg/easykube/docs
+      branches: refac/improvementso
+      start_path: adoc
 
 output:
-  dir: docs/site
+  dir: site
 
 runtime:
   fetch: true
