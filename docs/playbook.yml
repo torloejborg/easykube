@@ -3,9 +3,9 @@ site:
   start_page: easykube::index.adoc
 content:
   sources:
-    - url: https://github.com/torloejborg/easykube/docs
+    - url: https://github.com/torloejborg/easykube
       branches: refac/improvementso
-      start_path: adoc
+      start_path: docs/adoc
 
 output:
   dir: site
