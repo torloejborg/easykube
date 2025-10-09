@@ -14,6 +14,7 @@
 
         # Common packages used in all shells
             commonPackages = with pkgs; [
+              (ruby.withPackages (ps: with ps; [ rouge  ]))
               jq
               yq
               gnumake
@@ -28,7 +29,7 @@
               pkgsUnstable.kubernetes-helm
               pkgsUnstable.kustomize
               pkgsUnstable.go_1_24
-            ];
+            ] ;
     in {
       packages.${system}.default = pkgsUnstable.buildGoModule {
         pname = "easykube";

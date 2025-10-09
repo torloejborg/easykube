@@ -23,15 +23,17 @@ You may have to add the following to your nix.conf in order to quench nix warnin
 extra-experimental-features = nix-command
 extra-experimental-features = flakes
 ----
+The Nix flake has two shells;  Default will build easykube from source.
+
+`nix develop .#light` will drop you into a shell with supporting tools _without building_. Useful if you cloned the repository.
+
 ====
 
-The Nix flake has two shells, the default shell will build easykube and use the built version.
 
-`nix develop .#light` will drop you into the shell with supporting tools _without building_. Useful if you cloned the repository.
 
 === Manual installation[[install-manual]]
 
-Obtain the easykube binary from https://github.com/torloejborg/easykube/releases[here]
+Download the latest easykube binary for your platform https://github.com/torloejborg/easykube/releases[here]. Extract the archive, rename the binary to `easykube`, `ek` or whatever you please. And make sure it's on your systems PATH.
 
 Use a package manager, or download the following software yourself
 
@@ -41,12 +43,12 @@ Use a package manager, or download the following software yourself
 * https://helm.sh/docs/intro/quickstart/#install-helm[helm]
 * https://k9scli.io/topics/install/[k9s] (optional)
 
-CAUTION: On some linux systems, installing the above packages via snap, has proved troublesome. It may work out for you.
-
-Download the latest easykube binary for your platform https://github.com/torloejborg/easykube/releases[here]. Extract the archive, rename the binary to `easykube`, `ek` or whatever you please. And make sure it's on your systems PATH.
+CAUTION: On some linux systems, installing the above packages via snap, has proved troublesome for easykube. It may work out for you, it may not.
 
 === Post installation check [[install-postcheck]]
-When typing `easykube` in your shell you should see something like a warning and usage
+Typing `easykube` in your shell you should see a warning and usage description.
+
+[source,text]
 ----
 ⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear
 
@@ -79,6 +81,8 @@ Flags:
 ----
 
 Also, try with `easykube status`, that should yield some more warnings and errors.
+
+[source,text]
 ----
 ⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear
 Inspecting binary dependencies
@@ -112,6 +116,7 @@ You can use any editor, as long as it can be called with `editor /some/path/to/f
 
 Invoke `easykube config` this will launch your editor and present you with the following
 
+[source,text]
 ----
 easykube:
   # location of addons dir
@@ -127,7 +132,7 @@ easykube:
   # Container Runtime (as of now, only docker is supported. podman support is planned)
   container-runtime: docker
 ----
-<1> - Change this line to match the path to the addon repository you previously checked out
+<1> - Change this line to match the path to the addon repository you previously cloned
 <2> - This is the directory where easykube will store its configuration files it will be revisited in the operate section.
 <3> - Easykube will automatically create subdirectories here based on addon requirements
 
@@ -140,6 +145,7 @@ With installation and configuration done, it's time to create a cluster, do that
 
 If all went well, a cluster creation report is printed, each addon is listed in a section which describes which ports it want to expose, and what storage it needs.
 
+[source,text]
 ----
 ⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear
 Bootstrapping easykube single node cluster
@@ -187,6 +193,7 @@ What is the status now ?
 
 `easykube status`
 
+[source,text]
 ----
 Inspecting binary dependencies
 ✓ kubectl 1.34.1 (~1.34)
@@ -212,6 +219,7 @@ Since easykube uses Kind, lets examine the running docker containers.
 
 `docker ps`
 
+[source,text]
 ----
 ...
 a81acb9b11c9   kindest/node:v1.34.0   "/usr/local/bin/entr…"   29 minutes ago   Up 29 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 127.0.0.1:40581->6443/tcp, 0.0.0.0:7233->30950/tcp, 0.0.0.0:6379->30971/tcp, 0.0.0.0:5432->32000/tcp   easykube-control-plane

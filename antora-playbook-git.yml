@@ -12,9 +12,6 @@ content:
     - url: https://github.com/torloejborg/easykube
       branches: refac/improvements
       start_path: asciidoc
-    - url: https://github.com/torloejborg/easykube/pkg/resources
-      branches: refac/improvements
-      start_path: data
 
 output:
   dir: ./docs

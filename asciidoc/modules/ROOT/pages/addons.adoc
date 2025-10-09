@@ -1,11 +1,13 @@
 = Addons [[addons-addons]]
 :icons: font
+:source-highlighter: rouge
 
 == Addon repositories [[addons-repositories]]
 In essence, an addon is a collection of kubernetes yaml files, kustomize files or helm charts, orchestrated by a javascript, with _built-in dependency management_ and convenient tooling.
 
 Addons are organized in directory structures, they are typically git-repositories shared in an organization or team. Below is an except of a listing from the companion addon repo.
 
+[source,text]
 ----
 ├── __jslib <1>
 │   ├── 1-easykube.js
@@ -31,7 +33,7 @@ When easykube is invoked, it will recursively scan the addon repository and disc
 
 Let's examine an addon in detail, we'll look at the temporal addon, as it uses some non-trivial features. Below is its listing.
 
-[source,javascript]
+[source,javascript,linenums]
 ----
 let configuration = { //<1>
     "description": "An opensource workflow engine", //<2>

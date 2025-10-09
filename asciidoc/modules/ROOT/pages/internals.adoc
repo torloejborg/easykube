@@ -1,21 +1,50 @@
 = Internals[[internals-internals]]
+:source-highlighter: rouge
 
-On this page we describe some of the internals, and finer details of configuration.
+On this page we describe some of the internals, and how easykube differs from a plain Kind instance.
 
-== DNS Resolution
-It might seem strange that everything is available at `*.localtest.me` - This is because someone on the internet was kind enough to create a loopback domain name. All DNS requests to localtest.me and any subdomain will resolve to  `127.0.0.1`.
+== DNS Resolution[[internals-dns]]
+It might seem strange that everything is available at `*.localtest.me` - This is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to `localtest.me` and any subdomain will resolve to  `127.0.0.1`.
 
 Easykube takes advantage of this by configuring ingresses to use this hostname, so if you are familiar with apache httpd or another web server, it fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by kubernetes.
 
 In the old days, we would have to manually create a virtual host, and add an entry in our hosts file.
 
-Sometimes services inside easykube need to resolve names like `something.localtest.me` this won't work, because 127.0.0.1 does not point to any ClusterIP.
+Sometimes services inside easykube need to resolve names like `something.localtest.me` this won't work, because 127.0.0.1 does not point to any https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip[ClusterIP].
 
-We can get around this by emulating something called split-dns - depending on which network you originate from, you will resolve different IP adresses.
+We can get around this by emulating something called _split-dns_. Depending on which network you originate, a different IP adress is resolved.
 
-When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from `localtest.me`. Below is the listing of the coredns config
+When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from `*.localtest.me`. Below is excerpt from the coredns config which does the trick.
 
-[source,java,%linenum]
+[source,text]
 ----
-include::example$coredns.config[]
+   rewrite stop {
+       name regex (.*)\.localtest.me {1}-ext.default.svc.cluster.local
+       answer auto
+    }
 ----
+NOTE: Currently, *ext* services can only reside in the default namespace.
+
+The patch will translate `foo.localtest.me` into `ext-foo.default.svc.cluster.local` - So if you create a ClusterIP service with that name - requests originating from within the cluster will resolve to the ClusterIP.
+
+External requests will hit the ingress as usual.
+
+TIP: Use *ext* services to emulate services that need to communicate in a transparent way. An example; testing a CI workflow setup with a git server (gitea) and a Jenkins instance, gitea will define an ext-* ClusterIP service, jenkins can then refer to the server with just `gita.localtest.me` instead of `gitea.default.svc.cluster.local`
+
+== The script runtime [[internals-js]]
+
+Why scripting?
+
+Easykube is meant to be flexible, and used in different contexts with different addon repositories. Easykube defines a core set of utility functions which can be combined in interesting ways via scripting.
+
+Instead of inventing a dedicated _easykube-script_ language (which could be a fun challenge), it was instead decided to spare the innocent and use an existing library, enter https://github.com/dop251/goja[Goja], a Javascript VM for Golang.
+
+Adding new core functionality is relatively straightforward.
+
+[source,go]
+.pkg/js/easykube.go
+----
+include::example$easykube.go[tag=export]
+----
+
+The *_ek* object is populated with a name and a function.

@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Internals :: EasyKube Documentation</title>
+    <link rel="canonical" href="https://torloejborg.github.io/easykube/easykube/latest/internals.html">
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../_/css/site.css">
   </head>
@@ -30,7 +31,7 @@
     <a class="nav-link" href="index.html">Home</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="rationale.html">Why Easykube?</a>
+    <a class="nav-link" href="rationale.html">Why Easykube</a>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="install.html">Install Easykube</a>
@@ -39,10 +40,10 @@
     <a class="nav-link" href="addons.html">About addons</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="using.html">Using and adding software</a>
+    <a class="nav-link" href="using.html">Usage</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="extend.html">Extend</a>
+    <a class="nav-link" href="extend.html">Extending</a>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="troubleshooting.html">Troubleshooting and FAQ</a>
@@ -96,20 +97,21 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_dns_resolution">1. DNS Resolution</a></li>
+<li><a href="#internals-js">2. The script runtime</a></li>
 </ul>
 </div>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>On this page we describe some of the internals, and finer details of configuration.</p>
+<p>On this page we describe some of the internals, and how easykube differs from a plain Kind instance.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dns_resolution"><a class="anchor" href="#_dns_resolution"></a>1. DNS Resolution</h2>
+<h2 id="_dns_resolution"><a class="anchor" href="#_dns_resolution"></a>1. DNS Resolution<a id="internals-dns"></a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>It might seem strange that everything is available at <code>*.localtest.me</code> - This is because someone on the internet was kind enough to create a loopback domain name. All DNS requests to localtest.me and any subdomain will resolve to  <code>127.0.0.1</code>.</p>
+<p>It might seem strange that everything is available at <code>*.localtest.me</code> - This is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to <code>localtest.me</code> and any subdomain will resolve to  <code>127.0.0.1</code>.</p>
 </div>
 <div class="paragraph">
 <p>Easykube takes advantage of this by configuring ingresses to use this hostname, so if you are familiar with apache httpd or another web server, it fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by kubernetes.</p>
@@ -118,48 +120,102 @@
 <p>In the old days, we would have to manually create a virtual host, and add an entry in our hosts file.</p>
 </div>
 <div class="paragraph">
-<p>Sometimes services inside easykube need to resolve names like <code>something.localtest.me</code> this won&#8217;t work, because 127.0.0.1 does not point to any ClusterIP.</p>
+<p>Sometimes services inside easykube need to resolve names like <code>something.localtest.me</code> this won&#8217;t work, because 127.0.0.1 does not point to any <a href="https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip">ClusterIP</a>.</p>
 </div>
 <div class="paragraph">
-<p>We can get around this by emulating something called split-dns - depending on which network you originate from, you will resolve different IP adresses.</p>
+<p>We can get around this by emulating something called <em>split-dns</em>. Depending on which network you originate, a different IP adress is resolved.</p>
 </div>
 <div class="paragraph">
-<p>When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from <code>localtest.me</code>. Below is the listing of the coredns config</p>
+<p>When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from <code>*.localtest.me</code>. Below is excerpt from the coredns config which does the trick.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">localtest.me.:53 {
-        file /etc/coredns/local.db localtest.me {
-          upstream
-        }
-    }
-
-.:53 {
-    log
-    errors
-    health {
-      lameduck 5s
-    }
-
-    ready
-    kubernetes me cluster.local in-addr.arpa ip6.arpa {
-      pods insecure
-      fallthrough in-addr.arpa ip6.arpa
-    }
-
-    rewrite stop {
+<pre class="highlight"><code class="language-text" data-lang="text">   rewrite stop {
        name regex (.*)\.localtest.me {1}-ext.default.svc.cluster.local
        answer auto
-    }
-
-    prometheus :9153
-    forward . "/etc/resolv.conf"
-    cache 30
-    loop
-    reload
-    loadbalance
-}</code></pre>
+    }</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Currently, <strong>ext</strong> services can only reside in the default namespace.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The patch will translate <code>foo.localtest.me</code> into <code>ext-foo.default.svc.cluster.local</code> - So if you create a ClusterIP service with that name - requests originating from within the cluster will resolve to the ClusterIP.</p>
+</div>
+<div class="paragraph">
+<p>External requests will hit the ingress as usual.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Use <strong>ext</strong> services to emulate services that need to communicate in a transparent way. An example; testing a CI workflow setup with a git server (gitea) and a Jenkins instance, gitea will define an ext-* ClusterIP service, jenkins can then refer to the server with just <code>gita.localtest.me</code> instead of <code>gitea.default.svc.cluster.local</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="internals-js"><a class="anchor" href="#internals-js"></a>2. The script runtime</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Why scripting?</p>
+</div>
+<div class="paragraph">
+<p>Easykube is meant to be flexible, and used in different contexts with different addon repositories. Easykube defines a core set of utility functions which can be combined in interesting ways via scripting.</p>
+</div>
+<div class="paragraph">
+<p>Instead of inventing a dedicated <em>easykube-script</em> language (which could be a fun challenge), it was instead decided to spare the innocent and use an existing library, enter <a href="https://github.com/dop251/goja">Goja</a>, a Javascript VM for Golang.</p>
+</div>
+<div class="paragraph">
+<p>Adding new core functionality is relatively straightforward.</p>
+</div>
+<div class="listingblock">
+<div class="title">pkg/js/easykube.go</div>
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">	e := &amp;Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
+
+	easykubeObj := addon.NewObject()
+	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
+	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
+	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
+	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
+	check(easykubeObj.Set(PRELOAD, e.PreloadImages()))
+	check(easykubeObj.Set(WAIT_FOR_CRD, e.WaitForCRD()))
+	check(easykubeObj.Set(COPY_TO, e.CopyTo()))
+	check(easykubeObj.Set(CREATE_SECRET, e.CreateSecret()))
+	check(easykubeObj.Set(GET_SECRET, e.GetSecret()))
+	check(easykubeObj.Set(SPARSE_CHECKOUT, e.GitSparseCheckout()))
+	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
+	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
+	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
+	check(easykubeObj.Set(KEY_ENV, e.Env()))
+	check(easykubeObj.Set(HTTP, e.Http()))
+	check(easykubeObj.Set(EXEC, e.Exec()))
+	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
+
+	addon.ExportFunction("_ek", easykubeObj)
+
+	utilsObj := addon.NewObject()
+	check(utilsObj.Set("UUID", e.NewUUID()))
+	addon.ExportFunction("_utils", utilsObj)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong>_ek</strong> object is populated with a name and a function.</p>
 </div>
 </div>
 </div>

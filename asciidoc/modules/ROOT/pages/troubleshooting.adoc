@@ -1,1 +1,13 @@
 = Troubleshooting and FAQ
+
+* When creating the cluster, easykube complains about occupied ports, what should I do?
+** ...
+
+* Where did all my diskspace go?
+** ...
+
+* My javascript throws errors, how can I debug what's going on?
+** ...
+
+* Sometimes easykube fails with an error about 'deployment not ready'
+** ...

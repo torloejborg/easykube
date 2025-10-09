@@ -21,6 +21,7 @@ func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 		}
 	}
 
+	// tag::export[]
 	e := &Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
 
 	easykubeObj := addon.NewObject()
@@ -47,7 +48,7 @@ func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 	utilsObj := addon.NewObject()
 	check(utilsObj.Set("UUID", e.NewUUID()))
 	addon.ExportFunction("_utils", utilsObj)
-
+	// end::export[]
 }
 
 func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
