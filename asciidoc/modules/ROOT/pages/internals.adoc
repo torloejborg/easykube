@@ -17,5 +17,5 @@ When Easykube is created, the kubernetes core-dns service is patched to intercep
 
 [,text,linenums]
 ----
-include::../../../../pkg/resources/data/coredns/coredns.config[]
+include::
 ----
