@@ -46,4 +46,4 @@ docs:
 
 .PHONY:docs-local
 docs-local:
-	antora generate antora-playbook-local.yml
+	antora generate local-antora-playbook.yml

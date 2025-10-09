@@ -15,7 +15,7 @@ We can get around this by emulating something called split-dns - depending on wh
 
 When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from `localtest.me`. Below is the listing of the coredns config
 
-[,text,linenums]
+[source,java,%linenum]
 ----
-include::data:ROOT:coredns/coredns.config[]
+include::example$coredns.config[]
 ----

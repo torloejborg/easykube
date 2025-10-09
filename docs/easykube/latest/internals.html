@@ -61,14 +61,6 @@
     <span class="version">latest</span>
   </div>
   <ul class="components">
-    <li class="component">
-      <div class="title"><a href="../../data/latest/index.html">data</a></div>
-      <ul class="versions">
-        <li class="version is-latest">
-          <a href="../../data/latest/index.html">latest</a>
-        </li>
-      </ul>
-    </li>
     <li class="component is-current">
       <div class="title"><a href="index.html">EasyKube</a></div>
       <ul class="versions">
@@ -136,7 +128,37 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Unresolved include directive in modules/ROOT/pages/internals.adoc - include::data:ROOT:coredns/coredns.config[]</code></pre>
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">localtest.me.:53 {
+        file /etc/coredns/local.db localtest.me {
+          upstream
+        }
+    }
+
+.:53 {
+    log
+    errors
+    health {
+      lameduck 5s
+    }
+
+    ready
+    kubernetes me cluster.local in-addr.arpa ip6.arpa {
+      pods insecure
+      fallthrough in-addr.arpa ip6.arpa
+    }
+
+    rewrite stop {
+       name regex (.*)\.localtest.me {1}-ext.default.svc.cluster.local
+       answer auto
+    }
+
+    prometheus :9153
+    forward . "/etc/resolv.conf"
+    cache 30
+    loop
+    reload
+    loadbalance
+}</code></pre>
 </div>
 </div>
 </div>
