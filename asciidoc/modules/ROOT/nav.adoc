@@ -4,3 +4,5 @@
 * xref:addons.adoc[About addons]
 * xref:using.adoc[Using and adding software]
 * xref:extend.adoc[Extend]
+* xref:troubleshooting.adoc[Troubleshooting and FAQ]
+* xref:internals.adoc[Internals]

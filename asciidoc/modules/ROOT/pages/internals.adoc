@@ -1,0 +1,21 @@
+= Internals[[internals-internals]]
+
+On this page we describe some of the internals, and finer details of configuration.
+
+== DNS Resolution
+It might seem strange that everything is available at `*.localtest.me` - This is because someone on the internet was kind enough to create a loopback domain name. All DNS requests to localtest.me and any subdomain will resolve to  `127.0.0.1`.
+
+Easykube takes advantage of this by configuring ingresses to use this hostname, so if you are familiar with apache httpd or another web server, it fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by kubernetes.
+
+In the old days, we would have to manually create a virtual host, and add an entry in our hosts file.
+
+Sometimes services inside easykube need to resolve names like `something.localtest.me` this won't work, because 127.0.0.1 does not point to any ClusterIP.
+
+We can get around this by emulating something called split-dns - depending on which network you originate from, you will resolve different IP adresses.
+
+When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from `localtest.me`. Below is the listing of the coredns config
+
+[,text,linenums]
+----
+include::../../../../pkg/resources/data/coredns/coredns.config[]
+----

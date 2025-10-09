@@ -1,6 +1,6 @@
 site:
   title: EasyKube Documentation
-  url: https://torloejborg.github.io/easykube
+  url: /
   start_page: easykube::index.adoc
 
 urls:
@@ -9,12 +9,12 @@ urls:
 
 content:
   sources:
-    - url: https://github.com/torloejborg/easykube
-      branches: refac/improvements
+    - url: .
+      branches: HEAD
       start_path: asciidoc
 
 output:
-  dir: ./docs
+  dir: docs
 
 runtime:
   fetch: true

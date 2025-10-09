@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Extending :: EasyKube Documentation</title>
+    <title>Internals :: EasyKube Documentation</title>
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../_/css/site.css">
   </head>
   <body class="article">
 <header class="navbar">
   <div class="navbar-brand">
-    <a class="navbar-item" href="/easykube/latest/extend.html">
+    <a class="navbar-item" href="/easykube/latest/internals.html">
       EasyKube Documentation
     </a>
   </div>
@@ -41,13 +41,13 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="using.html">Using and adding software</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="extend.html">Extend</a>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="troubleshooting.html">Troubleshooting and FAQ</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="internals.html">Internals</a>
   </li>
 </ul>
@@ -81,19 +81,57 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">EasyKube</a></li>
-    <li><a href="extend.html">Extend</a></li>
+    <li><a href="internals.html">Internals</a></li>
   </ul>
 </nav>
-<div class="edit-this-page"><a href="file:///home/tor/code/github/easykube/asciidoc/modules/ROOT/pages/extend.adoc">Edit this Page</a></div>
+<div class="edit-this-page"><a href="file:///home/tor/code/github/easykube/asciidoc/modules/ROOT/pages/internals.adoc">Edit this Page</a></div>
 </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Extending</h1>
+<h1 class="page">Internals<a id="internals-internals"></a></h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_dns_resolution">1. DNS Resolution</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
 <div class="paragraph">
-<p>Under construction</p>
+<p>On this page we describe some of the internals, and finer details of configuration.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_dns_resolution"><a class="anchor" href="#_dns_resolution"></a>1. DNS Resolution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It might seem strange that everything is available at <code>*.localtest.me</code> - This is because someone on the internet was kind enough to create a loopback domain name. All DNS requests to localtest.me and any subdomain will resolve to  <code>127.0.0.1</code>.</p>
+</div>
+<div class="paragraph">
+<p>Easykube takes advantage of this by configuring ingresses to use this hostname, so if you are familiar with apache httpd or another web server, it fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by kubernetes.</p>
+</div>
+<div class="paragraph">
+<p>In the old days, we would have to manually create a virtual host, and add an entry in our hosts file.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes services inside easykube need to resolve names like <code>something.localtest.me</code> this won&#8217;t work, because 127.0.0.1 does not point to any ClusterIP.</p>
+</div>
+<div class="paragraph">
+<p>We can get around this by emulating something called split-dns - depending on which network you originate from, you will resolve different IP adresses.</p>
+</div>
+<div class="paragraph">
+<p>When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from <code>localtest.me</code>. Below is the listing of the coredns config</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Unresolved include directive in modules/ROOT/pages/internals.adoc - include::../../../../pkg/resources/data/coredns/coredns.config[]</code></pre>
+</div>
+</div>
+</div>
 </div>
 </article>
   </div>

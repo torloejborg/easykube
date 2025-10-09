@@ -43,3 +43,7 @@ mock:
 .PHONY:docs
 docs:
 	antora generate antora-playbook.yml
+
+.PHONY:docs-local
+docs-local:
+	antora generate antora-playbook-local.yml

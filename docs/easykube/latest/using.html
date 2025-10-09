@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Using Easykube :: EasyKube Documentation</title>
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="navbar">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/easykube/latest/using.html">
+      EasyKube Documentation
+    </a>
+  </div>
+</header>
+<div class="body">
+<div class="nav-container" data-component="easykube" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="index.html">EasyKube</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Home</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="rationale.html">Why Easykube?</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="install.html">Install Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="addons.html">About addons</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="using.html">Using and adding software</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="extend.html">Extend</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="troubleshooting.html">Troubleshooting and FAQ</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="internals.html">Internals</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">EasyKube</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="index.html">EasyKube</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">EasyKube</a></li>
+    <li><a href="using.html">Using and adding software</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///home/tor/code/github/easykube/asciidoc/modules/ROOT/pages/using.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Using Easykube</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_adding_software">1. Adding software</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Prerequisites; Easykube is <a href="install.html#install-install" class="xref page">installed</a>, <a href="install.html#install-configuration" class="xref page">configured</a> and <a href="install.html#install-postcheck" class="xref page">running</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adding_software"><a class="anchor" href="#_adding_software"></a>1. Adding software</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Examine what the repository provides</p>
+</div>
+<div class="paragraph">
+<p><code>$ easykube list</code></p>
+</div>
+<div class="paragraph">
+<p>This prints a table of available addons</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>┌──────────┬────────────────────────────────────────────────────────┐
+│  ADDON   │                      DESCRIPTION                       │
+├──────────┼────────────────────────────────────────────────────────┤
+│ debugpod │ Swiss-army knife of useful tools                       │
+│ elk-crds │ Applies ELK custom resource definitions to the cluster │
+│ gitea    │ Github-ish repository manager, lighter and open-source │
+│ immich   │ Self hosted photo manager                              │
+│ ingress  │ The NGinx ingress controller                           │
+│ keycloak │ OpenIdConnect gateway                                  │
+│ loglab   │ The Elastic, Logstash, Kibana (ELK) stack              │
+│ minio    │ S3 compatible storage server                           │
+│ pgadmin  │ Administrative UI for postgres                         │
+│ postgres │ Advanced Open Source RDBMS (tensorchord) variant       │
+│ rabbitmq │ A message queue system implemented in Erlang           │
+│ redis    │ Memory cache                                           │
+│ temporal │ An opensource workflow engine                          │
+└──────────┴────────────────────────────────────────────────────────┘</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s install the temporal workflow engine</p>
+</div>
+<div class="paragraph">
+<p><code>$ easykube add temporal</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre> Processing postgres.ek.js
+🖼  pull ghcr.io/tensorchord/vchord-postgres:pg17-v0.3.0
+🖼  tag ghcr.io/tensorchord/vchord-postgres:pg17-v0.3.0 to localhost:5001/postgres:x
+🖼  pushed localhost:5001/postgres:x
+kustomize applied for postgres
+Waiting for deployment "postgres" in namespace "default" to become ready...
+Deployment is ready!
+🔧 Processing ingress.ek.js
+🖼  pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼  pull registry.k8s.io/ingress-nginx/controller:v1.12.1
+🖼  tag registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4 to localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼  tag registry.k8s.io/ingress-nginx/controller:v1.12.1 to localhost:5001/ingress-nginx/controller:v1.12.1
+🖼  pushed localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼  pushed localhost:5001/ingress-nginx/controller:v1.12.1
+kustomize applied for ingress
+Waiting for deployment "ingress-nginx-controller" in namespace "ingress-nginx" to become ready...
+Deployment is ready!
+🔧 Processing temporal.ek.js
+DROP DATABASE
+NOTICE:  database "temporal" does not exist, skipping
+
+DROP ROLE
+NOTICE:  role "temporal" does not exist, skipping
+
+CREATE ROLE
+
+CREATE DATABASE
+
+🖼  pull temporalio/auto-setup:1.22.1.0
+🖼  pull temporalio/ui:2.19.0
+🖼  tag temporalio/ui:2.19.0 to localhost:5001/temporalio/ui:2.19.0
+🖼  tag temporalio/auto-setup:1.22.1.0 to localhost:5001/temporalio/auto-setup:1.22.1.0
+🖼  pushed localhost:5001/temporalio/ui:2.19.0
+🖼  pushed localhost:5001/temporalio/auto-setup:1.22.1.0
+kustomize applied for temporal
+Waiting for deployment "temporal-server" in namespace "default" to become ready...
+Deployment is ready!</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, now temporal claims it&#8217;s installed, but postgres and an ingress controller was also installed, that happened because of the
+<a href="addons.html#addons-dependencies" class="xref page">"dependsOn"</a> declaraion in the addon.</p>
+</div>
+<div class="paragraph">
+<p>If all went well you should be able to visit the temporal ui at <a href="https://temporal.localtest.me" class="bare">https://temporal.localtest.me</a></p>
+</div>
+<div class="paragraph">
+<p>Try adding temporal again with <code>$ easykube add temporal</code></p>
+</div>
+<div class="paragraph">
+<p>We get this result</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>⚠ postgres already present in cluster
+⚠ ingress already present in cluster
+⚠ temporal already present in cluster</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When an addon is added/installed, an entry in a configmap is created with the addon&#8217;s name and a timestamp.</p>
+</div>
+<div class="paragraph">
+<p>We can override this behavior by passing force flags <code>$ easykube add --help</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>by default addons also applies their dependencies
+
+Usage:
+  easykube add [addon...] [flags]
+
+Flags:
+      --cluster string   Specify a different kube-context for installation
+  -f, --force            If already applied, force
+  -h, --help             help for add
+      --kv string        pass key/value pairs into script context
+  -n, --nodepends        Do not apply dependent addons
+  -p, --pull             Download newer local images
+
+Global Flags:
+  -d, --dry-run   dry-run
+  -v, --verbose   verbose output</pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+By passing <code>--force</code> or <code>-f</code> you force the entire dependency tree to be added again. During development, one addon is typically iterated over, so its natural to use <code>$ easkube add foo --force --nodepends</code> or <code>$ easykube add -fn</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>That&#8217;s basically it! You can now build or use software catalogues that runs on a local kubernetes single node cluster.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
