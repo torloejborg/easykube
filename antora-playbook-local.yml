@@ -14,7 +14,7 @@ content:
       start_path: asciidoc
     - url: .
       branches: HEAD
-      start_path: pkg/resources
+      start_path: pkg/resources/data
 
 output:
   dir: docs
