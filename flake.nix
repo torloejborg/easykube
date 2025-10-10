@@ -20,9 +20,6 @@
               gnumake
               glibcLocales
             ] ++ [
-              pkgsUnstable.asciidoctor
-              pkgsUnstable.pandoc
-              pkgsUnstable.antora
               pkgsUnstable.upx
               pkgsUnstable.mockgen
               pkgsUnstable.kubectl

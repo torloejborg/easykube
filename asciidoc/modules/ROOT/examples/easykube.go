@@ -1,1 +1,0 @@
-../../../../pkg/js/easykube.go
