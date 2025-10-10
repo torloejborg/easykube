@@ -97,7 +97,6 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_dns_resolution">1. DNS Resolution</a></li>
-<li><a href="#internals-js">2. The script runtime</a></li>
 </ul>
 </div>
 <div id="preamble">
@@ -165,57 +164,6 @@ Use <strong>ext</strong> services to emulate services that need to communicate i
 </td>
 </tr>
 </table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="internals-js"><a class="anchor" href="#internals-js"></a>2. The script runtime</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Why scripting?</p>
-</div>
-<div class="paragraph">
-<p>Easykube is meant to be flexible, and used in different contexts with different addon repositories. Easykube defines a core set of utility functions which can be combined in interesting ways via scripting.</p>
-</div>
-<div class="paragraph">
-<p>Instead of inventing a dedicated <em>easykube-script</em> language (which could be a fun challenge), it was instead decided to spare the innocent and use an existing library, enter <a href="https://github.com/dop251/goja">Goja</a>, a Javascript VM for Golang.</p>
-</div>
-<div class="paragraph">
-<p>Adding new core functionality is relatively straightforward.</p>
-</div>
-<div class="listingblock">
-<div class="title">pkg/js/easykube.go</div>
-<div class="content">
-<pre class="highlight"><code class="language-go" data-lang="go">	e := &amp;Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
-
-	easykubeObj := addon.NewObject()
-	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
-	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
-	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
-	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
-	check(easykubeObj.Set(PRELOAD, e.PreloadImages()))
-	check(easykubeObj.Set(WAIT_FOR_CRD, e.WaitForCRD()))
-	check(easykubeObj.Set(COPY_TO, e.CopyTo()))
-	check(easykubeObj.Set(CREATE_SECRET, e.CreateSecret()))
-	check(easykubeObj.Set(GET_SECRET, e.GetSecret()))
-	check(easykubeObj.Set(SPARSE_CHECKOUT, e.GitSparseCheckout()))
-	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
-	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
-	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
-	check(easykubeObj.Set(KEY_ENV, e.Env()))
-	check(easykubeObj.Set(HTTP, e.Http()))
-	check(easykubeObj.Set(EXEC, e.Exec()))
-	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
-
-	addon.ExportFunction("_ek", easykubeObj)
-
-	utilsObj := addon.NewObject()
-	check(utilsObj.Set("UUID", e.NewUUID()))
-	addon.ExportFunction("_utils", utilsObj)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <strong>_ek</strong> object is populated with a name and a function.</p>
 </div>
 </div>
 </div>

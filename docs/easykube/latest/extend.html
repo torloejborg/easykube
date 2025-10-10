@@ -93,8 +93,85 @@
 </aside>
 <article class="doc">
 <h1 class="page">Extending</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#internals-js">1. The script runtime</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="internals-js"><a class="anchor" href="#internals-js"></a>1. The script runtime</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Under construction</p>
+<p>Why scripting?</p>
+</div>
+<div class="paragraph">
+<p>Easykube is meant to be flexible, and used in different contexts with different addon repositories. Easykube defines a core set of utility functions which can be combined in interesting ways via scripting.</p>
+</div>
+<div class="paragraph">
+<p>Instead of inventing a dedicated <em>easykube-script</em> language (which could be a fun challenge), it was instead decided to spare the innocent and use an existing library, enter <a href="https://github.com/dop251/goja">Goja</a>, a Javascript VM for Golang.</p>
+</div>
+<div class="paragraph">
+<p>Adding new core functionality is relatively straightforward. Below is the listing of the go file where all exported functions is declared.</p>
+</div>
+<div class="listingblock">
+<div class="title">pkg/js/easykube.go</div>
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">	e := &amp;Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
+
+	easykubeObj := addon.NewObject()
+	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
+	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
+	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
+	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
+	check(easykubeObj.Set(PRELOAD, e.PreloadImages()))
+	check(easykubeObj.Set(WAIT_FOR_CRD, e.WaitForCRD()))
+	check(easykubeObj.Set(COPY_TO, e.CopyTo()))
+	check(easykubeObj.Set(CREATE_SECRET, e.CreateSecret()))
+	check(easykubeObj.Set(GET_SECRET, e.GetSecret()))
+	check(easykubeObj.Set(SPARSE_CHECKOUT, e.GitSparseCheckout()))
+	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
+	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
+	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
+	check(easykubeObj.Set(KEY_ENV, e.Env()))
+	check(easykubeObj.Set(HTTP, e.Http()))
+	check(easykubeObj.Set(EXEC, e.Exec()))
+	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
+
+	addon.ExportFunction("_ek", easykubeObj)
+
+	utilsObj := addon.NewObject()
+	check(utilsObj.Set("UUID", e.NewUUID()))
+	addon.ExportFunction("_utils", utilsObj)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong>_ek</strong> object is populated with a name and a function. To add a function, simply copy/paste an existing file and adapt.</p>
+</div>
+<div class="paragraph">
+<p>Below the <strong>env</strong> function is listed</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>func (ctx *Easykube) Env() func(goja.FunctionCall) goja.Value {
+	return func(call goja.FunctionCall) goja.Value {
+		ctx.checkArgs(call, KEY_VALUE)
+		key := call.Argument(0).String()
+		val := os.Getenv(key)
+
+		if val == "" {
+			return goja.Null()
+		} else {
+			return ctx.AddonCtx.vm.ToValue(val)
+		}
+	}
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In a nutshell, define a function which has a pointer-receiver to Easykube that returns a function which returns a goja.Value.</p>
+</div>
+</div>
 </div>
 </article>
   </div>

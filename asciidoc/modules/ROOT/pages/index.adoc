@@ -1,5 +1,7 @@
 = Easykube documentation site
 
+"Bootstrap and share local Kubernetes developer environments"
+
 Welcome!
 
 These pages contain more detailed information about easykube.

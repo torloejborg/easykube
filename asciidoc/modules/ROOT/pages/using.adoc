@@ -115,3 +115,4 @@ Global Flags:
 TIP: By passing `--force` or `-f` you force the entire dependency tree to be added again. During development, one addon is typically iterated over, so its natural to use `$ easkube add foo --force --nodepends` or `$ easykube add -fn`
 
 That's basically it! You can now build or use software catalogues that runs on a local kubernetes single node cluster.
+

@@ -31,20 +31,3 @@ External requests will hit the ingress as usual.
 
 TIP: Use *ext* services to emulate services that need to communicate in a transparent way. An example; testing a CI workflow setup with a git server (gitea) and a Jenkins instance, gitea will define an ext-* ClusterIP service, jenkins can then refer to the server with just `gita.localtest.me` instead of `gitea.default.svc.cluster.local`
 
-== The script runtime [[internals-js]]
-
-Why scripting?
-
-Easykube is meant to be flexible, and used in different contexts with different addon repositories. Easykube defines a core set of utility functions which can be combined in interesting ways via scripting.
-
-Instead of inventing a dedicated _easykube-script_ language (which could be a fun challenge), it was instead decided to spare the innocent and use an existing library, enter https://github.com/dop251/goja[Goja], a Javascript VM for Golang.
-
-Adding new core functionality is relatively straightforward.
-
-[source,go]
-.pkg/js/easykube.go
-----
-include::example$easykube.go[tag=export]
-----
-
-The *_ek* object is populated with a name and a function.

@@ -1,13 +1,14 @@
 = Troubleshooting and FAQ
 
 * When creating the cluster, easykube complains about occupied ports, what should I do?
-** ...
+** As the error states, hunt down any services you already have running and shut them down. Alternatively you can comment or remove the extraPorts section in the offending addon.
 
 * Where did all my diskspace go?
-** ...
+** Some docker images are quite fat, and Easykube keeps images in triplicate. When an image is pulled from a remote registry, it is stored in your local docker context. Then the image is pushed to the local registry, and finally pulled into the kind-control plane. This is noticeable if the cluster was repeatedly created/destroyed - Just clean up the old containers and volumes, and space will be reclaimed.
+
 
 * My javascript throws errors, how can I debug what's going on?
-** ...
+** Unfortunately, I'm not aware of how to wire an external debugger into a Goja runtime. So at this point your best bet is the good old print-line debugging. At least easkyube will tell you which addon is the offender.
 
-* Sometimes easykube fails with an error about 'deployment not ready'
-** ...
+* Sometimes easykube fails with an error about 'deployment not ready' when adding something.
+** Some workloads just take some time to be ready, the `waitForDeployment` times out after 1 minute, it depends on your machine and the type of deployment - In any case you can retry. If you have the option, patching readiness/liveliness probes to some lower values, could also work.
