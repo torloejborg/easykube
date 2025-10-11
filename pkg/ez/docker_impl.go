@@ -4,13 +4,16 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types/container"
@@ -25,7 +28,6 @@ import (
 type DockerImpl struct {
 	Docker *client.Client
 	ctx    context.Context
-	Common ContainerRuntimeCommon
 	Fs     afero.Fs
 }
 
@@ -42,7 +44,6 @@ func NewDockerImpl() IContainerRuntime {
 	return &DockerImpl{
 		Docker: docker,
 		ctx:    context.Background(),
-		Common: ContainerRuntimeCommon{},
 	}
 
 }
@@ -67,6 +68,50 @@ func (cr *DockerImpl) IsContainerRunning(containerID string) bool {
 	}
 
 	return result.State.Running
+}
+
+func (i *DockerImpl) HasImageInKindRegistry(image string) bool {
+	image = strings.ReplaceAll(image, constants.LOCAL_REGISTRY+"/", "")
+	parts := strings.Split(image, ":")
+	imageWithoutTag := parts[0]
+	imageTag := parts[1]
+
+	type TagList struct {
+		Name string   `json:"name"`
+		Tags []string `json:"tags"`
+	}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	resp, err := client.Get(fmt.Sprintf("http://%s/v2/%s/tags/list", constants.LOCAL_REGISTRY, imageWithoutTag))
+	if nil != err {
+		log.Fatalln(err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if nil != err {
+		log.Fatalln(err)
+	}
+
+	var dat TagList
+
+	if jsonerr := json.Unmarshal(body, &dat); jsonerr != nil {
+		panic(jsonerr)
+	}
+
+	if strings.Contains(dat.Name, imageWithoutTag) {
+		for i := range dat.Tags {
+			if dat.Tags[i] == imageTag {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (cr *DockerImpl) HasImage(image string) bool {
@@ -172,10 +217,6 @@ func (cr *DockerImpl) FindContainer(name string) (*ContainerSearch, error) {
 			ContainerID: "",
 		}, nil
 	}
-}
-
-func (cr *DockerImpl) HasImageInKindRegistry(name string) bool {
-	return cr.Common.ImageExistsInKindRegistry(name)
 }
 
 func (cr *DockerImpl) StartContainer(id string) {

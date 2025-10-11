@@ -1,21 +1,23 @@
-package ez
+package ez_test
 
 import (
 	"path/filepath"
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/test"
 )
 
-func initCreateAddonsTest() {
-	Kube = &EasykubeSingleton{}
+func initCreateAddonsTest(t *testing.T) {
+	osd := test.CreateOsDetailsMock(t)
+	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
+	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
+	config := ez.NewEasykubeConfig(osd)
 
-	y := &OsDetailsStub{CreateOsDetailsImpl()}
-	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
-
-	Kube.UseOsDetails(y)
-	Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	Kube.UseEasykubeConfig(x)
+	ez.Kube.UseOsDetails(osd)
+	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	ez.Kube.UseEasykubeConfig(config)
 
 }
 
@@ -39,12 +41,11 @@ var expectedAddonFiles = []struct {
 }
 
 func TestCreateAddon(t *testing.T) {
-	initCreateAddonsTest()
+	initCreateAddonsTest(t)
 
-	Kube.MakeConfig()
-	config, _ := Kube.LoadConfig()
+	config, _ := ez.Kube.LoadConfig()
 
-	cut := NewSkaffold(config.AddonDir)
+	cut := ez.NewSkaffold(config.AddonDir)
 
 	for _, tt := range addonsToCreate {
 		t.Run(tt.addonName, func(t *testing.T) {
@@ -53,7 +54,7 @@ func TestCreateAddon(t *testing.T) {
 
 		for _, yy := range expectedAddonFiles {
 			t.Run(yy.file, func(t *testing.T) {
-				ok := FileOrDirExists(filepath.Join(config.AddonDir, tt.location, tt.addonName, yy.file))
+				ok := ez.FileOrDirExists(filepath.Join(config.AddonDir, tt.location, tt.addonName, yy.file))
 				t.Log(filepath.Join(config.AddonDir, tt.location, tt.addonName, yy.file))
 				if !ok {
 					t.Errorf("nope")

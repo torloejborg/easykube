@@ -11,6 +11,7 @@ const LOCAL_REGISTRY = "localhost:5001"
 const JS_LIB = "__jslib"
 const ADDON_CM = "installed-addons"
 const DEFAULT_NS = "default"
+const EASYKUBE_SECRET_NAME = "easykube-secrets"
 
 // KUSTOMIZE_TARGET_OUTPUT Name of file kustomize will render to
 const KUSTOMIZE_TARGET_OUTPUT = ".out.yaml"

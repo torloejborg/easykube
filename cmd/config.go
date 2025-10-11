@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"github.com/torloejborg/easykube/pkg/ez"
-
 	"github.com/spf13/cobra"
 )
 
@@ -12,14 +10,7 @@ var configCmd = &cobra.Command{
 	Short: "edits your easykube configuration file",
 	Long:  "editor is chosen via VISUAL or EDITOR environment variable",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ezk := ez.Kube
-		err := ezk.MakeConfig()
-		if err != nil {
-			return err
-		}
-		ezk.EditConfig()
-
-		return nil
+		return runConfigActual(cmd, args)
 	},
 }
 

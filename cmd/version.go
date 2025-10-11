@@ -11,9 +11,10 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "shows the version of easykube CLI",
 	Long:  `shows the version of easykube CLI`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		ez.Kube.FmtGreen(vars.Version)
+		return nil
 	},
 }
 

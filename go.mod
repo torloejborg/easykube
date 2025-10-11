@@ -13,6 +13,7 @@ require (
 	github.com/olekukonko/tablewriter v1.1.0
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.1
+	go.uber.org/mock v0.6.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.34.1

@@ -85,6 +85,7 @@ func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {
 	walkFunc := func(path string, entry fs.FileInfo, err error) error {
 		if !entry.IsDir() && addonExpre.MatchString(entry.Name()) {
 			file, openErr := Kube.Fs.Open(path)
+			abs, _ := filepath.Abs(file.Name())
 			if openErr != nil {
 				return openErr
 			}
@@ -92,7 +93,7 @@ func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {
 			foundAddon := &Addon{
 				Name:      entry.Name(),
 				ShortName: strings.ReplaceAll(entry.Name(), ".ek.js", ""),
-				File:      file.Name(),
+				File:      abs,
 				RootDir:   adr.EkConfig.AddonDir,
 			}
 

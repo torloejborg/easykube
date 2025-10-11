@@ -1,18 +1,20 @@
-package ez
+package ez_test
 
 import (
 	"fmt"
 	"slices"
 	"testing"
+
+	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func TestTopologicalSort(t *testing.T) {
-	graph := NewGraph()
+	graph := ez.NewGraph()
 
-	ingress := &Addon{Name: "nginx-controller"}
-	jenkins := &Addon{Name: "jenkins-lts"}
-	storage := &Addon{Name: "storage-provider"}
-	postgres := &Addon{Name: "postgresql"}
+	ingress := &ez.Addon{Name: "nginx-controller"}
+	jenkins := &ez.Addon{Name: "jenkins-lts"}
+	storage := &ez.Addon{Name: "storage-provider"}
+	postgres := &ez.Addon{Name: "postgresql"}
 
 	graph.Nodes = append(graph.Nodes,
 		ingress,
@@ -21,8 +23,8 @@ func TestTopologicalSort(t *testing.T) {
 		postgres)
 
 	_ = graph.AddEdge(postgres, storage)
-	graph.AddEdge(jenkins, storage)
-	graph.AddEdge(jenkins, ingress)
+	_ = graph.AddEdge(jenkins, storage)
+	_ = graph.AddEdge(jenkins, ingress)
 
 	sorted, err := graph.TopologicalSort()
 	slices.Reverse(sorted)
@@ -41,19 +43,19 @@ func TestTopologicalSort(t *testing.T) {
 }
 
 func TestDiamondGraph(t *testing.T) {
-	graph := NewGraph()
+	graph := ez.NewGraph()
 
-	a := &Addon{Name: "a"}
-	b := &Addon{Name: "b"}
-	c := &Addon{Name: "c"}
-	d := &Addon{Name: "d"}
+	a := &ez.Addon{Name: "a"}
+	b := &ez.Addon{Name: "b"}
+	c := &ez.Addon{Name: "c"}
+	d := &ez.Addon{Name: "d"}
 
 	graph.Nodes = append(graph.Nodes, a, b, c, d)
 
 	_ = graph.AddEdge(a, b)
-	graph.AddEdge(a, c)
-	graph.AddEdge(b, d)
-	graph.AddEdge(c, d)
+	_ = graph.AddEdge(a, c)
+	_ = graph.AddEdge(b, d)
+	_ = graph.AddEdge(c, d)
 
 	sorted, err := graph.TopologicalSort()
 	slices.Reverse(sorted)

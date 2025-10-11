@@ -1,4 +1,4 @@
-package ez
+package ez_test
 
 import (
 	"fmt"
@@ -7,18 +7,22 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/test"
 )
 
-func initClusterUtilsTest() {
+func initClusterUtilsTest(t *testing.T) {
 
-	y := &OsDetailsStub{CreateOsDetailsImpl()}
-	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
+	osd := test.CreateOsDetailsMock(t)
+	config := ez.NewEasykubeConfig(osd)
 
-	Kube.UseOsDetails(y)
-	Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	Kube.UseEasykubeConfig(x)
-	Kube.UseAddonReader(CreateAddonReaderImpl(x))
-	Kube.UseClusterUtils(CreateClusterUtilsImpl())
+	ez.Kube.UseOsDetails(osd)
+	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	ez.Kube.UseEasykubeConfig(config)
+	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
+	ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
+
+	_ = ez.Kube.MakeConfig()
 }
 
 var expectedPersistenceDirectories = []struct {
@@ -31,11 +35,10 @@ var expectedPersistenceDirectories = []struct {
 }
 
 func TestCreatePersistenceDirectories(t *testing.T) {
-	initClusterUtilsTest()
-	Kube.MakeConfig()
-	CopyTestAddonToMemFs("diamond", "./addons")
+	initClusterUtilsTest(t)
 
-	err := Kube.EnsurePersistenceDirectory()
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
+	err := ez.Kube.EnsurePersistenceDirectory()
 
 	if err != nil {
 		t.Errorf("Failed to create directories %v", err)
@@ -43,9 +46,9 @@ func TestCreatePersistenceDirectories(t *testing.T) {
 
 	for _, tt := range expectedPersistenceDirectories {
 		t.Run(tt.dir, func(t *testing.T) {
-			cfg, _ := Kube.GetUserConfigDir()
+			cfg, _ := ez.Kube.GetUserConfigDir()
 			persistenceDir := filepath.Join(cfg, "easykube", "persistence", tt.dir)
-			exists := FileOrDirExists(persistenceDir)
+			exists := ez.FileOrDirExists(persistenceDir)
 			if !exists {
 				t.Errorf("expected %v to exist", persistenceDir)
 			}
@@ -54,31 +57,29 @@ func TestCreatePersistenceDirectories(t *testing.T) {
 }
 
 func TestRenderKindConfigurationFromSetOfAddons(t *testing.T) {
-	initClusterUtilsTest()
-	Kube.MakeConfig()
-	CopyTestAddonToMemFs("diamond", "./addons")
-	addons, err := Kube.GetAddons()
+	initClusterUtilsTest(t)
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
+	addons, err := ez.Kube.GetAddons()
 	if err != nil {
 		t.Errorf("Failed to get addons %v", err)
 	}
-	addonList := make([]*Addon, 0)
+	addonList := make([]*ez.Addon, 0)
 	// unmap addons
 	for _, addon := range addons {
 		addonList = append(addonList, addon)
 	}
 
-	result := Kube.RenderToYAML(addonList)
+	result := ez.Kube.RenderToYAML(addonList)
 
 	fmt.Println(result)
 }
 
 func TestWrongPortConfigShouldFail(t *testing.T) {
 
-	initClusterUtilsTest()
-	Kube.MakeConfig()
-	CopyTestAddonToMemFs("portconfig", "./addons")
+	initClusterUtilsTest(t)
+	test.CopyTestAddonToMemFs("../../test_addons", "portconfig", "/home/some-user/addons", ez.Kube.Fs)
 
-	_, err := Kube.GetAddons()
+	_, err := ez.Kube.GetAddons()
 	if err != nil {
 
 		expectedContains := "requires both hostPort and nodePort to be set"

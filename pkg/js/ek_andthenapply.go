@@ -1,6 +1,8 @@
 package jsutils
 
 import (
+	"path/filepath"
+
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
@@ -8,7 +10,8 @@ import (
 func (ctx *Easykube) AndThenApply() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		toApply := call.Argument(0).String()
+		addonDir := filepath.Dir(ctx.AddonCtx.addon.File)
+		toApply := filepath.Join(addonDir, call.Argument(0).String())
 
 		if !ez.FileOrDirExists(toApply) {
 			ezk.FmtRed("could not locate %s to apply", toApply)

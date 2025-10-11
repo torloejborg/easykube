@@ -3,6 +3,7 @@ package jsutils
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/dop251/goja"
@@ -16,26 +17,37 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 
 		currentDir, _ := os.Getwd()
-		defer os.Chdir(currentDir)
+		defer func() {
+			if !ezk.IsDryRun() {
+				os.Chdir(currentDir)
+			}
+			if ezk.IsVerbose() {
+				ezk.FmtVerbose("cd %s", currentDir)
+			}
+		}()
 
 		repo := call.Argument(0).String()
 		branch := call.Argument(1).String()
 		source := call.Argument(2)
 
 		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
+		addonDir := filepath.Dir(e.AddonCtx.addon.File)
+		destination := filepath.Join(addonDir, call.Argument(3).String())
 
-		destination := call.Argument(3).String()
-		if ez.FileOrDirExists(destination) {
-			ezk.FmtYellow("Repository %s already checked out at %s", repo, destination)
-			return call.This
+		if !ezk.IsDryRun() {
+			err := ezk.MkdirAll(destination, 0777)
+			if err != nil {
+				panic(err)
+			}
+			os.Chdir(destination)
+		} else {
+			ezk.FmtDryRun("mkdir -p %s", destination)
+			ezk.FmtDryRun("cd %s", destination)
 		}
 
-		err := ezk.MkdirAll(destination, 0777)
-		if err != nil {
-			panic(err)
+		if ezk.IsVerbose() {
+			ezk.FmtVerbose("cd %s", destination)
 		}
-
-		os.Chdir(destination)
 
 		gitCmd := func(args []string) {
 
@@ -45,12 +57,16 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			if ezk.IsVerbose() {
 				ezk.FmtVerbose(cmdStr)
 			}
+			if ezk.IsDryRun() {
+				ezk.FmtDryRun(cmdStr)
+			} else {
 
-			_, stderr, err := ezk.RunCommand("git", args...)
+				_, stderr, err := ezk.RunCommand("git", args...)
 
-			if err != nil {
-				ezk.FmtRed(stderr, err.Error())
-				os.Exit(1)
+				if err != nil {
+					ezk.FmtRed(stderr, err.Error())
+					os.Exit(1)
+				}
 			}
 		}
 

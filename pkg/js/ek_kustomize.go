@@ -1,6 +1,7 @@
 package jsutils
 
 import (
+	"path/filepath"
 	"time"
 
 	"github.com/dop251/goja"
@@ -11,12 +12,12 @@ import (
 func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		yamlFile := ez.Kube.KustomizeBuild(".")
+		yamlFile := ez.Kube.KustomizeBuild(filepath.Dir(ctx.AddonCtx.addon.File))
 
 		ezk.ApplyYaml(yamlFile)
 
 		if ezk.IsDryRun() {
-			ezk.FmtDryRun("kustomize not applied for %s", ctx.AddonCtx.addon.ShortName)
+			return call.This
 		} else {
 			ezk.UpdateConfigMap(constants.ADDON_CM,
 				constants.DEFAULT_NS,

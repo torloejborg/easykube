@@ -11,7 +11,7 @@ import (
 var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "stops the cluster node and registry container",
-	Long:  "", Run: func(cmd *cobra.Command, args []string) {
+	Long:  "", RunE: func(cmd *cobra.Command, args []string) error {
 		ezk := ez.Kube
 		if ezk.IsContainerRunning(constants.KIND_CONTAINER) {
 			ezk.StopContainer(constants.KIND_CONTAINER)
@@ -22,6 +22,8 @@ var stopCmd = &cobra.Command{
 			ezk.StopContainer(constants.REGISTRY_CONTAINER)
 			ezk.FmtGreen("stopping %s", constants.REGISTRY_CONTAINER)
 		}
+
+		return nil
 	},
 }
 
