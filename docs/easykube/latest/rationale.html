@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Untitled :: EasyKube Documentation</title>
+    <title>Rationale :: EasyKube Documentation</title>
     <link rel="canonical" href="https://torloejborg.github.io/easykube/easykube/latest/rationale.html">
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../_/css/site.css">
@@ -92,44 +92,39 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
+<h1 class="page">Rationale</h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#rationale-rationale">1. Rationale</a></li>
-<li><a href="#_easykube">2. Easykube</a></li>
-<li><a href="#rationale-dowithit">3. What you can do with it</a></li>
-<li><a href="#rationale-dontdo">4. Please do not</a></li>
+<li><a href="#_easykube">1. Easykube</a></li>
+<li><a href="#_what_you_can_do_with_it">2. What you can do with it</a></li>
+<li><a href="#_please_do_not">3. Please do not</a></li>
 </ul>
 </div>
-<div class="sect1">
-<h2 id="rationale-rationale"><a class="anchor" href="#rationale-rationale"></a>1. Rationale</h2>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Easykube aims to enable sharing and distribution of development "platforms" via it&#8217;s companion addon-repositories.</p>
+<p>Easykube aims to enable sharing and distribution of development "platforms" via it’s companion addon-repositories.</p>
 </div>
 <div class="paragraph">
-<p>It&#8217;s meant as a team and individual enabler, everyone can install and work with an application&#8217;s particular stack locally, without breaking a shared environment.</p>
+<p>It’s meant as a team and individual enabler, everyone can install and work with an application’s particular stack locally, without breaking a shared environment.</p>
 </div>
 <div class="paragraph">
-<p>This is certainly doable with existing tooling, docker-compose and friends are popular choices. So what&#8217;s the point of another tool?</p>
+<p>This is certainly doable with existing tooling, docker-compose and friends are popular choices. So what’s the point of another tool?</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
+<div class="paragraph">
 <p>Kubernetes is also an orchestration platform</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>If you use kubernetes for your workloads, why not re-use the deployments which already exists?</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_easykube"><a class="anchor" href="#_easykube"></a>2. Easykube<a id="rationale-easykube"></a></h2>
+<h2 id="_easykube"><a class="anchor" href="#_easykube"></a>1. Easykube</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Is built on top of the awesome <a href="https://kind.sigs.k8s.io/">Kind</a> project (Kubernetes In Docker) and the incredible <a href="https://github.com/dop251/goja">Goja</a> javascript runtime go library.</p>
+<p>Is built on top of the awesome Kind project (Kubernetes In Docker) and the incredible Goja javascript runtime go library.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -140,7 +135,7 @@
 <p>It automatically sets up a local docker registry for the cluster and connects it, we can build air-gapped environments.</p>
 </li>
 <li>
-<p>Based on discovered addons, a kind-cluster configuration is generated for the particular addon repository&#8217;s use-case (host-ports and extra-mounts)</p>
+<p>Based on discovered addons, a kind-cluster configuration is generated for the particular addon repository’s use-case (host-ports and extra-mounts)</p>
 </li>
 <li>
 <p>Persistent data (if used) survives after cluster deletion</p>
@@ -159,15 +154,15 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="rationale-dowithit"><a class="anchor" href="#rationale-dowithit"></a>3. What you can do with it</h2>
+<h2 id="_what_you_can_do_with_it"><a class="anchor" href="#_what_you_can_do_with_it"></a>2. What you can do with it</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful when combined with tools like <a href="https://metalbear.com/mirrord/">mirrord</a>.</p>
+<p>Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful when combined with tools like mirrord.</p>
 </li>
 <li>
-<p>Break things, it&#8217;s OK. Just start over.</p>
+<p>Break things, it’s OK. Just start over.</p>
 </li>
 <li>
 <p>Effortlessly spin up a local development stack; databases, webservers, caches, workflow-engines, OAuth servers, S3 compatible storage, etc.</p>
@@ -176,14 +171,14 @@
 <p>Use as a learning/teaching tool for Kubernetes.</p>
 </li>
 <li>
-<p>Perhaps some team members simply don&#8217;t care about this kubernetes stuff - That&#8217;s ok, nobody can be forced to fall in love with YAML, instead <code>$ easykube add mystack</code> will have stuff running with minimal effort.</p>
+<p>Perhaps some team members simply don’t care about this kubernetes stuff - That’s ok, nobody can be forced to fall in love with YAML, instead $ easykube add mystack will have stuff running with minimal effort.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="rationale-dontdo"><a class="anchor" href="#rationale-dontdo"></a>4. Please do not</h2>
+<h2 id="_please_do_not"><a class="anchor" href="#_please_do_not"></a>3. Please do not</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>

@@ -40,3 +40,6 @@ mock:
 	mockgen -typed --source pkg/ez/k8s_utils.go --destination mock/m_k8s_utils.go
 	mockgen -typed --source pkg/ez/os_details.go --destination mock/m_os_details.go
 
+.PHONY:docs
+docs:
+	antora generate antora-playbook.yml
