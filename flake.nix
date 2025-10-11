@@ -20,9 +20,6 @@
               gnumake
               glibcLocales
             ] ++ [
-              pkgsUnstable.asciidoctor
-              pkgsUnstable.pandoc
-              pkgsUnstable.antora
               pkgsUnstable.upx
               pkgsUnstable.mockgen
               pkgsUnstable.kubectl
@@ -30,6 +27,13 @@
               pkgsUnstable.kustomize
               pkgsUnstable.go_1_24
             ] ;
+
+           docsPackages = with pkgs; [
+              pkgsUnstable.asciidoctor
+              pkgsUnstable.pandoc
+              pkgsUnstable.antora
+              pkgsUnstable.termtosvg
+           ];
     in {
       packages.${system}.default = pkgsUnstable.buildGoModule {
         pname = "easykube";
@@ -70,6 +74,17 @@
             echo "Welcome to the easykube light dev shell (no build)"
           '';
         };
+
+        docs = pkgs.mkShell {
+          packages = commonPackages ++ docsPackages;
+          shellHook = ''
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+            export PS1="[ek-docs]> "
+            echo "Welcome to the easykube doc builder shell (no build)"
+          '';
+        };
+
       };
     };
 }
