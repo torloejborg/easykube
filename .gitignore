@@ -2,10 +2,11 @@
 .idea
 .vscode
 .continue
-build
-dist
+/build
+/dist
 cert-lan
 result
 complete.zsh
+/node_modules
 package.json
 package-lock.json
