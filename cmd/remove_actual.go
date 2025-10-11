@@ -3,8 +3,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"slices"
 
+	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
@@ -42,4 +44,27 @@ func removeActual(opts RemoveOpts) error {
 	}
 
 	return nil
+}
+
+func remove(addon *ez.Addon) {
+	addonDir := filepath.Dir(addon.File)
+	ezk := ez.Kube
+
+	outYaml := filepath.Join(addonDir, constants.KUSTOMIZE_TARGET_OUTPUT)
+
+	ezk.DeleteYaml(outYaml)
+	if ezk.IsDryRun() {
+		ezk.FmtDryRun("rm %s", outYaml)
+	} else {
+		ezk.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
+
+		if ezk.IsVerbose() {
+			ezk.FmtVerbose("rm %s", outYaml)
+		}
+		err := ezk.Remove(outYaml)
+		if err != nil {
+			ezk.FmtYellow("%s could not be deleted", constants.KUSTOMIZE_TARGET_OUTPUT)
+		}
+	}
+
 }
