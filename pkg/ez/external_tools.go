@@ -103,9 +103,14 @@ func (et *ExternalToolsImpl) DeleteYaml(yamlFile string) {
 
 	cmd := "kubectl"
 	args := []string{"delete", "-f", yamlFile}
+	cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
+
+	if Kube.IsVerbose() {
+		Kube.FmtVerbose(cmdStr)
+	}
 
 	if Kube.IsDryRun() {
-		Kube.FmtDryRun(cmd, strings.Join(args, " "))
+		Kube.FmtDryRun(cmdStr)
 	} else {
 		_, stderr, err := et.RunCommand(cmd, args...)
 		if err != nil {
