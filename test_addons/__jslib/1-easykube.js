@@ -4,11 +4,11 @@
 class Easykube {
 
     /**
-     * Defines compatibility with the easykube binary. EK will extract this version and compare it to its own.
-     * If a mismatch is detected a warning will be givenc
-     * @type {string} compat version, follows semver, we trust patch versions.
+     * Defines semver constraint for the easykube go-binary, patch versions are free to roll.
+     * The go binary will extract this, and compare it to its own version, if there is a version
+     * mismatch, the status command will complain.
      */
-    EK_COMPATIBLE_VERSION = "~1.1.4";
+    EASYKUBE_BINARY_COMPAT="~1.1.6";
 
     /**
      * Creates a new Easykube JavaScript handler. This class is for your IDE's enjoyment.
@@ -33,8 +33,8 @@ class Easykube {
      * @param {string} destination output file for rendered template
      * @param {string} namespace sets namespace in templated output
      */
-    helmTemplate(chart,values,destination,namespace='default') {
-        _ek.helmTemplate(chart,values,destination,namespace);
+    helmTemplate(chart, values, destination, namespace = 'default') {
+        _ek.helmTemplate(chart, values, destination, namespace);
         return this;
     }
 
@@ -75,7 +75,7 @@ class Easykube {
 
      * @param {string} deployment - Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)
      * @param {string} namespace , args) {
-        return _ek.execInContainer(deployment, namespace, - Namespace of container
+     return _ek.execInContainer(deployment, namespace, - Namespace of container
      * @param {string} command - The command to run, example "ls" or "/usr/local/bin/whatever"
      * @param {string[]} args - Arguments to the command, example ["-la","-v"]
      * @returns {string}
@@ -123,8 +123,8 @@ class Easykube {
      * @param {string} name what to call the secret
      * @param {{[key:string]: string}} data A map, All key and values are strings
      */
-    createSecret(namespace,name,data) {
-        _ek.createSecret(namespace,name,data)
+    createSecret(namespace, name, data) {
+        _ek.createSecret(namespace, name, data)
     }
 
     /**
@@ -132,8 +132,8 @@ class Easykube {
      * @param namespace
      * @param name
      */
-    getSecret(namespace,name) {
-        return _ek.getSecret(namespace,name)
+    getSecret(namespace, name) {
+        return _ek.getSecret(namespace, name)
     }
 
     /**
@@ -144,8 +144,8 @@ class Easykube {
      * @param {string} namespace where to apply the secret
      * @param {string} manifest which output to process, by default, it's the output from kustomize (.out.yaml)
      */
-    processExternalSecrets(secretMap,namespace,manifest = '.out.yaml') {
-        _ek.processExternalSecrets(secretMap,namespace,manifest);
+    processExternalSecrets(secretMap, namespace, manifest = '.out.yaml') {
+        _ek.processExternalSecrets(secretMap, namespace, manifest);
         return this;
     }
 
@@ -165,6 +165,43 @@ class Easykube {
      */
     env(key) {
         return _ek.env(key)
+    }
+
+
+    /**
+     * Represents an HTTP response object.
+     * @typedef {Object} HttpResponse
+     * @property {(cb: (body: string) => any) => HttpResponse} onSuccess callback to handle successes 2xx
+     * @property {(cb: (error: string, httpstatuscode: int) => any) => HttpResponse} onFail hard errors, malformed urls, connection failures etc.
+     */
+
+    /**
+     * Performs http requests using a very basic client
+     * @param {string} url endpoint for request
+     * @param {string} method the method, POST, GET, etc.
+     * @param {string} header headers for the request
+     * @param {Object} body arbitrary json structure or text
+     * @returns {HttpResponse}
+     */
+    http(url,method,header,body) {
+        return  _ek.http(url,method,header,body);
+    }
+
+    /**
+     * Represents a result of exec, this is created and exposed from go
+     * @typedef {Object} ExecResult
+     * @property {(cb: (output: string) => any) => string} onSuccess
+     * @property {(cb: (output: string) => any) => string} onFail
+     */
+
+    /**
+     * Executes an arbitrary OS command, this calls in to go's os.Exec
+     * @param {string} command the command
+     * @param {string[]} args arguments for the command
+     * @returns {ExecResult} the result
+     */
+    exec(command, args) {
+        return _ek.exec(command, args);
     }
 }
 

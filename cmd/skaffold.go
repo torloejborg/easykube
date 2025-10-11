@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/torloejborg/easykube/pkg/constants"
 
 	"github.com/spf13/cobra"
@@ -20,22 +18,15 @@ var skaffoldCmd = &cobra.Command{
 
   Useful for starting a new addon.
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-		ezk := ez.Kube
+	RunE: func(cmd *cobra.Command, args []string) error {
+
 		commandHelper := ez.CommandHelper(cmd)
-
-		addonName := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME)
-		addonDest := commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION)
-
-		ekc, err := ez.Kube.LoadConfig()
-		if nil != err {
-			ezk.FmtGreen("cannot proceed without easykube configuration")
-			os.Exit(-1)
+		opts := SkaffoldOpts{
+			AddonName:     commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME),
+			AddonLocation: commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION),
 		}
 
-		skaf := ez.NewSkaffold(ekc.AddonDir)
-		skaf.CreateNewAddon(addonName, addonDest)
-
+		return skaffoldActual(opts)
 	},
 }
 
@@ -43,4 +34,8 @@ func init() {
 	rootCmd.AddCommand(skaffoldCmd)
 	skaffoldCmd.Flags().String(constants.ARG_SKAFFOLD_NAME, "", "Name of new addon")
 	skaffoldCmd.Flags().String(constants.ARG_SKAFFOLD_LOCATION, "", "Destination within the addons repository")
+
+	_ = skaffoldCmd.MarkFlagRequired(constants.ARG_SKAFFOLD_NAME)
+	_ = skaffoldCmd.MarkFlagRequired(constants.ARG_SKAFFOLD_LOCATION)
+
 }

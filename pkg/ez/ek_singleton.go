@@ -16,7 +16,7 @@ type EasykubeSingleton struct {
 	OsDetails
 	afero.Fs
 	*cobra.Command
-	CobraCommandHelperImpl
+	ICobraCommandHelper
 	textutils.IPrinter
 }
 
@@ -59,8 +59,8 @@ func (t *EasykubeSingleton) UseFilesystemLayer(f afero.Fs) *EasykubeSingleton {
 	return t
 }
 
-func (t *EasykubeSingleton) UseCmdContext(ctx CobraCommandHelperImpl) {
-	t.CobraCommandHelperImpl = ctx
+func (t *EasykubeSingleton) UseCmdContext(ctx ICobraCommandHelper) {
+	t.ICobraCommandHelper = ctx
 }
 
 func (t *EasykubeSingleton) UseOsDetails(ctx OsDetails) {

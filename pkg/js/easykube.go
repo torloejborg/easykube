@@ -10,17 +10,18 @@ import (
 )
 
 type Easykube struct {
-	CobraCommandHelder *ez.CobraCommandHelperImpl
+	CobraCommandHelder ez.ICobraCommandHelper
 	AddonCtx           *AddonContext
 }
 
-func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext) {
+func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 	check := func(e error) {
 		if e != nil {
 			panic(e)
 		}
 	}
 
+	// tag::export[]
 	e := &Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
 
 	easykubeObj := addon.NewObject()
@@ -42,13 +43,12 @@ func ConfigureEasykubeScript(ctx *ez.CobraCommandHelperImpl, addon *AddonContext
 	check(easykubeObj.Set(EXEC, e.Exec()))
 	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
 
-
 	addon.ExportFunction("_ek", easykubeObj)
 
 	utilsObj := addon.NewObject()
 	check(utilsObj.Set("UUID", e.NewUUID()))
 	addon.ExportFunction("_utils", utilsObj)
-
+	// end::export[]
 }
 
 func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {

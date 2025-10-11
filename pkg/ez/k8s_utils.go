@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -79,30 +78,19 @@ type KubernetesSecret struct {
 	Type       string            `yaml:"type"`
 }
 
-type K8sSecretManager interface {
-	CreateSecret(namespace, secretName string, data map[string]string)
+type IK8SUtils interface {
+	ReloadClientSet() error
+	CreateSecret(namespace, secretName string, data map[string]string) error
 	GetSecret(name, namespace string) (map[string][]byte, error)
-}
-
-type K8sConfigManager interface {
 	CreateConfigmap(name, namespace string) error
 	DeleteKeyFromConfigmap(name, namespace, key string)
 	ReadConfigmap(name string, namespace string) (map[string]string, error)
 	UpdateConfigMap(name, namespace, key string, data []byte)
 	HasKubeConfig() bool
-}
-
-type K8sPodManager interface {
 	FindContainerInPod(deploymentName, namespace, containerPartialName string) (string, string, error)
 	ExecInPod(namespace, pod, command string, args []string) (string, string, error)
 	CopyFileToPod(namespace, pod, container, localPath, remotePath string) error
 	ListPods(namespace string) ([]string, error)
-}
-
-type IK8SUtils interface {
-	K8sSecretManager
-	K8sConfigManager
-	K8sPodManager
 	GetInstalledAddons() ([]string, error)
 	PatchCoreDNS()
 	WaitForDeploymentReadyWatch(name, namespace string) error
@@ -112,6 +100,20 @@ type IK8SUtils interface {
 
 func NewK8SUtils() IK8SUtils {
 
+	impl := &K8SUtilsImpl{
+		Clientset:  nil,
+		RestConfig: nil,
+	}
+
+	err := impl.ReloadClientSet()
+	if err != nil {
+		Kube.FmtRed("Failed to create Kubernetes client: %v", err)
+	}
+
+	return impl
+}
+
+func (k *K8SUtilsImpl) ReloadClientSet() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		Kube.FmtRed("cannot determine homedir")
@@ -122,27 +124,23 @@ func NewK8SUtils() IK8SUtils {
 
 	if !FileOrDirExists(kubeconfigPath) {
 		Kube.FmtYellow("expecting %s to exist, create the cluster and this message will disappear", kubeconfigPath)
-		return &K8SUtilsImpl{
-			Clientset:  nil,
-			RestConfig: nil,
-		}
+		return nil
 	}
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	k.RestConfig = config
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	return &K8SUtilsImpl{
-		Clientset:  clientset,
-		RestConfig: config,
-	}
+	k.Clientset = clientset
+	return nil
 }
 
 func (k *K8SUtilsImpl) GetSecret(name, namespace string) (map[string][]byte, error) {
@@ -414,7 +412,7 @@ func (k *K8SUtilsImpl) WaitForCRD(
 	})
 }
 
-func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[string]string) {
+func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[string]string) error {
 
 	var isProbablyBase64 = func(s string) bool {
 		decoded, err := base64.StdEncoding.DecodeString(s)
@@ -454,7 +452,9 @@ func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 
 	// todo: better err handling
 	if e != nil {
-		panic(e)
+		return e
+	} else {
+		return nil
 	}
 }
 

@@ -1,4 +1,4 @@
-package ez
+package ez_test
 
 import (
 	"fmt"
@@ -6,18 +6,20 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/ez"
 	"github.com/torloejborg/easykube/pkg/vars"
+	"github.com/torloejborg/easykube/test"
 )
 
-func initAddonReaderTest() {
+func initAddonReaderTest(t *testing.T) {
+	osd := test.CreateOsDetailsMock(t)
 
-	y := &OsDetailsStub{CreateOsDetailsImpl()}
-	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
-
-	Kube.UseOsDetails(y)
-	Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	Kube.UseEasykubeConfig(x)
-	Kube.UseAddonReader(CreateAddonReaderImpl(x))
+	config := ez.NewEasykubeConfig(osd)
+	ez.Kube.UseOsDetails(osd)
+	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	ez.Kube.UseEasykubeConfig(config)
+	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
+	_ = ez.Kube.MakeConfig()
 }
 
 var expectedAddonsForDiscoverTest = []struct {
@@ -31,12 +33,11 @@ var expectedAddonsForDiscoverTest = []struct {
 
 func TestDiscoverAddons(t *testing.T) {
 
-	initAddonReaderTest()
-	Kube.MakeConfig()
+	initAddonReaderTest(t)
 
-	CopyTestAddonToMemFs("diamond", "./addons")
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
 
-	all, err := Kube.GetAddons()
+	all, err := ez.Kube.GetAddons()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,12 +53,10 @@ func TestDiscoverAddons(t *testing.T) {
 
 func TestBrokenAddon(t *testing.T) {
 
-	initAddonReaderTest()
-	Kube.MakeConfig()
+	initAddonReaderTest(t)
+	test.CopyTestAddonToMemFs("../../test_addons", "broken", "/home/some-user/addons", ez.Kube.Fs)
 
-	CopyTestAddonToMemFs("broken", "./addons")
-
-	_, err := Kube.GetAddons()
+	_, err := ez.Kube.GetAddons()
 	if err != nil {
 
 		if !strings.Contains(err.Error(), "invalid character 'x' looking for beginning of object key string") {
@@ -70,15 +69,15 @@ func TestBrokenAddon(t *testing.T) {
 
 func TestVersionCompatibilityReader(t *testing.T) {
 
-	initAddonReaderTest()
-	Kube.MakeConfig()
+	initAddonReaderTest(t)
 
-	CopyTestAddonToMemFs("diamond", "./addons")
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
 
-	vars.Version = "1.4.4"
+	vars.Version = "1.1.9"
 
-	version, err := Kube.CheckAddonCompatibility()
+	version, err := ez.Kube.CheckAddonCompatibility()
 	if err != nil {
+		fmt.Println(err.Error())
 		if !strings.Contains(err.Error(), "addon repository want easykube ~1.1.4 but easykube is 1.4.4") {
 			t.Fail()
 		}

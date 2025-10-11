@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -17,7 +16,7 @@ import (
 
 type JsUtils struct {
 	vm                 *goja.Runtime
-	CobraCommandHelper *ez.CobraCommandHelperImpl
+	CobraCommandHelper ez.ICobraCommandHelper
 	AddonRoot          string
 }
 
@@ -26,9 +25,9 @@ type IJsUtils interface {
 }
 
 type AddonContext struct {
-	addon              *ez.Addon
-	vm                 *goja.Runtime
-	CobraCommandHelper *ez.CobraCommandHelperImpl
+	addon               *ez.Addon
+	vm                  *goja.Runtime
+	ICobraCommandHelper ez.ICobraCommandHelper
 }
 
 func (ac *AddonContext) ExportFunction(name string, action interface{}) {
@@ -42,13 +41,13 @@ func (ac *AddonContext) NewObject() *goja.Object {
 	return ac.vm.NewObject()
 }
 
-func NewJsUtils(commandHelper *ez.CobraCommandHelperImpl, source *ez.Addon) IJsUtils {
+func NewJsUtils(commandHelper ez.ICobraCommandHelper, source *ez.Addon) IJsUtils {
 	vm := goja.New()
 
 	ac := &AddonContext{
-		addon:              source,
-		vm:                 vm,
-		CobraCommandHelper: commandHelper,
+		addon:               source,
+		vm:                  vm,
+		ICobraCommandHelper: commandHelper,
 	}
 
 	export := func(name string, action interface{}) {
@@ -72,11 +71,6 @@ func NewJsUtils(commandHelper *ez.CobraCommandHelperImpl, source *ez.Addon) IJsU
 func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) error {
 	script := a.ReadScriptFile(ez.Kube.Fs)
 	ezk := ez.Kube
-
-	// Before we execute the addon javascript, set the working directory, such that all file operations for
-	// the addon will be relative to the addon directory, when we are done, go back where we came from.
-	ez.PushDir(filepath.Dir(a.File))
-	defer ez.PopDir()
 
 	ezk.FmtGreen("🔧 Processing %s", a.Name)
 
@@ -105,12 +99,12 @@ func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) error {
 func (jsu *JsUtils) GetPseudoJsIncludes() string {
 	jsScriptDir := filepath.Join(jsu.AddonRoot, constants.JS_LIB)
 	data := make([]string, 0)
+	exists, _ := afero.DirExists(ez.Kube.Fs, jsScriptDir)
 
-	if directoryExists(jsScriptDir) {
-
+	if exists {
 		walkFunc := func(path string, info fs.FileInfo, err error) error {
 			if !info.IsDir() && strings.HasSuffix(info.Name(), ".js") {
-				dat, err := os.ReadFile(filepath.Join(jsScriptDir, info.Name()))
+				dat, err := afero.ReadFile(ez.Kube.Fs, filepath.Join(jsScriptDir, info.Name()))
 				if err != nil {
 					panic(err)
 				}
@@ -130,12 +124,4 @@ func (jsu *JsUtils) GetPseudoJsIncludes() string {
 	} else {
 		return ""
 	}
-}
-
-func directoryExists(dirName string) bool {
-	info, err := ez.Kube.Stat(dirName)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return info.IsDir()
 }

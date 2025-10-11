@@ -13,8 +13,7 @@ func (ctx *Easykube) DockerExec() func(goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 
 		container := call.Argument(0).String()
-		//command := call.Argument(1).String()
-		command, _ := exportStringArray(call.Argument(1).Export())
+		command := ctx.extractStringSliceFromArgument(call.Argument(1))
 
 		if ezk.IsVerbose() {
 			ezk.FmtVerbose("docker exec %s %s", container, strings.Join(command, " "))

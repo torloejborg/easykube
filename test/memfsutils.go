@@ -1,47 +1,25 @@
-package ez
+package test
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"testing"
 
 	"github.com/spf13/afero"
-	"github.com/torloejborg/easykube/pkg/textutils"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
-type EasykubeConfigStub struct {
-	IEasykubeConfig
-}
-type OsDetailsStub struct {
-	OsDetails
-}
+func CopyTestAddonToMemFs(addonDir, testAddonName, dest string, destFs afero.Fs) {
 
-func (o *OsDetailsStub) GetUserConfigDir() (string, error) {
-	return "/home/some-user/.config", nil
-}
+	osfs := afero.NewOsFs()
 
-func (o *OsDetailsStub) GetUserHomeDir() (string, error) {
-	return "/home/some-user", nil
-}
-
-func TestMain(m *testing.M) {
-	Kube = &EasykubeSingleton{
-		IPrinter: textutils.NewPrinter(),
+	err := copyDirToMemFS(osfs, destFs, filepath.Join(addonDir, testAddonName), filepath.Join(dest, testAddonName))
+	if err != nil {
+		panic(err)
 	}
 
-	y := &OsDetailsStub{CreateOsDetailsImpl()}
-	x := &EasykubeConfigStub{CreateEasykubeConfigImpl(y)}
-
-	Kube.UseOsDetails(y)
-	Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	Kube.UseEasykubeConfig(x)
-
-	m.Run()
-}
-
-func CopyTestAddonToMemFs(src, dest string) {
-	err := copyDirToMemFS(afero.NewOsFs(), Kube.Fs, filepath.Join("../../test_addons", src), dest)
+	err = copyDirToMemFS(osfs, destFs, filepath.Join(addonDir, constants.JS_LIB), filepath.Join(dest, constants.JS_LIB))
 	if err != nil {
 		panic(err)
 	}
@@ -95,4 +73,23 @@ func copyFileToMemFS(osFs afero.Fs, memFs afero.Fs, srcPath, dstPath string) err
 	// Copy the contents
 	_, err = io.Copy(dstFile, srcFile)
 	return err
+}
+
+func PrintFiles(fs afero.Fs, dir string) error {
+
+	walkFn := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			rel, _ := filepath.Rel(dir, path)
+			fmt.Println(rel)
+		} else {
+
+		}
+		return nil
+	}
+
+	return afero.Walk(fs, dir, walkFn)
 }

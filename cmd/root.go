@@ -8,7 +8,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func withAppContext(ctx context.Context, appCtx *ez.CobraCommandHelperImpl) context.Context {
+func WithAppContext(ctx context.Context, appCtx *ez.CobraCommandHelperImpl) context.Context {
 	return context.WithValue(ctx, ez.AppCtxKey, appCtx)
 }
 
@@ -25,8 +25,9 @@ hint: start with 'easykube config'`,
 			Command: cmd,
 		}
 
-		cmd.SetContext(withAppContext(cmd.Context(), &ctx))
-		ez.Kube.UseCmdContext(ez.CobraCommandHelperImpl{Command: cmd})
+		cmd.SetContext(WithAppContext(cmd.Context(), &ctx))
+
+		ez.Kube.UseCmdContext(&ez.CobraCommandHelperImpl{Command: cmd})
 	},
 }
 

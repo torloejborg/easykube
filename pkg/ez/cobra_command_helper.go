@@ -8,6 +8,7 @@ type ICobraCommandHelper interface {
 	GetBoolFlag(name string) bool
 	GetStringFlag(name string) string
 	IsVerbose() bool
+	IsDryRun() bool
 }
 
 type CobraCommandHelperImpl struct {
