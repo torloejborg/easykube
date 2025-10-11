@@ -7,3 +7,5 @@ dist
 cert-lan
 result
 complete.zsh
+package.json
+package-lock.json

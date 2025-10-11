@@ -1,0 +1,39 @@
+= Contributing
+
+This is an opensource project, so pull requests are welcome.
+
+Use nix to get all the tools you need for development,
+the nix flake has three shell variants;
+
+* default
+* light
+* docs
+
+
+== Default
+
+First make sure you have nix installed, this is mentioned xref:install.adoc#install-nix[here].
+
+Then clone the repository, the default shell will set things up and compile easykube, however, this can get tedious. Instead, use the light variant for development.
+
+== Light
+
+`nix develop .#light`
+
+This creates a shell with all the tools needed for building and testing.
+
+== Docs
+
+Another shell is available on the 'docs' branch, this branch is dedicated to write documentation and comes with an additional set of tools.
+
+`nix develop .#docs`
+
+Currently, no github actions is setup to generate and publish documentation, this is a semi-manual workflow (it's nice to see the results before going live)
+
+We use asciidoctor and antora as tools to write and generate a static site.
+
+Generate the documentation with
+
+`make docs` - The output is generated into /docs
+
+Then commit, push and make a PR

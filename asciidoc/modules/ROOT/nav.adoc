@@ -3,6 +3,9 @@
 * xref:install.adoc[Install Easykube]
 * xref:addons.adoc[About addons]
 * xref:using.adoc[Usage]
-* xref:extend.adoc[Extending]
-* xref:troubleshooting.adoc[Troubleshooting and FAQ]
 * xref:internals.adoc[Internals]
+* xref:faq.adoc[FAQ]
+
+* Development
+** xref:developing/contributing.adoc[Contributing]
+** xref:developing/newfunctionality.adoc[Adding new functionality]

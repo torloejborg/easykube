@@ -1,0 +1,4 @@
+= Spring Projects
+:page-article: spring-projects
+
+List all Spring Projects

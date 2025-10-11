@@ -1,4 +1,4 @@
-= Rationale
+= Rationale [[rationale-rationale]]
 
 Easykube aims to enable sharing and distribution of development "platforms" via it’s companion addon-repositories.
 
@@ -10,7 +10,7 @@ Kubernetes is also an orchestration platform
 
 If you use kubernetes for your workloads, why not re-use the deployments which already exists?
 
-== Easykube
+== Easykube [[rationale-easykube]]
 
 Is built on top of the awesome Kind project (Kubernetes In Docker) and the incredible Goja javascript runtime go library.
 
@@ -28,7 +28,7 @@ Is built on top of the awesome Kind project (Kubernetes In Docker) and the incre
 
 * A CoreDNS hack lets you access everything from "localtest.me" - Never edit that /etc/hosts file again!
 
-== What you can do with it
+== What you can do with it [[rationale-dowith]]
 
 * Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful when combined with tools like mirrord.
 
@@ -40,6 +40,8 @@ Is built on top of the awesome Kind project (Kubernetes In Docker) and the incre
 
 * Perhaps some team members simply don’t care about this kubernetes stuff - That’s ok, nobody can be forced to fall in love with YAML, instead $ easykube add mystack will have stuff running with minimal effort.
 
-== Please do not
+== Please do not [[rationale-donot]]
 
 * Use in a production setting, run your real workloads on a secured cluster. Easykube is not built with security in mind, only for local workloads.
+
+

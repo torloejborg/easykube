@@ -1,0 +1,4 @@
+= Search
+:page-article: search
+
+Search in all Spring Docs

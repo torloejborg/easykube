@@ -42,4 +42,5 @@ mock:
 
 .PHONY:docs
 docs:
+	asciidoc/ensure-spring-extensions.sh
 	antora generate antora-playbook.yml

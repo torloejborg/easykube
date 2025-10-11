@@ -31,7 +31,7 @@ asciidoc:
 
 ui:
   bundle:
-    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.0/ui-bundle.zip
     snapshot: true
   supplemental_files:
     # disable the component and version selectors
@@ -45,3 +45,8 @@ ui:
             </a>
           </div>
         </header>
+
+antora:
+  extensions:
+  - require: "@springio/antora-extensions/asciinema-extension"
+

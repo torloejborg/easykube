@@ -1,0 +1,3 @@
+{{#each (asciinema-split page.attributes.asciinemacasts)}}
+  <script>AsciinemaPlayer.create('{{{@root.siteRootPath}}}/_asciinema/{{this}}.cast', document.getElementById('{{this}}'), {{{asciinema-options this}}})</script>
+{{/each}}

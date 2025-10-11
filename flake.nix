@@ -29,6 +29,7 @@
             ] ;
 
            docsPackages = with pkgs; [
+              pkgsUnstable.nodejs
               pkgsUnstable.asciidoctor
               pkgsUnstable.pandoc
               pkgsUnstable.antora

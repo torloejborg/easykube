@@ -2,6 +2,13 @@
 
 "Bootstrap and share local Kubernetes developer environments"
 
+
+[asciinema,rows=10,autoPlay=true]
+.create a local cluser, and install an addon
+----
+include::example$demo.cast[]
+----
+
 Welcome!
 
 These pages contain more detailed information about easykube.

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Adding new stuff :: EasyKube Documentation</title>
+    <link rel="canonical" href="https://torloejborg.github.io/easykube/easykube/latest/developing/newfunctionality.html">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+<link rel="stylesheet" href="../../../_/css/vendor/asciinema-player.css">
+
+  </head>
+  <body class="article">
+<header class="navbar">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/easykube/latest/developing/newfunctionality.html">
+      EasyKube Documentation
+    </a>
+  </div>
+</header>
+<script src="../../../_/js/vendor/asciinema-player.js"></script>
+<div class="body">
+<div class="nav-container" data-component="easykube" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">EasyKube</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../rationale.html">Why Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../install.html">Install Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../addons.html">About addons</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../using.html">Usage</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../internals.html">Internals</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../faq.html">FAQ</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Development</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="contributing.html">Contributing</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="newfunctionality.html">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">EasyKube</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../index.html">EasyKube</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">EasyKube</a></li>
+    <li>Development</li>
+    <li><a href="newfunctionality.html">Adding new functionality</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///home/tor/code/gh/easykube/asciidoc/modules/ROOT/pages/developing/newfunctionality.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Adding new stuff</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#internals-js">1. The script runtime</a></li>
+<li><a href="#_mocks">2. Mocks</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="internals-js"><a class="anchor" href="#internals-js"></a>1. The script runtime</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Adding new core functionality is relatively straightforward. Below is the listing of the go file where all exported functions is declared.</p>
+</div>
+<div class="listingblock">
+<div class="title">pkg/js/easykube.go</div>
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">	e := &amp;Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
+
+	easykubeObj := addon.NewObject()
+	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
+	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
+	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
+	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
+	check(easykubeObj.Set(PRELOAD, e.PreloadImages()))
+	check(easykubeObj.Set(WAIT_FOR_CRD, e.WaitForCRD()))
+	check(easykubeObj.Set(COPY_TO, e.CopyTo()))
+	check(easykubeObj.Set(CREATE_SECRET, e.CreateSecret()))
+	check(easykubeObj.Set(GET_SECRET, e.GetSecret()))
+	check(easykubeObj.Set(SPARSE_CHECKOUT, e.GitSparseCheckout()))
+	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
+	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
+	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
+	check(easykubeObj.Set(KEY_ENV, e.Env()))
+	check(easykubeObj.Set(HTTP, e.Http()))
+	check(easykubeObj.Set(EXEC, e.Exec()))
+	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
+
+	addon.ExportFunction("_ek", easykubeObj)
+
+	utilsObj := addon.NewObject()
+	check(utilsObj.Set("UUID", e.NewUUID()))
+	addon.ExportFunction("_utils", utilsObj)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong>_ek</strong> object is populated with a name and a function. To add a function, simply copy/paste an existing file and adapt.</p>
+</div>
+<div class="paragraph">
+<p>Below the <strong>env</strong> function is listed</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>func (ctx *Easykube) Env() func(goja.FunctionCall) goja.Value {
+	return func(call goja.FunctionCall) goja.Value {
+		ctx.checkArgs(call, KEY_VALUE)
+		key := call.Argument(0).String()
+		val := os.Getenv(key)
+
+		if val == "" {
+			return goja.Null()
+		} else {
+			return ctx.AddonCtx.vm.ToValue(val)
+		}
+	}
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In a nutshell, define a function which has a pointer-receiver to Easykube that returns a function which returns a goja.Value.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mocks"><a class="anchor" href="#_mocks"></a>2. Mocks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The gomock from Uber is used to generate mocks for most interfaces, so if an interface is changed, remember to regenerate the mocks. Do this with;</p>
+</div>
+<div class="paragraph">
+<p><code>make mock</code></p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
