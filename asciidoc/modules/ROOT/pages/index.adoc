@@ -15,3 +15,10 @@ This site contain more detailed information about easykube.
 ----
 include::example$create.cast[]
 ----
+
+== History
+Easykube started out as collection of gradle build files. The primary use-case was to enable mobile developers to install real backends locally, enabling then to work offline and not require a personal instance of a test system on some random cluster.
+
+Those fancy macbooks were powerful enough to drive a small kubernetes instance, even with multiple backends.
+
+Later easykube was reimplemented in go-lang.
