@@ -1,6 +1,6 @@
 site:
   title: Easykube Documentation
-  url: /easykube
+  url: /
   start_page: easykube::index.adoc
 
 urls:

@@ -11,7 +11,7 @@ This site contain more detailed information about easykube.
 == Example Terminal Session
 
 [asciinema]
-.create a local cluster, install and create an addon (apologies for the delays in the screencast)
+.create a local cluster, install and create an addon (apologies for the delays in the screencast - the player can be scrubbed)
 ----
 include::example$create.cast[]
 ----
