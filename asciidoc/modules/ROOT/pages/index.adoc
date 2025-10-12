@@ -2,19 +2,18 @@
 
 "Bootstrap and share local Kubernetes developer environments"
 
-[asciinema,data-options='{"autoplay": true, "loop": true, "idleTimeLimit": 1, "preload": true}']
-.create a local cluster, install and create an addon
-----
-include::example$create.cast[]
-----
-
-Welcome!
-
 These pages contain more detailed information about easykube.
 
 If you want to know why easykube exists and what is's all about, read the xref:rationale.adoc#rationale-rationale[rationale] page.
+
 New uses should catch up with the xref:install.adoc[installation] page.
 
-Read about addons here xref:addons.adoc[Addons]
+Also, you should familiarize yourself about the concepts of xref:addons.adoc[addons]
 
+== Terminal Session
 
+[asciinema]
+.create a local cluster, install and create an addon (aporlogies for the delays in the screencast)
+----
+include::example$create.cast[]
+----
