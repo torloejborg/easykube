@@ -185,7 +185,7 @@ Addon: "temporal.ek.js"
 
 ⚠ Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries. <3>
 ----
-<1> What's really going is this; The total of all addons generates a single kind cluster configuration file.
+<1> A single kind cluster configuration file is created based on the aggregate of all addons
 <2> An addon want to expose port 80 and 443 from the host to the cluster.
 <3> Corpo users might find this feature useful, you can create the cluster with an option `-s /path/to/mysecret.properties` which will then automatically provide credentials when pulling images.
 

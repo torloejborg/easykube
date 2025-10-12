@@ -2,11 +2,10 @@
 
 "Bootstrap and share local Kubernetes developer environments"
 
-
-[asciinema,rows=10,autoPlay=true]
-.create a local cluser, and install an addon
+[asciinema,data-options='{"autoplay": true, "loop": true, "idleTimeLimit": 1, "preload": true}']
+.create a local cluster, install and create an addon
 ----
-include::example$demo.cast[]
+include::example$create.cast[]
 ----
 
 Welcome!
