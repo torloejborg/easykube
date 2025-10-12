@@ -97,7 +97,7 @@
     <li><a href="using.html">Usage</a></li>
   </ul>
 </nav>
-<div class="edit-this-page"><a href="file:///home/tor/code/gh/easykube/asciidoc/modules/ROOT/pages/using.adoc">Edit this Page</a></div>
+<div class="edit-this-page"><a href="file:///home/tor/code/github/easykube/asciidoc/modules/ROOT/pages/using.adoc">Edit this Page</a></div>
 </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
@@ -109,6 +109,7 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_adding_software">1. Adding software</a></li>
+<li><a href="#_imutababilty">2. Imutababilty</a></li>
 </ul>
 </div>
 <div id="preamble">
@@ -258,6 +259,17 @@ By passing <code>--force</code> or <code>-f</code> you force the entire dependen
 </div>
 <div class="paragraph">
 <p>That&#8217;s basically it! You can now build or use software catalogues that runs on a local kubernetes single node cluster.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_imutababilty"><a class="anchor" href="#_imutababilty"></a>2. Imutababilty</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Because Easykube runs in Docker, it is not possible to open new NodePorts in the cluster and expect them to be available - Docker is immutable by design.</p>
+</div>
+<div class="paragraph">
+<p>So, if you introduce a new service, or switch to a different addon repository, the cluster must be recreated. Your persistent data is safe, so it should be OK.</p>
 </div>
 </div>
 </div>

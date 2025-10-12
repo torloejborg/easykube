@@ -97,7 +97,7 @@
     <li><a href="faq.html">FAQ</a></li>
   </ul>
 </nav>
-<div class="edit-this-page"><a href="file:///home/tor/code/gh/easykube/asciidoc/modules/ROOT/pages/faq.adoc">Edit this Page</a></div>
+<div class="edit-this-page"><a href="file:///home/tor/code/github/easykube/asciidoc/modules/ROOT/pages/faq.adoc">Edit this Page</a></div>
 </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
@@ -153,6 +153,16 @@
 <ul>
 <li>
 <p>Some workloads just take some time to be ready, the <code>waitForDeployment</code> times out after 1 minute, it depends on your machine and the type of deployment - In any case you can retry. If you have the option, patching readiness/liveliness probes to some lower values, could also work.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>I cannot create postgres databases, it throws errors when creating or starting the database, what can I do?</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If you switched to a newer version - Existing database files might be not be compatible with a new version, either revert to the previous version, or delete the files in the postgres persistence directory.</p>
 </li>
 </ul>
 </div>

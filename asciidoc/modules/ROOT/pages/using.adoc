@@ -116,3 +116,8 @@ TIP: By passing `--force` or `-f` you force the entire dependency tree to be add
 
 That's basically it! You can now build or use software catalogues that runs on a local kubernetes single node cluster.
 
+== Imutababilty
+
+Because Easykube runs in Docker, it is not possible to open new NodePorts in the cluster and expect them to be available - Docker is immutable by design.
+
+So, if you introduce a new service, or switch to a different addon repository, the cluster must be recreated. Your persistent data is safe, so it should be OK.

@@ -15,3 +15,5 @@
 * Sometimes easykube fails with an error about 'deployment not ready' when adding something.
 ** Some workloads just take some time to be ready, the `waitForDeployment` times out after 1 minute, it depends on your machine and the type of deployment - In any case you can retry. If you have the option, patching readiness/liveliness probes to some lower values, could also work.
 
+* I cannot create postgres databases, it throws errors when creating or starting the database, what can I do?
+** If you switched to a newer version - Existing database files might be not be compatible with a new version, either revert to the previous version, or delete the files in the postgres persistence directory.

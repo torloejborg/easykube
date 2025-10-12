@@ -31,8 +31,8 @@ asciidoc:
 
 ui:
   bundle:
-#    url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.0/ui-bundle.zip
-    url: ../easykube-ui/build/ui-bundle.zip
+    url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.0/ui-bundle.zip
+#    url: ../easykube-ui/build/ui-bundle.zip
     snapshot: true
   supplemental_files:
     # disable the component and version selectors
