@@ -1,1 +1,0 @@
-"use strict";module.exports=(t,{data:{root:{page:e}}})=>{t=e.attributes["asciinema-options-"+t];return t||"{}"};

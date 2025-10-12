@@ -1,6 +1,6 @@
 site:
   title: Easykube Documentation
-  url: /easykube
+  url: http://torloejborg.github.io/easykube
   start_page: easykube::index.adoc
 
 urls:
@@ -15,10 +15,8 @@ content:
       worktrees: true
 
 output:
-  destinations:
-    - provider: fs
-      path: ./docs
-      clean: true
+  dir: ./docs
+  clean: true
 
 runtime:
   fetch: true
@@ -32,21 +30,9 @@ asciidoc:
 
 ui:
   bundle:
-    url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.0/ui-bundle.zip
+    url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.1/ui-bundle.zip
 #    url: ../easykube-ui/build/ui-bundle.zip
     snapshot: true
-  supplemental_files:
-    # disable the component and version selectors
-    - path: partials/header-content.hbs
-      contents: |
-        {{!-- custom header with no component/version dropdowns --}}
-        <header class="navbar">
-          <div class="navbar-brand">
-            <a class="navbar-item" href="{{@root.page.url}}">
-              {{@root.site.title}}
-            </a>
-          </div>
-        </header>
 
 antora:
   extensions:
