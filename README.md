@@ -7,7 +7,7 @@
 "A tool for learning kubernetes, run various stacks, develop complex applications locally"
 
 
-This README covers the basics, to find out more, visit the [documentation site](https://torlojeborg.github.io/easykube)
+This README covers the basics, to find out more, visit the [documentation site](https://torloejborg.github.io/easykube/easykube/latest)
 
 ## Download the binary for your platform
 
