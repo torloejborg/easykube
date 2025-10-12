@@ -1,6 +1,6 @@
 site:
   title: Easykube Documentation
-  url: https://torloejborg.github.io/easykube
+  url: /easykube
   start_page: easykube::index.adoc
 
 urls:
