@@ -30,7 +30,7 @@ asciidoc:
 
 ui:
   bundle:
-    url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.1/ui-bundle.zip
+    url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.2/ui-bundle.zip
 #    url: ../easykube-ui/build/ui-bundle.zip
     snapshot: true
 
