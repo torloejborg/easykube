@@ -1,10 +1,11 @@
 site:
   title: Easykube Documentation
-  url: /
+  url: /easykube
   start_page: easykube::index.adoc
 
 urls:
-  html_extension_style: default  # keep .html
+  #html_extension_style: default
+  html_extension_style: indexify
 
 content:
   sources:
@@ -14,20 +15,20 @@ content:
       worktrees: true
 
 output:
-  dir: docs
+  destinations:
+    - provider: fs
+      path: ./docs
+      clean: true
 
 runtime:
   fetch: true
 
 asciidoc:
-  sourcemap: true
   attributes:
     source-highlighter: rouge
     linenums: true
     toc: left
     toclevels: 3
-    sectanchors: ''
-    sectnums: ''
 
 ui:
   bundle:

@@ -44,3 +44,4 @@ mock:
 docs:
 	asciidoc/ensure-spring-extensions.sh
 	antora generate antora-playbook.yml
+	touch docs/.nojekyll
