@@ -1,19 +1,17 @@
 = Easykube documentation site
 
-"Bootstrap and share local Kubernetes developer environments"
+This site contain more detailed information about easykube.
 
-These pages contain more detailed information about easykube.
+* If you want to know why easykube exists and what is's all about, read the xref:rationale.adoc#rationale-rationale[rationale] page.
 
-If you want to know why easykube exists and what is's all about, read the xref:rationale.adoc#rationale-rationale[rationale] page.
+* Next vist the xref:install.adoc[installation] page.
 
-New uses should catch up with the xref:install.adoc[installation] page.
+* Also, you should familiarize yourself about the concepts of xref:addons.adoc[addons]
 
-Also, you should familiarize yourself about the concepts of xref:addons.adoc[addons]
-
-== Terminal Session
+== Example Terminal Session
 
 [asciinema]
-.create a local cluster, install and create an addon (aporlogies for the delays in the screencast)
+.create a local cluster, install and create an addon (apologies for the delays in the screencast)
 ----
 include::example$create.cast[]
 ----
