@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/ez"
@@ -58,6 +59,7 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 			ezk.FmtDryRun("skipping extractExternalSecrets")
 			return call.This
 		}
+		addonDir := filepath.Dir(ctx.AddonCtx.addon.File)
 
 		ctx.checkArgs(call, PROCESS_SECRETS)
 		var arg = call.Argument(0)
@@ -73,8 +75,8 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 
 		ezk.FmtGreen("Processing secrets and applying to %s", namespace)
 
-		filePath := manifest
-		externalSecrets, err := extractExternalSecrets(filePath)
+		pathToYaml := filepath.Join(addonDir, manifest)
+		externalSecrets, err := extractExternalSecrets(pathToYaml)
 
 		for i := range externalSecrets {
 			secret := ezk.TransformExternalSecret(externalSecrets[i], secretSource, namespace)
