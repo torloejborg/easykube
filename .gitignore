@@ -7,3 +7,6 @@ dist
 cert-lan
 result
 complete.zsh
+/node_modules
+/package-lock.json
+/package.json
