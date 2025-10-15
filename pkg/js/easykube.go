@@ -35,6 +35,7 @@ func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 	check(easykubeObj.Set(CREATE_SECRET, e.CreateSecret()))
 	check(easykubeObj.Set(GET_SECRET, e.GetSecret()))
 	check(easykubeObj.Set(SPARSE_CHECKOUT, e.GitSparseCheckout()))
+	check(easykubeObj.Set(CHECKOUT, e.GitCheckout()))
 	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
 	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
 	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
@@ -42,6 +43,7 @@ func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 	check(easykubeObj.Set(HTTP, e.Http()))
 	check(easykubeObj.Set(EXEC, e.Exec()))
 	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
+	check(easykubeObj.Set(ADDON_DIR, e.AddonDir()))
 
 	addon.ExportFunction("_ek", easykubeObj)
 
