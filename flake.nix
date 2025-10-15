@@ -11,6 +11,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       pkgsUnstable = unstable.legacyPackages.${system};
+      lib = pkgs.lib;
 
         # Common packages used in all shells
             commonPackages = with pkgs; [
@@ -33,7 +34,9 @@
         version = "latest";
         src = self;
 
-        vendorHash = "sha256-K3R8blmcMf67ztFS4TbpnrqVHhjotX0jRiWXttfdJSE=";
+#        vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        vendorHash = "sha256-hAb5h86zzZP1dVE8p8wfbtp8kOsvx8FW5Ts8x/BjaHg=";
+
       };
 
       devShells.${system} = {
