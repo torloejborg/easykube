@@ -49,6 +49,7 @@ func (ctx *Easykube) Exec() func(goja.FunctionCall) goja.Value {
 
 		if ez.Kube.IsDryRun() {
 			ez.Kube.FmtDryRun("%s %s", osCommand, strings.Join(args, " "))
+			er.success = true
 			return obj
 		} else {
 
@@ -58,7 +59,6 @@ func (ctx *Easykube) Exec() func(goja.FunctionCall) goja.Value {
 				er.output = notfoundErr.Error()
 				er.success = false
 				return obj
-
 			} else {
 
 				var outBuf, errBuf bytes.Buffer

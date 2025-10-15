@@ -203,6 +203,15 @@ class Easykube {
     exec(command, args) {
         return _ek.exec(command, args);
     }
+
+    /**
+     * Gets the directory of the current addon
+     * @param {string} name optional addon name, if specificed will return the path to another addon in the respository
+     * @returns {string} absoultue path to the addon directory
+     */
+    addonDir(name) {
+        return _ek.addonDir(name);
+    }
 }
 
 const easykube = new Easykube();
