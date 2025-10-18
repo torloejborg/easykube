@@ -19,11 +19,12 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 		if ezk.IsDryRun() {
 			ezk.FmtDryRun("skipping preload")
-			return goja.Undefined()
+			return call.This
 		}
 
 		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FLAG_PULL)
 		ctx.checkArgs(call, PRELOAD)
+		config, _ := ez.Kube.LoadConfig()
 
 		var arg = call.Argument(0)
 		result := make(map[string]string)
@@ -46,19 +47,12 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			go func() {
 				if !ezk.HasImageInKindRegistry(dest) || mustPull {
 
-					if strings.Contains(source, "ccta.dk") {
-						s, err := ezk.GetSecret("easykube-secrets", "default")
-						if err != nil {
-							panic(err)
-						}
+					registryCredentials := getPrivateRegistryCredentials(source, config.PrivateRegistries)
 
-						jsonBytes, _ := json.Marshal(map[string]string{
-							"username": string(s["artifactoryUsername"]),
-							"password": string(s["artifactoryPassword"]),
-						})
+					if registryCredentials != "" {
 
 						ezk.FmtGreen("🖼  pull from private registry %s", source)
-						ezk.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
+						ezk.PullImage(source, ptr.To(registryCredentials))
 
 					} else {
 						ezk.FmtGreen("🖼  pull %s", source)
@@ -81,4 +75,33 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 
 		return goja.Undefined()
 	}
+}
+
+func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) string {
+
+	for i := range config {
+
+		if strings.Contains(config[i].RepositoryMatch, registry) {
+
+			s, err := ez.Kube.GetSecret("easykube-secrets", "default")
+
+			if err != nil {
+				panic(err)
+			}
+
+			if s[config[i].UserKey] == nil || s[config[i].PasswordKey] == nil {
+				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RepositoryMatch)
+				return ""
+			}
+
+			jsonBytes, _ := json.Marshal(map[string]string{
+				"username": string(s[config[i].UserKey]),
+				"password": string(s[config[i].PasswordKey]),
+			})
+
+			return base64.StdEncoding.EncodeToString(jsonBytes)
+		}
+	}
+
+	return ""
 }

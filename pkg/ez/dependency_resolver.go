@@ -7,28 +7,28 @@ import (
 )
 
 type Graph struct {
-	Nodes    []*Addon
-	adj      map[*Addon][]*Addon
-	inDegree map[*Addon]int
+	Nodes    []IAddon
+	adj      map[IAddon][]IAddon
+	inDegree map[IAddon]int
 }
 
 func NewGraph() *Graph {
 	return &Graph{
-		Nodes:    make([]*Addon, 0),
-		adj:      make(map[*Addon][]*Addon),
-		inDegree: make(map[*Addon]int),
+		Nodes:    make([]IAddon, 0),
+		adj:      make(map[IAddon][]IAddon),
+		inDegree: make(map[IAddon]int),
 	}
 }
 
-func (g *Graph) AppendNode(v *Addon) {
+func (g *Graph) AppendNode(v IAddon) {
 	if _, exists := g.inDegree[v]; !exists {
 		g.Nodes = append(g.Nodes, v)
 		g.inDegree[v] = 0
-		g.adj[v] = make([]*Addon, 0)
+		g.adj[v] = make([]IAddon, 0)
 	}
 }
 
-func (g *Graph) AddEdge(u, v *Addon) error {
+func (g *Graph) AddEdge(u, v IAddon) error {
 	g.adj[u] = append(g.adj[u], v)
 	g.inDegree[v]++
 	if err := g.hasCycle(); err != nil {
@@ -40,11 +40,11 @@ func (g *Graph) AddEdge(u, v *Addon) error {
 }
 
 func (g *Graph) hasCycle() error {
-	visited := map[*Addon]bool{}
-	recStack := map[*Addon]bool{}
-	var cycle []*Addon
-	var dfs func(node *Addon) bool
-	dfs = func(node *Addon) bool {
+	visited := map[IAddon]bool{}
+	recStack := map[IAddon]bool{}
+	var cycle []IAddon
+	var dfs func(node IAddon) bool
+	dfs = func(node IAddon) bool {
 		if recStack[node] {
 			cycle = append(cycle, node)
 			return true
@@ -72,17 +72,17 @@ func (g *Graph) hasCycle() error {
 	return nil
 }
 
-func formatCycle(cycle []*Addon) string {
+func formatCycle(cycle []IAddon) string {
 	names := make([]string, len(cycle))
 	for i, addon := range cycle {
-		names[i] = addon.ShortName
+		names[i] = addon.GetShortName()
 	}
 	return strings.Join(names, " -> ")
 }
 
-func (g *Graph) TopologicalSort() ([]*Addon, error) {
-	result := make([]*Addon, 0)
-	queue := make([]*Addon, 0)
+func (g *Graph) TopologicalSort() ([]IAddon, error) {
+	result := make([]IAddon, 0)
+	queue := make([]IAddon, 0)
 	for _, node := range g.Nodes {
 		if g.inDegree[node] == 0 {
 			queue = append(queue, node)
@@ -107,17 +107,17 @@ func (g *Graph) TopologicalSort() ([]*Addon, error) {
 	return result, nil
 }
 
-func BuildDependencyGraph(roots []*Addon, allAddons map[string]*Addon) (*Graph, error) {
+func BuildDependencyGraph(roots []IAddon, allAddons map[string]IAddon) (*Graph, error) {
 	g := NewGraph()
 	visited := map[string]bool{}
-	var build func(*Addon) error
-	build = func(addon *Addon) error {
-		if visited[addon.ShortName] {
+	var build func(IAddon) error
+	build = func(addon IAddon) error {
+		if visited[addon.GetShortName()] {
 			return nil
 		}
-		visited[addon.ShortName] = true
+		visited[addon.GetShortName()] = true
 		g.AppendNode(addon)
-		for _, depName := range addon.Config.DependsOn {
+		for _, depName := range addon.GetConfig().DependsOn {
 			dep, ok := allAddons[depName]
 			if !ok {
 				return fmt.Errorf("dependency %s not found", depName)
@@ -139,7 +139,7 @@ func BuildDependencyGraph(roots []*Addon, allAddons map[string]*Addon) (*Graph, 
 	return g, nil
 }
 
-func ResolveDependencies(roots []*Addon, allAddons map[string]*Addon) ([]*Addon, error) {
+func ResolveDependencies(roots []IAddon, allAddons map[string]IAddon) ([]IAddon, error) {
 	g, err := BuildDependencyGraph(roots, allAddons)
 	if err != nil {
 		return nil, err

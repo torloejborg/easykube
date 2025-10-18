@@ -31,7 +31,7 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 		source := call.Argument(2)
 
 		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
-		addonDir := filepath.Dir(e.AddonCtx.addon.File)
+		addonDir := filepath.Dir(e.AddonCtx.addon.GetAddonFile())
 		destination := filepath.Join(addonDir, call.Argument(3).String())
 
 		if ez.FileOrDirExists(destination) {

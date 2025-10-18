@@ -12,7 +12,7 @@ import (
 func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		yamlFile := ez.Kube.KustomizeBuild(filepath.Dir(ctx.AddonCtx.addon.File))
+		yamlFile := ez.Kube.KustomizeBuild(filepath.Dir(ctx.AddonCtx.addon.GetAddonFile()))
 
 		ezk.ApplyYaml(yamlFile)
 
@@ -21,9 +21,9 @@ func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 		} else {
 			ezk.UpdateConfigMap(constants.ADDON_CM,
 				constants.DEFAULT_NS,
-				ctx.AddonCtx.addon.ShortName,
+				ctx.AddonCtx.addon.GetShortName(),
 				[]byte(time.Now().String()))
-			ezk.FmtGreen("kustomize applied for %s", ctx.AddonCtx.addon.ShortName)
+			ezk.FmtGreen("kustomize applied for %s", ctx.AddonCtx.addon.GetShortName())
 		}
 
 		return call.This

@@ -46,8 +46,8 @@ func removeActual(opts RemoveOpts) error {
 	return nil
 }
 
-func remove(addon *ez.Addon) {
-	addonDir := filepath.Dir(addon.File)
+func remove(addon ez.IAddon) {
+	addonDir := filepath.Dir(addon.GetAddonFile())
 	ezk := ez.Kube
 
 	outYaml := filepath.Join(addonDir, constants.KUSTOMIZE_TARGET_OUTPUT)
@@ -56,7 +56,7 @@ func remove(addon *ez.Addon) {
 	if ezk.IsDryRun() {
 		ezk.FmtDryRun("rm %s", outYaml)
 	} else {
-		ezk.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.ShortName)
+		ezk.DeleteKeyFromConfigmap(constants.ADDON_CM, constants.DEFAULT_NS, addon.GetShortName())
 
 		if ezk.IsVerbose() {
 			ezk.FmtVerbose("rm %s", outYaml)

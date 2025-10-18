@@ -47,6 +47,33 @@ func TestMakeDefaultConfig(t *testing.T) {
 
 }
 
+func TestLoadDefaultConfig(t *testing.T) {
+	initConfigTests(t)
+	cfgdir, _ := ez.Kube.GetUserConfigDir()
+
+	exists := ez.FileOrDirExists(filepath.Join(cfgdir, "easykube", "config.yaml"))
+	if !exists {
+		t.Errorf("expected easykube config file to exist")
+	}
+
+	data, err := ez.Kube.LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	reg1 := data.PrivateRegistries[0]
+	reg2 := data.PrivateRegistries[1]
+
+	if reg1.RepositoryMatch != "ccta.dk" {
+		t.Errorf("expected ccta.dk got %s", reg1.RepositoryMatch)
+	}
+
+	if reg2.RepositoryMatch != "anotherRepo" {
+		t.Errorf("expected anotherRepo got %s", reg2.RepositoryMatch)
+	}
+
+}
+
 var filesExist = []struct {
 	file   string
 	exists bool

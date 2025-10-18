@@ -24,7 +24,7 @@ func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
 		destinationFile := call.Argument(4).String()
 
 		// the addon.ek.js file - we will resolve the manifest relative to that
-		addon := ctx.AddonCtx.addon.File
+		addon := ctx.AddonCtx.addon.GetAddonFile()
 
 		fullPath := filepath.Dir(addon)
 

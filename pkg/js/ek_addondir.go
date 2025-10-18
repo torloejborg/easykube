@@ -10,7 +10,7 @@ import (
 func (ctx *Easykube) AddonDir() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
-		base := filepath.Dir(ctx.AddonCtx.addon.File)
+		base := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
 
 		if len(call.Arguments) == 1 {
 			search := call.Arguments[0].String()
@@ -21,7 +21,7 @@ func (ctx *Easykube) AddonDir() func(goja.FunctionCall) goja.Value {
 				ez.Kube.FmtYellow("No addons found for %s", search)
 				return ctx.AddonCtx.vm.ToValue("")
 			} else {
-				other := filepath.Dir(addon.File)
+				other := filepath.Dir(addon.GetAddonFile())
 				return ctx.AddonCtx.vm.ToValue(other)
 			}
 		}

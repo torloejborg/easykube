@@ -41,7 +41,7 @@ func (m *MockIClusterUtils) EXPECT() *MockIClusterUtilsMockRecorder {
 }
 
 // ConfigurationReport mocks base method.
-func (m *MockIClusterUtils) ConfigurationReport(addonList []*ez.Addon) string {
+func (m *MockIClusterUtils) ConfigurationReport(addonList []ez.IAddon) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConfigurationReport", addonList)
 	ret0, _ := ret[0].(string)
@@ -67,19 +67,19 @@ func (c *MockIClusterUtilsConfigurationReportCall) Return(arg0 string) *MockIClu
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIClusterUtilsConfigurationReportCall) Do(f func([]*ez.Addon) string) *MockIClusterUtilsConfigurationReportCall {
+func (c *MockIClusterUtilsConfigurationReportCall) Do(f func([]ez.IAddon) string) *MockIClusterUtilsConfigurationReportCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIClusterUtilsConfigurationReportCall) DoAndReturn(f func([]*ez.Addon) string) *MockIClusterUtilsConfigurationReportCall {
+func (c *MockIClusterUtilsConfigurationReportCall) DoAndReturn(f func([]ez.IAddon) string) *MockIClusterUtilsConfigurationReportCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CreateKindCluster mocks base method.
-func (m *MockIClusterUtils) CreateKindCluster(modules map[string]*ez.Addon) string {
+func (m *MockIClusterUtils) CreateKindCluster(modules map[string]ez.IAddon) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKindCluster", modules)
 	ret0, _ := ret[0].(string)
@@ -105,13 +105,13 @@ func (c *MockIClusterUtilsCreateKindClusterCall) Return(arg0 string) *MockIClust
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIClusterUtilsCreateKindClusterCall) Do(f func(map[string]*ez.Addon) string) *MockIClusterUtilsCreateKindClusterCall {
+func (c *MockIClusterUtilsCreateKindClusterCall) Do(f func(map[string]ez.IAddon) string) *MockIClusterUtilsCreateKindClusterCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIClusterUtilsCreateKindClusterCall) DoAndReturn(f func(map[string]*ez.Addon) string) *MockIClusterUtilsCreateKindClusterCall {
+func (c *MockIClusterUtilsCreateKindClusterCall) DoAndReturn(f func(map[string]ez.IAddon) string) *MockIClusterUtilsCreateKindClusterCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -155,7 +155,7 @@ func (c *MockIClusterUtilsEnsurePersistenceDirectoryCall) DoAndReturn(f func() e
 }
 
 // RenderToYAML mocks base method.
-func (m *MockIClusterUtils) RenderToYAML(addonList []*ez.Addon) string {
+func (m *MockIClusterUtils) RenderToYAML(addonList []ez.IAddon) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RenderToYAML", addonList)
 	ret0, _ := ret[0].(string)
@@ -181,13 +181,13 @@ func (c *MockIClusterUtilsRenderToYAMLCall) Return(arg0 string) *MockIClusterUti
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIClusterUtilsRenderToYAMLCall) Do(f func([]*ez.Addon) string) *MockIClusterUtilsRenderToYAMLCall {
+func (c *MockIClusterUtilsRenderToYAMLCall) Do(f func([]ez.IAddon) string) *MockIClusterUtilsRenderToYAMLCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIClusterUtilsRenderToYAMLCall) DoAndReturn(f func([]*ez.Addon) string) *MockIClusterUtilsRenderToYAMLCall {
+func (c *MockIClusterUtilsRenderToYAMLCall) DoAndReturn(f func([]ez.IAddon) string) *MockIClusterUtilsRenderToYAMLCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -59,7 +59,7 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 			ezk.FmtDryRun("skipping extractExternalSecrets")
 			return call.This
 		}
-		addonDir := filepath.Dir(ctx.AddonCtx.addon.File)
+		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
 
 		ctx.checkArgs(call, PROCESS_SECRETS)
 		var arg = call.Argument(0)

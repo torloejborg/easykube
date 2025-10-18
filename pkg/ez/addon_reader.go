@@ -17,8 +17,8 @@ import (
 )
 
 type IAddonReader interface {
-	GetAddons() (map[string]*Addon, error)
-	ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error)
+	GetAddons() (map[string]IAddon, error)
+	ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error)
 	ExtractJSON(input string) (string, bool)
 	CheckAddonCompatibility() (string, error)
 }
@@ -69,9 +69,9 @@ func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 	return msg, nil
 }
 
-func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {
+func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 
-	addons := make(map[string]*Addon)
+	addons := make(map[string]IAddon)
 	addonExpre, _ := regexp.Compile(`^.+\.(ek.js)$`)
 
 	if adr.EkConfig == nil {
@@ -120,11 +120,11 @@ func (adr *AddonReader) GetAddons() (map[string]*Addon, error) {
 
 func (adr *AddonReader) resolveExecutionOrder(
 	g *Graph,
-	toInstall *Addon,
-	allAddons map[string]*Addon,
-	out *[]*Addon, outgraph *Graph) {
+	toInstall IAddon,
+	allAddons map[string]IAddon,
+	out *[]IAddon, outgraph *Graph) {
 
-	d := toInstall.Config.DependsOn
+	d := toInstall.GetConfig().DependsOn
 	for x := range d {
 
 		next := allAddons[d[x]]
@@ -147,10 +147,10 @@ func (adr *AddonReader) resolveExecutionOrder(
 	}
 }
 
-func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig, error) {
+func (adr *AddonReader) ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error) {
 	out := Kube.IPrinter
 
-	code, err := afero.ReadFile(Kube.Fs, unconfigured.File)
+	code, err := afero.ReadFile(Kube.Fs, unconfigured.GetAddonFile())
 	if err != nil {
 		panic(err)
 	}
@@ -158,7 +158,7 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig,
 	parsed, ok := adr.ExtractJSON(string(code))
 
 	if len(parsed) == 0 {
-		out.FmtYellow("%s Does not provide any configuration", unconfigured.Name)
+		out.FmtYellow("%s Does not provide any configuration", unconfigured.GetName())
 		return &AddonConfig{
 			DependsOn:   nil,
 			ExtraPorts:  nil,
@@ -190,7 +190,7 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured *Addon) (*AddonConfig,
 		// validate port configuration
 		for _, port := range cfg.ExtraPorts {
 			if port.NodePort == 0 || port.HostPort == 0 {
-				return nil, fmt.Errorf("%s configuration of extraPorts requires both hostPort and nodePort to be set", unconfigured.Name)
+				return nil, fmt.Errorf("%s configuration of extraPorts requires both hostPort and nodePort to be set", unconfigured.GetName())
 			}
 		}
 

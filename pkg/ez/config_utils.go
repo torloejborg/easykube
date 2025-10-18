@@ -14,12 +14,19 @@ import (
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
+type PrivateRegistry struct {
+	RepositoryMatch string
+	UserKey         string
+	PasswordKey     string
+}
+
 type EasykubeConfigData struct {
 	AddonDir          string `mapstructure:"addon-root"`
 	PersistenceDir    string `mapstructure:"persistence-dir"`
 	ConfigurationDir  string `mapstructure:"config-dir"`
 	ContainerRuntime  string `mapstructure:"container-runtime"`
 	ConfigurationFile string
+	PrivateRegistries []PrivateRegistry `mapstructure:"private-registries"`
 }
 
 type IEasykubeConfig interface {
