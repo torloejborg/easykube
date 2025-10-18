@@ -49,10 +49,13 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 
 					registryCredentials := getPrivateRegistryCredentials(source, config.PrivateRegistries)
 
-					if registryCredentials != "" {
+					if registryCredentials.Base64EncodedDockerSecret != "" {
 
-						ezk.FmtGreen("🖼  pull from private registry %s", source)
-						ezk.PullImage(source, ptr.To(registryCredentials))
+						ezk.FmtGreen("🖼  pull from private registry %s using secret keys (%s,%s)", source,
+							registryCredentials.UserKey,
+							registryCredentials.PasswordKey)
+
+						ezk.PullImage(source, ptr.To(registryCredentials.Base64EncodedDockerSecret))
 
 					} else {
 						ezk.FmtGreen("🖼  pull %s", source)
@@ -77,11 +80,17 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	}
 }
 
-func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) string {
+type privateRegistryCredentials struct {
+	UserKey                   string
+	PasswordKey               string
+	Base64EncodedDockerSecret string
+}
+
+func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) privateRegistryCredentials {
 
 	for i := range config {
 
-		if strings.Contains(config[i].RepositoryMatch, registry) {
+		if strings.Contains(registry, config[i].RepositoryMatch) {
 
 			s, err := ez.Kube.GetSecret("easykube-secrets", "default")
 
@@ -91,7 +100,7 @@ func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry)
 
 			if s[config[i].UserKey] == nil || s[config[i].PasswordKey] == nil {
 				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RepositoryMatch)
-				return ""
+				return privateRegistryCredentials{"", "", ""}
 			}
 
 			jsonBytes, _ := json.Marshal(map[string]string{
@@ -99,9 +108,12 @@ func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry)
 				"password": string(s[config[i].PasswordKey]),
 			})
 
-			return base64.StdEncoding.EncodeToString(jsonBytes)
+			return privateRegistryCredentials{
+				UserKey:                   config[i].UserKey,
+				PasswordKey:               config[i].PasswordKey,
+				Base64EncodedDockerSecret: base64.StdEncoding.EncodeToString(jsonBytes)}
 		}
 	}
 
-	return ""
+	return privateRegistryCredentials{"", "", ""}
 }
