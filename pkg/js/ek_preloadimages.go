@@ -88,24 +88,37 @@ type privateRegistryCredentials struct {
 
 func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) privateRegistryCredentials {
 
+	secret, err := ez.Kube.GetSecret("easykube-secrets", "default")
+
+	if err != nil {
+		panic(err)
+	}
+
+	if strings.Contains(registry, "ccta.dk") {
+		jsonBytes, _ := json.Marshal(map[string]string{
+			"username": string(secret["artifactoryUsername"]),
+			"password": string(secret["artifactoryPassword"]),
+		})
+
+		return privateRegistryCredentials{
+			UserKey:                   "artifactoryUsername",
+			PasswordKey:               "artifactoryPassword",
+			Base64EncodedDockerSecret: base64.StdEncoding.EncodeToString(jsonBytes),
+		}
+	}
+
 	for i := range config {
 
 		if strings.Contains(registry, config[i].RepositoryMatch) {
 
-			s, err := ez.Kube.GetSecret("easykube-secrets", "default")
-
-			if err != nil {
-				panic(err)
-			}
-
-			if s[config[i].UserKey] == nil || s[config[i].PasswordKey] == nil {
+			if secret[config[i].UserKey] == nil || secret[config[i].PasswordKey] == nil {
 				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RepositoryMatch)
 				return privateRegistryCredentials{"", "", ""}
 			}
 
 			jsonBytes, _ := json.Marshal(map[string]string{
-				"username": string(s[config[i].UserKey]),
-				"password": string(s[config[i].PasswordKey]),
+				"username": string(secret[config[i].UserKey]),
+				"password": string(secret[config[i].PasswordKey]),
 			})
 
 			return privateRegistryCredentials{
