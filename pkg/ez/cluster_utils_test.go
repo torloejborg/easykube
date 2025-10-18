@@ -63,7 +63,7 @@ func TestRenderKindConfigurationFromSetOfAddons(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to get addons %v", err)
 	}
-	addonList := make([]*ez.Addon, 0)
+	addonList := make([]ez.IAddon, 0)
 	// unmap addons
 	for _, addon := range addons {
 		addonList = append(addonList, addon)

@@ -1,4 +1,4 @@
-package jsutils
+package jsutils_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/afero"
 	mock_ez "github.com/torloejborg/easykube/mock"
 	"github.com/torloejborg/easykube/pkg/ez"
+	jsutils "github.com/torloejborg/easykube/pkg/js"
 	"github.com/torloejborg/easykube/test"
 	"go.uber.org/mock/gomock"
 )
@@ -39,7 +40,7 @@ func TestPreloadImages(t *testing.T) {
 
 	sec := make(map[string][]byte)
 	sec["artifactoryUsername"] = []byte("user")
-	sec["artifactoryPassword"] = []byte("pass")
+	sec["artifactoryPassword"] = []byte("ohsosecret")
 
 	k8s := mock_ez.NewMockIK8SUtils(ctl)
 	k8s.EXPECT().GetSecret(gomock.Any(), gomock.Any()).Return(sec, nil).AnyTimes()
@@ -69,7 +70,7 @@ func TestPreloadImages(t *testing.T) {
 	mock.EXPECT().ReadScriptFile(gomock.Any()).Return(script).AnyTimes()
 	mock.EXPECT().GetRootDir().Return("/home/some-user/addons").AnyTimes()
 
-	jsu := NewJsUtils(mockCommand, mock)
+	jsu := jsutils.NewJsUtils(mockCommand, mock)
 	err := jsu.ExecAddonScript(mock)
 
 	if err != nil {
