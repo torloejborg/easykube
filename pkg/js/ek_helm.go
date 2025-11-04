@@ -15,8 +15,9 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 		addonDir := filepath.Dir(ctx.AddonCtx.addon.File)
 
-		chart := call.Argument(0).String()
-		if !strings.HasPrefix(chart, "/") {
+		chart := filepath.Clean(call.Argument(0).String())
+
+		if !filepath.IsAbs(chart) {
 			chart = filepath.Join(addonDir, call.Argument(0).String())
 		}
 
