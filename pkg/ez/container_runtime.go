@@ -40,6 +40,6 @@ func NewContainerRuntime() IContainerRuntime {
 		panic(err)
 	}
 
-	return NewDockerImpl()
+	return NewPodmanImpl()
 
 }
