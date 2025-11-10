@@ -562,15 +562,15 @@ func (c *MockIContainerRuntimePullImageCall) DoAndReturn(f func(string, *string)
 }
 
 // PushImage mocks base method.
-func (m *MockIContainerRuntime) PushImage(image string) {
+func (m *MockIContainerRuntime) PushImage(src, image string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "PushImage", image)
+	m.ctrl.Call(m, "PushImage", src, image)
 }
 
 // PushImage indicates an expected call of PushImage.
-func (mr *MockIContainerRuntimeMockRecorder) PushImage(image any) *MockIContainerRuntimePushImageCall {
+func (mr *MockIContainerRuntimeMockRecorder) PushImage(src, image any) *MockIContainerRuntimePushImageCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PushImage), image)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PushImage), src, image)
 	return &MockIContainerRuntimePushImageCall{Call: call}
 }
 
@@ -586,13 +586,13 @@ func (c *MockIContainerRuntimePushImageCall) Return() *MockIContainerRuntimePush
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimePushImageCall) Do(f func(string)) *MockIContainerRuntimePushImageCall {
+func (c *MockIContainerRuntimePushImageCall) Do(f func(string, string)) *MockIContainerRuntimePushImageCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimePushImageCall) DoAndReturn(f func(string)) *MockIContainerRuntimePushImageCall {
+func (c *MockIContainerRuntimePushImageCall) DoAndReturn(f func(string, string)) *MockIContainerRuntimePushImageCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

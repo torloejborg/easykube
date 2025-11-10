@@ -60,9 +60,9 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 	if !search.Found {
 		var cp *cluster.Provider
 
-		//if u.EkConfig.ContainerRuntime == "docker" {
-		//	cp = cluster.NewProvider(cluster.ProviderWithDocker())
-		//}
+		if u.EkConfig.ContainerRuntime == "docker" {
+			cp = cluster.NewProvider(cluster.ProviderWithDocker())
+		}
 
 		if u.EkConfig.ContainerRuntime == "podman" {
 			cp = cluster.NewProvider(cluster.ProviderWithPodman())

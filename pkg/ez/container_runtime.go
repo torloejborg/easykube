@@ -1,5 +1,7 @@
 package ez
 
+import "fmt"
+
 type ContainerSearch struct {
 	ContainerID string
 	Found       bool
@@ -35,11 +37,18 @@ type IContainerRuntime interface {
 
 func NewContainerRuntime() IContainerRuntime {
 
-	_, err := Kube.LoadConfig()
+	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	return NewPodmanImpl()
+	switch cfg.ContainerRuntime {
+	case "docker":
+		return NewDockerImpl()
+	case "podman":
+		return NewPodmanImpl()
+	default:
+		panic(fmt.Sprintf("unknown container runtime: %s", cfg.ContainerRuntime))
+	}
 
 }
