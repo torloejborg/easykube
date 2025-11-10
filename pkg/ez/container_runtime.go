@@ -13,7 +13,7 @@ type ImageSearch struct {
 
 type IContainerRuntime interface {
 	IsContainerRunning(containerID string) bool
-	PushImage(image string)
+	PushImage(src, image string)
 	PullImage(image string, privateRegistryCredentials *string)
 	HasImage(image string) bool
 	TagImage(source, target string)

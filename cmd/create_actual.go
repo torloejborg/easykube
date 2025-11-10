@@ -24,7 +24,7 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 	}
 
 	ezk.FmtGreen("Bootstrapping easykube single node cluster")
-	// Ensure configation exists
+	// Ensure configuration exists
 	err := ezk.MakeConfig()
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 	report := ezk.CreateKindCluster(addons)
 
 	// The cluster is created, and so a new context will exist, tell the k8sutils to
-	// create a new ClientSet, so we can bootstrap
+	// create a new ClientSet, so we can continue bootstrapping
 	cerr := ezk.ReloadClientSet()
 	if cerr != nil {
 		return cerr
@@ -104,7 +104,7 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 			return errors.New(fmt.Sprintf("Error reading property file %s, %v", opts.Secrets, err.Error()))
 		}
 
-		ezk.CreateSecret("default", constants.EASYKUBE_SECRET_NAME, configmap)
+		_ = ezk.CreateSecret("default", constants.EASYKUBE_SECRET_NAME, configmap)
 	} else {
 		ezk.FmtYellow("Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries.")
 	}

@@ -68,7 +68,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 					ezk.FmtGreen("🖼  tag %s to %s", source, dest)
 					ezk.TagImage(source, dest)
 
-					ezk.PushImage(dest)
+					ezk.PushImage(source, dest)
 					ezk.FmtGreen("🖼  pushed %s", dest)
 				}
 				defer wg.Done()

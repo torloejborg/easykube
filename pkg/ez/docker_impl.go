@@ -140,7 +140,7 @@ func (cr *DockerImpl) HasImage(image string) bool {
 	return false
 }
 
-func (cr *DockerImpl) PushImage(image string) {
+func (cr *DockerImpl) PushImage(src, dest string) {
 
 	opts := image2.PushOptions{
 		All:           false,
@@ -149,7 +149,7 @@ func (cr *DockerImpl) PushImage(image string) {
 		Platform:      nil,
 	}
 
-	reader, err := cr.Docker.ImagePush(cr.ctx, image, opts)
+	reader, err := cr.Docker.ImagePush(cr.ctx, src, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -288,6 +288,7 @@ func (cr *DockerImpl) ContainerWriteFile(containerId string, dst string, filenam
 	}
 }
 
+// TODO: Handle errors
 func (cr *DockerImpl) NetworkConnect(containerId string, networkId string) {
 	cr.Docker.NetworkConnect(cr.ctx, networkId, containerId, nil)
 }
