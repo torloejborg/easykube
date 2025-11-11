@@ -1,6 +1,8 @@
 package ez
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ContainerSearch struct {
 	ContainerID string
@@ -14,21 +16,21 @@ type ImageSearch struct {
 }
 
 type IContainerRuntime interface {
-	IsContainerRunning(containerID string) bool
-	PushImage(src, image string)
-	PullImage(image string, privateRegistryCredentials *string)
-	HasImage(image string) bool
-	TagImage(source, target string)
+	IsContainerRunning(containerID string) (bool, error)
+	PushImage(src, image string) error
+	PullImage(image string, privateRegistryCredentials *string) error
+	HasImage(image string) (bool, error)
+	TagImage(source, target string) error
 	FindContainer(name string) (*ContainerSearch, error)
-	StartContainer(id string)
-	StopContainer(id string)
-	RemoveContainer(id string)
-	ContainerWriteFile(containerId string, dst string, filename string, data []byte)
-	NetworkConnect(containerId string, networkId string)
-	IsNetworkConnectedToContainer(containerID string, networkID string) bool
+	StartContainer(id string) error
+	StopContainer(id string) error
+	RemoveContainer(id string) error
+	ContainerWriteFile(containerId string, dst string, filename string, data []byte) error
+	NetworkConnect(containerId string, networkId string) error
+	IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error)
 	IsClusterRunning() bool
-	HasImageInKindRegistry(name string) bool
-	Exec(containerId string, cmd []string)
+	HasImageInKindRegistry(name string) (bool, error)
+	Exec(containerId string, cmd []string) error
 	CloseContainerRuntime()
 	IsContainerRuntimeAvailable() bool
 	CreateContainerRegistry() error

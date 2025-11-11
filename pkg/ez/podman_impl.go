@@ -48,10 +48,11 @@ func NewPodmanImpl() IContainerRuntime {
 
 }
 func (cr *PodmanImpl) IsClusterRunning() bool {
-	return cr.IsContainerRunning(constants.KIND_CONTAINER)
+	running, _ := cr.IsContainerRunning(constants.KIND_CONTAINER)
+	return running
 }
 
-func (cr *PodmanImpl) IsNetworkConnectedToContainer(containerID string, networkID string) bool {
+func (cr *PodmanImpl) IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error) {
 
 	//cl, err := containers.List(cr.conn, nil)
 	//if err != nil {
@@ -64,10 +65,10 @@ func (cr *PodmanImpl) IsNetworkConnectedToContainer(containerID string, networkI
 	//	}
 	//}
 
-	return false
+	return false, nil
 }
 
-func (cr *PodmanImpl) IsContainerRunning(containerID string) bool {
+func (cr *PodmanImpl) IsContainerRunning(containerID string) (bool, error) {
 	// Get list of all containers
 	opts := &containers.ListOptions{
 		All: ptr.To(true),
@@ -91,14 +92,14 @@ func (cr *PodmanImpl) IsContainerRunning(containerID string) bool {
 
 	if foundRunning {
 		fmt.Printf("Container %s is running\n", containerID)
-		return true
+		return true, nil
 	} else {
 		fmt.Printf("Container %s is not running or does not exist\n", containerID)
-		return false
+		return false, nil
 	}
 }
 
-func (i *PodmanImpl) HasImageInKindRegistry(image string) bool {
+func (i *PodmanImpl) HasImageInKindRegistry(image string) (bool, error) {
 	image = strings.ReplaceAll(image, constants.LOCAL_REGISTRY+"/", "")
 	parts := strings.Split(image, ":")
 	imageWithoutTag := parts[0]
@@ -115,14 +116,16 @@ func (i *PodmanImpl) HasImageInKindRegistry(image string) bool {
 
 	resp, err := client.Get(fmt.Sprintf("http://%s/v2/%s/tags/list", constants.LOCAL_REGISTRY, imageWithoutTag))
 	if nil != err {
-		log.Fatalln(err)
+		return false, err
 	}
 
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	body, err := io.ReadAll(resp.Body)
 	if nil != err {
-		log.Fatalln(err)
+		return false, err
 	}
 
 	var dat TagList
@@ -134,53 +137,49 @@ func (i *PodmanImpl) HasImageInKindRegistry(image string) bool {
 	if strings.Contains(dat.Name, imageWithoutTag) {
 		for i := range dat.Tags {
 			if dat.Tags[i] == imageTag {
-				return true
+				return true, nil
 			}
 		}
 	}
 
-	return false
+	return false, nil
 }
 
-func (cr *PodmanImpl) HasImage(image string) bool {
+func (cr *PodmanImpl) HasImage(image string) (bool, error) {
 
 	getopt := new(images.GetOptions)
 
 	img, err := images.GetImage(cr.conn, image, getopt)
 	if nil != err {
-		Kube.FmtRed(err.Error())
-		return false
+		return false, err
 	}
 
 	if img == nil {
-		return false
+		return false, nil
 	} else {
-		return true
+		return true, nil
 	}
 }
 
-// TODO: Return error, pass destination
-func (cr *PodmanImpl) PushImage(src, dest string) {
+func (cr *PodmanImpl) PushImage(src, dest string) error {
 	pushOpts := images.PushOptions{
 		All:           ptr.To(true),
 		SkipTLSVerify: ptr.To(true),
 	}
 
-	err := images.Push(cr.conn, src, dest, &pushOpts)
-	if err != nil {
-		Kube.FmtRed(err.Error())
-		os.Exit(1)
+	if err := images.Push(cr.conn, src, dest, &pushOpts); err != nil {
+		return err
+	} else {
+		return nil
 	}
-
 }
 
-// TODO: Return error
-func (cr *PodmanImpl) PullImage(image string, privateRegistryCredentials *string) {
+func (cr *PodmanImpl) PullImage(image string, privateRegistryCredentials *string) error {
 
-	_, err := images.Pull(cr.conn, image, nil)
-	if err != nil {
-		Kube.FmtRed(err.Error())
-		os.Exit(1)
+	if _, err := images.Pull(cr.conn, image, nil); err != nil {
+		return err
+	} else {
+		return nil
 	}
 }
 
@@ -216,45 +215,43 @@ func (cr *PodmanImpl) FindContainer(name string) (*ContainerSearch, error) {
 
 }
 
-// TODO: Return error
-func (cr *PodmanImpl) StartContainer(id string) {
+func (cr *PodmanImpl) StartContainer(id string) error {
 	err := containers.Start(cr.conn, id, &containers.StartOptions{
 		DetachKeys: nil,
 		Recursive:  nil,
 	})
 
 	if err != nil {
-		Kube.FmtRed(err.Error())
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
 
-// TODO: Return error
-func (cr *PodmanImpl) StopContainer(id string) {
+func (cr *PodmanImpl) StopContainer(id string) error {
 	err := containers.Stop(cr.conn, id, &containers.StopOptions{})
 
 	if err != nil {
-		Kube.FmtRed(err.Error())
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
 
-// TODO: Return error
-func (cr *PodmanImpl) RemoveContainer(id string) {
+func (cr *PodmanImpl) RemoveContainer(id string) error {
 	_, err := containers.Remove(cr.conn, id, &containers.RemoveOptions{
 		Force:   ptr.To(true),
 		Volumes: ptr.To(true),
 	})
 
 	if err != nil {
-		Kube.FmtRed(err.Error())
-		os.Exit(1)
+		return err
 	}
 
+	return nil
 }
 
-// TODO: Return error
-func (cr *PodmanImpl) Exec(containerId string, cmd []string) {
+func (cr *PodmanImpl) Exec(containerId string, cmd []string) error {
 
 	execOpts := new(handlers.ExecCreateConfig)
 	execOpts.Cmd = cmd
@@ -274,9 +271,11 @@ func (cr *PodmanImpl) Exec(containerId string, cmd []string) {
 		os.Exit(1)
 	}
 
+	return nil
+
 }
 
-func (cr *PodmanImpl) ContainerWriteFile(containerId string, dst string, filename string, data []byte) {
+func (cr *PodmanImpl) ContainerWriteFile(containerId string, dst string, filename string, data []byte) error {
 
 	dat, err := memtar(data, filename)
 	if err != nil {
@@ -296,20 +295,23 @@ func (cr *PodmanImpl) ContainerWriteFile(containerId string, dst string, filenam
 		os.Exit(1)
 	}
 
+	return nil
+
 }
 
-func (cr *PodmanImpl) NetworkConnect(containerId string, networkId string) {
+func (cr *PodmanImpl) NetworkConnect(containerId string, networkId string) error {
 
 	err := network.Connect(cr.conn, constants.KIND_NETWORK_NAME, containerId, nil)
 	if err != nil {
 
 		if strings.Contains(err.Error(), "already connected to network") {
-			return
+			return nil
 		} else {
-			Kube.FmtRed(err.Error())
-			os.Exit(1)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func (cr *PodmanImpl) CloseContainerRuntime() {
@@ -345,9 +347,16 @@ func (cr *PodmanImpl) CreateContainerRegistry() error {
 		return err
 	}
 
-	imageSearch := cr.HasImage(registry)
+	imageSearch, err := cr.HasImage(registry)
+	if err != nil {
+		return err
+	}
+
 	if !imageSearch {
-		cr.PullImage(registry, nil)
+		pErr := cr.PullImage(registry, nil)
+		if pErr != nil {
+			return pErr
+		}
 	}
 
 	containerSearch, err := cr.FindContainer(containerName)
@@ -372,39 +381,52 @@ func (cr *PodmanImpl) CreateContainerRegistry() error {
 			return err
 		}
 
-		err = containers.Start(cr.conn, resp.ID, nil)
-
-		if err != nil {
+		if err := containers.Start(cr.conn, resp.ID, nil); err != nil {
 			return err
 		}
 
 		file, _ := ReadFileToBytes(filepath.Join(configDir, "easykube", "registry-config.yaml"))
-		cr.ContainerWriteFile(constants.REGISTRY_CONTAINER, "/etc/docker/registry", "config.yml", file)
+
+		if err := cr.ContainerWriteFile(constants.REGISTRY_CONTAINER, "/etc/docker/registry", "config.yml", file); err != nil {
+			return err
+		}
 
 		file, _ = ReadFileToBytes(filepath.Join(configDir, "easykube", "localtest.me.crt"))
-		cr.ContainerWriteFile(constants.REGISTRY_CONTAINER, "/etc/ssl", "localtest.me.crt", file)
+		if err := cr.ContainerWriteFile(constants.REGISTRY_CONTAINER, "/etc/ssl", "localtest.me.crt", file); err != nil {
+			return err
+		}
 
 		file, _ = ReadFileToBytes(filepath.Join(configDir, "easykube", "localtest.me.key"))
-		cr.ContainerWriteFile(constants.REGISTRY_CONTAINER, "/etc/ssl", "localtest.me.key", file)
+		if err := cr.ContainerWriteFile(constants.REGISTRY_CONTAINER, "/etc/ssl", "localtest.me.key", file); err != nil {
+			return err
+		}
 
 	}
 
 	return nil
 }
 
-func copyFileToPodmanVolume(volumeName, srcPath, dstFilename string) error {
-
-	// TODO: implement
-
-	return nil
-}
-
 func (cr *PodmanImpl) Commit(containerID string) {
-
+	// nop
 }
 
-func (cr *PodmanImpl) TagImage(source string, target string) {
-	images.Tag(cr.conn, source, target, constants.LOCAL_REGISTRY, nil)
+func (cr *PodmanImpl) TagImage(source string, target string) error {
+	target = strings.TrimPrefix(target, constants.LOCAL_REGISTRY+"/")
+	parts := strings.Split(target, ":")
+	imageName := parts[0]
+	imageTag := "latest"
+	if len(parts) > 1 {
+		imageTag = parts[1]
+	}
+
+	repo := fmt.Sprintf("%s/%s", constants.LOCAL_REGISTRY, imageName)
+
+	if err := images.Tag(cr.conn, source, imageTag, repo, nil); err != nil {
+		return err
+	} else {
+		return nil
+	}
+
 }
 
 func (p *PodmanImpl) memtar(data []byte, filename string) ([]byte, error) {
@@ -423,8 +445,7 @@ func (p *PodmanImpl) memtar(data []byte, filename string) ([]byte, error) {
 		Typeflag: tar.TypeReg, // regular file
 	}
 
-	err := tw.WriteHeader(hdr)
-	if err != nil {
+	if err := tw.WriteHeader(hdr); err != nil {
 		return nil, err
 	}
 

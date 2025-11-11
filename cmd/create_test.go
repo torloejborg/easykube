@@ -35,9 +35,9 @@ func setupMockForCreate(ctrl *gomock.Controller) {
 	// mocks interactions with docker
 	containerRuntime := mock_ez.NewMockIContainerRuntime(ctrl)
 	containerRuntime.EXPECT().IsClusterRunning().Return(false).AnyTimes()
-	containerRuntime.EXPECT().IsContainerRunning(gomock.Any()).Return(false)
-	containerRuntime.EXPECT().HasImage(constants.REGISTRY_IMAGE).Return(false)
-	containerRuntime.EXPECT().HasImage(constants.KIND_IMAGE).Return(false)
+	containerRuntime.EXPECT().IsContainerRunning(gomock.Any()).Return(false, nil)
+	containerRuntime.EXPECT().HasImage(constants.REGISTRY_IMAGE).Return(false, nil)
+	containerRuntime.EXPECT().HasImage(constants.KIND_IMAGE).Return(false, nil)
 	containerRuntime.EXPECT().PullImage(constants.REGISTRY_IMAGE, gomock.Any())
 	containerRuntime.EXPECT().PullImage(constants.KIND_IMAGE, gomock.Any())
 	containerRuntime.EXPECT().CreateContainerRegistry()

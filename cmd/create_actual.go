@@ -19,25 +19,32 @@ type CreateOpts struct {
 func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 	ezk := ez.Kube
 
-	if ezk.IsContainerRunning(constants.KIND_CONTAINER) {
+	if running, _ := ezk.IsContainerRunning(constants.KIND_CONTAINER); running {
 		return errors.New("cluster already running")
 	}
 
 	ezk.FmtGreen("Bootstrapping easykube single node cluster")
 	// Ensure configuration exists
-	err := ezk.MakeConfig()
-	if err != nil {
+	if err := ezk.MakeConfig(); err != nil {
 		return err
 	}
 
-	if !ezk.HasImage(constants.REGISTRY_IMAGE) {
-		ezk.FmtYellow("Pulling docker registry image")
-		ezk.PullImage(constants.REGISTRY_IMAGE, nil)
+	if img, err := ezk.HasImage(constants.REGISTRY_IMAGE); err != nil {
+		return err
+	} else if !img {
+		ezk.FmtGreen("Pulling registry image")
+		if e := ezk.PullImage(constants.REGISTRY_IMAGE, nil); e != nil {
+			return e
+		}
 	}
 
-	if !ezk.HasImage(constants.KIND_IMAGE) {
-		ezk.FmtYellow("Pulling kind image")
-		ezk.PullImage(constants.KIND_IMAGE, nil)
+	if img, err := ezk.HasImage(constants.KIND_IMAGE); err != nil {
+		return err
+	} else if !img {
+		ezk.FmtGreen("Pulling kind image")
+		if e := ezk.PullImage(constants.KIND_IMAGE, nil); e != nil {
+			return e
+		}
 	}
 
 	pdErr := ez.Kube.EnsurePersistenceDirectory()
@@ -76,11 +83,13 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 		return cerr
 	}
 
-	ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
+	if e := ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); e != nil {
+		return e
+	}
+	
 	ezk.PatchCoreDNS()
 
-	err = ezk.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
-	if err != nil {
+	if err := ezk.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS); err != nil {
 		return err
 	}
 

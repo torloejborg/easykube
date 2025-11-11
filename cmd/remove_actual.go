@@ -19,9 +19,10 @@ func removeActual(opts RemoveOpts) error {
 	// switch to the easykube context
 	ezk.EnsureLocalContext()
 
-	allAddons, aerr := ez.Kube.GetAddons()
-	if aerr != nil {
-		ezk.FmtRed("could not get addons %s", aerr.Error())
+	allAddons, err := ez.Kube.GetAddons()
+	if err != nil {
+		eMsg := "could not read addons"
+		return errors.Join(errors.New(eMsg), err)
 	}
 
 	installedAddons, e := ezk.GetInstalledAddons()

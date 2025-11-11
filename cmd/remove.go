@@ -18,8 +18,8 @@ var removeCmd = &cobra.Command{
 		return removeActual(opts)
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		k8sutils := ez.CreateK8sUtilsImpl()
-		clusterAddons, e := k8sutils.GetInstalledAddons()
+		k8sUtils := ez.CreateK8sUtilsImpl()
+		clusterAddons, e := k8sUtils.GetInstalledAddons()
 		if e == nil {
 			return clusterAddons, cobra.ShellCompDirectiveNoFileComp
 		}

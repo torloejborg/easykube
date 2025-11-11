@@ -1,13 +1,15 @@
 package ez
 
 import (
+	"errors"
 	"fmt"
-	"github.com/Masterminds/semver/v3"
-	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/textutils"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/Masterminds/semver/v3"
+	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/textutils"
 )
 
 type StatusBuilderImpl struct {
@@ -38,12 +40,12 @@ func NewStatusBuilder() IStatusBuilder {
 
 func (s *StatusBuilderImpl) DoContainerCheck() error {
 	if !Kube.IsContainerRuntimeAvailable() {
-		Kube.FmtRed("Container runtime not available, is docker running??")
-		os.Exit(-1)
+		return errors.New("container runtime not available, is docker running")
 	}
 
 	running := func(containerID string) {
-		if Kube.IsContainerRunning(containerID) {
+
+		if running, _ := Kube.IsContainerRunning(containerID); running {
 			Kube.FmtGreen("✓ %s container", containerID)
 		} else {
 			Kube.FmtRed("⚠ %s container not running", containerID)
@@ -54,7 +56,7 @@ func (s *StatusBuilderImpl) DoContainerCheck() error {
 	running(constants.REGISTRY_CONTAINER)
 	running(constants.KIND_CONTAINER)
 
-	if Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind") {
+	if connected, _ := Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind"); connected {
 		Kube.FmtGreen("✓ %s connected to kind network", constants.REGISTRY_CONTAINER)
 	} else {
 		Kube.FmtRed("⚠ %s not connected to kind network", constants.REGISTRY_CONTAINER)

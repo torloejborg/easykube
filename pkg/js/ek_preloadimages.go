@@ -44,8 +44,10 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			i++
 			wg.Add(1)
 			go func() {
-				if !ezk.HasImageInKindRegistry(dest) || mustPull {
 
+				if hasImage, err := ezk.HasImageInKindRegistry(dest); err != nil {
+					panic(err)
+				} else if !hasImage || mustPull {
 					if strings.Contains(source, "ccta.dk") {
 						s, err := ezk.GetSecret("easykube-secrets", "default")
 						if err != nil {
@@ -58,17 +60,25 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 						})
 
 						ezk.FmtGreen("🖼  pull from private registry %s", source)
-						ezk.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes)))
+						if err := ezk.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes))); err != nil {
+							panic(err)
+						}
 
 					} else {
 						ezk.FmtGreen("🖼  pull %s", source)
-						ezk.PullImage(source, nil)
+						if err := ezk.PullImage(source, nil); err != nil {
+							panic(err)
+						}
 					}
 
 					ezk.FmtGreen("🖼  tag %s to %s", source, dest)
-					ezk.TagImage(source, dest)
+					if err := ezk.TagImage(source, dest); err != nil {
+						panic(err)
+					}
 
-					ezk.PushImage(source, dest)
+					if err := ezk.PushImage(source, dest); err != nil {
+						panic(err)
+					}
 					ezk.FmtGreen("🖼  pushed %s", dest)
 				}
 				defer wg.Done()
