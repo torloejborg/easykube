@@ -149,7 +149,7 @@ func (cr *DockerImpl) PushImage(src, dest string) {
 		Platform:      nil,
 	}
 
-	reader, err := cr.Docker.ImagePush(cr.ctx, src, opts)
+	reader, err := cr.Docker.ImagePush(cr.ctx, dest, opts)
 	if err != nil {
 		panic(err)
 	}
