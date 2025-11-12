@@ -37,7 +37,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		var wg sync.WaitGroup
 
 		if mustPull {
-			ezk.FmtYellow("🖼 will pull fresh images")
+			ezk.FmtGreen("🖼 will pull fresh images")
 		}
 
 		for source, dest := range result {

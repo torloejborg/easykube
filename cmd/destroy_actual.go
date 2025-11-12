@@ -11,16 +11,21 @@ func destroyActual() error {
 	if search, err := ezk.FindContainer(constants.KIND_CONTAINER); err != nil {
 		return err
 	} else if search.Found {
-		ezk.FmtGreen("Stopping %s", constants.KIND_CONTAINER)
+
 		if search.IsRunning {
-			if err := ezk.StopContainer(search.ContainerID); err != nil {
+
+			if _, err := ezk.FmtSpinner(func() (any, error) {
+				return nil, ezk.StopContainer(search.ContainerID)
+			}, "Stopping %s", constants.KIND_CONTAINER); err != nil {
 				return err
 			}
 		}
-		if err := ezk.RemoveContainer(search.ContainerID); err != nil {
+
+		if _, err := ezk.FmtSpinner(func() (any, error) {
+			return nil, ezk.RemoveContainer(search.ContainerID)
+		}, "Removing %s", constants.KIND_CONTAINER); err != nil {
 			return err
 		}
-		ezk.FmtGreen("Removing %s", constants.KIND_CONTAINER)
 	}
 
 	return nil

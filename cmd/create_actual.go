@@ -16,7 +16,7 @@ type CreateOpts struct {
 	Secrets string
 }
 
-func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
+func createActualCmd(opts CreateOpts) error {
 	ezk := ez.Kube
 
 	if running, _ := ezk.IsContainerRunning(constants.KIND_CONTAINER); running {
@@ -32,18 +32,20 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 	if img, err := ezk.HasImage(constants.REGISTRY_IMAGE); err != nil {
 		return err
 	} else if !img {
-		ezk.FmtGreen("Pulling registry image")
-		if e := ezk.PullImage(constants.REGISTRY_IMAGE, nil); e != nil {
-			return e
+		if _, err := ezk.FmtSpinner(func() (any, error) {
+			return nil, ezk.PullImage(constants.REGISTRY_IMAGE, nil)
+		}, "Pulling registry image %s", constants.REGISTRY_IMAGE); err != nil {
+			return err
 		}
 	}
 
 	if img, err := ezk.HasImage(constants.KIND_IMAGE); err != nil {
 		return err
 	} else if !img {
-		ezk.FmtGreen("Pulling kind image")
-		if e := ezk.PullImage(constants.KIND_IMAGE, nil); e != nil {
-			return e
+		if _, err := ezk.FmtSpinner(func() (any, error) {
+			return nil, ezk.PullImage(constants.KIND_IMAGE, nil)
+		}, "Pulling kind image %s", constants.KIND_IMAGE); err != nil {
+			return err
 		}
 	}
 
@@ -52,9 +54,10 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 		return pdErr
 	}
 
-	regerr := ez.Kube.CreateContainerRegistry()
-	if regerr != nil {
-		return regerr
+	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
+		return nil, ez.Kube.CreateContainerRegistry()
+	}, "Ensure container registry"); err != nil {
+		return err
 	}
 
 	addons, aerr := ez.Kube.GetAddons()
@@ -74,26 +77,34 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 		os.Exit(-1)
 	}
 
-	report := ezk.CreateKindCluster(addons)
+	report, _ := ezk.FmtSpinner(func() (any, error) {
+		r := ezk.CreateKindCluster(addons)
+		return r, nil
+	}, "Creating kind-easykube control plane")
 
-	// The cluster is created, and so a new context will exist, tell the k8sutils to
+	// The cluster is created, and so a new context will exist, tell the k8sUtils to
 	// create a new ClientSet, so we can continue bootstrapping
 	cerr := ezk.ReloadClientSet()
 	if cerr != nil {
 		return cerr
 	}
 
-	if e := ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); e != nil {
-		return e
+	if connected, _ := ezk.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); !connected {
+		if e := ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); e != nil {
+			return e
+		}
 	}
-	
-	ezk.PatchCoreDNS()
+
+	_, _ = ezk.FmtSpinner(func() (any, error) {
+		ezk.PatchCoreDNS()
+		return nil, nil
+	}, "Patching coredns")
 
 	if err := ezk.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS); err != nil {
 		return err
 	}
 
-	ezk.FmtGreen(report)
+	ezk.FmtGreen(report.(string))
 
 	// switch to the easykube context
 	ezk.EnsureLocalContext()

@@ -42,7 +42,7 @@ func (u *ClusterUtils) ConfigurationReport(addonList []*Addon) string {
 	sb := new(strings.Builder)
 	t := new(template.Template)
 
-	template.Must(t.Parse(string(portTmpl))).Execute(sb, addonList)
+	_ = template.Must(t.Parse(string(portTmpl))).Execute(sb, addonList)
 
 	return sb.String()
 }
@@ -73,18 +73,6 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		}
 		homedir, _ := Kube.GetUserHomeDir()
 
-		currentDir, e := os.Getwd()
-		if e != nil {
-			Kube.FmtRed("cannot get current working directory")
-		}
-		defer os.Chdir(currentDir)
-
-		e = os.Chdir(homedir)
-		if e != nil {
-			Kube.FmtRed("cannot change directory to %s", homedir)
-			panic(e)
-		}
-
 		configDir, _ := os.UserConfigDir()
 		configFile := u.RenderToYAML(addonList)
 
@@ -95,12 +83,8 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		optReady := cluster.CreateWithWaitForReady(20 * time.Second)
 
 		kubeconfigPath := filepath.Join(homedir, ".kube", "easykube")
-
 		optKubeConfig := cluster.CreateWithKubeconfigPath(kubeconfigPath)
-
 		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
-
-		Kube.FmtGreen("Waiting for cluster ready")
 
 		err := cp.Create(constants.CLUSTER_NAME, optKubeConfig, optConfig, optNodeImage, optNoGreeting, optReady)
 		if nil != err {
@@ -111,22 +95,29 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 		search, _ = Kube.FindContainer(constants.KIND_CONTAINER)
 
 		if search.IsRunning {
-			Kube.FmtGreen("Configuring containerd")
-			c1 := []string{"mkdir", "-p", "/etc/containerd/certs.d/localhost:5001"}
-			Kube.Exec(search.ContainerID, c1)
+			_, _ = Kube.FmtSpinner(func() (any, error) {
+				command := []string{"mkdir", "-p", "/etc/containerd/certs.d/localhost:5001"}
+				if err := Kube.Exec(search.ContainerID, command); err != nil {
+					return nil, err
+				}
 
-			Kube.FmtGreen("Adding registry host")
-			toml, err := resources.AppResources.ReadFile("data/hosts.toml")
-			Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", toml)
-			if err != nil {
-				panic(err)
-			}
+				toml, _ := resources.AppResources.ReadFile("data/hosts.toml")
+				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", toml); err != nil {
+					return nil, err
+				}
+
+				return nil, nil
+			}, "Configuring control plane containerd")
+
 		}
 	}
 
 	if search.Found && !search.IsRunning {
-		Kube.FmtGreen("Starting existing cluster")
-		Kube.StartContainer(search.ContainerID)
+
+		_, _ = Kube.FmtSpinner(func() (any, error) {
+			return nil, Kube.StartContainer(search.ContainerID)
+		}, "Starting existing cluster")
+
 	}
 
 	return u.ConfigurationReport(addonList)

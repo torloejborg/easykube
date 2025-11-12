@@ -88,7 +88,7 @@ func TestCreate(t *testing.T) {
 		Secrets: "/home/some-user/prop.properties",
 	}
 
-	err := createActualCmd(opts, ez.Kube.ICobraCommandHelper)
+	err := createActualCmd(opts)
 
 	if err != nil {
 		t.Error(err)
