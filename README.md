@@ -21,9 +21,9 @@ You must install go, version 1.22.3 or newer should work.
 
 Compile with ```go build```, go will pull in dependencies from github, and a binary ```easykube``` should appear in the project directory.
 
-## Prerequisite dependent binaries
+## Prerequisites
 
-Next, you must have the follow set of programs installed, and available on your path.
+Next, you must have the following set of programs installed, and available on your path.
 
 * docker (windows and mac, could use docker desktop. Docker on WSL2 works ok)
 * kustomize
@@ -34,6 +34,11 @@ Use your favourite package manager to install the binaries. As long they are in 
 for the prerequisites. Easykube will create a kind cluster called `easykube-kind`
 
 Once all dependencies are in place, a little configuration is required.
+
+![Tip](https://img.shields.io/badge/💡_Tip-green?style=for-the-badge)
+> Easykube will not mess around with your existing kubeconfigs, it will
+create a new configuration file in ~/.kube/easykube - Refer to [here](https://torloejborg.github.io/easykube/easykube/latest/install/#install-create) for more information.
+
 
 ## Get some addons
 By itself, easykube is not very exciting, it can only establish an empty cluster. Clone this repository somewhere,
