@@ -145,6 +145,16 @@ With installation and configuration done, it's time to create a cluster, do that
 
 If all went well, a cluster creation report is printed, each addon is listed in a section which describes which ports it want to expose, and what storage it needs.
 
+[TIP]
+====
+You may get a warning about "not being able to manage the cluster"
+
+Easykube will not mess around with your existing kubeconfigs and default config, it will create a new one in `~/.kube/easykube` and automatically use that when running tooling. You may want to add that file to the KUBECONFIG variable, otherwise you cannot manage the cluster with external tools like K9S.
+
+Read more about kubeconfigs https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/[here] - If you are new to Kubernetes, do not attempt to manage all contexts in a single merged config file, that path leads to madness.
+
+====
+
 [source,text]
 ----
 ⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear

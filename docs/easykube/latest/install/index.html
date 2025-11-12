@@ -348,6 +348,26 @@ your favorite editor.</p>
 <div class="paragraph">
 <p>If all went well, a cluster creation report is printed, each addon is listed in a section which describes which ports it want to expose, and what storage it needs.</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You may get a warning about "not being able to manage the cluster"</p>
+</div>
+<div class="paragraph">
+<p>Easykube will not mess around with your existing kubeconfigs and default config, it will create a new one in <code>~/.kube/easykube</code> and automatically use that when running tooling. You may want to add that file to the KUBECONFIG variable, otherwise you cannot manage the cluster with external tools like K9S.</p>
+</div>
+<div class="paragraph">
+<p>Read more about kubeconfigs <a href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/">here</a> - If you are new to Kubernetes, do not attempt to manage all contexts in a single merged config file, that path leads to madness.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-text" data-lang="text">⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear
