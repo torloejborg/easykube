@@ -35,7 +35,8 @@ type PodmanImpl struct {
 
 func NewPodmanImpl() IContainerRuntime {
 
-	conn, err := bindings.NewConnection(context.Background(), "unix:///run/user/1000/podman/podman.sock")
+	uid := os.Geteuid()
+	conn, err := bindings.NewConnection(context.Background(), fmt.Sprintf("unix:///run/user/%d/podman/podman.sock", uid))
 	if err != nil {
 		fmt.Println("No Podman context found. Is podman running??")
 		os.Exit(-1)
@@ -53,17 +54,18 @@ func (cr *PodmanImpl) IsClusterRunning() bool {
 }
 
 func (cr *PodmanImpl) IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error) {
+	opts := new(network.InspectOptions)
 
-	//cl, err := containers.List(cr.conn, nil)
-	//if err != nil {
-	//	Kube.FmtRed(err.Error())
-	//}
-	//
-	//for _, c := range cl {
-	//	for _, n := range c.Networks {
-	//		c.Networks[n]
-	//	}
-	//}
+	report, err := network.Inspect(cr.conn, networkID, opts)
+	if err != nil {
+		return false, err
+	}
+
+	for i := range report.Containers {
+		if report.Containers[i].Name == containerID {
+			return true, nil
+		}
+	}
 
 	return false, nil
 }
@@ -91,10 +93,8 @@ func (cr *PodmanImpl) IsContainerRunning(containerID string) (bool, error) {
 	}
 
 	if foundRunning {
-		fmt.Printf("Container %s is running\n", containerID)
 		return true, nil
 	} else {
-		fmt.Printf("Container %s is not running or does not exist\n", containerID)
 		return false, nil
 	}
 }
@@ -147,18 +147,15 @@ func (i *PodmanImpl) HasImageInKindRegistry(image string) (bool, error) {
 
 func (cr *PodmanImpl) HasImage(image string) (bool, error) {
 
-	getopt := new(images.GetOptions)
+	existOpts := new(images.ExistsOptions)
+	exists, err := images.Exists(cr.conn, image, existOpts)
 
-	img, err := images.GetImage(cr.conn, image, getopt)
-	if nil != err {
+	if err != nil {
 		return false, err
+	} else {
+		return exists, nil
 	}
 
-	if img == nil {
-		return false, nil
-	} else {
-		return true, nil
-	}
 }
 
 func (cr *PodmanImpl) PushImage(src, dest string) error {
@@ -195,7 +192,7 @@ func (cr *PodmanImpl) PullImage(image string, credentials *PrivateRegistryCreden
 func (cr *PodmanImpl) FindContainer(name string) (*ContainerSearch, error) {
 
 	list, err := containers.List(cr.conn, &containers.ListOptions{
-		All: ptr.To(false),
+		All: ptr.To(true),
 	})
 
 	if err != nil {

@@ -87,7 +87,7 @@ func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry)
 	secret, err := ez.Kube.GetSecret("easykube-secrets", "default")
 
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
 	for i := range config {

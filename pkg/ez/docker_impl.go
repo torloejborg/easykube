@@ -421,7 +421,6 @@ func (cr *DockerImpl) TagImage(source string, target string) error {
 	} else {
 		return nil
 	}
-
 }
 
 func memtar(data []byte, filename string) ([]byte, error) {
