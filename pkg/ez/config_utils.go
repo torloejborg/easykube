@@ -12,6 +12,7 @@ import (
 
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"github.com/torloejborg/easykube/pkg/textutils"
 )
@@ -228,17 +229,15 @@ func (ec *EasykubeConfig) patchConfigWithPrivateRegistryTemplate(cfg *EasykubeCo
 	if cfg.PrivateRegistries == nil && !strings.Contains(cfgText, configStanza) {
 
 		// patch config
-		f, err := os.OpenFile(cfgFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-		defer func(f *os.File) {
-			err := f.Close()
-			if err != nil {
-				panic(err)
-			}
-		}(f)
-
+		f, err := Kube.Fs.OpenFile(cfgFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 		if err != nil {
 			panic(err)
 		}
+
+		defer func(f afero.File) {
+			_ = f.Close()
+		}(f)
+
 		_, err = f.WriteString(configStanza)
 		if err != nil {
 			return
