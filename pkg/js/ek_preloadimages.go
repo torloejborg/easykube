@@ -1,16 +1,12 @@
 package jsutils
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"strings"
 	"sync"
 
+	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
-	"k8s.io/utils/ptr"
-
-	"github.com/dop251/goja"
 )
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
@@ -19,11 +15,12 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 		if ezk.IsDryRun() {
 			ezk.FmtDryRun("skipping preload")
-			return goja.Undefined()
+			return call.This
 		}
 
 		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FLAG_PULL)
 		ctx.checkArgs(call, PRELOAD)
+		config, _ := ez.Kube.LoadConfig()
 
 		var arg = call.Argument(0)
 		result := make(map[string]string)
@@ -45,22 +42,15 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			wg.Add(1)
 			go func() {
 
+				registryCredentials := getPrivateRegistryCredentials(source, config.PrivateRegistries)
 				if hasImage, err := ezk.HasImageInKindRegistry(dest); err != nil {
 					panic(err)
 				} else if !hasImage || mustPull {
-					if strings.Contains(source, "ccta.dk") {
-						s, err := ezk.GetSecret("easykube-secrets", "default")
-						if err != nil {
-							panic(err)
-						}
-
-						jsonBytes, _ := json.Marshal(map[string]string{
-							"username": string(s["artifactoryUsername"]),
-							"password": string(s["artifactoryPassword"]),
-						})
-
-						ezk.FmtGreen("🖼  pull from private registry %s", source)
-						if err := ezk.PullImage(source, ptr.To(base64.StdEncoding.EncodeToString(jsonBytes))); err != nil {
+					if registryCredentials != nil {
+						ezk.FmtGreen("🖼  pull from private registry %s using secret keys (%s,%s)", source,
+							registryCredentials.Username,
+							"[redacted]")
+						if err := ezk.PullImage(source, registryCredentials); err != nil {
 							panic(err)
 						}
 
@@ -83,12 +73,37 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 				}
 				defer wg.Done()
 			}()
-		}
 
-		if i > 0 {
-			wg.Wait()
+			if i > 0 {
+				wg.Wait()
+			}
 		}
-
 		return goja.Undefined()
 	}
+}
+
+func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) *ez.PrivateRegistryCredentials {
+
+	secret, err := ez.Kube.GetSecret("easykube-secrets", "default")
+
+	if err != nil {
+		panic(err)
+	}
+
+	for i := range config {
+
+		if strings.Contains(registry, config[i].RepositoryMatch) {
+
+			if secret[config[i].UserKey] == nil || secret[config[i].PasswordKey] == nil {
+				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RepositoryMatch)
+				return nil
+			}
+			return &ez.PrivateRegistryCredentials{
+				Username: config[i].UserKey,
+				Password: config[i].PasswordKey,
+			}
+		}
+	}
+
+	return nil
 }

@@ -70,7 +70,7 @@ func createActualCmd(opts CreateOpts) error {
 		ezk.FmtYellow("Can not create easykube cluster")
 		fmt.Println()
 		for k, v := range occupiedPorts {
-			ez.Kube.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.Name, strings.Join(ez.IntSliceToStrings(v), ","))
+			ez.Kube.FmtGreen("* %s wants to bind to: 127.0.0.1:[%s]", k.GetName(), strings.Join(ez.IntSliceToStrings(v), ","))
 		}
 		fmt.Println()
 		ezk.FmtRed("Please halt your local services, or remove the ExtraPorts configuration from the addons listed above ")
@@ -132,7 +132,7 @@ func createActualCmd(opts CreateOpts) error {
 	return nil
 }
 
-func ensureClusterPortsFree(addons map[string]*ez.Addon) (map[*ez.Addon][]int, error) {
+func ensureClusterPortsFree(addons map[string]ez.IAddon) (map[ez.IAddon][]int, error) {
 
 	IsPortAvailable := func(host string, port int) bool {
 		addr := fmt.Sprintf("%s:%d", host, port)
@@ -144,10 +144,10 @@ func ensureClusterPortsFree(addons map[string]*ez.Addon) (map[*ez.Addon][]int, e
 		return false
 	}
 
-	failed := make(map[*ez.Addon][]int)
+	failed := make(map[ez.IAddon][]int)
 
 	for _, a := range addons {
-		for _, p := range a.Config.ExtraPorts {
+		for _, p := range a.GetConfig().ExtraPorts {
 			if !IsPortAvailable("127.0.0.1", p.HostPort) {
 				failed[a] = append(failed[a], p.HostPort)
 			}

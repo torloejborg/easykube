@@ -80,7 +80,7 @@ func (c *MockIAddonReaderCheckAddonCompatibilityCall) DoAndReturn(f func() (stri
 }
 
 // ExtractConfiguration mocks base method.
-func (m *MockIAddonReader) ExtractConfiguration(unconfigured *ez.Addon) (*ez.AddonConfig, error) {
+func (m *MockIAddonReader) ExtractConfiguration(unconfigured ez.IAddon) (*ez.AddonConfig, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExtractConfiguration", unconfigured)
 	ret0, _ := ret[0].(*ez.AddonConfig)
@@ -107,13 +107,13 @@ func (c *MockIAddonReaderExtractConfigurationCall) Return(arg0 *ez.AddonConfig, 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIAddonReaderExtractConfigurationCall) Do(f func(*ez.Addon) (*ez.AddonConfig, error)) *MockIAddonReaderExtractConfigurationCall {
+func (c *MockIAddonReaderExtractConfigurationCall) Do(f func(ez.IAddon) (*ez.AddonConfig, error)) *MockIAddonReaderExtractConfigurationCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIAddonReaderExtractConfigurationCall) DoAndReturn(f func(*ez.Addon) (*ez.AddonConfig, error)) *MockIAddonReaderExtractConfigurationCall {
+func (c *MockIAddonReaderExtractConfigurationCall) DoAndReturn(f func(ez.IAddon) (*ez.AddonConfig, error)) *MockIAddonReaderExtractConfigurationCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -158,10 +158,10 @@ func (c *MockIAddonReaderExtractJSONCall) DoAndReturn(f func(string) (string, bo
 }
 
 // GetAddons mocks base method.
-func (m *MockIAddonReader) GetAddons() (map[string]*ez.Addon, error) {
+func (m *MockIAddonReader) GetAddons() (map[string]ez.IAddon, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAddons")
-	ret0, _ := ret[0].(map[string]*ez.Addon)
+	ret0, _ := ret[0].(map[string]ez.IAddon)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -179,19 +179,19 @@ type MockIAddonReaderGetAddonsCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIAddonReaderGetAddonsCall) Return(arg0 map[string]*ez.Addon, arg1 error) *MockIAddonReaderGetAddonsCall {
+func (c *MockIAddonReaderGetAddonsCall) Return(arg0 map[string]ez.IAddon, arg1 error) *MockIAddonReaderGetAddonsCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIAddonReaderGetAddonsCall) Do(f func() (map[string]*ez.Addon, error)) *MockIAddonReaderGetAddonsCall {
+func (c *MockIAddonReaderGetAddonsCall) Do(f func() (map[string]ez.IAddon, error)) *MockIAddonReaderGetAddonsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIAddonReaderGetAddonsCall) DoAndReturn(f func() (map[string]*ez.Addon, error)) *MockIAddonReaderGetAddonsCall {
+func (c *MockIAddonReaderGetAddonsCall) DoAndReturn(f func() (map[string]ez.IAddon, error)) *MockIAddonReaderGetAddonsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

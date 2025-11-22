@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	base64 "encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -170,14 +171,20 @@ func (cr *DockerImpl) PushImage(src, dest string) error {
 
 }
 
-func (cr *DockerImpl) PullImage(image string, privateRegistryCredentials *string) error {
+func (cr *DockerImpl) PullImage(image string, credentials *PrivateRegistryCredentials) error {
 
 	opts := image2.PullOptions{
 		All: false,
 	}
 
-	if privateRegistryCredentials != nil {
-		opts.RegistryAuth = *privateRegistryCredentials
+	if credentials != nil {
+
+		jsonBytes, _ := json.Marshal(map[string]string{
+			"username": credentials.Username,
+			"password": credentials.Password,
+		})
+
+		opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
 	}
 
 	reader, err := cr.Docker.ImagePull(cr.ctx, image, opts)

@@ -52,6 +52,15 @@ type AddonConfig struct {
 	ExtraMounts []MountConfig `json:"extraMounts"`
 }
 
+type IAddon interface {
+	ReadScriptFile(fs afero.Fs) string
+	GetName() string
+	GetShortName() string
+	GetConfig() AddonConfig
+	GetAddonFile() string
+	GetRootDir() string
+}
+
 type Addon struct {
 	// Addon name including .ek.js
 	Name string
@@ -71,4 +80,24 @@ func (a *Addon) ReadScriptFile(fs afero.Fs) string {
 		panic(err)
 	}
 	return string(val)
+}
+
+func (a *Addon) GetName() string {
+	return a.Name
+}
+
+func (a *Addon) GetShortName() string {
+	return a.ShortName
+}
+
+func (a *Addon) GetConfig() AddonConfig {
+	return a.Config
+}
+
+func (a *Addon) GetAddonFile() string {
+	return a.File
+}
+
+func (a *Addon) GetRootDir() string {
+	return a.RootDir
 }

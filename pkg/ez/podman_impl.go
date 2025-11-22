@@ -174,9 +174,18 @@ func (cr *PodmanImpl) PushImage(src, dest string) error {
 	}
 }
 
-func (cr *PodmanImpl) PullImage(image string, privateRegistryCredentials *string) error {
+func (cr *PodmanImpl) PullImage(image string, credentials *PrivateRegistryCredentials) error {
 
-	if _, err := images.Pull(cr.conn, image, nil); err != nil {
+	var opts *images.PullOptions = nil
+
+	if credentials != nil {
+		opts = &images.PullOptions{
+			Password: ptr.To(credentials.Password),
+			Username: ptr.To(credentials.Username),
+		}
+	}
+
+	if _, err := images.Pull(cr.conn, image, opts); err != nil {
 		return err
 	} else {
 		return nil

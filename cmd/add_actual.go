@@ -51,8 +51,8 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 	installed, err := ez.Kube.GetInstalledAddons()
 
 	for _, addon := range toInstall {
-		if slices.Contains(installed, addon.ShortName) && !opts.ForceInstall {
-			ezk.FmtGreen("✔ %s already present in cluster", addon.ShortName)
+		if slices.Contains(installed, addon.GetShortName()) && !opts.ForceInstall {
+			ezk.FmtGreen("%s already present in cluster", addon.GetShortName())
 			continue
 		}
 
@@ -64,8 +64,8 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 	return nil
 }
 
-func pickAddons(name []string, addons map[string]*ez.Addon) ([]*ez.Addon, []string) {
-	result := make([]*ez.Addon, 0)
+func pickAddons(name []string, addons map[string]ez.IAddon) ([]ez.IAddon, []string) {
+	result := make([]ez.IAddon, 0)
 	missing := make([]string, 0)
 
 	for ni := range name {
@@ -73,7 +73,7 @@ func pickAddons(name []string, addons map[string]*ez.Addon) ([]*ez.Addon, []stri
 		found := false
 
 		for i := range addons {
-			if addons[i].ShortName == n || addons[i].Name == n {
+			if addons[i].GetShortName() == n || addons[i].GetName() == n {
 				result = append(result, addons[i])
 				found = true
 				break

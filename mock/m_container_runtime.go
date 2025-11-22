@@ -536,17 +536,17 @@ func (c *MockIContainerRuntimeNetworkConnectCall) DoAndReturn(f func(string, str
 }
 
 // PullImage mocks base method.
-func (m *MockIContainerRuntime) PullImage(image string, privateRegistryCredentials *string) error {
+func (m *MockIContainerRuntime) PullImage(image string, credentials *ez.PrivateRegistryCredentials) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PullImage", image, privateRegistryCredentials)
+	ret := m.ctrl.Call(m, "PullImage", image, credentials)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PullImage indicates an expected call of PullImage.
-func (mr *MockIContainerRuntimeMockRecorder) PullImage(image, privateRegistryCredentials any) *MockIContainerRuntimePullImageCall {
+func (mr *MockIContainerRuntimeMockRecorder) PullImage(image, credentials any) *MockIContainerRuntimePullImageCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PullImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PullImage), image, privateRegistryCredentials)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PullImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PullImage), image, credentials)
 	return &MockIContainerRuntimePullImageCall{Call: call}
 }
 
@@ -562,13 +562,13 @@ func (c *MockIContainerRuntimePullImageCall) Return(arg0 error) *MockIContainerR
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimePullImageCall) Do(f func(string, *string) error) *MockIContainerRuntimePullImageCall {
+func (c *MockIContainerRuntimePullImageCall) Do(f func(string, *ez.PrivateRegistryCredentials) error) *MockIContainerRuntimePullImageCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimePullImageCall) DoAndReturn(f func(string, *string) error) *MockIContainerRuntimePullImageCall {
+func (c *MockIContainerRuntimePullImageCall) DoAndReturn(f func(string, *ez.PrivateRegistryCredentials) error) *MockIContainerRuntimePullImageCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

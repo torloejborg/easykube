@@ -540,17 +540,17 @@ func (c *MockIK8SUtilsReloadClientSetCall) DoAndReturn(f func() error) *MockIK8S
 }
 
 // TransformExternalSecret mocks base method.
-func (m *MockIK8SUtils) TransformExternalSecret(secret ez.ExternalSecret, mockData map[string]map[string]string, namespace string) ez.KubernetesSecret {
+func (m *MockIK8SUtils) TransformExternalSecret(secret ez.ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) ez.KubernetesSecret {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TransformExternalSecret", secret, mockData, namespace)
+	ret := m.ctrl.Call(m, "TransformExternalSecret", secret, mockData, addonName, namespace)
 	ret0, _ := ret[0].(ez.KubernetesSecret)
 	return ret0
 }
 
 // TransformExternalSecret indicates an expected call of TransformExternalSecret.
-func (mr *MockIK8SUtilsMockRecorder) TransformExternalSecret(secret, mockData, namespace any) *MockIK8SUtilsTransformExternalSecretCall {
+func (mr *MockIK8SUtilsMockRecorder) TransformExternalSecret(secret, mockData, addonName, namespace any) *MockIK8SUtilsTransformExternalSecretCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransformExternalSecret", reflect.TypeOf((*MockIK8SUtils)(nil).TransformExternalSecret), secret, mockData, namespace)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransformExternalSecret", reflect.TypeOf((*MockIK8SUtils)(nil).TransformExternalSecret), secret, mockData, addonName, namespace)
 	return &MockIK8SUtilsTransformExternalSecretCall{Call: call}
 }
 
@@ -566,13 +566,13 @@ func (c *MockIK8SUtilsTransformExternalSecretCall) Return(arg0 ez.KubernetesSecr
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIK8SUtilsTransformExternalSecretCall) Do(f func(ez.ExternalSecret, map[string]map[string]string, string) ez.KubernetesSecret) *MockIK8SUtilsTransformExternalSecretCall {
+func (c *MockIK8SUtilsTransformExternalSecretCall) Do(f func(ez.ExternalSecret, map[string]map[string]string, string, string) ez.KubernetesSecret) *MockIK8SUtilsTransformExternalSecretCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIK8SUtilsTransformExternalSecretCall) DoAndReturn(f func(ez.ExternalSecret, map[string]map[string]string, string) ez.KubernetesSecret) *MockIK8SUtilsTransformExternalSecretCall {
+func (c *MockIK8SUtilsTransformExternalSecretCall) DoAndReturn(f func(ez.ExternalSecret, map[string]map[string]string, string, string) ez.KubernetesSecret) *MockIK8SUtilsTransformExternalSecretCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

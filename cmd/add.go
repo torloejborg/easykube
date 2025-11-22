@@ -34,7 +34,7 @@ func NewAddCmd() *cobra.Command {
 				// ignore for now
 			}
 			for _, i := range a {
-				addons = append(addons, i.ShortName)
+				addons = append(addons, i.GetShortName())
 			}
 			return addons, cobra.ShellCompDirectiveNoFileComp
 		},

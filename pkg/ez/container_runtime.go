@@ -15,10 +15,15 @@ type ImageSearch struct {
 	Found  bool
 }
 
+type PrivateRegistryCredentials struct {
+	Username string
+	Password string
+}
+
 type IContainerRuntime interface {
 	IsContainerRunning(containerID string) (bool, error)
 	PushImage(src, image string) error
-	PullImage(image string, privateRegistryCredentials *string) error
+	PullImage(image string, credentials *PrivateRegistryCredentials) error
 	HasImage(image string) (bool, error)
 	TagImage(source, target string) error
 	FindContainer(name string) (*ContainerSearch, error)

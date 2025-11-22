@@ -41,6 +41,7 @@ func setupMockForCreate(ctrl *gomock.Controller) {
 	containerRuntime.EXPECT().PullImage(constants.REGISTRY_IMAGE, gomock.Any())
 	containerRuntime.EXPECT().PullImage(constants.KIND_IMAGE, gomock.Any())
 	containerRuntime.EXPECT().CreateContainerRegistry()
+	containerRuntime.EXPECT().IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 	containerRuntime.EXPECT().NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 
 	// not creating

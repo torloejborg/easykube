@@ -21,9 +21,9 @@ You must install go, version 1.22.3 or newer should work.
 
 Compile with ```go build```, go will pull in dependencies from github, and a binary ```easykube``` should appear in the project directory.
 
-## Prerequisite dependent binaries
+## Prerequisites
 
-Next, you must have the follow set of programs installed, and available on your path.
+Next, you must have the following set of programs installed, and available on your path.
 
 * docker (windows and mac, could use docker desktop. Docker on WSL2 works ok)
 * kustomize
@@ -34,6 +34,11 @@ Use your favourite package manager to install the binaries. As long they are in 
 for the prerequisites. Easykube will create a kind cluster called `easykube-kind`
 
 Once all dependencies are in place, a little configuration is required.
+
+![Tip](https://img.shields.io/badge/💡_Tip-green?style=for-the-badge)
+> Easykube will not mess around with your existing kubeconfigs, it will
+create a new configuration file in ~/.kube/easykube - Refer to [here](https://torloejborg.github.io/easykube/easykube/latest/install/#install-create) for more information.
+
 
 ## Get some addons
 By itself, easykube is not very exciting, it can only establish an empty cluster. Clone this repository somewhere,
@@ -58,7 +63,7 @@ By itself, easykube is not very exciting, it can only establish an empty cluster
 
 4. Use it; `easykube --help` prints out a summary of all commands, `easykube <command> --help` prints the summary for that command. 
 
-6. `easykube create -s <your local properties file>` will create a kind cluster and import your *your.properties* as a secret which easykube will use to pull images from a private registry. It will also create a new kind-easykube cluster config.
+6. `easykube create -s <path to a property file>` (could be a .gradle/gradle.properties file) creates a kind cluster and importsthe properites as a secret, this is used resolve credentials for private docker registries.
  NOTE: If you are not using a private repository, the "-s" argument can be skipped, and images will be pulled from dockerhub.
 
 ## What it does

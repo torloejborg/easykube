@@ -21,11 +21,11 @@ type JsUtils struct {
 }
 
 type IJsUtils interface {
-	ExecAddonScript(a *ez.Addon) error
+	ExecAddonScript(a ez.IAddon) error
 }
 
 type AddonContext struct {
-	addon               *ez.Addon
+	addon               ez.IAddon
 	vm                  *goja.Runtime
 	ICobraCommandHelper ez.ICobraCommandHelper
 }
@@ -41,7 +41,7 @@ func (ac *AddonContext) NewObject() *goja.Object {
 	return ac.vm.NewObject()
 }
 
-func NewJsUtils(commandHelper ez.ICobraCommandHelper, source *ez.Addon) IJsUtils {
+func NewJsUtils(commandHelper ez.ICobraCommandHelper, source ez.IAddon) IJsUtils {
 	vm := goja.New()
 
 	ac := &AddonContext{
@@ -63,16 +63,16 @@ func NewJsUtils(commandHelper ez.ICobraCommandHelper, source *ez.Addon) IJsUtils
 
 	return &JsUtils{
 		vm:                 vm,
-		AddonRoot:          source.RootDir,
+		AddonRoot:          source.GetRootDir(),
 		CobraCommandHelper: commandHelper,
 	}
 }
 
-func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) error {
+func (jsu *JsUtils) ExecAddonScript(a ez.IAddon) error {
 	script := a.ReadScriptFile(ez.Kube.Fs)
 	ezk := ez.Kube
 
-	ezk.FmtGreen("🔧 Processing %s", a.Name)
+	ezk.FmtGreen("🔧 Processing %s", a.GetName())
 
 	// Wrap the JavaScript execution in a deferred function
 	err := func() (err error) {
@@ -87,7 +87,7 @@ func (jsu *JsUtils) ExecAddonScript(a *ez.Addon) error {
 	}()
 
 	if err != nil {
-		e := errors.New("in addon " + a.Name)
+		e := errors.New("in addon " + a.GetName())
 		return errors.Join(e, err)
 	}
 
