@@ -16,28 +16,40 @@ type CreateOpts struct {
 	Secrets string
 }
 
-func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
+func createActualCmd(opts CreateOpts) error {
 	ezk := ez.Kube
 
-	if ezk.IsContainerRunning(constants.KIND_CONTAINER) {
-		return errors.New("cluster already running")
+	s, _ := ezk.FindContainer(constants.KIND_CONTAINER)
+	if s.Found && !s.IsRunning {
+		return fmt.Errorf("cluster container %s exists but is not running", constants.KIND_CONTAINER)
+	} else if s.Found && s.IsRunning {
+		return fmt.Errorf("cluster container %s is already running", constants.KIND_CONTAINER)
 	}
 
 	ezk.FmtGreen("Bootstrapping easykube single node cluster")
-	// Ensure configation exists
-	err := ezk.MakeConfig()
-	if err != nil {
+	// Ensure configuration exists
+	if err := ezk.MakeConfig(); err != nil {
 		return err
 	}
 
-	if !ezk.HasImage(constants.REGISTRY_IMAGE) {
-		ezk.FmtYellow("Pulling docker registry image")
-		ezk.PullImage(constants.REGISTRY_IMAGE, nil)
+	if img, err := ezk.HasImage(constants.REGISTRY_IMAGE); err != nil {
+		return err
+	} else if !img {
+		if _, err := ezk.FmtSpinner(func() (any, error) {
+			return nil, ezk.PullImage(constants.REGISTRY_IMAGE, nil)
+		}, "Pulling registry image %s", constants.REGISTRY_IMAGE); err != nil {
+			return err
+		}
 	}
 
-	if !ezk.HasImage(constants.KIND_IMAGE) {
-		ezk.FmtYellow("Pulling kind image")
-		ezk.PullImage(constants.KIND_IMAGE, nil)
+	if img, err := ezk.HasImage(constants.KIND_IMAGE); err != nil {
+		return err
+	} else if !img {
+		if _, err := ezk.FmtSpinner(func() (any, error) {
+			return nil, ezk.PullImage(constants.KIND_IMAGE, nil)
+		}, "Pulling kind image %s", constants.KIND_IMAGE); err != nil {
+			return err
+		}
 	}
 
 	pdErr := ez.Kube.EnsurePersistenceDirectory()
@@ -45,9 +57,10 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 		return pdErr
 	}
 
-	regerr := ez.Kube.CreateContainerRegistry()
-	if regerr != nil {
-		return regerr
+	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
+		return nil, ez.Kube.CreateContainerRegistry()
+	}, "Ensure container registry"); err != nil {
+		return err
 	}
 
 	addons, aerr := ez.Kube.GetAddons()
@@ -67,24 +80,34 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 		os.Exit(-1)
 	}
 
-	report := ezk.CreateKindCluster(addons)
+	report, _ := ezk.FmtSpinner(func() (any, error) {
+		r := ezk.CreateKindCluster(addons)
+		return r, nil
+	}, "Creating kind-easykube control plane")
 
-	// The cluster is created, and so a new context will exist, tell the k8sutils to
-	// create a new ClientSet, so we can bootstrap
+	// The cluster is created, and so a new context will exist, tell the k8sUtils to
+	// create a new ClientSet, so we can continue bootstrapping
 	cerr := ezk.ReloadClientSet()
 	if cerr != nil {
 		return cerr
 	}
 
-	ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
-	ezk.PatchCoreDNS()
+	if connected, _ := ezk.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); !connected {
+		if e := ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); e != nil {
+			return e
+		}
+	}
 
-	err = ezk.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
-	if err != nil {
+	_, _ = ezk.FmtSpinner(func() (any, error) {
+		ezk.PatchCoreDNS()
+		return nil, nil
+	}, "Patching coredns")
+
+	if err := ezk.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS); err != nil {
 		return err
 	}
 
-	ezk.FmtGreen(report)
+	ezk.FmtGreen(report.(string))
 
 	// switch to the easykube context
 	ezk.EnsureLocalContext()
@@ -104,7 +127,7 @@ func createActualCmd(opts CreateOpts, cmdHelper ez.ICobraCommandHelper) error {
 			return errors.New(fmt.Sprintf("Error reading property file %s, %v", opts.Secrets, err.Error()))
 		}
 
-		ezk.CreateSecret("default", constants.EASYKUBE_SECRET_NAME, configmap)
+		_ = ezk.CreateSecret("default", constants.EASYKUBE_SECRET_NAME, configmap)
 	} else {
 		ezk.FmtYellow("Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries.")
 	}

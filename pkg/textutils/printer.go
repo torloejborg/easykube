@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gookit/color"
+	"github.com/slok/gospinner"
 )
 
 type IPrinter interface {
@@ -12,6 +13,7 @@ type IPrinter interface {
 	FmtYellow(out string, args ...any)
 	FmtVerbose(out string, args ...any)
 	FmtDryRun(out string, args ...any)
+	FmtSpinner(action func() (any, error), out string, args ...any) (any, error)
 }
 
 func NewPrinter() IPrinter {
@@ -19,6 +21,27 @@ func NewPrinter() IPrinter {
 }
 
 type PrinterImpl struct {
+}
+
+func (p *PrinterImpl) FmtSpinner(action func() (any, error), out string, args ...any) (any, error) {
+	s, _ := gospinner.NewSpinner(gospinner.Dots)
+
+	var message = ""
+	if args != nil {
+		message = fmt.Sprintf(out, args...)
+	} else {
+		message = out
+	}
+
+	_ = s.Start(message)
+	result, err := action()
+	if err != nil {
+		_ = s.Fail()
+		return result, err
+	} else {
+		_ = s.Succeed()
+	}
+	return result, nil
 }
 
 func (p *PrinterImpl) FmtGreen(out string, args ...any) {

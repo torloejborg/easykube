@@ -28,10 +28,10 @@ func TestPreloadImages(t *testing.T) {
 	ez.Kube.UseK8sUtils(k8s)
 
 	dockerMock := mock_ez.NewMockIContainerRuntime(ctl)
-	dockerMock.EXPECT().HasImageInKindRegistry(gomock.Any()).Return(false).AnyTimes()
+	dockerMock.EXPECT().HasImageInKindRegistry(gomock.Any()).Return(false, nil).AnyTimes()
 	dockerMock.EXPECT().PullImage(gomock.Any(), gomock.Any()).AnyTimes()
 	dockerMock.EXPECT().TagImage(gomock.Any(), gomock.Any()).AnyTimes()
-	dockerMock.EXPECT().PushImage(gomock.Any()).AnyTimes()
+	dockerMock.EXPECT().PushImage(gomock.Any(), gomock.Any()).AnyTimes()
 
 	ez.Kube.UseContainerRuntime(dockerMock)
 

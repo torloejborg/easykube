@@ -13,7 +13,7 @@ func startActual() error {
 		OK      bool
 	}
 
-	x := func(container string) (*StartStatus, error) {
+	findAndStart := func(container string) (*StartStatus, error) {
 		f, err := ez.Kube.FindContainer(container)
 		if err != nil {
 			return nil, err
@@ -32,7 +32,9 @@ func startActual() error {
 				OK:      true,
 			}, nil
 		} else if !f.IsRunning {
-			ezk.StartContainer(container)
+			if err := ezk.StartContainer(container); err != nil {
+				return nil, err
+			}
 			return &StartStatus{
 				Name:    container,
 				Message: container + " started",
@@ -42,11 +44,11 @@ func startActual() error {
 		return &StartStatus{}, nil
 	}
 
-	cluster, err := x(constants.KIND_CONTAINER)
+	cluster, err := findAndStart(constants.KIND_CONTAINER)
 	if err != nil {
 		return err
 	}
-	registry, err := x(constants.REGISTRY_CONTAINER)
+	registry, err := findAndStart(constants.REGISTRY_CONTAINER)
 	if err != nil {
 		return err
 	}
@@ -65,7 +67,7 @@ func startActual() error {
 
 	if !registry.OK && !cluster.OK {
 		ezk.FmtGreen("Hint:\n")
-		createCmd.Help()
+		_ = createCmd.Help()
 	}
 
 	return nil

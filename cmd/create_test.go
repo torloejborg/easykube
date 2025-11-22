@@ -32,15 +32,22 @@ func setupMockForCreate(ctrl *gomock.Controller) {
 		"anotherkey": "anothervalue",
 	})
 
+	search := &ez.ContainerSearch{
+		ContainerID: "",
+		Found:       false,
+		IsRunning:   false,
+	}
+
 	// mocks interactions with docker
 	containerRuntime := mock_ez.NewMockIContainerRuntime(ctrl)
+	containerRuntime.EXPECT().FindContainer(gomock.Any()).Return(search, nil)
 	containerRuntime.EXPECT().IsClusterRunning().Return(false).AnyTimes()
-	containerRuntime.EXPECT().IsContainerRunning(gomock.Any()).Return(false)
-	containerRuntime.EXPECT().HasImage(constants.REGISTRY_IMAGE).Return(false)
-	containerRuntime.EXPECT().HasImage(constants.KIND_IMAGE).Return(false)
+	containerRuntime.EXPECT().HasImage(constants.REGISTRY_IMAGE).Return(false, nil)
+	containerRuntime.EXPECT().HasImage(constants.KIND_IMAGE).Return(false, nil)
 	containerRuntime.EXPECT().PullImage(constants.REGISTRY_IMAGE, gomock.Any())
 	containerRuntime.EXPECT().PullImage(constants.KIND_IMAGE, gomock.Any())
 	containerRuntime.EXPECT().CreateContainerRegistry()
+	containerRuntime.EXPECT().IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 	containerRuntime.EXPECT().NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 
 	// not creating
@@ -88,7 +95,7 @@ func TestCreate(t *testing.T) {
 		Secrets: "/home/some-user/prop.properties",
 	}
 
-	err := createActualCmd(opts, ez.Kube.ICobraCommandHelper)
+	err := createActualCmd(opts)
 
 	if err != nil {
 		t.Error(err)

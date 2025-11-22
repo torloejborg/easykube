@@ -1,5 +1,9 @@
 package ez
 
+import (
+	"fmt"
+)
+
 type ContainerSearch struct {
 	ContainerID string
 	Found       bool
@@ -11,22 +15,27 @@ type ImageSearch struct {
 	Found  bool
 }
 
+type PrivateRegistryCredentials struct {
+	Username string
+	Password string
+}
+
 type IContainerRuntime interface {
-	IsContainerRunning(containerID string) bool
-	PushImage(image string)
-	PullImage(image string, privateRegistryCredentials *string)
-	HasImage(image string) bool
-	TagImage(source, target string)
+	IsContainerRunning(containerID string) (bool, error)
+	PushImage(src, image string) error
+	PullImage(image string, credentials *PrivateRegistryCredentials) error
+	HasImage(image string) (bool, error)
+	TagImage(source, target string) error
 	FindContainer(name string) (*ContainerSearch, error)
-	StartContainer(id string)
-	StopContainer(id string)
-	RemoveContainer(id string)
-	ContainerWriteFile(containerId string, dst string, filename string, data []byte)
-	NetworkConnect(containerId string, networkId string)
-	IsNetworkConnectedToContainer(containerID string, networkID string) bool
+	StartContainer(id string) error
+	StopContainer(id string) error
+	RemoveContainer(id string) error
+	ContainerWriteFile(containerId string, dst string, filename string, data []byte) error
+	NetworkConnect(containerId string, networkId string) error
+	IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error)
 	IsClusterRunning() bool
-	HasImageInKindRegistry(name string) bool
-	Exec(containerId string, cmd []string)
+	HasImageInKindRegistry(name string) (bool, error)
+	Exec(containerId string, cmd []string) error
 	CloseContainerRuntime()
 	IsContainerRuntimeAvailable() bool
 	CreateContainerRegistry() error
@@ -35,11 +44,18 @@ type IContainerRuntime interface {
 
 func NewContainerRuntime() IContainerRuntime {
 
-	_, err := Kube.LoadConfig()
+	cfg, err := Kube.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	return NewDockerImpl()
+	switch cfg.ContainerRuntime {
+	case "docker":
+		return NewDockerImpl()
+	case "podman":
+		return NewPodmanImpl()
+	default:
+		panic(fmt.Sprintf("unknown container runtime: %s", cfg.ContainerRuntime))
+	}
 
 }

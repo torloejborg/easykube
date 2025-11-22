@@ -52,7 +52,7 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 
 	for _, addon := range toInstall {
 		if slices.Contains(installed, addon.GetShortName()) && !opts.ForceInstall {
-			ezk.FmtYellow("%s already present in cluster", addon.GetShortName())
+			ezk.FmtGreen("%s already present in cluster", addon.GetShortName())
 			continue
 		}
 
