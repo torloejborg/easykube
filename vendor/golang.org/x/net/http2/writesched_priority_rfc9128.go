@@ -39,7 +39,7 @@ type priorityWriteSchedulerRFC9218 struct {
 	prioritizeIncremental bool
 }
 
-func newPriorityWriteSchedulerRFC9218() WriteScheduler {
+func newPriorityWriteSchedulerRFC9128() WriteScheduler {
 	ws := &priorityWriteSchedulerRFC9218{
 		streams: make(map[uint32]streamMetadata),
 	}
