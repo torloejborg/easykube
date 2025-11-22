@@ -39,4 +39,7 @@ mock:
 	mockgen -typed --source pkg/ez/external_tools.go --destination mock/m_external_m.go
 	mockgen -typed --source pkg/ez/k8s_utils.go --destination mock/m_k8s_utils.go
 	mockgen -typed --source pkg/ez/os_details.go --destination mock/m_os_details.go
+	mockgen -typed --source pkg/ez/addon_types.go --destination mock/m_addon.go
+	mockgen -typed --source pkg/js/jsrunner.go --package mock_ez --destination mock/m_jsrunner.go
+
 

@@ -188,3 +188,79 @@ func (c *MockIEasykubeConfigMakeConfigCall) DoAndReturn(f func() error) *MockIEa
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// PatchConfig mocks base method.
+func (m *MockIEasykubeConfig) PatchConfig() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PatchConfig")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PatchConfig indicates an expected call of PatchConfig.
+func (mr *MockIEasykubeConfigMockRecorder) PatchConfig() *MockIEasykubeConfigPatchConfigCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchConfig", reflect.TypeOf((*MockIEasykubeConfig)(nil).PatchConfig))
+	return &MockIEasykubeConfigPatchConfigCall{Call: call}
+}
+
+// MockIEasykubeConfigPatchConfigCall wrap *gomock.Call
+type MockIEasykubeConfigPatchConfigCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigPatchConfigCall) Return(arg0 error) *MockIEasykubeConfigPatchConfigCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigPatchConfigCall) Do(f func() error) *MockIEasykubeConfigPatchConfigCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigPatchConfigCall) DoAndReturn(f func() error) *MockIEasykubeConfigPatchConfigCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// PathToConfigFile mocks base method.
+func (m *MockIEasykubeConfig) PathToConfigFile() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PathToConfigFile")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// PathToConfigFile indicates an expected call of PathToConfigFile.
+func (mr *MockIEasykubeConfigMockRecorder) PathToConfigFile() *MockIEasykubeConfigPathToConfigFileCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PathToConfigFile", reflect.TypeOf((*MockIEasykubeConfig)(nil).PathToConfigFile))
+	return &MockIEasykubeConfigPathToConfigFileCall{Call: call}
+}
+
+// MockIEasykubeConfigPathToConfigFileCall wrap *gomock.Call
+type MockIEasykubeConfigPathToConfigFileCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigPathToConfigFileCall) Return(arg0 string) *MockIEasykubeConfigPathToConfigFileCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigPathToConfigFileCall) Do(f func() string) *MockIEasykubeConfigPathToConfigFileCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigPathToConfigFileCall) DoAndReturn(f func() string) *MockIEasykubeConfigPathToConfigFileCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}

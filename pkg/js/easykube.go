@@ -64,7 +64,7 @@ func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
 
 	if undef != 0 {
 		ez.Kube.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
-			e.AddonCtx.addon.Name,
+			e.AddonCtx.addon.GetName(),
 			jsName,
 			argLen,
 			undef)

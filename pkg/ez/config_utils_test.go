@@ -1,11 +1,13 @@
 package ez_test
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/textutils"
 	"github.com/torloejborg/easykube/test"
 )
 
@@ -43,6 +45,51 @@ func TestMakeDefaultConfig(t *testing.T) {
 
 	if data.AddonDir != filepath.Join(homeDir, "addons") {
 		t.Errorf("expected addons dir to be ./addons")
+	}
+
+}
+
+func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
+	initConfigTests(t)
+
+	// use config with private registries enabled
+	cfg := textutils.TrimMargin(`
+	|easykube:
+	|  addon-root: /home/tor/code/research/easykube-addons
+	|  config-dir: /home/tor/.config/easykube
+	|  persistence-dir: /home/tor/.config/easykube/persistence
+	|  container-runtime: docker
+	|  private-registries:
+	|   - repositoryMatch: ccta.dk
+	|     userKey: userkey1
+	|     passwordKey: passkey1
+	|   - repositoryMatch: anotherRepo
+	|     userKey: userkey2
+	|     passwordKey: passkey2
+	`, "|")
+
+	f, _ := ez.Kube.Fs.OpenFile(ez.Kube.IEasykubeConfig.PathToConfigFile(), os.O_TRUNC|os.O_WRONLY, os.ModePerm)
+	_, _ = f.WriteString(cfg)
+
+	exists := ez.FileOrDirExists(ez.Kube.IEasykubeConfig.PathToConfigFile())
+	if !exists {
+		t.Errorf("expected easykube config file to exist")
+	}
+
+	data, err := ez.Kube.LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	reg1 := data.PrivateRegistries[0]
+	reg2 := data.PrivateRegistries[1]
+
+	if reg1.RepositoryMatch != "ccta.dk" {
+		t.Errorf("expected ccta.dk got %s", reg1.RepositoryMatch)
+	}
+
+	if reg2.RepositoryMatch != "anotherRepo" {
+		t.Errorf("expected anotherRepo got %s", reg2.RepositoryMatch)
 	}
 
 }

@@ -63,7 +63,7 @@ By itself, easykube is not very exciting, it can only establish an empty cluster
 
 4. Use it; `easykube --help` prints out a summary of all commands, `easykube <command> --help` prints the summary for that command. 
 
-6. `easykube create -s <your local properties file>` will create a kind cluster and import your *your.properties* as a secret which easykube will use to pull images from a private registry. It will also create a new kind-easykube cluster config.
+6. `easykube create -s <path to a property file>` (could be a .gradle/gradle.properties file) creates a kind cluster and importsthe properites as a secret, this is used resolve credentials for private docker registries.
  NOTE: If you are not using a private repository, the "-s" argument can be skipped, and images will be pulled from dockerhub.
 
 ## What it does

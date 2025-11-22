@@ -113,4 +113,5 @@ func InitializeKubeSingleton() {
 	Kube.UseExternalTools(NewExternalTools())
 	Kube.UseContainerRuntime(CreateContainerRuntimeImpl())
 	Kube.UseClusterUtils(CreateClusterUtilsImpl())
+
 }

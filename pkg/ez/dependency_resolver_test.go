@@ -37,7 +37,7 @@ func TestTopologicalSort(t *testing.T) {
 	} else {
 		t.Log("Sorted order:")
 		for _, node := range sorted {
-			t.Log(node.Name)
+			t.Log(node.GetName())
 		}
 	}
 }
@@ -65,7 +65,7 @@ func TestDiamondGraph(t *testing.T) {
 	}
 
 	for _, n := range sorted {
-		fmt.Println(n.Name)
+		fmt.Println(n.GetName())
 	}
 
 }
