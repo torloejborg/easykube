@@ -131,10 +131,18 @@ easykube:
 
   # Container Runtime (as of now, only docker is supported. podman support is planned)
   container-runtime: docker
+
+  # Declare private registries. Whenever easykube pulls an image, and the registry name contains a substring
+  # defined by repositoryMatch, the credentials are resolved by looking up the values in easykube-secrets.
+  #private-registries:  <4>
+  #  - repositoryMatch: partial-domain-name.io
+  #    userKey: userCredentialsKey
+  #    passwordKey: userCredntialPasswordKey <4>
 ----
 <1> - Change this line to match the path to the addon repository you previously cloned
 <2> - This is the directory where easykube will store its configuration files it will be revisited in the operate section.
 <3> - Easykube will automatically create subdirectories here based on addon requirements
+<4> - Uncomment this block if you need to interact with private registries
 
 Save the file, and we'll be ready for the next step.
 
@@ -241,3 +249,48 @@ a81acb9b11c9   kindest/node:v1.34.0   "/usr/local/bin/entr…"   29 minutes ago 
 We can see that kindest/node is running with a bunch of port-forwards, they were defined by the addons.
 
 The registry is a local docker-registry. Most easykube addons should pull from that registry to avoid exessive bandwidth consumption.
+
+
+== Using private image registries (main branch only)
+
+If you find yourself in a corperate environment, or self-host containers in a private registries, easykube can be configured to use these. In the previous sections, there were hints about this in the configuration directives and the `-s` cluster create option.
+
+You supply actual credentials to easykube via the `-s` option. The input must be a valid property file.
+
+.example of a property file passed to easykube with the -s option
+----
+#Credentials for repo 1
+artifactoryRepoUserName=user
+artifactoryRepoPassword=password
+
+# Credentials for repo 2
+sonatypeRepoUserName=user
+sonatypeRepoPassword=password
+----
+
+The property file is loaded into easykube as a secret called `easykube-secrets` in the default namespace.
+
+In order for easykube to use these credentials, a *repository match* must be configured
+
+.configuration with multiple configured private repositories
+----
+easykube:
+  addon-root: /home/jane/addons
+
+  config-dir: /home/jane/.config/easykube
+  persistence-dir: /home/jane/.config/easykube/persistence
+
+  container-runtime: docker
+
+  private-registries:
+    - repositoryMatch: artifactory.my-internal-host.internal.domain <1>
+      userKey: artifactoryRepoUsername
+      passwordKey: artifactoryRepoPassword
+    - repositoryMatch: sonatype.some.domain.com <2>
+      userKey: sonatypeRepoUsername
+      passwordKey: sonatypeRepoPassword
+----
+
+When Easykube pulls images, the registry url is matched against every *repositoryMatch* (1,2) testing if the match is a substring in the registry url.
+
+If there is a match, then the pull operation will be supplied with the matching credentials, constructed from the values in `easykube-secrets`

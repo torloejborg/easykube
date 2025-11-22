@@ -105,6 +105,7 @@
 </li>
 <li><a href="#install-configuration">Configuration</a></li>
 <li><a href="#install-create">Create cluster</a></li>
+<li><a href="#_using_private_image_registries_main_branch_only">Using private image registries (main branch only)</a></li>
 </ul>
 </div>
 <div id="preamble">
@@ -312,7 +313,14 @@ your favorite editor.</p>
   persistence-dir: /home/jane/.config/easykube/persistence <i class="conum" data-value="3"></i><b>(3)</b>
 
   # Container Runtime (as of now, only docker is supported. podman support is planned)
-  container-runtime: docker</code></pre>
+  container-runtime: docker
+
+  # Declare private registries. Whenever easykube pulls an image, and the registry name contains a substring
+  # defined by repositoryMatch, the credentials are resolved by looking up the values in easykube-secrets.
+  #private-registries:  <i class="conum" data-value="4"></i><b>(4)</b>
+  #  - repositoryMatch: partial-domain-name.io
+  #    userKey: userCredentialsKey
+  #    passwordKey: userCredntialPasswordKey <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -328,6 +336,10 @@ your favorite editor.</p>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>- Easykube will automatically create subdirectories here based on addon requirements</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>- Uncomment this block if you need to interact with private registries</td>
 </tr>
 </table>
 </div>
@@ -484,6 +496,61 @@ a81acb9b11c9   kindest/node:v1.34.0   "/usr/local/bin/entr…"   29 minutes ago 
 </div>
 <div class="paragraph">
 <p>The registry is a local docker-registry. Most easykube addons should pull from that registry to avoid exessive bandwidth consumption.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_private_image_registries_main_branch_only"><a class="anchor" href="#_using_private_image_registries_main_branch_only"></a>Using private image registries (main branch only)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you find yourself in a corperate environment, or self-host containers in a private registries, easykube can be configured to use these. In the previous sections, there were hints about this in the configuration directives and the <code>-s</code> cluster create option.</p>
+</div>
+<div class="paragraph">
+<p>You supply actual credentials to easykube via the <code>-s</code> option. The input must be a valid property file.</p>
+</div>
+<div class="listingblock">
+<div class="title">example of a property file passed to easykube with the -s option</div>
+<div class="content">
+<pre>#Credentials for repo 1
+artifactoryRepoUserName=user
+artifactoryRepoPassword=password
+
+# Credentials for repo 2
+sonatypeRepoUserName=user
+sonatypeRepoPassword=password</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The property file is loaded into easykube as a secret called <code>easykube-secrets</code> in the default namespace.</p>
+</div>
+<div class="paragraph">
+<p>In order for easykube to use these credentials, a <strong>repository match</strong> must be configured</p>
+</div>
+<div class="listingblock">
+<div class="title">configuration with multiple configured private repositories</div>
+<div class="content">
+<pre>easykube:
+  addon-root: /home/jane/addons
+
+  config-dir: /home/jane/.config/easykube
+  persistence-dir: /home/jane/.config/easykube/persistence
+
+  container-runtime: docker
+
+  private-registries:
+    - repositoryMatch: artifactory.my-internal-host.internal.domain <i class="conum" data-value="1"></i><b>(1)</b>
+      userKey: artifactoryRepoUsername
+      passwordKey: artifactoryRepoPassword
+    - repositoryMatch: sonatype.some.domain.com <i class="conum" data-value="2"></i><b>(2)</b>
+      userKey: sonatypeRepoUsername
+      passwordKey: sonatypeRepoPassword</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When Easykube pulls images, the registry url is matched against every <strong>repositoryMatch</strong> (1,2) testing if the match is a substring in the registry url.</p>
+</div>
+<div class="paragraph">
+<p>If there is a match, then the pull operation will be supplied with the matching credentials, constructed from the values in <code>easykube-secrets</code></p>
 </div>
 </div>
 </div>
