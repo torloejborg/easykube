@@ -12,6 +12,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
       pkgsUnstable = unstable.legacyPackages.${system};
       lib = pkgs.lib;
+      go_compiler_flags = "-tags=remote,containers_remote,exclude_graphdriver_btrfs,exclude_graphdriver_devicemapper,exclude_graphdriver_overlay,exclude_graphdriver_zfs";
 
         # Common packages used in all shells
             commonPackages = with pkgs; [
@@ -20,6 +21,10 @@
               yq
               gnumake
               glibcLocales
+              pkg-config
+              stdenv.cc
+              gpgme
+              libgpg-error
             ] ++ [
               pkgsUnstable.upx
               pkgsUnstable.mockgen
@@ -33,14 +38,33 @@
         pname = "easykube";
         version = "latest";
         src = self;
+         nativeBuildInputs = [
+           pkgs.pkg-config
+           pkgs.stdenv.cc
+         ];
 
-#        vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-        vendorHash = "sha256-wDrZgWehUa174PYhfI6rCqQAPTbyj/Jc3wGZAwRtbgw=";
+         buildInputs = [
+            pkgs.gpgme
+            pkgs.libgpg-error
+         ];
+
+          tags = [
+            "remote"
+            "containers_remote"
+            "exclude_graphdriver_btrfs"
+            "exclude_graphdriver_devicemapper"
+            "exclude_graphdriver_overlay"
+            "exclude_graphdriver_zfs"
+          ];
+
+        #vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        vendorHash = "sha256-v2+sWT8fn6HsPdn4545SZ+37alMSZ+JXoOGweGj5yWQ=";
 
       };
 
       devShells.${system} = {
         default = pkgs.mkShell {
+
           packages = commonPackages ++  [
             (self.packages.${system}.default)
           ];
@@ -60,6 +84,7 @@
         };
 
         light = pkgs.mkShell {
+          GOFLAGS = go_compiler_flags;
           packages = commonPackages;
           shell = pkgs.zsh;
           impureEnv = true;
