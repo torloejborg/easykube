@@ -12,13 +12,9 @@ easykube:
   # Container Runtime (as of now, only docker is supported. podman support is planned)
   container-runtime: docker
 
-  # Declare private docker registries. Whenever easykube pulls an image, and
-  # name is a substring of the registry url then use the credentials specified at
-  # cluster creation time ("-s" argument)
-  private-registries:
-    - repositoryMatch: ccta.dk
-      userKey: artifactoryUsername
-      passwordKey: artifactoryPassword
-    - repositoryMatch: anotherRepo
-      userKey: anotherUsernameKey
-      passwordKey: anotherPasswordKey
+  # Declare private registries. Whenever easykube pulls an image, and the registry name contains a substring
+  # defined by repositoryMatch, the credentials are resolved by looking up the values in easykube-secrets.
+  #private-registries:
+  #  - repositoryMatch: partial-domain-name.io
+  #    userKey: userCredentialsKey
+  #    passwordKey: userCredntialPasswordKey
