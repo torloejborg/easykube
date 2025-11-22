@@ -19,13 +19,11 @@ type CreateOpts struct {
 func createActualCmd(opts CreateOpts) error {
 	ezk := ez.Kube
 
-	s, err := ezk.FindContainer(constants.KIND_CONTAINER)
-	if err != nil {
-		return err
-	} else if !s.IsRunning {
-		return errors.New("cluster created, but is stopped, start it first")
-	} else if s.IsRunning {
-		return errors.New("cluster running")
+	s, _ := ezk.FindContainer(constants.KIND_CONTAINER)
+	if s.Found && !s.IsRunning {
+		return fmt.Errorf("cluster container %s exists but is not running", constants.KIND_CONTAINER)
+	} else if s.Found && s.IsRunning {
+		return fmt.Errorf("cluster container %s is already running", constants.KIND_CONTAINER)
 	}
 
 	ezk.FmtGreen("Bootstrapping easykube single node cluster")
