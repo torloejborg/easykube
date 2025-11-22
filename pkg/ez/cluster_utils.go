@@ -14,9 +14,9 @@ import (
 )
 
 type IClusterUtils interface {
-	CreateKindCluster(modules map[string]*Addon) string
-	RenderToYAML(addonList []*Addon) string
-	ConfigurationReport(addonList []*Addon) string
+	CreateKindCluster(modules map[string]IAddon) string
+	RenderToYAML(addonList []IAddon) string
+	ConfigurationReport(addonList []IAddon) string
 	EnsurePersistenceDirectory() error
 }
 
@@ -36,7 +36,7 @@ func NewClusterUtils() IClusterUtils {
 	}
 }
 
-func (u *ClusterUtils) ConfigurationReport(addonList []*Addon) string {
+func (u *ClusterUtils) ConfigurationReport(addonList []IAddon) string {
 
 	portTmpl, _ := resources.AppResources.ReadFile("data/createreport.template")
 	sb := new(strings.Builder)
@@ -47,12 +47,12 @@ func (u *ClusterUtils) ConfigurationReport(addonList []*Addon) string {
 	return sb.String()
 }
 
-func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
+func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 
 	// kind already exists, but not started
 	search, _ := Kube.FindContainer("kind-control-plane")
 
-	addonList := make([]*Addon, 0)
+	addonList := make([]IAddon, 0)
 	for _, addon := range modules {
 		addonList = append(addonList, addon)
 	}
@@ -132,7 +132,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]*Addon) string {
 	return u.ConfigurationReport(addonList)
 }
 
-func (u *ClusterUtils) RenderToYAML(addonList []*Addon) string {
+func (u *ClusterUtils) RenderToYAML(addonList []IAddon) string {
 	data, err := resources.AppResources.ReadFile("data/cluster_config.template")
 	if err != nil {
 		panic(err)
@@ -162,8 +162,8 @@ func (u *ClusterUtils) EnsurePersistenceDirectory() error {
 	}
 
 	for _, a := range addons {
-		if len(a.Config.ExtraMounts) > 0 {
-			mounts := a.Config.ExtraMounts
+		if len(a.GetConfig().ExtraMounts) > 0 {
+			mounts := a.GetConfig().ExtraMounts
 			for m := range mounts {
 				path := filepath.Join(mounts[m].PersistenceDir, mounts[m].HostPath)
 				err := Kube.MkdirAll(path, 0777)

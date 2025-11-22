@@ -13,8 +13,14 @@ import (
 func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		addonDir := filepath.Dir(ctx.AddonCtx.addon.File)
-		chart := filepath.Join(addonDir, call.Argument(0).String())
+		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
+
+		chart := filepath.Clean(call.Argument(0).String())
+
+		if !filepath.IsAbs(chart) {
+			chart = filepath.Join(addonDir, call.Argument(0).String())
+		}
+
 		values := filepath.Join(addonDir, call.Argument(1).String())
 		destination := filepath.Join(addonDir, call.Argument(2).String())
 		namespace := call.Argument(3).String()

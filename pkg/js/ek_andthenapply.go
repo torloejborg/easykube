@@ -10,7 +10,7 @@ import (
 func (ctx *Easykube) AndThenApply() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		addonDir := filepath.Dir(ctx.AddonCtx.addon.File)
+		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
 		toApply := filepath.Join(addonDir, call.Argument(0).String())
 
 		if !ez.FileOrDirExists(toApply) {

@@ -10,7 +10,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
+func (e *Easykube) GitCheckout() func(goja.FunctionCall) goja.Value {
 
 	return func(call goja.FunctionCall) goja.Value {
 		e.checkArgs(call, SPARSE_CHECKOUT)
@@ -28,14 +28,11 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 		repo := call.Argument(0).String()
 		branch := call.Argument(1).String()
-		source := call.Argument(2)
-
-		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
 		addonDir := filepath.Dir(e.AddonCtx.addon.GetAddonFile())
-		destination := filepath.Join(addonDir, call.Argument(3).String())
+		destination := filepath.Join(addonDir, call.Argument(2).String())
 
 		if ez.FileOrDirExists(destination) {
-			ezk.FmtYellow("%s already exists, skipping sparseCheckout", destination)
+			ezk.FmtYellow("%s already exists, skipping checkout", destination)
 			return call.This
 		}
 
@@ -75,15 +72,9 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			}
 		}
 
-		gitCmd([]string{"init"})
-		gitCmd([]string{"config", "core.sparsecheckout", "true"})
-		gitCmd([]string{"remote", "add", "-f", "origin", repo})
-		gitCmd([]string{"pull", "origin", branch})
-
-		gitArgs := []string{"sparse-checkout", "set"}
-		allArgs := append(gitArgs, gitSparseDirectoryList...)
-
-		gitCmd(allArgs)
+		gitCmd([]string{"clone", repo, destination})
+		gitCmd([]string{"checkout", branch})
+		gitCmd([]string{"pull"})
 
 		return call.This
 	}

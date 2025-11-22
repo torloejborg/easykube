@@ -6,6 +6,9 @@
 
 "A tool for learning kubernetes, run various stacks, develop complex applications locally"
 
+
+This README covers the basics, to find out more, visit the [documentation site](https://torloejborg.github.io/easykube/easykube/latest)
+
 ## Download the binary for your platform
 
 ### [OSX/amd64](https://github.com/torloejborg/easykube/releases/latest/download/easykube-darwin-amd64.zip)
@@ -18,9 +21,9 @@ You must install go, version 1.22.3 or newer should work.
 
 Compile with ```go build```, go will pull in dependencies from github, and a binary ```easykube``` should appear in the project directory.
 
-## Prerequisite dependent binaries
+## Prerequisites
 
-Next, you must have the follow set of programs installed, and available on your path.
+Next, you must have the following set of programs installed, and available on your path.
 
 * docker (windows and mac, could use docker desktop. Docker on WSL2 works ok)
 * kustomize
@@ -32,15 +35,20 @@ for the prerequisites. Easykube will create a kind cluster called `easykube-kind
 
 Once all dependencies are in place, a little configuration is required.
 
-## Get some addons!
-By itself, easykube is not very exciting, it can only establish an empty cluster and load kustomize and helm files/charts. Clone this repository somewhere,
+![Tip](https://img.shields.io/badge/💡_Tip-green?style=for-the-badge)
+> Easykube will not mess around with your existing kubeconfigs, it will
+create a new configuration file in ~/.kube/easykube - Refer to [here](https://torloejborg.github.io/easykube/easykube/latest/install/#install-create) for more information.
+
+
+## Get some addons
+By itself, easykube is not very exciting, it can only establish an empty cluster. Clone this repository somewhere,
 
 `git@github.com:torloejborg/easykube-addons.git`
 
 ## Configuration
 
 1. Set an environment variable VISUAL=<an editor> this could be `nano`,`vi`,`code` or whatever you prefer.
-2. (Optional) Link the `easykube` binary to a place where the system can find it, such as /usr/local/bin, or add the easykube source tree to your PATH variable.
+2. (Optional) Link the `easykube` binary to a place where the system can find it, such as /usr/local/bin, or add the easykube source tree to your PATH variable. Establishing a dev environment is covered [here](https://torloejborg.github.io/easykube/easykube/latest/install/#install-nix)
 3. Now, invoke `easykube config` this starts the editor with a default configuration
     ```
    easykube:
@@ -55,7 +63,7 @@ By itself, easykube is not very exciting, it can only establish an empty cluster
 
 4. Use it; `easykube --help` prints out a summary of all commands, `easykube <command> --help` prints the summary for that command. 
 
-6. `easykube create -s <your local properties file>` will create a kind cluster and import your *your.properties* as a secret which easykube will use to pull images from a private registry. It will also create a new kind-easykube cluster config.
+6. `easykube create -s <path to a property file>` (could be a .gradle/gradle.properties file) creates a kind cluster and importsthe properites as a secret, this is used resolve credentials for private docker registries.
  NOTE: If you are not using a private repository, the "-s" argument can be skipped, and images will be pulled from dockerhub.
 
 ## What it does
@@ -74,42 +82,6 @@ to build and apply the manifests in each addon.
 A simple set of command allows the user to perform rudimentary scripting
 of the installation process. 
 
-## Creating a new addon
-
-A template function is provided that enables you to start out with a minimal example. run `easykube skaffold --name new-project --location utils`. This will create directory `utils/new-project` in the root of the addons dir.
-
-`easykube list` will display the new addon as uninstalled (installed have green checkmarks)
-
-`easykube add new-project` installs the addon, after some time, you can visit http://new-project.localtest.me 
-
-When changes are made to the new addon, you can iterate changes quickly by force-installing without touching any of the dependencies, by issuing `easykube add new-project --force --no-depends` or `easykube add new-project -fn` 
-
-## DNS Trickery
-
-When the cluster is created, Kubernetes CoreDNS is patched to 
-understand the localtest.me domain. "localtest.me" is a domain someone created on the internet, itself, and all subdomains resolves to 127.0.0.1
-
-This allows us to invent an arbitrary number of hostnames which is useful when you have many services. Editing (and forgetting entries) in the hosts file is a thing of the past.   
-
-A note for advanced users; Let's say you have a service in the cluster that depends on the "outside" hostname of a service already running in the cluster.
-
-The prime example of this is the Keycloak addon.
-
-Keycloak is exposed at https://keycloak.localtest.me. When developing a service that depends on keycloak, the service can only look up keycloak from within the cluster on the address using a service name keycloak.default.cluster.svc.
-
-In order to circumvent this a rewrite rule modifies an internal the DNS request for keycloak.localtest.me to point to a service postfixed with **"-ext"**
-
-```
- rewrite stop {
-       name regex (.*)\.localtest.me {1}-ext.default.svc.cluster.local
-       answer auto
-    }
-```
-
-So to enable "external" name resolution for a given service, in this case keycloak. Just create an extra 
-service called keycloak-ext (which points to the pod/deployment). The service must be created in the default namespace.  
-
-In your application the url to the oauth provider will simply be keycloak.localtest.me. Your app and keycloak will not complain about different origins.  
 
 ## Certificates
 In the folder cacerts, there is a selfsigned CA certificate - Install this on your system to enjoy https browser connections (most addons require https)

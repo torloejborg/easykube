@@ -29,7 +29,8 @@ func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
 
 		if ezk.IsDryRun() {
 			ezk.FmtDryRun(infostr)
-			return goja.Undefined()
+			er.success = true
+			return obj
 		}
 
 		pods, _ := ezk.ListPods(namespace)

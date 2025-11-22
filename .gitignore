@@ -8,5 +8,5 @@ cert-lan
 result
 complete.zsh
 /node_modules
-package.json
-package-lock.json
+/package-lock.json
+/package.json

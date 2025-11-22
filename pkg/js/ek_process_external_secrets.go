@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/ez"
@@ -54,10 +55,12 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 	return func(call goja.FunctionCall) goja.Value {
 
 		ezk := ez.Kube
+
 		if ezk.IsDryRun() {
 			ezk.FmtDryRun("skipping extractExternalSecrets")
 			return call.This
 		}
+		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
 
 		ctx.checkArgs(call, PROCESS_SECRETS)
 		var arg = call.Argument(0)
@@ -73,12 +76,16 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 
 		ezk.FmtGreen("Processing secrets and applying to %s", namespace)
 
-		filePath := manifest
-		externalSecrets, err := extractExternalSecrets(filePath)
+		pathToYaml := filepath.Join(addonDir, manifest)
+		externalSecrets, err := extractExternalSecrets(pathToYaml)
+		datasource := ctx.AddonCtx.addon.GetName()
 
 		for i := range externalSecrets {
-			secret := ezk.TransformExternalSecret(externalSecrets[i], secretSource, namespace)
-			ezk.CreateSecret(namespace, externalSecrets[i].Metadata.Name, secret.Data)
+			secret := ezk.TransformExternalSecret(externalSecrets[i], secretSource, datasource, namespace)
+			if err := ezk.CreateSecret(namespace, externalSecrets[i].Metadata.Name, secret.Data); err != nil {
+				ezk.FmtRed("error creating secret: %v", err)
+				panic(err)
+			}
 		}
 
 		if err != nil {
