@@ -1,13 +1,20 @@
 easykube:
   # location of addons dir
   addon-root: {{ .AddonDir }}
-  
+
   # where local configuration is stored
   config-dir: {{ .ConfigurationDir }}
-  
+
   # if an absolute path is not given, persistence will be located in config-dir
-  # this is used by kind to store peristent data, it will survive cluster deletion
+  # this is used by kind to store persistent data, it will survive cluster deletion
   persistence-dir: {{ .PersistenceDir }}
-  
+
   # Container Runtime (as of now, only docker is supported. podman support is planned)
   container-runtime: docker
+
+  # Declare private registries. Whenever easykube pulls an image, and the registry name contains a substring
+  # defined by repositoryMatch, the credentials are resolved by looking up the values in easykube-secrets.
+  #private-registries:
+  #  - repositoryMatch: partial-domain-name.io
+  #    userKey: userCredentialsKey
+  #    passwordKey: userCredntialPasswordKey

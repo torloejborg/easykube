@@ -12,5 +12,7 @@ func main() {
 	ez.Kube = &ez.EasykubeSingleton{}
 	ez.InitializeKubeSingleton()
 
+	_ = ez.Kube.IEasykubeConfig.PatchConfig()
+
 	cmd.Execute()
 }

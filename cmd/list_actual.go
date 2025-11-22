@@ -62,14 +62,14 @@ func listActual(opts ListOpts) error {
 
 		for _, m := range keys {
 
-			addonStr := modules[m].ShortName
-			if slices.Contains(installed, modules[m].ShortName) {
-				addonStr = modules[m].ShortName + " ✓"
+			addonStr := modules[m].GetShortName()
+			if slices.Contains(installed, modules[m].GetShortName()) {
+				addonStr = modules[m].GetShortName() + " ✓"
 			}
 
 			row := []string{
 				addonStr,
-				modules[m].Config.Description,
+				modules[m].GetConfig().Description,
 			}
 
 			_ = table.Append(row)
@@ -78,6 +78,6 @@ func listActual(opts ListOpts) error {
 
 		_ = table.Render() // Send output to stdout
 	}
-	
+
 	return nil
 }

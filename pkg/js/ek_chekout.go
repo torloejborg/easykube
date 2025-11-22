@@ -28,7 +28,7 @@ func (e *Easykube) GitCheckout() func(goja.FunctionCall) goja.Value {
 
 		repo := call.Argument(0).String()
 		branch := call.Argument(1).String()
-		addonDir := filepath.Dir(e.AddonCtx.addon.File)
+		addonDir := filepath.Dir(e.AddonCtx.addon.GetAddonFile())
 		destination := filepath.Join(addonDir, call.Argument(2).String())
 
 		if ez.FileOrDirExists(destination) {
