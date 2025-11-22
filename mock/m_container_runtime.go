@@ -113,9 +113,11 @@ func (c *MockIContainerRuntimeCommitCall) DoAndReturn(f func(string)) *MockICont
 }
 
 // ContainerWriteFile mocks base method.
-func (m *MockIContainerRuntime) ContainerWriteFile(containerId, dst, filename string, data []byte) {
+func (m *MockIContainerRuntime) ContainerWriteFile(containerId, dst, filename string, data []byte) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "ContainerWriteFile", containerId, dst, filename, data)
+	ret := m.ctrl.Call(m, "ContainerWriteFile", containerId, dst, filename, data)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // ContainerWriteFile indicates an expected call of ContainerWriteFile.
@@ -131,19 +133,19 @@ type MockIContainerRuntimeContainerWriteFileCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeContainerWriteFileCall) Return() *MockIContainerRuntimeContainerWriteFileCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeContainerWriteFileCall) Return(arg0 error) *MockIContainerRuntimeContainerWriteFileCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeContainerWriteFileCall) Do(f func(string, string, string, []byte)) *MockIContainerRuntimeContainerWriteFileCall {
+func (c *MockIContainerRuntimeContainerWriteFileCall) Do(f func(string, string, string, []byte) error) *MockIContainerRuntimeContainerWriteFileCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeContainerWriteFileCall) DoAndReturn(f func(string, string, string, []byte)) *MockIContainerRuntimeContainerWriteFileCall {
+func (c *MockIContainerRuntimeContainerWriteFileCall) DoAndReturn(f func(string, string, string, []byte) error) *MockIContainerRuntimeContainerWriteFileCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -187,9 +189,11 @@ func (c *MockIContainerRuntimeCreateContainerRegistryCall) DoAndReturn(f func() 
 }
 
 // Exec mocks base method.
-func (m *MockIContainerRuntime) Exec(containerId string, cmd []string) {
+func (m *MockIContainerRuntime) Exec(containerId string, cmd []string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Exec", containerId, cmd)
+	ret := m.ctrl.Call(m, "Exec", containerId, cmd)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Exec indicates an expected call of Exec.
@@ -205,19 +209,19 @@ type MockIContainerRuntimeExecCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeExecCall) Return() *MockIContainerRuntimeExecCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeExecCall) Return(arg0 error) *MockIContainerRuntimeExecCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeExecCall) Do(f func(string, []string)) *MockIContainerRuntimeExecCall {
+func (c *MockIContainerRuntimeExecCall) Do(f func(string, []string) error) *MockIContainerRuntimeExecCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeExecCall) DoAndReturn(f func(string, []string)) *MockIContainerRuntimeExecCall {
+func (c *MockIContainerRuntimeExecCall) DoAndReturn(f func(string, []string) error) *MockIContainerRuntimeExecCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -262,11 +266,12 @@ func (c *MockIContainerRuntimeFindContainerCall) DoAndReturn(f func(string) (*ez
 }
 
 // HasImage mocks base method.
-func (m *MockIContainerRuntime) HasImage(image string) bool {
+func (m *MockIContainerRuntime) HasImage(image string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HasImage", image)
 	ret0, _ := ret[0].(bool)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // HasImage indicates an expected call of HasImage.
@@ -282,29 +287,30 @@ type MockIContainerRuntimeHasImageCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeHasImageCall) Return(arg0 bool) *MockIContainerRuntimeHasImageCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockIContainerRuntimeHasImageCall) Return(arg0 bool, arg1 error) *MockIContainerRuntimeHasImageCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeHasImageCall) Do(f func(string) bool) *MockIContainerRuntimeHasImageCall {
+func (c *MockIContainerRuntimeHasImageCall) Do(f func(string) (bool, error)) *MockIContainerRuntimeHasImageCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeHasImageCall) DoAndReturn(f func(string) bool) *MockIContainerRuntimeHasImageCall {
+func (c *MockIContainerRuntimeHasImageCall) DoAndReturn(f func(string) (bool, error)) *MockIContainerRuntimeHasImageCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // HasImageInKindRegistry mocks base method.
-func (m *MockIContainerRuntime) HasImageInKindRegistry(name string) bool {
+func (m *MockIContainerRuntime) HasImageInKindRegistry(name string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HasImageInKindRegistry", name)
 	ret0, _ := ret[0].(bool)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // HasImageInKindRegistry indicates an expected call of HasImageInKindRegistry.
@@ -320,19 +326,19 @@ type MockIContainerRuntimeHasImageInKindRegistryCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeHasImageInKindRegistryCall) Return(arg0 bool) *MockIContainerRuntimeHasImageInKindRegistryCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockIContainerRuntimeHasImageInKindRegistryCall) Return(arg0 bool, arg1 error) *MockIContainerRuntimeHasImageInKindRegistryCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeHasImageInKindRegistryCall) Do(f func(string) bool) *MockIContainerRuntimeHasImageInKindRegistryCall {
+func (c *MockIContainerRuntimeHasImageInKindRegistryCall) Do(f func(string) (bool, error)) *MockIContainerRuntimeHasImageInKindRegistryCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeHasImageInKindRegistryCall) DoAndReturn(f func(string) bool) *MockIContainerRuntimeHasImageInKindRegistryCall {
+func (c *MockIContainerRuntimeHasImageInKindRegistryCall) DoAndReturn(f func(string) (bool, error)) *MockIContainerRuntimeHasImageInKindRegistryCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -376,11 +382,12 @@ func (c *MockIContainerRuntimeIsClusterRunningCall) DoAndReturn(f func() bool) *
 }
 
 // IsContainerRunning mocks base method.
-func (m *MockIContainerRuntime) IsContainerRunning(containerID string) bool {
+func (m *MockIContainerRuntime) IsContainerRunning(containerID string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsContainerRunning", containerID)
 	ret0, _ := ret[0].(bool)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // IsContainerRunning indicates an expected call of IsContainerRunning.
@@ -396,19 +403,19 @@ type MockIContainerRuntimeIsContainerRunningCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeIsContainerRunningCall) Return(arg0 bool) *MockIContainerRuntimeIsContainerRunningCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockIContainerRuntimeIsContainerRunningCall) Return(arg0 bool, arg1 error) *MockIContainerRuntimeIsContainerRunningCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeIsContainerRunningCall) Do(f func(string) bool) *MockIContainerRuntimeIsContainerRunningCall {
+func (c *MockIContainerRuntimeIsContainerRunningCall) Do(f func(string) (bool, error)) *MockIContainerRuntimeIsContainerRunningCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeIsContainerRunningCall) DoAndReturn(f func(string) bool) *MockIContainerRuntimeIsContainerRunningCall {
+func (c *MockIContainerRuntimeIsContainerRunningCall) DoAndReturn(f func(string) (bool, error)) *MockIContainerRuntimeIsContainerRunningCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -452,11 +459,12 @@ func (c *MockIContainerRuntimeIsContainerRuntimeAvailableCall) DoAndReturn(f fun
 }
 
 // IsNetworkConnectedToContainer mocks base method.
-func (m *MockIContainerRuntime) IsNetworkConnectedToContainer(containerID, networkID string) bool {
+func (m *MockIContainerRuntime) IsNetworkConnectedToContainer(containerID, networkID string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsNetworkConnectedToContainer", containerID, networkID)
 	ret0, _ := ret[0].(bool)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // IsNetworkConnectedToContainer indicates an expected call of IsNetworkConnectedToContainer.
@@ -472,27 +480,29 @@ type MockIContainerRuntimeIsNetworkConnectedToContainerCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeIsNetworkConnectedToContainerCall) Return(arg0 bool) *MockIContainerRuntimeIsNetworkConnectedToContainerCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockIContainerRuntimeIsNetworkConnectedToContainerCall) Return(arg0 bool, arg1 error) *MockIContainerRuntimeIsNetworkConnectedToContainerCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeIsNetworkConnectedToContainerCall) Do(f func(string, string) bool) *MockIContainerRuntimeIsNetworkConnectedToContainerCall {
+func (c *MockIContainerRuntimeIsNetworkConnectedToContainerCall) Do(f func(string, string) (bool, error)) *MockIContainerRuntimeIsNetworkConnectedToContainerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeIsNetworkConnectedToContainerCall) DoAndReturn(f func(string, string) bool) *MockIContainerRuntimeIsNetworkConnectedToContainerCall {
+func (c *MockIContainerRuntimeIsNetworkConnectedToContainerCall) DoAndReturn(f func(string, string) (bool, error)) *MockIContainerRuntimeIsNetworkConnectedToContainerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // NetworkConnect mocks base method.
-func (m *MockIContainerRuntime) NetworkConnect(containerId, networkId string) {
+func (m *MockIContainerRuntime) NetworkConnect(containerId, networkId string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "NetworkConnect", containerId, networkId)
+	ret := m.ctrl.Call(m, "NetworkConnect", containerId, networkId)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // NetworkConnect indicates an expected call of NetworkConnect.
@@ -508,33 +518,35 @@ type MockIContainerRuntimeNetworkConnectCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeNetworkConnectCall) Return() *MockIContainerRuntimeNetworkConnectCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeNetworkConnectCall) Return(arg0 error) *MockIContainerRuntimeNetworkConnectCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeNetworkConnectCall) Do(f func(string, string)) *MockIContainerRuntimeNetworkConnectCall {
+func (c *MockIContainerRuntimeNetworkConnectCall) Do(f func(string, string) error) *MockIContainerRuntimeNetworkConnectCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeNetworkConnectCall) DoAndReturn(f func(string, string)) *MockIContainerRuntimeNetworkConnectCall {
+func (c *MockIContainerRuntimeNetworkConnectCall) DoAndReturn(f func(string, string) error) *MockIContainerRuntimeNetworkConnectCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // PullImage mocks base method.
-func (m *MockIContainerRuntime) PullImage(image string, privateRegistryCredentials *string) {
+func (m *MockIContainerRuntime) PullImage(image string, credentials *ez.PrivateRegistryCredentials) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "PullImage", image, privateRegistryCredentials)
+	ret := m.ctrl.Call(m, "PullImage", image, credentials)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // PullImage indicates an expected call of PullImage.
-func (mr *MockIContainerRuntimeMockRecorder) PullImage(image, privateRegistryCredentials any) *MockIContainerRuntimePullImageCall {
+func (mr *MockIContainerRuntimeMockRecorder) PullImage(image, credentials any) *MockIContainerRuntimePullImageCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PullImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PullImage), image, privateRegistryCredentials)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PullImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PullImage), image, credentials)
 	return &MockIContainerRuntimePullImageCall{Call: call}
 }
 
@@ -544,33 +556,35 @@ type MockIContainerRuntimePullImageCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimePullImageCall) Return() *MockIContainerRuntimePullImageCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimePullImageCall) Return(arg0 error) *MockIContainerRuntimePullImageCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimePullImageCall) Do(f func(string, *string)) *MockIContainerRuntimePullImageCall {
+func (c *MockIContainerRuntimePullImageCall) Do(f func(string, *ez.PrivateRegistryCredentials) error) *MockIContainerRuntimePullImageCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimePullImageCall) DoAndReturn(f func(string, *string)) *MockIContainerRuntimePullImageCall {
+func (c *MockIContainerRuntimePullImageCall) DoAndReturn(f func(string, *ez.PrivateRegistryCredentials) error) *MockIContainerRuntimePullImageCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // PushImage mocks base method.
-func (m *MockIContainerRuntime) PushImage(image string) {
+func (m *MockIContainerRuntime) PushImage(src, image string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "PushImage", image)
+	ret := m.ctrl.Call(m, "PushImage", src, image)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // PushImage indicates an expected call of PushImage.
-func (mr *MockIContainerRuntimeMockRecorder) PushImage(image any) *MockIContainerRuntimePushImageCall {
+func (mr *MockIContainerRuntimeMockRecorder) PushImage(src, image any) *MockIContainerRuntimePushImageCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PushImage), image)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PushImage), src, image)
 	return &MockIContainerRuntimePushImageCall{Call: call}
 }
 
@@ -580,27 +594,29 @@ type MockIContainerRuntimePushImageCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimePushImageCall) Return() *MockIContainerRuntimePushImageCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimePushImageCall) Return(arg0 error) *MockIContainerRuntimePushImageCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimePushImageCall) Do(f func(string)) *MockIContainerRuntimePushImageCall {
+func (c *MockIContainerRuntimePushImageCall) Do(f func(string, string) error) *MockIContainerRuntimePushImageCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimePushImageCall) DoAndReturn(f func(string)) *MockIContainerRuntimePushImageCall {
+func (c *MockIContainerRuntimePushImageCall) DoAndReturn(f func(string, string) error) *MockIContainerRuntimePushImageCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RemoveContainer mocks base method.
-func (m *MockIContainerRuntime) RemoveContainer(id string) {
+func (m *MockIContainerRuntime) RemoveContainer(id string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RemoveContainer", id)
+	ret := m.ctrl.Call(m, "RemoveContainer", id)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // RemoveContainer indicates an expected call of RemoveContainer.
@@ -616,27 +632,29 @@ type MockIContainerRuntimeRemoveContainerCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeRemoveContainerCall) Return() *MockIContainerRuntimeRemoveContainerCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeRemoveContainerCall) Return(arg0 error) *MockIContainerRuntimeRemoveContainerCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeRemoveContainerCall) Do(f func(string)) *MockIContainerRuntimeRemoveContainerCall {
+func (c *MockIContainerRuntimeRemoveContainerCall) Do(f func(string) error) *MockIContainerRuntimeRemoveContainerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeRemoveContainerCall) DoAndReturn(f func(string)) *MockIContainerRuntimeRemoveContainerCall {
+func (c *MockIContainerRuntimeRemoveContainerCall) DoAndReturn(f func(string) error) *MockIContainerRuntimeRemoveContainerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // StartContainer mocks base method.
-func (m *MockIContainerRuntime) StartContainer(id string) {
+func (m *MockIContainerRuntime) StartContainer(id string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "StartContainer", id)
+	ret := m.ctrl.Call(m, "StartContainer", id)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // StartContainer indicates an expected call of StartContainer.
@@ -652,27 +670,29 @@ type MockIContainerRuntimeStartContainerCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeStartContainerCall) Return() *MockIContainerRuntimeStartContainerCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeStartContainerCall) Return(arg0 error) *MockIContainerRuntimeStartContainerCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeStartContainerCall) Do(f func(string)) *MockIContainerRuntimeStartContainerCall {
+func (c *MockIContainerRuntimeStartContainerCall) Do(f func(string) error) *MockIContainerRuntimeStartContainerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeStartContainerCall) DoAndReturn(f func(string)) *MockIContainerRuntimeStartContainerCall {
+func (c *MockIContainerRuntimeStartContainerCall) DoAndReturn(f func(string) error) *MockIContainerRuntimeStartContainerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // StopContainer mocks base method.
-func (m *MockIContainerRuntime) StopContainer(id string) {
+func (m *MockIContainerRuntime) StopContainer(id string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "StopContainer", id)
+	ret := m.ctrl.Call(m, "StopContainer", id)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // StopContainer indicates an expected call of StopContainer.
@@ -688,27 +708,29 @@ type MockIContainerRuntimeStopContainerCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeStopContainerCall) Return() *MockIContainerRuntimeStopContainerCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeStopContainerCall) Return(arg0 error) *MockIContainerRuntimeStopContainerCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeStopContainerCall) Do(f func(string)) *MockIContainerRuntimeStopContainerCall {
+func (c *MockIContainerRuntimeStopContainerCall) Do(f func(string) error) *MockIContainerRuntimeStopContainerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeStopContainerCall) DoAndReturn(f func(string)) *MockIContainerRuntimeStopContainerCall {
+func (c *MockIContainerRuntimeStopContainerCall) DoAndReturn(f func(string) error) *MockIContainerRuntimeStopContainerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // TagImage mocks base method.
-func (m *MockIContainerRuntime) TagImage(source, target string) {
+func (m *MockIContainerRuntime) TagImage(source, target string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "TagImage", source, target)
+	ret := m.ctrl.Call(m, "TagImage", source, target)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // TagImage indicates an expected call of TagImage.
@@ -724,19 +746,19 @@ type MockIContainerRuntimeTagImageCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeTagImageCall) Return() *MockIContainerRuntimeTagImageCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeTagImageCall) Return(arg0 error) *MockIContainerRuntimeTagImageCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeTagImageCall) Do(f func(string, string)) *MockIContainerRuntimeTagImageCall {
+func (c *MockIContainerRuntimeTagImageCall) Do(f func(string, string) error) *MockIContainerRuntimeTagImageCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeTagImageCall) DoAndReturn(f func(string, string)) *MockIContainerRuntimeTagImageCall {
+func (c *MockIContainerRuntimeTagImageCall) DoAndReturn(f func(string, string) error) *MockIContainerRuntimeTagImageCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

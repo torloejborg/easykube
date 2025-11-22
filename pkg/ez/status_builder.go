@@ -1,6 +1,7 @@
 package ez
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -23,6 +24,7 @@ type IStatusBuilder interface {
 	getHelmVersion() string
 	getKubectlVersion() string
 	getKustomizeVersion() string
+	getPodmanVersion() string
 	getVersionStr(in, wants string, inErr error) string
 }
 
@@ -38,12 +40,12 @@ func NewStatusBuilder() IStatusBuilder {
 
 func (s *StatusBuilderImpl) DoContainerCheck() error {
 	if !Kube.IsContainerRuntimeAvailable() {
-		Kube.FmtRed("Container runtime not available, is docker running??")
-		os.Exit(-1)
+		return errors.New("container runtime not available, is docker running")
 	}
 
 	running := func(containerID string) {
-		if Kube.IsContainerRunning(containerID) {
+
+		if running, _ := Kube.IsContainerRunning(containerID); running {
 			Kube.FmtGreen("✓ %s container", containerID)
 		} else {
 			Kube.FmtRed("⚠ %s container not running", containerID)
@@ -54,7 +56,7 @@ func (s *StatusBuilderImpl) DoContainerCheck() error {
 	running(constants.REGISTRY_CONTAINER)
 	running(constants.KIND_CONTAINER)
 
-	if Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind") {
+	if connected, _ := Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind"); connected {
 		Kube.FmtGreen("✓ %s connected to kind network", constants.REGISTRY_CONTAINER)
 	} else {
 		Kube.FmtRed("⚠ %s not connected to kind network", constants.REGISTRY_CONTAINER)
@@ -83,10 +85,25 @@ func (s *StatusBuilderImpl) DoBinaryCheck() error {
 		}
 	}
 
+	cfg, err := Kube.IEasykubeConfig.LoadConfig()
+	if err != nil {
+		return err
+	}
+
 	Kube.FmtGreen("Inspecting binary dependencies")
 	versionCheck := make([]binaryCheckStatus, 0)
+
+	runtime := cfg.ContainerRuntime
+
+	if runtime == "docker" {
+		versionCheck = append(versionCheck, checkBinary("docker", s.getDockerVersion))
+	}
+
+	if runtime == "podman" {
+		versionCheck = append(versionCheck, checkBinary("podman", s.getPodmanVersion))
+	}
+
 	versionCheck = append(versionCheck, checkBinary("kubectl", s.getKubectlVersion))
-	versionCheck = append(versionCheck, checkBinary("docker", s.getDockerVersion))
 	versionCheck = append(versionCheck, checkBinary("helm", s.getHelmVersion))
 	versionCheck = append(versionCheck, checkBinary("kustomize", s.getKustomizeVersion))
 
@@ -161,6 +178,11 @@ func (s *StatusBuilderImpl) getHelmVersion() string {
 func (s *StatusBuilderImpl) getKustomizeVersion() string {
 	out, _, err := Kube.RunCommand("kustomize", []string{"version"}...)
 	return s.getVersionStr(out, constants.KUSTOMIZE_SEMVER, err)
+}
+
+func (s *StatusBuilderImpl) getPodmanVersion() string {
+	out, _, err := Kube.RunCommand("/usr/bin/podman", []string{"version", "--format", " {{.Version}}"}...)
+	return s.getVersionStr(out, constants.PODMAN_SEMVER, err)
 }
 
 func (s *StatusBuilderImpl) getVersionStr(in, wants string, inErr error) string {

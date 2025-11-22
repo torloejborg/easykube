@@ -8,18 +8,24 @@ import (
 func destroyActual() error {
 
 	ezk := ez.Kube
-	search, err := ezk.FindContainer(constants.KIND_CONTAINER)
-	if err != nil {
+	if search, err := ezk.FindContainer(constants.KIND_CONTAINER); err != nil {
 		return err
-	}
+	} else if search.Found {
 
-	if search.Found {
-		ezk.FmtYellow("Stopping %s", constants.KIND_CONTAINER)
 		if search.IsRunning {
-			ezk.StopContainer(search.ContainerID)
+
+			if _, err := ezk.FmtSpinner(func() (any, error) {
+				return nil, ezk.StopContainer(search.ContainerID)
+			}, "Stopping %s", constants.KIND_CONTAINER); err != nil {
+				return err
+			}
 		}
-		ezk.RemoveContainer(search.ContainerID)
-		ezk.FmtYellow("Removing %s", constants.KIND_CONTAINER)
+
+		if _, err := ezk.FmtSpinner(func() (any, error) {
+			return nil, ezk.RemoveContainer(search.ContainerID)
+		}, "Removing %s", constants.KIND_CONTAINER); err != nil {
+			return err
+		}
 	}
 
 	return nil

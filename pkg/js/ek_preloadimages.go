@@ -1,16 +1,12 @@
 package jsutils
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"strings"
 	"sync"
 
+	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
-	"k8s.io/utils/ptr"
-
-	"github.com/dop251/goja"
 )
 
 func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
@@ -38,73 +34,60 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		var wg sync.WaitGroup
 
 		if mustPull {
-			ezk.FmtYellow("🖼 will pull fresh images")
+			ezk.FmtGreen("🖼 will pull fresh images")
 		}
 
 		for source, dest := range result {
 			i++
 			wg.Add(1)
 			go func() {
-				if !ezk.HasImageInKindRegistry(dest) || mustPull {
 
-					registryCredentials := getPrivateRegistryCredentials(source, config.PrivateRegistries)
-
-					if registryCredentials.Base64EncodedDockerSecret != "" {
-
+				registryCredentials := getPrivateRegistryCredentials(source, config.PrivateRegistries)
+				if hasImage, err := ezk.HasImageInKindRegistry(dest); err != nil {
+					panic(err)
+				} else if !hasImage || mustPull {
+					if registryCredentials != nil {
 						ezk.FmtGreen("🖼  pull from private registry %s using secret keys (%s,%s)", source,
-							registryCredentials.UserKey,
-							registryCredentials.PasswordKey)
-
-						ezk.PullImage(source, ptr.To(registryCredentials.Base64EncodedDockerSecret))
+							registryCredentials.Username,
+							"[redacted]")
+						if err := ezk.PullImage(source, registryCredentials); err != nil {
+							panic(err)
+						}
 
 					} else {
 						ezk.FmtGreen("🖼  pull %s", source)
-						ezk.PullImage(source, nil)
+						if err := ezk.PullImage(source, nil); err != nil {
+							panic(err)
+						}
 					}
 
 					ezk.FmtGreen("🖼  tag %s to %s", source, dest)
-					ezk.TagImage(source, dest)
+					if err := ezk.TagImage(source, dest); err != nil {
+						panic(err)
+					}
 
-					ezk.PushImage(dest)
+					if err := ezk.PushImage(source, dest); err != nil {
+						panic(err)
+					}
 					ezk.FmtGreen("🖼  pushed %s", dest)
 				}
 				defer wg.Done()
 			}()
-		}
 
-		if i > 0 {
-			wg.Wait()
+			if i > 0 {
+				wg.Wait()
+			}
 		}
-
 		return goja.Undefined()
 	}
 }
 
-type privateRegistryCredentials struct {
-	UserKey                   string
-	PasswordKey               string
-	Base64EncodedDockerSecret string
-}
-
-func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) privateRegistryCredentials {
+func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) *ez.PrivateRegistryCredentials {
 
 	secret, err := ez.Kube.GetSecret("easykube-secrets", "default")
 
 	if err != nil {
-		panic(err)
-	}
-
-	if strings.Contains(registry, "ccta.dk") {
-		jsonBytes, _ := json.Marshal(map[string]string{
-			"username": string(secret["artifactoryUsername"]),
-			"password": string(secret["artifactoryPassword"]),
-		})
-
-		return privateRegistryCredentials{
-			UserKey:                   "artifactoryUsername",
-			PasswordKey:               "artifactoryPassword",
-			Base64EncodedDockerSecret: base64.StdEncoding.EncodeToString(jsonBytes),
-		}
+		return nil
 	}
 
 	for i := range config {
@@ -113,20 +96,14 @@ func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry)
 
 			if secret[config[i].UserKey] == nil || secret[config[i].PasswordKey] == nil {
 				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RepositoryMatch)
-				return privateRegistryCredentials{"", "", ""}
+				return nil
 			}
-
-			jsonBytes, _ := json.Marshal(map[string]string{
-				"username": string(secret[config[i].UserKey]),
-				"password": string(secret[config[i].PasswordKey]),
-			})
-
-			return privateRegistryCredentials{
-				UserKey:                   config[i].UserKey,
-				PasswordKey:               config[i].PasswordKey,
-				Base64EncodedDockerSecret: base64.StdEncoding.EncodeToString(jsonBytes)}
+			return &ez.PrivateRegistryCredentials{
+				Username: config[i].UserKey,
+				Password: config[i].PasswordKey,
+			}
 		}
 	}
 
-	return privateRegistryCredentials{"", "", ""}
+	return nil
 }

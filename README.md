@@ -58,13 +58,17 @@ By itself, easykube is not very exciting, it can only establish an empty cluster
     config-dir: /home/user/.config/easykube
     # if an absolute path is not given, persistence will be located in config-dir
     persistence-dir: /home/user/.config/easykube/persistence
+    #private-registries:
+    #  - repositoryMatch: partial-domain-name.io
+    #    userKey: userCredentialsKey
+    #    passwordKey: userCredntialPasswordKey
    ```
     The important part being the path to the addons dir, change to match the location of an easykube addon repository.
 
 4. Use it; `easykube --help` prints out a summary of all commands, `easykube <command> --help` prints the summary for that command. 
 
-6. `easykube create -s <path to a property file>` (could be a .gradle/gradle.properties file) creates a kind cluster and importsthe properites as a secret, this is used resolve credentials for private docker registries.
- NOTE: If you are not using a private repository, the "-s" argument can be skipped, and images will be pulled from dockerhub.
+6. `easykube create -s <path to a property file>` (could be a .gradle/gradle.properties file) creates a kind cluster and imports the properties as a secret, this is used resolve credentials for private docker registries.
+ NOTE: If you are not using a private repository, the "-s" argument can be omitted, and images will be pulled from dockerhub. To read more about configuring private registries read [this page](https://torloejborg.github.io/easykube/easykube/latest/install/)
 
 ## What it does
 
