@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Internals :: Easykube Documentation</title>
-    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/internals/">
+    <title>Container Runtimes :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/container_runtimes/">
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../../_/css/site.css">
 <link rel="stylesheet" href="../../../_/css/vendor/asciinema-player.css">
@@ -50,11 +50,11 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../using/">Usage</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="./">Internals</a>
-  </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
+    <a class="nav-link" href="../internals/">Internals</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="./">Container Runtimes</a>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../faq/">FAQ</a>
@@ -86,7 +86,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../">EasyKube</a></li>
-    <li><a href="./">Internals</a></li>
+    <li><a href="./">Container Runtimes</a></li>
   </ul>
 </nav>
 </div>
@@ -95,48 +95,58 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Internals<a id="internals-internals"></a></h1>
+<h1 class="page">Container Runtimes</h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_dns_resolution">DNS Resolution</a></li>
+<li><a href="#_docker">Docker</a></li>
+<li><a href="#_podman">Podman</a></li>
 </ul>
 </div>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>On this page we describe some of the internals, and how easykube differs from a plain Kind instance.</p>
+<p>Currently easykube support docker and podman container runtimes, each have subtle differences and modes of operation.</p>
+</div>
+<div class="paragraph">
+<p>Chosing a runtime is done in the easykube configuration file</p>
+</div>
+<div class="paragraph">
+<p><code>$ easykube config</code></p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dns_resolution"><a class="anchor" href="#_dns_resolution"></a>DNS Resolution<a id="internals-dns"></a></h2>
+<h2 id="_docker"><a class="anchor" href="#_docker"></a>Docker</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>It might seem strange that everything is available at <code>*.localtest.me</code> - This is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to <code>localtest.me</code> and any subdomain will resolve to  <code>127.0.0.1</code>.</p>
+<p>Docker is widely used, and can be found on many platforms combined with the desktop manager. In most cases docker runs with a set of permissive privileges (on default installations) it runs as the superuser (root) - which has it&#8217;s pros and cons.</p>
 </div>
 <div class="paragraph">
-<p>Easykube takes advantage of this by configuring ingresses to use this hostname, so if you are familiar with apache httpd or another web server, it fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by kubernetes.</p>
+<p>On a developer machine, elevated permissions are in many cases acceptable. However, in some organizations docker is banned because of security concerns.</p>
 </div>
 <div class="paragraph">
-<p>In the old days, we would have to manually create a virtual host, and add an entry in our hosts file.</p>
+<p>Easykube has not been tested with rootless docker, for rootless operation consider using podman instead.</p>
 </div>
 <div class="paragraph">
-<p>Sometimes services inside easykube need to resolve names like <code>something.localtest.me</code> this won&#8217;t work, because 127.0.0.1 does not point to any <a href="https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip">ClusterIP</a>.</p>
+<p>Privileged Docker mostly give less friction.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_podman"><a class="anchor" href="#_podman"></a>Podman</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>We can get around this by emulating something called <em>split-dns</em>. Depending on which network you originate, a different IP adress is resolved.</p>
+<p>In constrained environments, it&#8217;s possible to use easykube together with rootless podman. If you are new to Podman, there are some subtle differences you should be aware of.</p>
 </div>
-<div class="paragraph">
-<p>When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from <code>*.localtest.me</code>. Below is excerpt from the coredns config which does the trick.</p>
-</div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre class="highlight"><code class="language-text" data-lang="text">   rewrite stop {
-       name regex (.*)\.localtest.me {1}-ext.default.svc.cluster.local
-       answer auto
-    }</code></pre>
+<pre>Image names are not automatically resolved.</pre>
 </div>
+</div>
+<div class="paragraph">
+<p>This means you must specify the fully qualified registry name for an image,
+for instance;  the image <code>busybox:latest</code> won&#8217;t automatically resolve with the podman go library. Using docker it&#8217;s just assumed that the image lives on dockerhub, using Podman the image should be specified as <code>dockerhub.io/library/busybox:latest</code>.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -145,25 +155,15 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Currently, <strong>ext</strong> services can only reside in the default namespace.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>Easykube expects to talk to podman via a socket, on Linux systems this socket can typically be found in <code>/run/user/&lt;uid&gt;/podman/podman.socket</code></p>
 </div>
 <div class="paragraph">
-<p>The patch will translate <code>foo.localtest.me</code> into <code>ext-foo.default.svc.cluster.local</code> - So if you create a ClusterIP service with that name - requests originating from within the cluster will resolve to the ClusterIP.</p>
+<p>If the socket it not there, and you are using a systemd based OS, try and start it with</p>
 </div>
 <div class="paragraph">
-<p>External requests will hit the ingress as usual.</p>
+<p><code>systemctl --user start podman.socket</code></p>
 </div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-Use <strong>ext</strong> services to emulate services that need to communicate in a transparent way. An example; testing a CI workflow setup with a git server (gitea) and a Jenkins instance, gitea will define an ext-* ClusterIP service, jenkins can then refer to the server with just <code>gita.localtest.me</code> instead of <code>gitea.default.svc.cluster.local</code>
 </td>
 </tr>
 </table>
