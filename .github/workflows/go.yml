@@ -19,10 +19,10 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v6
       with:
-        go-version: '1.24.0'
+        go-version: '1.24.2'
 
     - name: Build
-      run: go build -v ./...
+      run: go build -tags=remote,containers_remote,exclude_graphdriver_btrfs,exclude_graphdriver_devicemapper,exclude_graphdriver_overlay,exclude_graphdriver_zfs -v ./...
 
     - name: Test
-      run: go test -v ./...
+      run: go test -tags=remote,containers_remote,exclude_graphdriver_btrfs,exclude_graphdriver_devicemapper,exclude_graphdriver_overlay,exclude_graphdriver_zfs -v ./...
