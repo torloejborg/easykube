@@ -640,14 +640,14 @@ func (k *K8SUtilsImpl) TransformExternalSecret(secret ExternalSecret, mockData m
 
 				k8sSecret.Data[dataItem.SecretKey] = value
 			} else {
-				Kube.FmtYellow("Warning: Property %s not found in external secret %s for key %s\n",
-					secret.Metadata.Name,
+				Kube.FmtYellow("No supplied value were matched for substitution with property '%s' in external secret '%s' mapped by '%s'",
 					property,
+					secret.Metadata.Name,
 					key)
 			}
 		} else {
 
-			Kube.FmtYellow("Warning: Key %s not found in map sourced from addon %s for external secret \n",
+			Kube.FmtYellow("Warning: Key %s not found in map sourced from addon %s for external secret",
 				key,
 				addonName,
 				secret.Metadata.Name)

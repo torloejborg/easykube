@@ -13,11 +13,16 @@ import (
 func (ctx *Easykube) KeyValue() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, KEY_VALUE)
+		inputStr := ctx.CobraCommandHelder.GetStringFlag(constants.FLAG_KEYVALUE)
+		if inputStr == "" {
+			return goja.Undefined()
+		}
+
 		key := call.Argument(0).String()
-		kvmap, err := parseKVPairs(ctx.CobraCommandHelder.GetStringFlag(constants.FLAG_KEYVALUE))
+		kvmap, err := parseKVPairs(inputStr)
 
 		if err != nil {
-			ez.Kube.FmtRed("Error parsing key-value pairs: %s", err.Error())
+			ez.Kube.FmtYellow("Failed to parse key-value pairs: %s ,input was %s", err.Error(), inputStr)
 			return goja.Undefined()
 		}
 
