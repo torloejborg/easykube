@@ -58,8 +58,7 @@
           ];
 
         #vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-        vendorHash = "sha256-v2+sWT8fn6HsPdn4545SZ+37alMSZ+JXoOGweGj5yWQ=";
-
+        vendorHash = "sha256-DuRFwAZzu7XXXRFrxFM2t2RH48HKKw/th0n+tVzVGBU=";
       };
 
       devShells.${system} = {
