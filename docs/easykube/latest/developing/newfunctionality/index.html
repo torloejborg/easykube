@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Adding new stuff :: Easykube Documentation</title>
+    <title>Adding New Stuff :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/developing/newfunctionality/">
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../../../_/css/site.css">
@@ -96,19 +96,20 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Adding new stuff</h1>
+<h1 class="page">Adding New Stuff</h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#internals-js">The script runtime</a></li>
+<li><a href="#internals-js">The Script Runtime</a></li>
 <li><a href="#_mocks">Mocks</a></li>
 </ul>
 </div>
 <div class="sect1">
-<h2 id="internals-js"><a class="anchor" href="#internals-js"></a>The script runtime</h2>
+<h2 id="internals-js"><a class="anchor" href="#internals-js"></a>The Script Runtime</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Adding new core functionality is relatively straightforward. Below is the listing of the go file where all exported functions is declared.</p>
+<p>Adding new core functionality is relatively straightforward.
+Below is the listing of the Go file where all exported functions are declared.</p>
 </div>
 <div class="listingblock">
 <div class="title">pkg/js/easykube.go</div>
@@ -144,10 +145,11 @@
 </div>
 </div>
 <div class="paragraph">
-<p>The <strong>_ek</strong> object is populated with a name and a function. To add a function, simply copy/paste an existing file and adapt.</p>
+<p>The <strong>_ek</strong> object is populated with a name and a function.
+To add a function, simply copy/paste an existing file and adapt it.</p>
 </div>
 <div class="paragraph">
-<p>Below the <strong>env</strong> function is listed</p>
+<p>Below is the <strong>env</strong> function:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -167,7 +169,8 @@
 </div>
 </div>
 <div class="paragraph">
-<p>In a nutshell, define a function which has a pointer-receiver to Easykube that returns a function which returns a goja.Value.</p>
+<p>In a nutshell:
+Define a method with a pointer receiver to <code>Easykube</code> that returns a function, which in turn returns a <code>goja.Value</code>.</p>
 </div>
 </div>
 </div>
@@ -175,7 +178,11 @@
 <h2 id="_mocks"><a class="anchor" href="#_mocks"></a>Mocks</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The gomock from Uber is used to generate mocks for most interfaces, so if an interface is changed, remember to regenerate the mocks. Do this with;</p>
+<p><code>gomock</code> from Uber is used to generate mocks for most interfaces.
+If an interface is changed, remember to regenerate the mocks.</p>
+</div>
+<div class="paragraph">
+<p>Run:</p>
 </div>
 <div class="paragraph">
 <p><code>make mock</code></p>

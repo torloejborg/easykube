@@ -113,29 +113,29 @@
 <h2 id="_dns_resolution"><a class="anchor" href="#_dns_resolution"></a>DNS Resolution<a id="internals-dns"></a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>It might seem strange that everything is available at <code>*.localtest.me</code> - This is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to <code>localtest.me</code> and any subdomain will resolve to  <code>127.0.0.1</code>.</p>
+<p>It might seem strange that everything is available at *.localtest.me — this is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to localtest.me and any subdomain will resolve to 127.0.0.1.</p>
 </div>
 <div class="paragraph">
-<p>Easykube takes advantage of this by configuring ingresses to use this hostname, so if you are familiar with apache httpd or another web server, it fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by kubernetes.</p>
+<p>Easykube takes advantage of this by configuring ingresses to use this hostname. If you are familiar with Apache httpd or another web server, it is fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by Kubernetes.</p>
 </div>
 <div class="paragraph">
-<p>In the old days, we would have to manually create a virtual host, and add an entry in our hosts file.</p>
+<p>In the past, we would have had to manually create a virtual host and add an entry in our hosts file.</p>
 </div>
 <div class="paragraph">
-<p>Sometimes services inside easykube need to resolve names like <code>something.localtest.me</code> this won&#8217;t work, because 127.0.0.1 does not point to any <a href="https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip">ClusterIP</a>.</p>
+<p>Sometimes services inside easykube need to resolve names like something.localtest.me. This won&#8217;t work because 127.0.0.1 does not point to any <a href="https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip">ClusterIP</a>.</p>
 </div>
 <div class="paragraph">
-<p>We can get around this by emulating something called <em>split-dns</em>. Depending on which network you originate, a different IP adress is resolved.</p>
+<p>We can get around this by emulating something called split-DNS. Depending on which network you originate from, a different IP address is resolved.</p>
 </div>
 <div class="paragraph">
-<p>When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from <code>*.localtest.me</code>. Below is excerpt from the coredns config which does the trick.</p>
+<p>When easykube is created, the Kubernetes CoreDNS service is patched to intercept addresses from *.localtest.me. Below is an excerpt from the CoreDNS config that accomplishes this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-text" data-lang="text">   rewrite stop {
-       name regex (.*)\.localtest.me {1}-ext.default.svc.cluster.local
-       answer auto
-    }</code></pre>
+<pre class="highlight"><code class="language-text" data-lang="text">rewrite stop {
+name regex (.*).localtest.me {1}-ext.default.svc.cluster.local
+answer auto
+}</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -145,16 +145,11 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Currently, <strong>ext</strong> services can only reside in the default namespace.
+Currently, ext services can only reside in the default namespace.
+The patch will translate foo.localtest.me into ext-foo.default.svc.cluster.local. So if you create a ClusterIP service with that name, requests originating from within the cluster will resolve to the ClusterIP. External requests will hit the ingress as usual.
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>The patch will translate <code>foo.localtest.me</code> into <code>ext-foo.default.svc.cluster.local</code> - So if you create a ClusterIP service with that name - requests originating from within the cluster will resolve to the ClusterIP.</p>
-</div>
-<div class="paragraph">
-<p>External requests will hit the ingress as usual.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -163,7 +158,7 @@ Currently, <strong>ext</strong> services can only reside in the default namespac
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Use <strong>ext</strong> services to emulate services that need to communicate in a transparent way. An example; testing a CI workflow setup with a git server (gitea) and a Jenkins instance, gitea will define an ext-* ClusterIP service, jenkins can then refer to the server with just <code>gita.localtest.me</code> instead of <code>gitea.default.svc.cluster.local</code>
+Use ext services to emulate services that need to communicate in a transparent way. For example, when testing a CI workflow setup with a Git server (Gitea) and a Jenkins instance, Gitea will define an ext-* ClusterIP service, and Jenkins can then refer to the server with just gitea.localtest.me instead of gitea.default.svc.cluster.local.
 </td>
 </tr>
 </table>

@@ -106,51 +106,55 @@
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph">
-<p>Easykube aims to enable sharing and distribution of development "platforms" via it’s companion addon-repositories.</p>
-</div>
-<div class="paragraph">
-<p>It’s meant as a team and individual enabler, everyone can install and work with an application’s particular stack locally, without breaking a shared environment.</p>
-</div>
-<div class="paragraph">
-<p>This is certainly doable with existing tooling, docker-compose and friends are popular choices. So what’s the point of another tool?</p>
-</div>
-<div class="paragraph">
-<p>Kubernetes is also an orchestration platform</p>
-</div>
-<div class="paragraph">
-<p>If you use kubernetes for your workloads, why not re-use the deployments which already exists?</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Easykube aims to enable sharing and distribution of development "platforms" via its companion addon repositories.</p>
+</li>
+<li>
+<p>It is meant as a team and individual enabler: everyone can install and work with an application’s particular stack locally, without breaking a shared environment.</p>
+</li>
+<li>
+<p>This is certainly doable with existing tooling—Docker Compose and friends are popular choices. So what’s the point of another tool?</p>
+</li>
+<li>
+<p>Kubernetes is also an orchestration platform.</p>
+</li>
+<li>
+<p>If you use Kubernetes for your workloads, why not re-use the deployments that already exist?</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="rationale-easykube"><a class="anchor" href="#rationale-easykube"></a>Easykube</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>Is built on top of the awesome Kind project (Kubernetes In Docker) and the incredible Goja javascript runtime go library.</p>
-</div>
 <div class="ulist">
 <ul>
 <li>
-<p>It bootstraps a single-node kind-cluster with some small modifications</p>
+<p>Easykube is built on top of the Kind project (Kubernetes in Docker) and the Goja JavaScript runtime Go library.</p>
 </li>
 <li>
-<p>It automatically sets up a local docker registry for the cluster and connects it, we can build air-gapped environments.</p>
+<p>It bootstraps a single-node Kind cluster with some small modifications.</p>
 </li>
 <li>
-<p>Based on discovered addons, a kind-cluster configuration is generated for the particular addon repository’s use-case (host-ports and extra-mounts)</p>
+<p>It automatically sets up a local Docker registry for the cluster and connects it, allowing air-gapped environments.</p>
 </li>
 <li>
-<p>Persistent data (if used) survives after cluster deletion</p>
+<p>Based on discovered addons, a Kind cluster configuration is generated for the particular addon repository’s use case (host ports and extra mounts).</p>
 </li>
 <li>
-<p>Addon dependency resolution</p>
+<p>Persistent data (if used) survives cluster deletion.</p>
 </li>
 <li>
-<p>Addon installation is programmable via embedded Javascript runtime, highly customizable.</p>
+<p>Addon dependency resolution.</p>
 </li>
 <li>
-<p>A CoreDNS hack lets you access everything from "localtest.me" - Never edit that /etc/hosts file again!</p>
+<p>Addon installation is programmable via the embedded JavaScript runtime, making it highly customizable.</p>
+</li>
+<li>
+<p>A CoreDNS hack lets you access everything from "localtest.me" — never edit your /etc/hosts file again!</p>
 </li>
 </ul>
 </div>
@@ -162,19 +166,19 @@
 <div class="ulist">
 <ul>
 <li>
-<p>Enable your team to install and run your cloud-native application(s) locally - this becomes especially powerful when combined with tools like mirrord.</p>
+<p>Enable your team to install and run your cloud-native application(s) locally—especially powerful when combined with tools like mirrord.</p>
 </li>
 <li>
-<p>Break things, it’s OK. Just start over.</p>
+<p>Break things; it’s OK. Just start over.</p>
 </li>
 <li>
-<p>Effortlessly spin up a local development stack; databases, webservers, caches, workflow-engines, OAuth servers, S3 compatible storage, etc.</p>
+<p>Effortlessly spin up a local development stack: databases, web servers, caches, workflow engines, OAuth servers, S3-compatible storage, etc.</p>
 </li>
 <li>
-<p>Use as a learning/teaching tool for Kubernetes.</p>
+<p>Use as a learning or teaching tool for Kubernetes.</p>
 </li>
 <li>
-<p>Perhaps some team members simply don’t care about this kubernetes stuff - That’s ok, nobody can be forced to fall in love with YAML, instead $ easykube add mystack will have stuff running with minimal effort.</p>
+<p>Perhaps some team members simply don’t care about Kubernetes—That’s OK, nobody can be forced to fall in love with YAML. Instead, $ easykube add mystack will have stuff running with minimal effort.</p>
 </li>
 </ul>
 </div>
@@ -183,12 +187,8 @@
 <div class="sect1">
 <h2 id="rationale-donot"><a class="anchor" href="#rationale-donot"></a>Please do not</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Use in a production setting, run your real workloads on a secured cluster. Easykube is not built with security in mind, only for local workloads.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>Use in a production setting. Run your real workloads on a secured cluster. Easykube is not built with security in mind, only for local workloads.</p>
 </div>
 </div>
 </div>

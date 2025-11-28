@@ -1,3 +1,4 @@
+.create a local cluster, install and create an addon (apologies for the delays in the screencast - the player can be scrubbed)
 {"version":3,"term":{"cols":112,"rows":34,"type":"xterm-256color","version":"Konsole 25.08.1","theme":{"fg":"#17a88b","bg":"#1e2229","palette":"#000000:#b21818:#18b218:#b26818:#1818b2:#b218b2:#18b2b2:#b2b2b2:#686868:#ff5454:#54ff54:#ffff54:#5454ff:#ff54ff:#54ffff:#ffffff"}},"timestamp":1760211616,"env":{"SHELL":"/nix/store/1jzhbwq5rjjaqa75z88ws2b424vh7m53-bash-5.2p32/bin/bash"}}
 [0.002867, "o", "bash-5.2$ "]
 [1.694046, "o", "z"]

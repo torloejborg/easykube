@@ -96,67 +96,63 @@
 </aside>
 <article class="doc">
 <h1 class="page">FAQ</h1>
-<div class="ulist">
-<ul>
-<li>
+<div class="paragraph">
 <p>Why javascript?? I thought this is a Go program?</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Easykube is meant to be flexible, and used in different contexts with different addon repositories. Easykube defines a core set of utility functions which can be combined in interesting ways via scripting. Instead of inventing a dedicated <em>easykube-script</em> language (which could be a fun challenge), it was instead decided to spare the innocent and use an existing library, enter <a href="https://github.com/dop251/goja">Goja</a>, a Javascript VM for Golang.</p>
+<p>Easykube is designed to be flexible and used in different contexts with different addon repositories. It defines a core set of utility functions that can be combined in useful ways through scripting. Instead of inventing a dedicated easykube-script language (tempting as that may be), it was decided to use an existing library instead. Enter <a href="https://github.com/dop251/goja">Goja</a>, a JavaScript VM for Golang.</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>When creating the cluster, easykube complains about occupied ports, what should I do?</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>As the error states, hunt down any services you already have running and shut them down. Alternatively you can comment or remove the extraPorts section in the offending addon.</p>
+<p>As the error states, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the extraPorts section in the offending addon.</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>Where did all my diskspace go?</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Some docker images are quite fat, and Easykube keeps images in triplicate. When an image is pulled from a remote registry, it is stored in your local docker context. Then the image is pushed to the local registry, and finally pulled into the kind-control plane. This is noticeable if the cluster was repeatedly created/destroyed - Just clean up the old containers and volumes, and space will be reclaimed.</p>
+<p>Some Docker images are quite large, and easykube may keep images in triplicate. When an image is pulled from a remote registry, it is stored in your local Docker context. Then it is pushed to the local registry, and finally pulled into the kind control plane. This becomes noticeable if the cluster is repeatedly created and destroyed. Cleaning up old containers and volumes will reclaim the space.</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>My javascript throws errors, how can I debug what&#8217;s going on?</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Unfortunately, I&#8217;m not aware of how to wire an external debugger into a Goja runtime. So at this point your best bet is the good old print-line debugging. At least easkyube will tell you which addon is the offender.</p>
+<p>Unfortunately, there is no straightforward way to attach an external debugger to a Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>Sometimes easykube fails with an error about 'deployment not ready' when adding something.</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Some workloads just take some time to be ready, the <code>waitForDeployment</code> times out after 1 minute, it depends on your machine and the type of deployment - In any case you can retry. If you have the option, patching readiness/liveliness probes to some lower values, could also work.</p>
+<p>Some workloads simply take longer to become ready. The waitForDeployment function times out after 1 minute. This depends on your machine and the nature of the deployment. In most cases you can just retry. If possible, lowering readiness/liveness probe thresholds may also help.</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>I cannot create postgres databases, it throws errors when creating or starting the database, what can I do?</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>If you switched to a newer version - Existing database files might be not be compatible with a new version, either revert to the previous version, or delete the files in the postgres persistence directory.</p>
-</li>
-</ul>
-</div>
+<p>If you switched to a newer version, existing database files might not be compatible. Either revert to the previous version or delete the files in the Postgres persistence directory.</p>
 </li>
 </ul>
 </div>

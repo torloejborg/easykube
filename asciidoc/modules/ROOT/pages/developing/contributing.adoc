@@ -1,20 +1,19 @@
 = Contributing
 
-This is an opensource project, so pull requests are welcome.
+This is an open-source project, so pull requests are welcome.
 
-Use nix to get all the tools you need for development,
-the nix flake has three shell variants;
+Use Nix to get all the tools you need for development.
+The Nix flake provides three shell variants:
 
 * default
 * light
 * docs
 
-
 == Default
 
-First make sure you have nix installed, this is mentioned xref:install.adoc#install-nix[here].
+First, make sure you have Nix installed; this is described xref:install.adoc#install-nix[here].
 
-Then clone the repository, the default shell will set things up and compile easykube, however, this can get tedious. Instead, use the light variant for development.
+Then clone the repository. The default shell will set everything up and compile easykube. However, this can get tedious during development, so it is recommended to use the *light* variant instead.
 
 == Light
 
@@ -24,16 +23,16 @@ This creates a shell with all the tools needed for building and testing.
 
 == Docs
 
-Another shell is available on the 'docs' branch, this branch is dedicated to write documentation and comes with an additional set of tools.
+Another shell is available on the `docs` branch. This branch is dedicated to writing documentation and comes with an additional set of tools.
 
 `nix develop .#docs`
 
-Currently, no github actions is setup to generate and publish documentation, this is a semi-manual workflow (it's nice to see the results before going live)
+Currently, no GitHub Actions workflow is set up to generate and publish documentation. This means the workflow is semi-manual, which is useful because you can review the results before publishing.
 
-We use asciidoctor and antora as tools to write and generate a static site.
+We use Asciidoctor and Antora to write and generate the static documentation site.
 
-Generate the documentation with
+Generate the documentation with:
 
-`make docs` - The output is generated into /docs
+`make docs` — The output is generated into the `/docs` directory.
 
-Then commit, push and make a PR
+Then commit, push, and create a PR.

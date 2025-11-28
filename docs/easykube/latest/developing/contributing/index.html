@@ -108,11 +108,11 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>This is an opensource project, so pull requests are welcome.</p>
+<p>This is an open-source project, so pull requests are welcome.</p>
 </div>
 <div class="paragraph">
-<p>Use nix to get all the tools you need for development,
-the nix flake has three shell variants;</p>
+<p>Use Nix to get all the tools you need for development.
+The Nix flake provides three shell variants:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -133,10 +133,10 @@ the nix flake has three shell variants;</p>
 <h2 id="_default"><a class="anchor" href="#_default"></a>Default</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>First make sure you have nix installed, this is mentioned <a href="../../install/#install-nix" class="xref page">here</a>.</p>
+<p>First, make sure you have Nix installed; this is described <a href="../../install/#install-nix" class="xref page">here</a>.</p>
 </div>
 <div class="paragraph">
-<p>Then clone the repository, the default shell will set things up and compile easykube, however, this can get tedious. Instead, use the light variant for development.</p>
+<p>Then clone the repository. The default shell will set everything up and compile easykube. However, this can get tedious during development, so it is recommended to use the <strong>light</strong> variant instead.</p>
 </div>
 </div>
 </div>
@@ -155,25 +155,25 @@ the nix flake has three shell variants;</p>
 <h2 id="_docs"><a class="anchor" href="#_docs"></a>Docs</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Another shell is available on the 'docs' branch, this branch is dedicated to write documentation and comes with an additional set of tools.</p>
+<p>Another shell is available on the <code>docs</code> branch. This branch is dedicated to writing documentation and comes with an additional set of tools.</p>
 </div>
 <div class="paragraph">
 <p><code>nix develop .#docs</code></p>
 </div>
 <div class="paragraph">
-<p>Currently, no github actions is setup to generate and publish documentation, this is a semi-manual workflow (it&#8217;s nice to see the results before going live)</p>
+<p>Currently, no GitHub Actions workflow is set up to generate and publish documentation. This means the workflow is semi-manual, which is useful because you can review the results before publishing.</p>
 </div>
 <div class="paragraph">
-<p>We use asciidoctor and antora as tools to write and generate a static site.</p>
+<p>We use Asciidoctor and Antora to write and generate the static documentation site.</p>
 </div>
 <div class="paragraph">
-<p>Generate the documentation with</p>
+<p>Generate the documentation with:</p>
 </div>
 <div class="paragraph">
-<p><code>make docs</code> - The output is generated into /docs</p>
+<p><code>make docs</code> — The output is generated into the <code>/docs</code> directory.</p>
 </div>
 <div class="paragraph">
-<p>Then commit, push and make a PR</p>
+<p>Then commit, push, and create a PR.</p>
 </div>
 </div>
 </div>

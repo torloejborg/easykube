@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Install, configure and create :: Easykube Documentation</title>
+    <title>Install, Configure, and Create :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/install/">
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -95,7 +95,7 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Install, configure and create<a id="install"></a></h1>
+<h1 class="page">Install, Configure, and Create<a id="install"></a></h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
@@ -103,18 +103,16 @@
 <ul class="sectlevel2">
 <li><a href="#install-nix">Nix</a></li>
 <li><a href="#_manual_installation">Manual installation</a></li>
-<li><a href="#install-postcheck">Post installation check</a></li>
+<li><a href="#install-postcheck">Post-installation check</a></li>
 </ul>
 </li>
 <li><a href="#install-configuration">Configuration</a></li>
-<li><a href="#install-create">Create cluster</a></li>
-<li><a href="#_using_private_image_registries_main_branch_only">Using private image registries (main branch only)</a></li>
 </ul>
 </div>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Welcome, on these pages you will find guides on how to install, operate and extend the software to suit your own use-cases.</p>
+<p>Welcome! On these pages you will find guides on how to install, operate, and extend Easykube software to suit your own use cases.</p>
 </div>
 </div>
 </div>
@@ -122,10 +120,10 @@
 <h2 id="_installation"><a class="anchor" href="#_installation"></a>Installation<a id="install-install"></a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are many ways to install easykube, below are some of the paths you can choose.</p>
+<p>There are many ways to install Easykube; below are some of the paths you can choose.</p>
 </div>
 <div class="paragraph">
-<p>Please note that pre-built easykube binaries exist for windows, linux, and macos. It will run on windows, but it&#8217;s recommended run easykube in WSL2</p>
+<p>Please note that pre-built easykube binaries exist for Windows, Linux, and macOS. It will run on Windows, but it is recommended to run easykube in WSL2. On never macs you will need to explicitly allow the binary to run, I simply can&#8217;t be arsed to communicate with Apple about signing and approval procedures, if you are trapped in that pit - build from source.</p>
 </div>
 <div class="sect2">
 <h3 id="install-nix"><a class="anchor" href="#install-nix"></a>Nix</h3>
@@ -136,7 +134,7 @@
 <p><code>nix develop github:/torloejborg/easykube</code></p>
 </div>
 <div class="paragraph">
-<p>This will fetch and build from source, and automatically pull in the required binary dependencies (except docker), you will then be dropped into a shell with all the tooling available, and can start using easykube.</p>
+<p>This will fetch and build from source and automatically pull in the required binary dependencies (except Docker). You will then be dropped into a shell with all tooling available and can start using easykube.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -147,7 +145,7 @@
 <td class="content">
 <div class="title">nix (~/.config/nix/nix.conf)</div>
 <div class="paragraph">
-<p>You may have to add the following to your nix.conf in order to quench nix warnings</p>
+<p>You may have to add the following to your nix.conf in order to silence Nix warnings:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -156,10 +154,10 @@ extra-experimental-features = flakes</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The Nix flake has two shells;  Default will build easykube from source.</p>
+<p>The Nix flake has two shells. The default will build easykube from source.</p>
 </div>
 <div class="paragraph">
-<p><code>nix develop .#light</code> will drop you into a shell with supporting tools <em>without building</em>. Useful if you cloned the repository.</p>
+<p><code>nix develop .#light</code> will drop you into a shell with supporting tools <strong>without building</strong>. Useful if you cloned the repository.</p>
 </div>
 </td>
 </tr>
@@ -169,10 +167,11 @@ extra-experimental-features = flakes</pre>
 <div class="sect2">
 <h3 id="_manual_installation"><a class="anchor" href="#_manual_installation"></a>Manual installation<a id="install-manual"></a></h3>
 <div class="paragraph">
-<p>Download the latest easykube binary for your platform <a href="https://github.com/torloejborg/easykube/releases">here</a>. Extract the archive, rename the binary to <code>easykube</code>, <code>ek</code> or whatever you please. And make sure it&#8217;s on your systems PATH.</p>
+<p>Download the latest easykube binary for your platform <a href="https://github.com/torloejborg/easykube/releases">here</a>.
+Extract the archive, rename the binary to <code>easykube</code>, <code>ek</code>, or whatever you prefer, and make sure it is on your system’s PATH.</p>
 </div>
 <div class="paragraph">
-<p>Use a package manager, or download the following software yourself</p>
+<p>Use a package manager or download the following software yourself:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -200,16 +199,16 @@ extra-experimental-features = flakes</pre>
 <i class="fa icon-caution" title="Caution"></i>
 </td>
 <td class="content">
-On some linux systems, installing the above packages via snap, has proved troublesome for easykube. It may work out for you, it may not.
+On some Linux systems, installing the above packages via snap has proved troublesome for easykube. It may work for you; it may not.
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="install-postcheck"><a class="anchor" href="#install-postcheck"></a>Post installation check</h3>
+<h3 id="install-postcheck"><a class="anchor" href="#install-postcheck"></a>Post-installation check</h3>
 <div class="paragraph">
-<p>Typing <code>easykube</code> in your shell you should see a warning and usage description.</p>
+<p>Typing <code>easykube</code> in your shell should show a warning and usage description.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -218,33 +217,11 @@ On some linux systems, installing the above packages via snap, has proved troubl
 bootstrap a single node kubernetes cluster, install development platforms via addon-repositories
 
 hint: start with 'easykube config'
-
-Usage:
-  easykube [command]
-
-Available Commands:
-  add         applies one or more addons located in the addon repository
-  completion  Generate the autocompletion script for the specified shell
-  config      edits your easykube configuration file
-  create      creates the easykube cluster
-  destroy     kills the current easykube cluster
-  help        Help about any command
-  list        lists available modules in the addon repository
-  remove      removes a previously installed addon
-  skaffold    creates a new addon using a basic template
-  start       starts the cluster node and registry container
-  status      inspects you environment to see if prerequisites are met
-  stop        stops the cluster node and registry container
-  version     shows the version of easykube CLI
-
-Flags:
-  -d, --dry-run   dry-run
-  -h, --help      help for easykube
-  -v, --verbose   verbose output</code></pre>
+...</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Also, try with <code>easykube status</code>, that should yield some more warnings and errors.</p>
+<p>Also try <code>easykube status</code>; this should yield additional warnings and errors.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -254,19 +231,11 @@ Inspecting binary dependencies
 ✓ docker 28.4.0 (^28)
 ✓ helm 3.19.0 (~3.19)
 ✓ kustomize 5.7.1 (~5.7)
-
-Container configuration
-⚠ easykube-registry container not running
-⚠ easykube-control-plane container not running
-⚠ easykube-registry not connected to kind network
-
-Repository configuration
-stat /home/jane/addons: no such file or directory
-⚠ addon directory '/home/jane/addons' does not exist, check your config</code></pre>
+...</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The checks for the dependent binaries passes, next, proceed to configuration.</p>
+<p>The checks for the dependent binaries pass. Next, proceed to configuration.</p>
 </div>
 </div>
 </div>
@@ -275,7 +244,7 @@ stat /home/jane/addons: no such file or directory
 <h2 id="install-configuration"><a class="anchor" href="#install-configuration"></a>Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By itself easykube is not very interesting, it cannot do anything without its companion addons, which you will find <a href="https://github.com/torloejborg/easykube-addons">here</a>. Clone (or download the repository) to your local machine.</p>
+<p>By itself, easykube is not very interesting—it cannot do anything without its companion addons, which you will find <a href="https://github.com/torloejborg/easykube-addons">here</a>. Clone (or download) the repository to your local machine.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -284,276 +253,10 @@ stat /home/jane/addons: no such file or directory
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The next sections assume the addon repository is placed in <code>/home/jane/code/easykube-addons</code> - adjust accordingly.
+The next sections assume the addon repository is placed in <code>/home/jane/code/easykube-addons</code> — adjust accordingly.
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>You will need to set an evironment variable named <code>VISUAL</code> which points to
-your favorite editor.</p>
-</div>
-<div class="paragraph">
-<p><code>$ export VISUAL=nvim</code></p>
-</div>
-<div class="paragraph">
-<p>You can use any editor, as long as it can be called with <code>editor /some/path/to/file.txt</code></p>
-</div>
-<div class="paragraph">
-<p>Invoke <code>easykube config</code> this will launch your editor and present you with the following</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-text" data-lang="text">easykube:
-  # location of addons dir
-  addon-root: /home/jane/addons <i class="conum" data-value="1"></i><b>(1)</b>
-
-  # where local configuration is stored
-  config-dir: /home/jane/.config/easykube <i class="conum" data-value="2"></i><b>(2)</b>
-
-  # if an absolute path is not given, persistence will be located in config-dir
-  # this is used by kind to store peristent data, it will survive cluster deletion
-  persistence-dir: /home/jane/.config/easykube/persistence <i class="conum" data-value="3"></i><b>(3)</b>
-
-  # Container Runtime (as of now, only docker is supported. podman support is planned)
-  container-runtime: docker
-
-  # Declare private registries. Whenever easykube pulls an image, and the registry name contains a substring
-  # defined by repositoryMatch, the credentials are resolved by looking up the values in easykube-secrets.
-  #private-registries:  <i class="conum" data-value="4"></i><b>(4)</b>
-  #  - repositoryMatch: partial-domain-name.io
-  #    userKey: userCredentialsKey
-  #    passwordKey: userCredntialPasswordKey <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>- Change this line to match the path to the addon repository you previously cloned</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>- This is the directory where easykube will store its configuration files it will be revisited in the operate section.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>- Easykube will automatically create subdirectories here based on addon requirements</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>- Uncomment this block if you need to interact with private registries</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>Save the file, and we&#8217;ll be ready for the next step.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="install-create"><a class="anchor" href="#install-create"></a>Create cluster</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>With installation and configuration done, it&#8217;s time to create a cluster, do that with;</p>
-</div>
-<div class="paragraph">
-<p><code>easykube create</code></p>
-</div>
-<div class="paragraph">
-<p>If all went well, a cluster creation report is printed, each addon is listed in a section which describes which ports it want to expose, and what storage it needs.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>You may get a warning about "not being able to manage the cluster"</p>
-</div>
-<div class="paragraph">
-<p>Easykube will not mess around with your existing kubeconfigs and default config, it will create a new one in <code>~/.kube/easykube</code> and automatically use that when running tooling. You may want to add that file to the KUBECONFIG variable, otherwise you cannot manage the cluster with external tools like K9S.</p>
-</div>
-<div class="paragraph">
-<p>Read more about kubeconfigs <a href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/">here</a> - If you are new to Kubernetes, do not attempt to manage all contexts in a single merged config file, that path leads to madness.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-text" data-lang="text">⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear
-Bootstrapping easykube single node cluster
-Waiting for cluster ready
-Configuring containerd
-Adding registry host
-These addons contribute to cluster configuration <i class="conum" data-value="1"></i><b>(1)</b>
-
-Addon: "gitea.ek.js"
-  Mounts:
-        - /home/jane/.config/easykube/persistence/gitea -&gt; /storage/gitea
-
-Addon: "ingress.ek.js" <i class="conum" data-value="2"></i><b>(2)</b>
-  Ports:
-        - 127.0.0.1 80/TCP -&gt; NodePort 80
-        - 127.0.0.1 443/TCP -&gt; NodePort 443
-
-Addon: "immich.ek.js"
-  Mounts:
-        - /home/jane/.config/easykube/persistence/immich-data -&gt; /storage/immich-data
-        - /home/jane/.config/easykube/persistence/immich-extra-volume -&gt; /storage/ext-pictures
-
-Addon: "postgres.ek.js"
-  Ports:
-        - 127.0.0.1 5432/TCP -&gt; NodePort 32000
-
-  Mounts:
-        - /home/jane/.config/easykube/persistence/postgres-data -&gt; /storage/pg-data
-
-Addon: "redis.ek.js"
-  Ports:
-        - 127.0.0.1 6379/TCP -&gt; NodePort 30971
-
-Addon: "temporal.ek.js"
-  Ports:
-        - 127.0.0.1 7233/TCP -&gt; NodePort 30950
-
-⚠ Warning, cluster created without importing secrets, this might affect your ability to pull images from private registries. <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>A single kind cluster configuration file is created based on the aggregate of all addons</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>An addon want to expose port 80 and 443 from the host to the cluster.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Corpo users might find this feature useful, you can create the cluster with an option <code>-s /path/to/mysecret.properties</code> which will then automatically provide credentials when pulling images.</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>What is the status now ?</p>
-</div>
-<div class="paragraph">
-<p><code>easykube status</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-text" data-lang="text">Inspecting binary dependencies
-✓ kubectl 1.34.1 (~1.34)
-✓ docker 28.4.0 (^28)
-✓ helm 3.19.0 (~3.19)
-✓ kustomize 5.7.1 (~5.7)
-
-Container configuration
-✓ easykube-registry container
-✓ easykube-control-plane container
-✓ easykube-registry connected to kind network
-
-Repository configuration
-✓ 13 addons discovered at '/home/jane/code/easykube-addons'
-✓ dev build, skipping addon catalog compatibility check</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>All good. Easykube is ready for usage.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-You might get a warning where easykube complains about a KUBECONFIG environment variable not being set. The warning provides a link on how to configure that.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>Since easykube uses Kind, lets examine the running docker containers.</p>
-</div>
-<div class="paragraph">
-<p><code>docker ps</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-text" data-lang="text">...
-a81acb9b11c9   kindest/node:v1.34.0   "/usr/local/bin/entr…"   29 minutes ago   Up 29 minutes   0.0.0.0:80-&gt;80/tcp, 0.0.0.0:443-&gt;443/tcp, 127.0.0.1:40581-&gt;6443/tcp, 0.0.0.0:7233-&gt;30950/tcp, 0.0.0.0:6379-&gt;30971/tcp, 0.0.0.0:5432-&gt;32000/tcp   easykube-control-plane
-
-132098d8a882   registry:2.8.3         "/entrypoint.sh /etc…"   29 minutes ago   Up 29 minutes   127.0.0.1:5001-&gt;5000/tcp   easykube-registry
-...</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We can see that kindest/node is running with a bunch of port-forwards, they were defined by the addons.</p>
-</div>
-<div class="paragraph">
-<p>The registry is a local docker-registry. Most easykube addons should pull from that registry to avoid exessive bandwidth consumption.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_using_private_image_registries_main_branch_only"><a class="anchor" href="#_using_private_image_registries_main_branch_only"></a>Using private image registries (main branch only)</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>If you find yourself in a corperate environment, or self-host containers in a private registries, easykube can be configured to use these. In the previous sections, there were hints about this in the configuration directives and the <code>-s</code> cluster create option.</p>
-</div>
-<div class="paragraph">
-<p>You supply actual credentials to easykube via the <code>-s</code> option. The input must be a valid property file.</p>
-</div>
-<div class="listingblock">
-<div class="title">example of a property file passed to easykube with the -s option</div>
-<div class="content">
-<pre>#Credentials for repo 1
-artifactoryRepoUserName=user
-artifactoryRepoPassword=password
-
-# Credentials for repo 2
-sonatypeRepoUserName=user
-sonatypeRepoPassword=password</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The property file is loaded into easykube as a secret called <code>easykube-secrets</code> in the default namespace.</p>
-</div>
-<div class="paragraph">
-<p>In order for easykube to use these credentials, a <strong>repository match</strong> must be configured</p>
-</div>
-<div class="listingblock">
-<div class="title">configuration with multiple configured private repositories</div>
-<div class="content">
-<pre>easykube:
-  addon-root: /home/jane/addons
-
-  config-dir: /home/jane/.config/easykube
-  persistence-dir: /home/jane/.config/easykube/persistence
-
-  container-runtime: docker
-
-  private-registries:
-    - repositoryMatch: artifactory.my-internal-host.internal.domain <i class="conum" data-value="1"></i><b>(1)</b>
-      userKey: artifactoryRepoUsername
-      passwordKey: artifactoryRepoPassword
-    - repositoryMatch: sonatype.some.domain.com <i class="conum" data-value="2"></i><b>(2)</b>
-      userKey: sonatypeRepoUsername
-      passwordKey: sonatypeRepoPassword</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>When Easykube pulls images, the registry url is matched against every <strong>repositoryMatch</strong> (1,2) testing if the match is a substring in the registry url.</p>
-</div>
-<div class="paragraph">
-<p>If there is a match, then the pull operation will be supplied with the matching credentials, constructed from the values in <code>easykube-secrets</code></p>
 </div>
 </div>
 </div>

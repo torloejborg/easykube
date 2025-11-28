@@ -1,24 +1,25 @@
 = Easykube documentation site
 
-This site contain more detailed information about easykube.
+This site contains more detailed information about easykube.
 
-* If you want to know why easykube exists and what is's all about, read the xref:rationale.adoc#rationale-rationale[rationale] page.
+If you want to know why easykube exists and what it’s all about, read the xref:rationale.adoc#rationale-rationale[rationale] page.
 
-* Next vist the xref:install.adoc[installation] page.
+Next, visit the xref:install.adoc[installation] page.
 
-* Also, you should familiarize yourself about the concepts of xref:addons.adoc[addons]
+Also, you should familiarize yourself with the concepts of xref:addons.adoc[addons].
 
 == Example Terminal Session
 
 [asciinema]
-.create a local cluster, install and create an addon (apologies for the delays in the screencast - the player can be scrubbed)
 ----
+.create a local cluster, install and create an addon (apologies for the delays in the screencast - the player can be scrubbed)
 include::example$create.cast[]
 ----
 
 == History
-Easykube started out as collection of gradle build files. The primary use-case was to enable mobile developers to install real backends locally, enabling then to work offline and not require a personal instance of a test system on some random cluster.
 
-Those fancy macbooks were powerful enough to drive a small kubernetes instance, even with multiple backends.
+Easykube started out as a collection of Gradle build scripts. The primary use case was to enable mobile developers to install real backends locally, allowing them to work offline and not require a personal instance of a test system on some random cluster.
 
-Later easykube was reimplemented in go-lang.
+The fontender's fancy MacBooks were powerful enough to drive a small Kubernetes instance, even with multiple backends, so why have their machines sit idle ?
+
+Later, easykube was reimplemented in Go. And here we are :)

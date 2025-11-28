@@ -4,30 +4,26 @@
 On this page we describe some of the internals, and how easykube differs from a plain Kind instance.
 
 == DNS Resolution[[internals-dns]]
-It might seem strange that everything is available at `*.localtest.me` - This is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to `localtest.me` and any subdomain will resolve to  `127.0.0.1`.
 
-Easykube takes advantage of this by configuring ingresses to use this hostname, so if you are familiar with apache httpd or another web server, it fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by kubernetes.
+It might seem strange that everything is available at *.localtest.me — this is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to localtest.me and any subdomain will resolve to 127.0.0.1.
 
-In the old days, we would have to manually create a virtual host, and add an entry in our hosts file.
+Easykube takes advantage of this by configuring ingresses to use this hostname. If you are familiar with Apache httpd or another web server, it is fair to say that virtual hosts are generated dynamically whenever a new ingress definition is discovered by Kubernetes.
 
-Sometimes services inside easykube need to resolve names like `something.localtest.me` this won't work, because 127.0.0.1 does not point to any https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip[ClusterIP].
+In the past, we would have had to manually create a virtual host and add an entry in our hosts file.
 
-We can get around this by emulating something called _split-dns_. Depending on which network you originate, a different IP adress is resolved.
+Sometimes services inside easykube need to resolve names like something.localtest.me. This won't work because 127.0.0.1 does not point to any https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip[ClusterIP].
 
-When Easykube is created, the kubernetes core-dns service is patched to intercept addresses from `*.localtest.me`. Below is excerpt from the coredns config which does the trick.
+We can get around this by emulating something called split-DNS. Depending on which network you originate from, a different IP address is resolved.
+
+When easykube is created, the Kubernetes CoreDNS service is patched to intercept addresses from *.localtest.me. Below is an excerpt from the CoreDNS config that accomplishes this:
 
 [source,text]
-----
-   rewrite stop {
-       name regex (.*)\.localtest.me {1}-ext.default.svc.cluster.local
-       answer auto
-    }
-----
-NOTE: Currently, *ext* services can only reside in the default namespace.
+rewrite stop {
+name regex (.*).localtest.me {1}-ext.default.svc.cluster.local
+answer auto
+}
 
-The patch will translate `foo.localtest.me` into `ext-foo.default.svc.cluster.local` - So if you create a ClusterIP service with that name - requests originating from within the cluster will resolve to the ClusterIP.
+NOTE: Currently, ext services can only reside in the default namespace.
+The patch will translate foo.localtest.me into ext-foo.default.svc.cluster.local. So if you create a ClusterIP service with that name, requests originating from within the cluster will resolve to the ClusterIP. External requests will hit the ingress as usual.
 
-External requests will hit the ingress as usual.
-
-TIP: Use *ext* services to emulate services that need to communicate in a transparent way. An example; testing a CI workflow setup with a git server (gitea) and a Jenkins instance, gitea will define an ext-* ClusterIP service, jenkins can then refer to the server with just `gita.localtest.me` instead of `gitea.default.svc.cluster.local`
-
+TIP: Use ext services to emulate services that need to communicate in a transparent way. For example, when testing a CI workflow setup with a Git server (Gitea) and a Jenkins instance, Gitea will define an ext-* ClusterIP service, and Jenkins can then refer to the server with just gitea.localtest.me instead of gitea.default.svc.cluster.local.

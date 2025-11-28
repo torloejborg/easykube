@@ -100,13 +100,13 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_adding_software">Adding software</a></li>
-<li><a href="#_imutababilty">Imutababilty</a></li>
+<li><a href="#_immutability">Immutability</a></li>
 </ul>
 </div>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Prerequisites; Easykube is <a href="../install/#install-install" class="xref page">installed</a>, <a href="../install/#install-configuration" class="xref page">configured</a> and <a href="../install/#install-postcheck" class="xref page">running</a></p>
+<p>Prerequisites: Easykube is <a href="../install/#install-install" class="xref page">installed</a>, <a href="../install/#install-configuration" class="xref page">configured</a>, and <a href="../install/#install-postcheck" class="xref page">running</a>.</p>
 </div>
 </div>
 </div>
@@ -114,17 +114,16 @@
 <h2 id="_adding_software"><a class="anchor" href="#_adding_software"></a>Adding software</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Examine what the repository provides</p>
+<p>Examine what the repository provides:</p>
 </div>
 <div class="paragraph">
-<p><code>$ easykube list</code></p>
+<p>$ easykube list</p>
 </div>
 <div class="paragraph">
-<p>This prints a table of available addons</p>
+<p>This prints a table of available addons:</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre>┌──────────┬────────────────────────────────────────────────────────┐
+<div class="paragraph">
+<p>┌──────────┬────────────────────────────────────────────────────────┐
 │  ADDON   │                      DESCRIPTION                       │
 ├──────────┼────────────────────────────────────────────────────────┤
 │ debugpod │ Swiss-army knife of useful tools                       │
@@ -140,11 +139,10 @@
 │ rabbitmq │ A message queue system implemented in Erlang           │
 │ redis    │ Memory cache                                           │
 │ temporal │ An opensource workflow engine                          │
-└──────────┴────────────────────────────────────────────────────────┘</pre>
-</div>
+└──────────┴────────────────────────────────────────────────────────┘</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s install the temporal workflow engine</p>
+<p>Let&#8217;s install the temporal workflow engine:</p>
 </div>
 <div class="paragraph">
 <p><code>$ easykube add temporal</code></p>
@@ -159,12 +157,12 @@ kustomize applied for postgres
 Waiting for deployment "postgres" in namespace "default" to become ready...
 Deployment is ready!
 🔧 Processing ingress.ek.js
-🖼  pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4
-🖼  pull registry.k8s.io/ingress-nginx/controller:v1.12.1
-🖼  tag registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4 to localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
-🖼  tag registry.k8s.io/ingress-nginx/controller:v1.12.1 to localhost:5001/ingress-nginx/controller:v1.12.1
-🖼  pushed localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
-🖼  pushed localhost:5001/ingress-nginx/controller:v1.12.1
+🖼 pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼 pull registry.k8s.io/ingress-nginx/controller:v1.12.1
+🖼 tag registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.4 to localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼 tag registry.k8s.io/ingress-nginx/controller:v1.12.1 to localhost:5001/ingress-nginx/controller:v1.12.1
+🖼 pushed localhost:5001/ingress-nginx/kube-webhook-certgen:v1.4.4
+🖼 pushed localhost:5001/ingress-nginx/controller:v1.12.1
 kustomize applied for ingress
 Waiting for deployment "ingress-nginx-controller" in namespace "ingress-nginx" to become ready...
 Deployment is ready!
@@ -191,14 +189,13 @@ Deployment is ready!</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>So, now temporal claims it&#8217;s installed, but postgres and an ingress controller was also installed, that happened because of the
-<a href="../addons/#addons-dependencies" class="xref page">"dependsOn"</a> declaraion in the addon.</p>
+<p>Now temporal claims it’s installed, but Postgres and the ingress controller were also installed. This happened because of the <a href="../addons/#addons-dependencies" class="xref page">"dependsOn"</a> declaration in the addon.</p>
 </div>
 <div class="paragraph">
-<p>If all went well you should be able to visit the temporal ui at <a href="https://temporal.localtest.me" class="bare">https://temporal.localtest.me</a></p>
+<p>If all went well, you should be able to visit the Temporal UI at <a href="https://temporal.localtest.me" class="bare">https://temporal.localtest.me</a></p>
 </div>
 <div class="paragraph">
-<p>Try adding temporal again with <code>$ easykube add temporal</code></p>
+<p>Try adding temporal again with $ easykube add temporal. You get this result:</p>
 </div>
 <div class="paragraph">
 <p>We get this result</p>
@@ -207,21 +204,16 @@ Deployment is ready!</pre>
 <div class="content">
 <pre>⚠ postgres already present in cluster
 ⚠ ingress already present in cluster
-⚠ temporal already present in cluster</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>When an addon is added/installed, an entry in a configmap is created with the addon&#8217;s name and a timestamp.</p>
-</div>
-<div class="paragraph">
-<p>We can override this behavior by passing force flags <code>$ easykube add --help</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>by default addons also applies their dependencies
+⚠ temporal already present in cluster
+
+When an addon is added/installed, an entry in a configmap is created with the addon's name and a timestamp.
+
+We can override this behavior by passing force flags $ easykube add --help:
+
+By default, addons also apply their dependencies.
 
 Usage:
-  easykube add [addon...] [flags]
+easykube add [addon...] [flags]
 
 Flags:
       --cluster string   Specify a different kube-context for installation
@@ -243,24 +235,24 @@ Global Flags:
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-By passing <code>--force</code> or <code>-f</code> you force the entire dependency tree to be added again. During development, one addon is typically iterated over, so its natural to use <code>$ easkube add foo --force --nodepends</code> or <code>$ easykube add -fn</code>
+By passing --force or -f you force the entire dependency tree to be added again. During development, one addon is typically iterated over, so it’s natural to use $ easykube add foo --force --nodepends or $ easykube add -fn.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>That&#8217;s basically it! You can now build or use software catalogues that runs on a local kubernetes single node cluster.</p>
+<p>That’s basically it! You can now build or use software catalogues that run on a local Kubernetes single-node cluster.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_imutababilty"><a class="anchor" href="#_imutababilty"></a>Imutababilty</h2>
+<h2 id="_immutability"><a class="anchor" href="#_immutability"></a>Immutability</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Because Easykube runs in Docker, it is not possible to open new NodePorts in the cluster and expect them to be available - Docker is immutable by design.</p>
+<p>Because easykube runs in Docker (or a compatible runtime), it is not possible to open new NodePorts in the cluster and expect them to be available—Docker is immutable by design.</p>
 </div>
 <div class="paragraph">
-<p>So, if you introduce a new service, or switch to a different addon repository, the cluster must be recreated. Your persistent data is safe, so it should be OK.</p>
+<p>So, if you introduce a new service or switch to a different addon repository, the cluster must be recreated. Your persistent data is safe, so it should be OK.</p>
 </div>
 </div>
 </div>

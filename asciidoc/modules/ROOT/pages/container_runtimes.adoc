@@ -1,37 +1,36 @@
 = Container Runtimes
 
-Currently easykube support docker and podman container runtimes, each have subtle differences and modes of operation.
+Currently, easykube supports Docker and Podman container runtimes. Each has subtle differences and modes of operation.
 
-Chosing a runtime is done in the easykube configuration file
+Choosing a runtime is done in the easykube configuration file:
 
-`$ easykube config`
+$ easykube config
 
 == Docker
 
-Docker is widely used, and can be found on many platforms combined with the desktop manager. In most cases docker runs with a set of permissive privileges (on default installations) it runs as the superuser (root) - which has it's pros and cons.
+Docker is widely used and available on many platforms, often bundled with a desktop manager. In most cases Docker runs with permissive privileges (on default installations it runs as the superuser, root), which has both pros and cons.
 
-On a developer machine, elevated permissions are in many cases acceptable. However, in some organizations docker is banned because of security concerns.
+On a developer machine, elevated permissions are often acceptable. However, in some organizations Docker is banned due to security concerns.
 
-Easykube has not been tested with rootless docker, for rootless operation consider using podman instead.
+Easykube has not been tested with rootless Docker. For rootless operation, consider using Podman instead.
 
-Privileged Docker mostly give less friction.
+Privileged Docker generally results in less friction.
 
 == Podman
 
-In constrained environments, it's possible to use easykube together with rootless podman. If you are new to Podman, there are some subtle differences you should be aware of.
+In constrained environments, it is possible to use easykube together with rootless Podman. If you are new to Podman, there are a few subtle differences you should be aware of.
 
- Image names are not automatically resolved.
+Image names are not automatically resolved.
 
-This means you must specify the fully qualified registry name for an image,
-for instance;  the image `busybox:latest` won't automatically resolve with the podman go library. Using docker it's just assumed that the image lives on dockerhub, using Podman the image should be specified as `dockerhub.io/library/busybox:latest`.
+This means you must specify the fully qualified registry name for an image.
+For instance, the image busybox:latest will not automatically resolve when using the Podman Go API. With Docker, it is assumed that the image lives on Docker Hub. With Podman, the image must be specified explicitly as:
 
+dockerhub.io/library/busybox:latest
 
 [NOTE]
-====
-Easykube expects to talk to podman via a socket, on Linux systems this socket can typically be found in `/run/user/<uid>/podman/podman.socket`
+Easykube expects to communicate with Podman via a socket.
+On Linux systems, this socket is typically found at:
+/run/user/<uid>/podman/podman.socket
+If the socket is not present, and you are using a systemd-based OS, try starting it with:
+systemctl --user start podman.socket
 
-If the socket it not there, and you are using a systemd based OS, try and start it with
-
-`systemctl --user start podman.socket`
-
-====

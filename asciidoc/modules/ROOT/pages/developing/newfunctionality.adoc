@@ -1,10 +1,10 @@
-= Adding new stuff
+= Adding New Stuff
 :icons: font
 
-== The script runtime [[internals-js]]
+== The Script Runtime [[internals-js]]
 
-
-Adding new core functionality is relatively straightforward. Below is the listing of the go file where all exported functions is declared.
+Adding new core functionality is relatively straightforward.
+Below is the listing of the Go file where all exported functions are declared.
 
 [source,go]
 .pkg/js/easykube.go
@@ -12,16 +12,23 @@ Adding new core functionality is relatively straightforward. Below is the listin
 include::example$easykube.go[tag=export]
 ----
 
-The *_ek* object is populated with a name and a function. To add a function, simply copy/paste an existing file and adapt.
+The *_ek* object is populated with a name and a function.
+To add a function, simply copy/paste an existing file and adapt it.
 
-Below the *env* function is listed
+Below is the *env* function:
+
 ----
 include::example$ek_env.go[tag=envfunc]
 ----
 
-In a nutshell, define a function which has a pointer-receiver to Easykube that returns a function which returns a goja.Value.
+In a nutshell:
+Define a method with a pointer receiver to `Easykube` that returns a function, which in turn returns a `goja.Value`.
 
 == Mocks
-The gomock from Uber is used to generate mocks for most interfaces, so if an interface is changed, remember to regenerate the mocks. Do this with;
+
+`gomock` from Uber is used to generate mocks for most interfaces.
+If an interface is changed, remember to regenerate the mocks.
+
+Run:
 
 `make mock`

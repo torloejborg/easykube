@@ -106,13 +106,13 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Currently easykube support docker and podman container runtimes, each have subtle differences and modes of operation.</p>
+<p>Currently, easykube supports Docker and Podman container runtimes. Each has subtle differences and modes of operation.</p>
 </div>
 <div class="paragraph">
-<p>Chosing a runtime is done in the easykube configuration file</p>
+<p>Choosing a runtime is done in the easykube configuration file:</p>
 </div>
 <div class="paragraph">
-<p><code>$ easykube config</code></p>
+<p>$ easykube config</p>
 </div>
 </div>
 </div>
@@ -120,16 +120,16 @@
 <h2 id="_docker"><a class="anchor" href="#_docker"></a>Docker</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Docker is widely used, and can be found on many platforms combined with the desktop manager. In most cases docker runs with a set of permissive privileges (on default installations) it runs as the superuser (root) - which has it&#8217;s pros and cons.</p>
+<p>Docker is widely used and available on many platforms, often bundled with a desktop manager. In most cases Docker runs with permissive privileges (on default installations it runs as the superuser, root), which has both pros and cons.</p>
 </div>
 <div class="paragraph">
-<p>On a developer machine, elevated permissions are in many cases acceptable. However, in some organizations docker is banned because of security concerns.</p>
+<p>On a developer machine, elevated permissions are often acceptable. However, in some organizations Docker is banned due to security concerns.</p>
 </div>
 <div class="paragraph">
-<p>Easykube has not been tested with rootless docker, for rootless operation consider using podman instead.</p>
+<p>Easykube has not been tested with rootless Docker. For rootless operation, consider using Podman instead.</p>
 </div>
 <div class="paragraph">
-<p>Privileged Docker mostly give less friction.</p>
+<p>Privileged Docker generally results in less friction.</p>
 </div>
 </div>
 </div>
@@ -137,16 +137,17 @@
 <h2 id="_podman"><a class="anchor" href="#_podman"></a>Podman</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In constrained environments, it&#8217;s possible to use easykube together with rootless podman. If you are new to Podman, there are some subtle differences you should be aware of.</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Image names are not automatically resolved.</pre>
-</div>
+<p>In constrained environments, it is possible to use easykube together with rootless Podman. If you are new to Podman, there are a few subtle differences you should be aware of.</p>
 </div>
 <div class="paragraph">
-<p>This means you must specify the fully qualified registry name for an image,
-for instance;  the image <code>busybox:latest</code> won&#8217;t automatically resolve with the podman go library. Using docker it&#8217;s just assumed that the image lives on dockerhub, using Podman the image should be specified as <code>dockerhub.io/library/busybox:latest</code>.</p>
+<p>Image names are not automatically resolved.</p>
+</div>
+<div class="paragraph">
+<p>This means you must specify the fully qualified registry name for an image.
+For instance, the image busybox:latest will not automatically resolve when using the Podman Go API. With Docker, it is assumed that the image lives on Docker Hub. With Podman, the image must be specified explicitly as:</p>
+</div>
+<div class="paragraph">
+<p>dockerhub.io/library/busybox:latest</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -155,15 +156,11 @@ for instance;  the image <code>busybox:latest</code> won&#8217;t automatically r
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<div class="paragraph">
-<p>Easykube expects to talk to podman via a socket, on Linux systems this socket can typically be found in <code>/run/user/&lt;uid&gt;/podman/podman.socket</code></p>
-</div>
-<div class="paragraph">
-<p>If the socket it not there, and you are using a systemd based OS, try and start it with</p>
-</div>
-<div class="paragraph">
-<p><code>systemctl --user start podman.socket</code></p>
-</div>
+Easykube expects to communicate with Podman via a socket.
+On Linux systems, this socket is typically found at:
+/run/user/&lt;uid&gt;/podman/podman.socket
+If the socket is not present, and you are using a systemd-based OS, try starting it with:
+systemctl --user start podman.socket
 </td>
 </tr>
 </table>
