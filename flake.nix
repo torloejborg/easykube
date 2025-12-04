@@ -20,6 +20,8 @@
         "exclude_graphdriver_devicemapper"
         "exclude_graphdriver_overlay"
         "exclude_graphdriver_zfs"
+        "containers_image_openpgp"
+        "containers_image_storage_stub"
       ];
 
       go_flags = "-tags=${builtins.concatStringsSep "," go_tags}";
@@ -29,13 +31,6 @@
         jq
         yq
         gnumake
-        glibcLocales
-        pkg-config
-        stdenv.cc
-        gpgme
-        libgpg-error
-        btrfs-progs
-        lvm2
       ] ++ [
         pkgsUnstable.upx
         pkgsUnstable.mockgen
@@ -50,28 +45,14 @@
         version = "latest";
         src = self;
 
-        # EXPLICITLY disable vendor mode (important for some nixpkgs revisions)
         vendorHash = null;
-
-        # Use module-download mode — set to "" and let nix tell you the correct hash
         modSha256 = "";
-
-        nativeBuildInputs = [
-          pkgs.pkg-config
-          pkgs.stdenv.cc
-        ];
-
-        buildInputs = [
-          pkgs.gpgme
-          pkgs.libgpg-error
-          pkgs.btrfs-progs
-          pkgs.lvm2
-        ];
 
         tags = go_tags;
 
         # ensure go runs in module mode (optional/redundant with vendorHash=null)
         buildFlags = [ "-mod=mod" ];
+
       };
 
       devShells.${system} = {
