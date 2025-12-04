@@ -1,3 +1,5 @@
+## Notice: nix build is currently broken due to podman transitive dependencies requiring native complation - a fix is inflight. 
+
 [![Go](https://github.com/torloejborg/easykube/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/torloejborg/easykube/actions/workflows/go.yml)
 [![CodeQL Advanced](https://github.com/torloejborg/easykube/actions/workflows/codeql.yml/badge.svg)](https://github.com/torloejborg/easykube/actions/workflows/codeql.yml)
 [![Dependabot Updates](https://github.com/torloejborg/easykube/actions/workflows/dependabot/dependabot-updates/badge.svg?branch=main)](https://github.com/torloejborg/easykube/actions/workflows/dependabot/dependabot-updates)
