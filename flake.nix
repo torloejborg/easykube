@@ -21,7 +21,6 @@
         "exclude_graphdriver_overlay"
         "exclude_graphdriver_zfs"
         "containers_image_openpgp"
-        "containers_image_storage_stub"
       ];
 
       go_flags = "-tags=${builtins.concatStringsSep "," go_tags}";
@@ -45,14 +44,28 @@
         version = "latest";
         src = self;
 
-        vendorHash = null;
-        modSha256 = "";
+        vendorHash = "sha256-9+aRA8yzZ84DApX4S5WEddL90XFQvrzLKLL5B2cjG4c=";
 
         tags = go_tags;
 
-        # ensure go runs in module mode (optional/redundant with vendorHash=null)
-        buildFlags = [ "-mod=mod" ];
+        # Add version information similar to Makefile
+        ldflags = [ "-X github.com/torloejborg/easykube/pkg/vars.Version=${self.lastModifiedDate or "unknown"}" ];
 
+        # Add build dependencies for storage drivers
+        buildInputs = with pkgsUnstable; [
+          btrfs-progs
+          lvm2
+        ];
+
+        # Set CGO flags for btrfs
+        CGO_CFLAGS = "-I${pkgsUnstable.btrfs-progs}/include";
+        CGO_LDFLAGS = "-L${pkgsUnstable.btrfs-progs}/lib";
+
+      };
+
+      apps.${system}.default = {
+        type = "app";
+        program = "${self.packages.${system}.default}/bin/easykube";
       };
 
       devShells.${system} = {
