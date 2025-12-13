@@ -14,7 +14,7 @@ require (
 	github.com/olekukonko/tablewriter v1.1.2
 	github.com/slok/gospinner v0.1.1
 	github.com/spf13/afero v1.15.0
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	go.podman.io/common v0.66.1
 	go.uber.org/mock v0.6.0
 	gopkg.in/yaml.v3 v3.0.1
