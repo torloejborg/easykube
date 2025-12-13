@@ -68,21 +68,24 @@
         program = "${self.packages.${system}.default}/bin/easykube";
       };
 
-      devShells.${system} = {
-        default = pkgs.mkShell {
-          packages = commonPackages;
+      devShells.${system}.default = pkgs.mkShell {
+        inputsFrom = [
+          self.packages.${system}.default
+        ];
 
-          shell = pkgs.zsh;
-          impureEnv = true;
+        packages = commonPackages;
 
-          shellHook = ''
-            export LC_ALL=C.UTF-8
-            export LANG=C.UTF-8
-            export PS1="[ek-dev]> "
-            echo "Welcome to the easykube dev shell"
-            echo
-          '';
-        };
+        shell = pkgs.zsh;
+        impureEnv = true;
+
+        shellHook = ''
+          export LC_ALL=C.UTF-8
+          export LANG=C.UTF-8
+          export PS1="[ek-dev]> "
+          echo "easykube has been built and is available on PATH"
+          echo
+        '';
+      };
 
         light = pkgs.mkShell {
           GOFLAGS = go_flags;
