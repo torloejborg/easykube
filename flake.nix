@@ -85,7 +85,7 @@
           echo "easykube has been built and is available on PATH"
           echo
         '';
-      };
+      
 
         light = pkgs.mkShell {
           GOFLAGS = go_flags;
