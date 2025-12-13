@@ -20,7 +20,6 @@
         "exclude_graphdriver_devicemapper"
         "exclude_graphdriver_overlay"
         "exclude_graphdriver_zfs"
-        "containers_image_openpgp"
       ];
 
       go_flags = "-tags=${builtins.concatStringsSep "," go_tags}";
@@ -36,7 +35,8 @@
         pkgsUnstable.kubectl
         pkgsUnstable.kubernetes-helm
         pkgsUnstable.kustomize
-        pkgsUnstable.go_1_24
+        pkgsUnstable.go_1_25
+        pkgsUnstable.gpgme
       ];
     in {
       packages.${system}.default = pkgsUnstable.buildGoModule {
