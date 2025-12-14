@@ -60,7 +60,6 @@
         # Set CGO flags for btrfs
         CGO_CFLAGS = "-I${pkgsUnstable.btrfs-progs}/include";
         CGO_LDFLAGS = "-L${pkgsUnstable.btrfs-progs}/lib";
-
       };
 
       apps.${system}.default = {
@@ -68,24 +67,25 @@
         program = "${self.packages.${system}.default}/bin/easykube";
       };
 
-      devShells.${system}.default = pkgs.mkShell {
-        inputsFrom = [
-          self.packages.${system}.default
-        ];
+      devShells.${system} = {
+        default = pkgs.mkShell {
+          inputsFrom = [
+            self.packages.${system}.default
+          ];
 
-        packages = commonPackages;
+          packages = commonPackages;
 
-        shell = pkgs.zsh;
-        impureEnv = true;
+          shell = pkgs.zsh;
+          impureEnv = true;
 
-        shellHook = ''
-          export LC_ALL=C.UTF-8
-          export LANG=C.UTF-8
-          export PS1="[ek-dev]> "
-          echo "easykube has been built and is available on PATH"
-          echo
-        '';
-      
+          shellHook = ''
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+            export PS1="[ek-dev]> "
+            echo "easykube has been built and is available on PATH"
+            echo
+          '';
+        };
 
         light = pkgs.mkShell {
           GOFLAGS = go_flags;
