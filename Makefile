@@ -1,7 +1,8 @@
 VERSION     ?= $(shell git describe --tags --dirty --always)
 MODULE_PATH := $(shell grep '^module ' go.mod | cut -d' ' -f2)
 LDFLAGS     = -ldflags "-X $(MODULE_PATH)/pkg/vars.Version=$(VERSION)"
-TAGS		= remote,containers_remote,exclude_graphdriver_btrfs,exclude_graphdriver_devicemapper,exclude_graphdriver_overlay,exclude_graphdriver_zfs
+TAGS		= ""
+
 linux:
 	GOOS=linux GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-linux-amd64
 

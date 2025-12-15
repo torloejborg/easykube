@@ -4,15 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-
-    eksrc = {
-        url = "github:torloejborg/easykube/feat/podman";
-        flake = false; # important for Go modules
-      };
-
   };
 
-  outputs = { self, nixpkgs, unstable, eksrc }:
+  outputs = { self, nixpkgs, unstable }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -39,7 +33,7 @@
         pname = "easykube";
         version = "latest";
 
-        src = eksrc;
+        src = self;
 
         vendorHash = "sha256-vuwzjHu0VaewO7Di70HfcHwAxdTdVq0N0+Vy3ktgX5E=";
 
@@ -69,7 +63,7 @@
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             export PS1="ek-dev$ "
-            
+
             # Only source completion if binary exists
             if command -v easykube >/dev/null 2>&1; then
               source <(easykube completion bash)
