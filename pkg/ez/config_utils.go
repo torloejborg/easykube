@@ -231,7 +231,9 @@ func (ec *EasykubeConfig) patchConfigWithPrivateRegistryTemplate(cfg *EasykubeCo
 	data, _ := ReadFileToBytes(cfgFile)
 	cfgText := string(data)
 
-	if cfg.PrivateRegistries == nil && !strings.Contains(cfgText, configStanza) {
+	if cfg.PrivateRegistries == nil && !strings.Contains(cfgText, "repositoryMatch") &&
+		!strings.Contains(cfgText, "userKey") &&
+		!strings.Contains(cfgText, "passwordKey") {
 
 		// patch config
 		f, err := Kube.Fs.OpenFile(cfgFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
