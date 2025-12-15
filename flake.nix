@@ -29,18 +29,27 @@
               pkgsUnstable.go_1_25
             ] ;
     in {
-      packages.${system}.default = pkgsUnstable.buildGoModule {
+      packages.${system}.default = pkgsUnstable.pkgsStatic.buildGoModule {
         pname = "easykube";
         version = "latest";
         src = self;
-        #vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
         vendorHash = "sha256-vuwzjHu0VaewO7Di70HfcHwAxdTdVq0N0+Vy3ktgX5E=";
 
-          ldflags = [
-            "-s"
-            "-w"
-            "-extldflags=-static"
-          ];
+        env.CGO_ENABLED = "0";
+
+        ldflags = [
+          "-s"
+          "-w"
+          "-extldflags=-static"
+        ];
+
+#        doCheck = false;
+
+        meta = with lib; {
+          description = "easykube - Kubernetes cluster management tool";
+          license = licenses.mit;
+          platforms = platforms.linux;
+        };
       };
 
       devShells.${system} = {
