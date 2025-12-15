@@ -4,9 +4,15 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    eksrc = {
+        url = "github:torloejborg/easykube/feat/podman";
+        flake = false; # important for Go modules
+      };
+
   };
 
-  outputs = { self, nixpkgs, unstable }:
+  outputs = { self, nixpkgs, unstable, eksrc }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -32,7 +38,9 @@
       packages.${system}.default = pkgsUnstable.pkgsStatic.buildGoModule {
         pname = "easykube";
         version = "latest";
-        src = self;
+
+        src = eksrc;
+
         vendorHash = "sha256-vuwzjHu0VaewO7Di70HfcHwAxdTdVq0N0+Vy3ktgX5E=";
 
         env.CGO_ENABLED = "0";
@@ -43,8 +51,6 @@
           "-extldflags=-static"
         ];
 
-#        doCheck = false;
-
         meta = with lib; {
           description = "easykube - Kubernetes cluster management tool";
           license = licenses.mit;
@@ -52,26 +58,27 @@
         };
       };
 
-      devShells.${system} = {
+       devShells.${system} = {
        default = pkgs.mkShell {
-         inputsFrom = [
-           self.packages.${system}.default
-         ];
 
-         packages = commonPackages;
+         packages = commonPackages ++ [ self.packages.${system}.default ];
 
          shell = pkgs.zsh;
          impureEnv = true;
-         shellHook = ''
-           export LC_ALL=C.UTF-8
-           export LANG=C.UTF-8
-           export PS1="[ek-dev]> "
-           source <(easykube completion bash)
+          shellHook = ''
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+            export PS1="ek-dev$ "
+            
+            # Only source completion if binary exists
+            if command -v easykube >/dev/null 2>&1; then
+              source <(easykube completion bash)
+            fi
 
-           echo "Welcome to the easykube dev shell"
-           echo
-           easykube
-         '';
+            echo "Welcome to the easykube dev shell"
+            echo
+            easykube
+          '';
        };
         light = pkgs.mkShell {
           packages = commonPackages;
@@ -80,7 +87,7 @@
           shellHook = ''
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
-            export PS1="[ek-light]> "
+            export PS1="ek-light $ "
             echo "Welcome to the easykube light dev shell (no build)"
           '';
         };

@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "eksrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765807011,
+        "narHash": "sha256-TWFIVM5K+wZhW9rVYifYTCuAGVof5nkbAnYUaM+KUjI=",
+        "owner": "torloejborg",
+        "repo": "easykube",
+        "rev": "82fc75198b5adca42f949162854f73edd2236f3d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "torloejborg",
+        "ref": "feat/podman",
+        "repo": "easykube",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1735563628,
@@ -18,17 +35,18 @@
     },
     "root": {
       "inputs": {
+        "eksrc": "eksrc",
         "nixpkgs": "nixpkgs",
         "unstable": "unstable"
       }
     },
     "unstable": {
       "locked": {
-        "lastModified": 1759036355,
-        "narHash": "sha256-0m27AKv6ka+q270dw48KflE0LwQYrO7Fm4/2//KCVWg=",
+        "lastModified": 1765472234,
+        "narHash": "sha256-9VvC20PJPsleGMewwcWYKGzDIyjckEz8uWmT0vCDYK0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e9f00bd893984bc8ce46c895c3bf7cac95331127",
+        "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
         "type": "github"
       },
       "original": {
