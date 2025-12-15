@@ -189,6 +189,11 @@ func (ec *EasykubeConfig) MakeConfig() error {
 			return err
 		}
 
+		err = CopyResource("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
+		if nil != err {
+			return err
+		}
+
 		err = CopyResource("cert/localtest.me.key", "localtest.me.key")
 		if nil != err {
 			return err

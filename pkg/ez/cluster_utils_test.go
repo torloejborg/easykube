@@ -69,7 +69,8 @@ func TestRenderKindConfigurationFromSetOfAddons(t *testing.T) {
 		addonList = append(addonList, addon)
 	}
 
-	result := ez.Kube.RenderToYAML(addonList)
+	cfg, _ := ez.Kube.LoadConfig()
+	result := ez.Kube.RenderToYAML(addonList, cfg)
 
 	fmt.Println(result)
 }

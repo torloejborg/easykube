@@ -1,9 +1,5 @@
 package ez
 
-import (
-	"fmt"
-)
-
 type ContainerSearch struct {
 	ContainerID string
 	Found       bool
@@ -49,13 +45,5 @@ func NewContainerRuntime() IContainerRuntime {
 		panic(err)
 	}
 
-	switch cfg.ContainerRuntime {
-	case "docker":
-		return NewDockerImpl()
-	case "podman":
-		return NewPodmanImpl()
-	default:
-		panic(fmt.Sprintf("unknown container runtime: %s", cfg.ContainerRuntime))
-	}
-
+	return NewContainerRuntimeImpl(cfg.ContainerRuntime);
 }
