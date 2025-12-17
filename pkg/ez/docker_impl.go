@@ -61,9 +61,9 @@ func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
 	}
 
 }
-func (cr *ContainerRuntimeImpl) IsClusterRunning() bool {
+func (cri *ContainerRuntimeImpl) IsClusterRunning() bool {
 
-	running, err := cr.IsContainerRunning(constants.KIND_CONTAINER)
+	running, err := cri.IsContainerRunning(constants.KIND_CONTAINER)
 	if err != nil {
 		return false
 	} else {
@@ -71,8 +71,18 @@ func (cr *ContainerRuntimeImpl) IsClusterRunning() bool {
 	}
 }
 
-func (cr *ContainerRuntimeImpl) IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error) {
-	jsonData, err := cr.Docker.ContainerInspect(cr.ctx, containerID)
+func (cri *ContainerRuntimeImpl) DiscoverContainerRuntimeConnection(runtimeType string) (ContainerConnection, error) {
+
+	res := ContainerConnection{
+		Host: "nil",
+		Type: "docker",
+	}
+
+	return res, nil
+}
+
+func (cri *ContainerRuntimeImpl) IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error) {
+	jsonData, err := cri.Docker.ContainerInspect(cri.ctx, containerID)
 	if err != nil {
 		return false, err
 	}
@@ -80,8 +90,8 @@ func (cr *ContainerRuntimeImpl) IsNetworkConnectedToContainer(containerID string
 	return networkData != nil, nil
 }
 
-func (cr *ContainerRuntimeImpl) IsContainerRunning(containerID string) (bool, error) {
-	result, err := cr.Docker.ContainerInspect(cr.ctx, containerID)
+func (cri *ContainerRuntimeImpl) IsContainerRunning(containerID string) (bool, error) {
+	result, err := cri.Docker.ContainerInspect(cri.ctx, containerID)
 
 	if err != nil {
 		return false, err
@@ -90,7 +100,7 @@ func (cr *ContainerRuntimeImpl) IsContainerRunning(containerID string) (bool, er
 	return result.State.Running, nil
 }
 
-func (i *ContainerRuntimeImpl) HasImageInKindRegistry(image string) (bool, error) {
+func (cri *ContainerRuntimeImpl) HasImageInKindRegistry(image string) (bool, error) {
 	image = strings.ReplaceAll(image, constants.LOCAL_REGISTRY+"/", "")
 	parts := strings.Split(image, ":")
 	imageWithoutTag := parts[0]
@@ -136,7 +146,7 @@ func (i *ContainerRuntimeImpl) HasImageInKindRegistry(image string) (bool, error
 	return false, nil
 }
 
-func (cr *ContainerRuntimeImpl) HasImage(image string) (bool, error) {
+func (cri *ContainerRuntimeImpl) HasImage(image string) (bool, error) {
 
 	f := filters.NewArgs()
 	f.Add("reference", image)
@@ -146,7 +156,7 @@ func (cr *ContainerRuntimeImpl) HasImage(image string) (bool, error) {
 		Filters: f,
 	}
 
-	res, err := cr.Docker.ImageList(cr.ctx, opts)
+	res, err := cri.Docker.ImageList(cri.ctx, opts)
 	if err != nil {
 		return false, err
 	}
@@ -162,7 +172,7 @@ func (cr *ContainerRuntimeImpl) HasImage(image string) (bool, error) {
 	return false, nil
 }
 
-func (cr *ContainerRuntimeImpl) PushImage(src, dest string) error {
+func (cri *ContainerRuntimeImpl) PushImage(src, dest string) error {
 
 	auth := base64.StdEncoding.EncodeToString([]byte(`{}`))
 
@@ -173,7 +183,7 @@ func (cr *ContainerRuntimeImpl) PushImage(src, dest string) error {
 		Platform:      nil,
 	}
 
-	reader, err := cr.Docker.ImagePush(cr.ctx, dest, opts)
+	reader, err := cri.Docker.ImagePush(cri.ctx, dest, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -186,7 +196,7 @@ func (cr *ContainerRuntimeImpl) PushImage(src, dest string) error {
 
 }
 
-func (cr *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateRegistryCredentials) error {
+func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateRegistryCredentials) error {
 
 	opts := image2.PullOptions{
 		All: false,
@@ -202,7 +212,7 @@ func (cr *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateRegi
 		opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
 	}
 
-	reader, err := cr.Docker.ImagePull(cr.ctx, image, opts)
+	reader, err := cri.Docker.ImagePull(cri.ctx, image, opts)
 	if err != nil {
 		return err
 	}
@@ -224,7 +234,7 @@ func (cr *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateRegi
 	return nil
 }
 
-func (cr *ContainerRuntimeImpl) FindContainer(name string) (*ContainerSearch, error) {
+func (cri *ContainerRuntimeImpl) FindContainer(name string) (*ContainerSearch, error) {
 
 	f := filters.NewArgs()
 	f.Add("name", name)
@@ -233,7 +243,7 @@ func (cr *ContainerRuntimeImpl) FindContainer(name string) (*ContainerSearch, er
 		Filters: f,
 	}
 
-	resp, err := cr.Docker.ContainerList(cr.ctx, opts)
+	resp, err := cri.Docker.ContainerList(cri.ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -256,50 +266,50 @@ func (cr *ContainerRuntimeImpl) FindContainer(name string) (*ContainerSearch, er
 	}
 }
 
-func (cr *ContainerRuntimeImpl) StartContainer(id string) error {
-	if err := cr.Docker.ContainerStart(cr.ctx, id, container.StartOptions{}); err != nil {
+func (cri *ContainerRuntimeImpl) StartContainer(id string) error {
+	if err := cri.Docker.ContainerStart(cri.ctx, id, container.StartOptions{}); err != nil {
 		return err
 	} else {
 		return nil
 	}
 }
 
-func (cr *ContainerRuntimeImpl) StopContainer(id string) error {
-	if err := cr.Docker.ContainerStop(cr.ctx, id, container.StopOptions{}); err != nil {
+func (cri *ContainerRuntimeImpl) StopContainer(id string) error {
+	if err := cri.Docker.ContainerStop(cri.ctx, id, container.StopOptions{}); err != nil {
 		return err
 	} else {
 		return nil
 	}
 }
 
-func (cr *ContainerRuntimeImpl) RemoveContainer(id string) error {
-	if err := cr.Docker.ContainerRemove(cr.ctx, id, container.RemoveOptions{}); err != nil {
+func (cri *ContainerRuntimeImpl) RemoveContainer(id string) error {
+	if err := cri.Docker.ContainerRemove(cri.ctx, id, container.RemoveOptions{}); err != nil {
 		return err
 	} else {
 		return nil
 	}
 }
 
-func (cr *ContainerRuntimeImpl) Exec(containerId string, cmd []string) error {
+func (cri *ContainerRuntimeImpl) Exec(containerId string, cmd []string) error {
 	exec := container.ExecOptions{
 		Cmd:          cmd,
 		AttachStderr: true,
 		AttachStdout: true,
 	}
 
-	x, err := cr.Docker.ContainerExecCreate(cr.ctx, containerId, exec)
+	x, err := cri.Docker.ContainerExecCreate(cri.ctx, containerId, exec)
 	if err != nil {
 		return err
 	}
 
-	if err := cr.Docker.ContainerExecStart(cr.ctx, x.ID, container.ExecStartOptions{
+	if err := cri.Docker.ContainerExecStart(cri.ctx, x.ID, container.ExecStartOptions{
 		Detach: false,
 	}); err != nil {
 		return err
 	}
 
 	for i := 1; i < 20; i++ {
-		resp, err := cr.Docker.ContainerInspect(cr.ctx, containerId)
+		resp, err := cri.Docker.ContainerInspect(cri.ctx, containerId)
 		if err != nil {
 			return err
 		}
@@ -312,7 +322,7 @@ func (cr *ContainerRuntimeImpl) Exec(containerId string, cmd []string) error {
 	return nil
 }
 
-func (cr *ContainerRuntimeImpl) ContainerWriteFile(containerId string, dst string, filename string, data []byte) error {
+func (cri *ContainerRuntimeImpl) ContainerWriteFile(containerId string, dst string, filename string, data []byte) error {
 	opts := container.CopyToContainerOptions{
 		AllowOverwriteDirWithFile: true,
 	}
@@ -322,30 +332,30 @@ func (cr *ContainerRuntimeImpl) ContainerWriteFile(containerId string, dst strin
 		return err
 	}
 
-	if err := cr.Docker.CopyToContainer(cr.ctx, containerId, dst, bytes.NewReader(data), opts); err != nil {
+	if err := cri.Docker.CopyToContainer(cri.ctx, containerId, dst, bytes.NewReader(data), opts); err != nil {
 		return errors.Join(errors.New("failed to write file in docker container"), err)
 	}
 
 	return nil
 }
 
-func (cr *ContainerRuntimeImpl) NetworkConnect(containerId string, networkId string) error {
-	if err := cr.Docker.NetworkConnect(cr.ctx, networkId, containerId, nil); err != nil {
+func (cri *ContainerRuntimeImpl) NetworkConnect(containerId string, networkId string) error {
+	if err := cri.Docker.NetworkConnect(cri.ctx, networkId, containerId, nil); err != nil {
 		return err
 	} else {
 		return nil
 	}
 }
 
-func (cr *ContainerRuntimeImpl) CloseContainerRuntime() {
+func (cri *ContainerRuntimeImpl) CloseContainerRuntime() {
 }
 
-func (cr *ContainerRuntimeImpl) IsContainerRuntimeAvailable() bool {
-	_, err := cr.Docker.Info(cr.ctx)
+func (cri *ContainerRuntimeImpl) IsContainerRuntimeAvailable() bool {
+	_, err := cri.Docker.Info(cri.ctx)
 	return err == nil
 }
 
-func (cr *ContainerRuntimeImpl) CreateContainerRegistry() error {
+func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 	registry := constants.REGISTRY_IMAGE
 	containerName := constants.REGISTRY_CONTAINER
@@ -364,14 +374,14 @@ func (cr *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		return err
 	}
 
-	imageSearch, err := cr.HasImage(registry)
+	imageSearch, err := cri.HasImage(registry)
 	if !imageSearch {
-		if err := cr.PullImage(registry, nil); err != nil {
+		if err := cri.PullImage(registry, nil); err != nil {
 			return err
 		}
 	}
 
-	containerSearch, err := cr.FindContainer(containerName)
+	containerSearch, err := cri.FindContainer(containerName)
 	if err != nil {
 		return err
 	}
@@ -409,39 +419,39 @@ func (cr *ContainerRuntimeImpl) CreateContainerRegistry() error {
 			Binds: binds,
 		}
 
-		resp, err := cr.Docker.ContainerCreate(cr.ctx, containerConfig, hostConfig, networkingConfig, nil, constants.REGISTRY_CONTAINER)
+		resp, err := cri.Docker.ContainerCreate(cri.ctx, containerConfig, hostConfig, networkingConfig, nil, constants.REGISTRY_CONTAINER)
 		if err != nil {
 			panic(err)
 		}
 
-		err = cr.Docker.ContainerStart(cr.ctx, resp.ID, container.StartOptions{})
+		err = cri.Docker.ContainerStart(cri.ctx, resp.ID, container.StartOptions{})
 		if err != nil {
 			panic(err)
 		}
 	}
 
 	if containerSearch.Found && !containerSearch.IsRunning {
-		cr.StartContainer(containerSearch.ContainerID)
+		cri.StartContainer(containerSearch.ContainerID)
 	}
 
 	return nil
 }
 
-func (cr *ContainerRuntimeImpl) Commit(containerID string) {
+func (cri *ContainerRuntimeImpl) Commit(containerID string) {
 
 	opts := container.CommitOptions{
 		Reference: "",
 	}
 
-	resp, err := cr.Docker.ContainerCommit(cr.ctx, containerID, opts)
+	resp, err := cri.Docker.ContainerCommit(cri.ctx, containerID, opts)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(resp.ID)
 }
 
-func (cr *ContainerRuntimeImpl) TagImage(source string, target string) error {
-	if err := cr.Docker.ImageTag(cr.ctx, source, target); err != nil {
+func (cri *ContainerRuntimeImpl) TagImage(source string, target string) error {
+	if err := cri.Docker.ImageTag(cri.ctx, source, target); err != nil {
 		return err
 	} else {
 		return nil

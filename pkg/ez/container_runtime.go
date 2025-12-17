@@ -6,6 +6,11 @@ type ContainerSearch struct {
 	IsRunning   bool
 }
 
+type ContainerConnection struct {
+	Host string
+	Type string
+}
+
 type ImageSearch struct {
 	SHA256 string
 	Found  bool
@@ -17,6 +22,7 @@ type PrivateRegistryCredentials struct {
 }
 
 type IContainerRuntime interface {
+	DiscoverContainerRuntimeConnection() (ContainerConnection, error)
 	IsContainerRunning(containerID string) (bool, error)
 	PushImage(src, image string) error
 	PullImage(image string, credentials *PrivateRegistryCredentials) error
@@ -45,5 +51,5 @@ func NewContainerRuntime() IContainerRuntime {
 		panic(err)
 	}
 
-	return NewContainerRuntimeImpl(cfg.ContainerRuntime);
+	return NewContainerRuntimeImpl(cfg.ContainerRuntime)
 }
