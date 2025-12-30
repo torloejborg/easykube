@@ -23,6 +23,7 @@ runtime:
 
 asciidoc:
   attributes:
+    plantuml-format: svg
     source-highlighter: rouge
     linenums: true
     toc: left
@@ -37,4 +38,3 @@ ui:
 antora:
   extensions:
   - require: "@springio/antora-extensions/asciinema-extension"
-
