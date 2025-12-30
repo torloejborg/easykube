@@ -4,16 +4,16 @@ LDFLAGS     = -ldflags "-X $(MODULE_PATH)/pkg/vars.Version=$(VERSION)"
 TAGS		= ""
 
 linux:
-	GOOS=linux GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-linux-amd64
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-linux-amd64
 
 osx_amd64:
-	GOOS=darwin GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-darwin-amd64
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-darwin-amd64
 
 osx_arm64:
-	GOOS=darwin GOARCH=arm64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-darwin-arm64
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-darwin-arm64
 
 windows:
-	GOOS=windows GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-windows-amd64.exe
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-windows-amd64.exe
 
 clean:
 	rm -rf build dist
@@ -43,4 +43,5 @@ mock:
 	mockgen -typed --source pkg/ez/addon_types.go --destination mock/m_addon.go
 	mockgen -typed --source pkg/js/jsrunner.go --package mock_ez --destination mock/m_jsrunner.go
 
-
+gomod2nix:
+	nix run github:nix-community/gomod2nix -- generate
