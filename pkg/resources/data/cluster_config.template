@@ -12,16 +12,18 @@ nodes:
         nodeRegistration:
           kubeletExtraArgs:
             pod-max-pids: "8096"
-    extraPortMappings:{{range . -}}
+    extraPortMappings:{{range .AddonList -}}
     {{ range .Config.ExtraPorts }}
     - hostPort: {{.HostPort}}
       containerPort: {{.NodePort}}
       protocol: {{.Protocol}}
     {{- end}}
     {{- end}}
-    extraMounts:{{range . -}}
+    extraMounts:{{range .AddonList -}}
     {{ range .Config.ExtraMounts }}
     - hostPath: {{.PersistenceDir}}{{.HostPath}}
       containerPath: {{.ContainerPath}}
     {{- end}}
     {{- end}}
+    - hostPath: {{.Config.ConfigurationDir}}/localtest.me.ca.crt
+      containerPath: "/etc/ssl/certs/localtest.me.ca.crt"

@@ -9,96 +9,79 @@
   outputs = { self, nixpkgs, unstable }:
     let
       system = "x86_64-linux";
-
       pkgs = nixpkgs.legacyPackages.${system};
       pkgsUnstable = unstable.legacyPackages.${system};
+      lib = pkgs.lib;
 
-      go_tags = [
-        "remote"
-        "containers_remote"
-        "exclude_graphdriver_btrfs"
-        "exclude_graphdriver_devicemapper"
-        "exclude_graphdriver_overlay"
-        "exclude_graphdriver_zfs"
-      ];
-
-      go_flags = "-tags=${builtins.concatStringsSep "," go_tags}";
-
-      commonPackages = with pkgs; [
-        (ruby.withPackages (ps: with ps; [ rouge ]))
-        jq
-        yq
-        gnumake
-      ] ++ [
-        pkgsUnstable.upx
-        pkgsUnstable.mockgen
-        pkgsUnstable.kubectl
-        pkgsUnstable.kubernetes-helm
-        pkgsUnstable.kustomize
-        pkgsUnstable.go_1_25
-        pkgsUnstable.gpgme
-      ];
+        # Common packages used in all shells
+            commonPackages = with pkgs; [
+              (ruby.withPackages (ps: with ps; [ rouge  ]))
+              jq
+              yq
+              gnumake
+              glibcLocales
+            ] ++ [
+              pkgsUnstable.upx
+              pkgsUnstable.mockgen
+              pkgsUnstable.kubectl
+              pkgsUnstable.kubernetes-helm
+              pkgsUnstable.kustomize
+              pkgsUnstable.go_1_25
+            ] ;
     in {
-      packages.${system}.default = pkgsUnstable.buildGoModule {
+      packages.${system}.default = pkgsUnstable.pkgsStatic.buildGoModule {
         pname = "easykube";
         version = "latest";
+
         src = self;
 
-        vendorHash = "sha256-9+aRA8yzZ84DApX4S5WEddL90XFQvrzLKLL5B2cjG4c=";
+        vendorHash = "sha256-vuwzjHu0VaewO7Di70HfcHwAxdTdVq0N0+Vy3ktgX5E=";
 
-        tags = go_tags;
+        env.CGO_ENABLED = "0";
 
-        # Add version information similar to Makefile
-        ldflags = [ "-X github.com/torloejborg/easykube/pkg/vars.Version=${self.lastModifiedDate or "unknown"}" ];
-
-        # Add build dependencies for storage drivers
-        buildInputs = with pkgsUnstable; [
-          btrfs-progs
-          lvm2
+        ldflags = [
+          "-s"
+          "-w"
+          "-extldflags=-static"
         ];
 
-        # Set CGO flags for btrfs
-        CGO_CFLAGS = "-I${pkgsUnstable.btrfs-progs}/include";
-        CGO_LDFLAGS = "-L${pkgsUnstable.btrfs-progs}/lib";
-      };
-
-      apps.${system}.default = {
-        type = "app";
-        program = "${self.packages.${system}.default}/bin/easykube";
-      };
-
-      devShells.${system} = {
-        default = pkgs.mkShell {
-          inputsFrom = [
-            self.packages.${system}.default
-          ];
-
-          packages = commonPackages;
-
-          shell = pkgs.zsh;
-          impureEnv = true;
-
-          shellHook = ''
-            export LC_ALL=C.UTF-8
-            export LANG=C.UTF-8
-            export PS1="[ek-dev]> "
-            echo "easykube has been built and is available on PATH"
-            echo
-          '';
+        meta = with lib; {
+          description = "easykube - Kubernetes cluster management tool";
+          license = licenses.mit;
+          platforms = platforms.linux;
         };
+      };
 
-        light = pkgs.mkShell {
-          GOFLAGS = go_flags;
+       devShells.${system} = {
+       default = pkgs.mkShell {
 
-          packages = commonPackages;
+         packages = commonPackages ++ [ self.packages.${system}.default ];
 
-          shell = pkgs.zsh;
-          impureEnv = true;
-
+         shell = pkgs.zsh;
+         impureEnv = true;
           shellHook = ''
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
-            export PS1="[ek-light]> "
+            export PS1="ek-dev$ "
+
+            # Only source completion if binary exists
+            if command -v easykube >/dev/null 2>&1; then
+              source <(easykube completion bash)
+            fi
+
+            echo "Welcome to the easykube dev shell"
+            echo
+            easykube
+          '';
+       };
+        light = pkgs.mkShell {
+          packages = commonPackages;
+          shell = pkgs.zsh;
+          impureEnv = true;
+          shellHook = ''
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+            export PS1="ek-light $ "
             echo "Welcome to the easykube light dev shell (no build)"
           '';
         };

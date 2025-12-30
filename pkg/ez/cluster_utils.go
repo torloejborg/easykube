@@ -2,6 +2,7 @@ package ez
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,7 +16,7 @@ import (
 
 type IClusterUtils interface {
 	CreateKindCluster(modules map[string]IAddon) string
-	RenderToYAML(addonList []IAddon) string
+	RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string
 	ConfigurationReport(addonList []IAddon) string
 	EnsurePersistenceDirectory() error
 }
@@ -49,7 +50,7 @@ func (u *ClusterUtils) ConfigurationReport(addonList []IAddon) string {
 
 func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 
-	// kind already exists, but not started
+	// see if the cluster has been created
 	search, _ := Kube.FindContainer("kind-control-plane")
 
 	addonList := make([]IAddon, 0)
@@ -74,7 +75,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 		homedir, _ := Kube.GetUserHomeDir()
 
 		configDir, _ := os.UserConfigDir()
-		configFile := u.RenderToYAML(addonList)
+		configFile := u.RenderToYAML(addonList,u.EkConfig)
 
 		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
@@ -94,21 +95,33 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 		// initial cluster should be running now
 		search, _ = Kube.FindContainer(constants.KIND_CONTAINER)
 
+		fmt.Println()
 		if search.IsRunning {
 			_, _ = Kube.FmtSpinner(func() (any, error) {
-				command := []string{"mkdir", "-p", "/etc/containerd/certs.d/localhost:5001"}
-				if err := Kube.Exec(search.ContainerID, command); err != nil {
+
+				localhostReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/localhost:5001"}
+				if err := Kube.Exec(search.ContainerID, localhostReg); err != nil {
 					return nil, err
 				}
 
-				toml, _ := resources.AppResources.ReadFile("data/hosts.toml")
-				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", toml); err != nil {
+				registryReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/registry.localtest.me:5001"}
+				if err := Kube.Exec(search.ContainerID, registryReg); err != nil {
+					return nil, err
+				}
+
+
+				localhost, _ := resources.AppResources.ReadFile("data/reg-localhost.toml")
+				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", localhost); err != nil {
+					return nil, err
+				}
+
+				registry, _ := resources.AppResources.ReadFile("data/reg-registry.toml")
+				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/registry.localtest.me:5001", "hosts.toml", registry); err != nil {
 					return nil, err
 				}
 
 				return nil, nil
-			}, "Configuring control plane containerd")
-
+			}, "Wiring local registry to control plane")
 		}
 	}
 
@@ -123,11 +136,16 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 	return u.ConfigurationReport(addonList)
 }
 
-func (u *ClusterUtils) RenderToYAML(addonList []IAddon) string {
+func (u *ClusterUtils) RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string {
 	data, err := resources.AppResources.ReadFile("data/cluster_config.template")
 	if err != nil {
 		panic(err)
 	}
+
+	x:= struct {
+		Config *EasykubeConfigData
+		AddonList []IAddon
+	} {Config: config, AddonList: addonList}
 
 	templ := template.New("config")
 	templ, err = templ.Parse(string(data))
@@ -137,7 +155,7 @@ func (u *ClusterUtils) RenderToYAML(addonList []IAddon) string {
 
 	buf := &bytes.Buffer{}
 
-	err = templ.Execute(buf, addonList)
+	err = templ.Execute(buf, x)
 	if err != nil {
 		panic(err)
 	}

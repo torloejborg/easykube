@@ -155,17 +155,17 @@ func (c *MockIClusterUtilsEnsurePersistenceDirectoryCall) DoAndReturn(f func() e
 }
 
 // RenderToYAML mocks base method.
-func (m *MockIClusterUtils) RenderToYAML(addonList []ez.IAddon) string {
+func (m *MockIClusterUtils) RenderToYAML(addonList []ez.IAddon, config *ez.EasykubeConfigData) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RenderToYAML", addonList)
+	ret := m.ctrl.Call(m, "RenderToYAML", addonList, config)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // RenderToYAML indicates an expected call of RenderToYAML.
-func (mr *MockIClusterUtilsMockRecorder) RenderToYAML(addonList any) *MockIClusterUtilsRenderToYAMLCall {
+func (mr *MockIClusterUtilsMockRecorder) RenderToYAML(addonList, config any) *MockIClusterUtilsRenderToYAMLCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderToYAML", reflect.TypeOf((*MockIClusterUtils)(nil).RenderToYAML), addonList)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderToYAML", reflect.TypeOf((*MockIClusterUtils)(nil).RenderToYAML), addonList, config)
 	return &MockIClusterUtilsRenderToYAMLCall{Call: call}
 }
 
@@ -181,13 +181,13 @@ func (c *MockIClusterUtilsRenderToYAMLCall) Return(arg0 string) *MockIClusterUti
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIClusterUtilsRenderToYAMLCall) Do(f func([]ez.IAddon) string) *MockIClusterUtilsRenderToYAMLCall {
+func (c *MockIClusterUtilsRenderToYAMLCall) Do(f func([]ez.IAddon, *ez.EasykubeConfigData) string) *MockIClusterUtilsRenderToYAMLCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIClusterUtilsRenderToYAMLCall) DoAndReturn(f func([]ez.IAddon) string) *MockIClusterUtilsRenderToYAMLCall {
+func (c *MockIClusterUtilsRenderToYAMLCall) DoAndReturn(f func([]ez.IAddon, *ez.EasykubeConfigData) string) *MockIClusterUtilsRenderToYAMLCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
