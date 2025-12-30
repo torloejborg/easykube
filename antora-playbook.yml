@@ -28,7 +28,10 @@ asciidoc:
     linenums: true
     toc: left
     toclevels: 3
-
+    kroki-server-url: https://kroki.io
+    kroki-fetch-diagram: true
+  extensions:
+    - asciidoctor-kroki
 ui:
   bundle:
     url: https://github.com/torloejborg/easykube-docs-ui/releases/download/v1.0.2/ui-bundle.zip

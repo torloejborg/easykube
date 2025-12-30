@@ -19,7 +19,7 @@
 
       # Common packages used in all shells
       commonPackages = with pkgs; [
-        (ruby.withPackages (ps: with ps; [ rouge  ]))
+        (ruby.withPackages (ps: with ps; [ rouge ]))
         jq
         yq
         gnumake
@@ -39,6 +39,9 @@
                     pkgsUnstable.pandoc
                     pkgsUnstable.antora
                     pkgsUnstable.termtosvg
+                    pkgsUnstable.plantuml
+                    pkgsUnstable.graphviz
+                    pkgsUnstable.ruby
                  ];
 
     in {
@@ -63,7 +66,7 @@
           shellHook = ''
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
-            export PS1="ek-dev $"
+            export PS1="ek-dev $ "
             # Only source completion if binary exists
             if command -v easykube >/dev/null 2>&1; then
               source <(easykube completion bash)
@@ -87,10 +90,11 @@
 
         docs = pkgs.mkShell {
           packages = commonPackages ++ docsPackages;
+          impureEnv = true;
           shellHook = ''
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
-            export PS1="[ek-docs]> "
+            export PS1="ek-docs $ "
             echo "Welcome to the easykube doc builder shell (no build)"
           '';
         };

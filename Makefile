@@ -49,5 +49,5 @@ gomod2nix:
 .PHONY:docs
 docs:
 	asciidoc/ensure-spring-extensions.sh
-	antora generate antora-playbook.yml
+	antora generate --stacktrace antora-playbook.yml
 	touch docs/.nojekyll
