@@ -188,6 +188,45 @@ func (c *MockIContainerRuntimeCreateContainerRegistryCall) DoAndReturn(f func() 
 	return c
 }
 
+// DiscoverContainerRuntimeConnection mocks base method.
+func (m *MockIContainerRuntime) DiscoverContainerRuntimeConnection(runtime string) (ez.ContainerConnection, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DiscoverContainerRuntimeConnection", runtime)
+	ret0, _ := ret[0].(ez.ContainerConnection)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DiscoverContainerRuntimeConnection indicates an expected call of DiscoverContainerRuntimeConnection.
+func (mr *MockIContainerRuntimeMockRecorder) DiscoverContainerRuntimeConnection(runtime any) *MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DiscoverContainerRuntimeConnection", reflect.TypeOf((*MockIContainerRuntime)(nil).DiscoverContainerRuntimeConnection), runtime)
+	return &MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall{Call: call}
+}
+
+// MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall wrap *gomock.Call
+type MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall) Return(arg0 ez.ContainerConnection, arg1 error) *MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall) Do(f func(string) (ez.ContainerConnection, error)) *MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall) DoAndReturn(f func(string) (ez.ContainerConnection, error)) *MockIContainerRuntimeDiscoverContainerRuntimeConnectionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Exec mocks base method.
 func (m *MockIContainerRuntime) Exec(containerId string, cmd []string) error {
 	m.ctrl.T.Helper()

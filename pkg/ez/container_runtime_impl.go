@@ -43,7 +43,13 @@ func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
 		clientsOpts = append(clientsOpts, client.FromEnv)
 		break
 	case "podman":
-		clientsOpts = append(clientsOpts, client.WithHost("unix:///run/user/1000/podman/podman.sock"))
+		// get the socket location
+		sout, _, err := Kube.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
+		if err != nil {
+			panic("Failed to get podman info")
+		}
+
+		clientsOpts = append(clientsOpts, client.WithHost("unix:///"+sout))
 		break
 	default:
 		panic("unknown container runtime")
