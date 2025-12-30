@@ -48,8 +48,8 @@ func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
 		if err != nil {
 			panic("Failed to get podman info")
 		}
-
-		clientsOpts = append(clientsOpts, client.WithHost("unix:///"+sout))
+		socket := strings.TrimSpace(sout)
+		clientsOpts = append(clientsOpts, client.WithHost("unix:///"+socket))
 		break
 	default:
 		panic("unknown container runtime")

@@ -19,7 +19,11 @@ type CreateOpts struct {
 func createActualCmd(opts CreateOpts) error {
 	ezk := ez.Kube
 
-	s, _ := ezk.FindContainer(constants.KIND_CONTAINER)
+	s, err := ezk.FindContainer(constants.KIND_CONTAINER)
+	if err != nil {
+		return err
+	}
+
 	if s.Found && !s.IsRunning {
 		return fmt.Errorf("cluster container %s exists but is not running", constants.KIND_CONTAINER)
 	} else if s.Found && s.IsRunning {
