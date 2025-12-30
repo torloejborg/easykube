@@ -47,11 +47,9 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 					panic(err)
 				} else if !hasImage || mustPull {
 					if registryCredentials != nil {
-
-						ezk.FmtGreen("🖼  pull from private registry %s using credentials (%s,%s)", source,
+						ezk.FmtGreen("🖼  pull from private registry %s using secret keys (%s,%s)", source,
 							registryCredentials.Username,
 							"[redacted]")
-
 						if err := ezk.PullImage(source, registryCredentials); err != nil {
 							panic(err)
 						}
@@ -101,8 +99,8 @@ func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry)
 				return nil
 			}
 			return &ez.PrivateRegistryCredentials{
-				Username: string(secret[config[i].UserKey]),
-				Password: string(secret[config[i].PasswordKey]),
+				Username: config[i].UserKey,
+				Password: config[i].PasswordKey,
 			}
 		}
 	}

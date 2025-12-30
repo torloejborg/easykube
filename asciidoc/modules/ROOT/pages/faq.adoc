@@ -22,4 +22,4 @@ Sometimes easykube fails with an error about 'deployment not ready' when adding 
 
 I cannot create postgres databases, it throws errors when creating or starting the database, what can I do?
 
-** If you switched to a newer version, existing database files might not be compatible. Either revert to the previous version or delete the files in the Postgres persistence directory.
+** If you switched to a newer postgres version, existing database files might not be compatible. Either revert to the previous version or delete the files in the Postgres persistence directory.

@@ -34,3 +34,4 @@ On Linux systems, this socket is typically found at:
 If the socket is not present, and you are using a systemd-based OS, try starting it with:
 systemctl --user start podman.socket
 
+You can override the podman socket location by setting the CONTAINER_HOST environment variable.

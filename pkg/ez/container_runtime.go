@@ -1,13 +1,14 @@
 package ez
 
-import (
-	"fmt"
-)
-
 type ContainerSearch struct {
 	ContainerID string
 	Found       bool
 	IsRunning   bool
+}
+
+type ContainerConnection struct {
+	Host string
+	Type string
 }
 
 type ImageSearch struct {
@@ -21,6 +22,7 @@ type PrivateRegistryCredentials struct {
 }
 
 type IContainerRuntime interface {
+	DiscoverContainerRuntimeConnection(runtime string) (ContainerConnection, error)
 	IsContainerRunning(containerID string) (bool, error)
 	PushImage(src, image string) error
 	PullImage(image string, credentials *PrivateRegistryCredentials) error
@@ -49,13 +51,5 @@ func NewContainerRuntime() IContainerRuntime {
 		panic(err)
 	}
 
-	switch cfg.ContainerRuntime {
-	case "docker":
-		return NewDockerImpl()
-	case "podman":
-		return NewPodmanImpl()
-	default:
-		panic(fmt.Sprintf("unknown container runtime: %s", cfg.ContainerRuntime))
-	}
-
+	return NewContainerRuntimeImpl(cfg.ContainerRuntime)
 }

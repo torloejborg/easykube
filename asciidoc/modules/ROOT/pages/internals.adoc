@@ -3,6 +3,9 @@
 
 On this page we describe some of the internals, and how easykube differs from a plain Kind instance.
 
+== Local image registry
+
+
 == DNS Resolution[[internals-dns]]
 
 It might seem strange that everything is available at *.localtest.me — this is because someone on the internet was kind enough to create a public loopback domain. All DNS requests to localtest.me and any subdomain will resolve to 127.0.0.1.

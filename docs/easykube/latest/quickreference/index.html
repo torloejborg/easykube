@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>FAQ :: Easykube Documentation</title>
-    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/faq/">
+    <title>Quick Reference :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/quickreference/">
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../../_/css/site.css">
 <link rel="stylesheet" href="../../../_/css/vendor/asciinema-player.css">
@@ -56,11 +56,11 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="./">FAQ</a>
-  </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../quickreference/">Quick Reference</a>
+    <a class="nav-link" href="../faq/">FAQ</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="./">Quick Reference</a>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
@@ -89,7 +89,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../">EasyKube</a></li>
-    <li><a href="./">FAQ</a></li>
+    <li><a href="./">Quick Reference</a></li>
   </ul>
 </nav>
 </div>
@@ -98,66 +98,53 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">FAQ</h1>
-<div class="paragraph">
-<p>Why javascript?? I thought this is a Go program?</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Easykube is designed to be flexible and used in different contexts with different addon repositories. It defines a core set of utility functions that can be combined in useful ways through scripting. Instead of inventing a dedicated easykube-script language (tempting as that may be), it was decided to use an existing library instead. Enter <a href="https://github.com/dop251/goja">Goja</a>, a JavaScript VM for Golang.</p>
-</li>
+<h1 class="page">Quick Reference</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_create">Create</a></li>
+<li><a href="#_add">Add</a></li>
+<li><a href="#_remove">Remove</a></li>
+<li><a href="#_destroy">Destroy</a></li>
 </ul>
 </div>
+<div class="sect1">
+<h2 id="_create"><a class="anchor" href="#_create"></a>Create</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>When creating the cluster, easykube complains about occupied ports, what should I do?</p>
+<p>Easykube orchestrates the creation of a local kubernetes cluster, and can install various packages (addons) in that cluster.</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>As the error states, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the extraPorts section in the offending addon.</p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre>@startuml
+start
+:Generate/Load Configuration;
+:Create Registry;
+:Configure Registry;
+stop
+
+@enduml</pre>
 </div>
-<div class="paragraph">
-<p>Where did all my diskspace go?</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>Some Docker images are quite large, and easykube may keep images in triplicate. When an image is pulled from a remote registry, it is stored in your local Docker context. Then it is pushed to the local registry, and finally pulled into the kind control plane. This becomes noticeable if the cluster is repeatedly created and destroyed. Cleaning up old containers and volumes will reclaim the space.</p>
-</li>
-</ul>
 </div>
-<div class="paragraph">
-<p>My javascript throws errors, how can I debug what&#8217;s going on?</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>Unfortunately, there is no straightforward way to attach an external debugger to a Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.</p>
-</li>
-</ul>
+<div class="sect1">
+<h2 id="_add"><a class="anchor" href="#_add"></a>Add</h2>
+<div class="sectionbody">
+
 </div>
-<div class="paragraph">
-<p>Sometimes easykube fails with an error about 'deployment not ready' when adding something.</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>Some workloads simply take longer to become ready. The waitForDeployment function times out after 1 minute. This depends on your machine and the nature of the deployment. In most cases you can just retry. If possible, lowering readiness/liveness probe thresholds may also help.</p>
-</li>
-</ul>
+<div class="sect1">
+<h2 id="_remove"><a class="anchor" href="#_remove"></a>Remove</h2>
+<div class="sectionbody">
+
 </div>
-<div class="paragraph">
-<p>I cannot create postgres databases, it throws errors when creating or starting the database, what can I do?</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>If you switched to a newer postgres version, existing database files might not be compatible. Either revert to the previous version or delete the files in the Postgres persistence directory.</p>
-</li>
-</ul>
+<div class="sect1">
+<h2 id="_destroy"><a class="anchor" href="#_destroy"></a>Destroy</h2>
+<div class="sectionbody">
+
+</div>
 </div>
 </article>
   </div>

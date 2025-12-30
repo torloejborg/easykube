@@ -103,3 +103,4 @@ To write your own addon, copy/paste is a reasonable strategy. Alternatively, you
 `$ easkube skaffold --name myaddon --location utils`
 
 This generates a simple addon skeleton you can adapt for your own purposes. The location parameter is relative to the root of the addon repository.
+

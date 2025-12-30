@@ -38,7 +38,7 @@
 
 * Use as a learning or teaching tool for Kubernetes.
 
-* Perhaps some team members simply don’t care about Kubernetes—That’s OK, nobody can be forced to fall in love with YAML. Instead, $ easykube add mystack will have stuff running with minimal effort.
+* Perhaps some team members simply don’t care about Kubernetes—That’s OK, nobody can be forced to fall in love with YAML. Instead, `$ easykube add mystack` will have stuff running with minimal effort.
 
 == Please do not [[rationale-donot]]
 

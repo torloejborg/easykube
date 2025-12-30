@@ -4,101 +4,83 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    gomod2nix.url = "github:nix-community/gomod2nix";
   };
 
-  outputs = { self, nixpkgs, unstable }:
+  outputs = { self, nixpkgs, unstable, gomod2nix}:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      pkgsUnstable = unstable.legacyPackages.${system};
+      pkgsUnstable = import unstable {
+        inherit system;
+        overlays = [ gomod2nix.overlays.default ];
+      };
       lib = pkgs.lib;
-      go_compiler_flags = "-tags=remote,containers_remote,exclude_graphdriver_btrfs,exclude_graphdriver_devicemapper,exclude_graphdriver_overlay,exclude_graphdriver_zfs";
 
-        # Common packages used in all shells
-            commonPackages = with pkgs; [
-              (ruby.withPackages (ps: with ps; [ rouge  ]))
-              jq
-              yq
-              gnumake
-              glibcLocales
-              pkg-config
-              stdenv.cc
-              gpgme
-              libgpg-error
-            ] ++ [
-              pkgsUnstable.upx
-              pkgsUnstable.mockgen
-              pkgsUnstable.kubectl
-              pkgsUnstable.kubernetes-helm
-              pkgsUnstable.kustomize
-              pkgsUnstable.go_1_24
-            ] ;
+      # Common packages used in all shells
+      commonPackages = with pkgs; [
+        (ruby.withPackages (ps: with ps; [ rouge  ]))
+        jq
+        yq
+        gnumake
+        glibcLocales
+      ] ++ [
+        pkgsUnstable.upx
+        pkgsUnstable.mockgen
+        pkgsUnstable.kubectl
+        pkgsUnstable.kubernetes-helm
+        pkgsUnstable.kustomize
+        pkgsUnstable.go_1_25
+      ];
 
-           docsPackages = with pkgs; [
-              pkgsUnstable.nodejs
-              pkgsUnstable.asciidoctor
-              pkgsUnstable.pandoc
-              pkgsUnstable.antora
-              pkgsUnstable.termtosvg
-           ];
+       docsPackages = with pkgs; [
+                    pkgsUnstable.nodejs
+                    pkgsUnstable.asciidoctor
+                    pkgsUnstable.pandoc
+                    pkgsUnstable.antora
+                    pkgsUnstable.termtosvg
+                 ];
+
     in {
-      packages.${system}.default = pkgsUnstable.buildGoModule {
+      packages.${system}.default = pkgsUnstable.buildGoApplication {
         pname = "easykube";
         version = "latest";
         src = self;
-         nativeBuildInputs = [
-           pkgs.pkg-config
-           pkgs.stdenv.cc
-         ];
-
-         buildInputs = [
-            pkgs.gpgme
-            pkgs.libgpg-error
-         ];
-
-          tags = [
-            "remote"
-            "containers_remote"
-            "exclude_graphdriver_btrfs"
-            "exclude_graphdriver_devicemapper"
-            "exclude_graphdriver_overlay"
-            "exclude_graphdriver_zfs"
-          ];
-
-        #vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-        vendorHash = "sha256-DuRFwAZzu7XXXRFrxFM2t2RH48HKKw/th0n+tVzVGBU=";
+        modules = ./gomod2nix.toml;
+        CGO_ENABLED = 0;
+        ldflags = [
+          "-s"
+          "-w"
+          "-extldflags=-static"
+        ];
       };
 
-      devShells.${system} = {
-        default = pkgs.mkShell {
-
-          packages = commonPackages ++  [
-            (self.packages.${system}.default)
-          ];
-
-          shell = pkgs.zsh;
-          impureEnv = true;
+       devShells.${system} = {
+       default = pkgs.mkShell {
+       packages = commonPackages ++ [ self.packages.${system}.default ];
+       shell = pkgs.zsh;
+         impureEnv = true;
           shellHook = ''
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
-            export PS1="[ek-dev]> "
-            source <(easykube completion bash)
-
+            export PS1="ek-dev $"
+            # Only source completion if binary exists
+            if command -v easykube >/dev/null 2>&1; then
+              source <(easykube completion bash)
+            fi
             echo "Welcome to the easykube dev shell"
             echo
             easykube
           '';
-        };
-
+       };
         light = pkgs.mkShell {
-          GOFLAGS = go_compiler_flags;
           packages = commonPackages;
           shell = pkgs.zsh;
           impureEnv = true;
           shellHook = ''
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
-            export PS1="[ek-light]> "
+            export PS1="ek-light $ "
             echo "Welcome to the easykube light dev shell (no build)"
           '';
         };

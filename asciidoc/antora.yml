@@ -3,3 +3,7 @@ version: latest
 title: EasyKube
 nav:
   - modules/ROOT/nav.adoc
+
+asciidoc:
+  extensions:
+    - '@asciidoctor/diagram'

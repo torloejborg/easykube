@@ -115,4 +115,4 @@ That’s basically it! You can now build or use software catalogues that run on 
 
 Because easykube runs in Docker (or a compatible runtime), it is not possible to open new NodePorts in the cluster and expect them to be available—Docker is immutable by design.
 
-So, if you introduce a new service or switch to a different addon repository, the cluster must be recreated. Your persistent data is safe, so it should be OK.
+So, if you introduce a new service or switch to a different addon repository, the cluster must be recreated. Your persistent data survives across cluster creation/deletion.

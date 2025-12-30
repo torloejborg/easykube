@@ -189,6 +189,11 @@ func (ec *EasykubeConfig) MakeConfig() error {
 			return err
 		}
 
+		err = CopyResource("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
+		if nil != err {
+			return err
+		}
+
 		err = CopyResource("cert/localtest.me.key", "localtest.me.key")
 		if nil != err {
 			return err
@@ -226,7 +231,9 @@ func (ec *EasykubeConfig) patchConfigWithPrivateRegistryTemplate(cfg *EasykubeCo
 	data, _ := ReadFileToBytes(cfgFile)
 	cfgText := string(data)
 
-	if cfg.PrivateRegistries == nil && !strings.Contains(cfgText, configStanza) {
+	if cfg.PrivateRegistries == nil && !strings.Contains(cfgText, "repositoryMatch") &&
+		!strings.Contains(cfgText, "userKey") &&
+		!strings.Contains(cfgText, "passwordKey") {
 
 		// patch config
 		f, err := Kube.Fs.OpenFile(cfgFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)

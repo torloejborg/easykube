@@ -4,6 +4,9 @@
 .continue
 /build
 /dist
+vendor
+build
+dist
 cert-lan
 result
 complete.zsh
