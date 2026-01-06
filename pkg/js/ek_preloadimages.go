@@ -99,8 +99,8 @@ func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry)
 				return nil
 			}
 			return &ez.PrivateRegistryCredentials{
-				Username: config[i].UserKey,
-				Password: config[i].PasswordKey,
+				Username: string(secret[config[i].UserKey]),
+				Password: string(secret[config[i].PasswordKey]),
 			}
 		}
 	}

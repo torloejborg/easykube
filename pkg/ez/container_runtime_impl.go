@@ -21,6 +21,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	image2 "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/spf13/afero"
@@ -209,13 +210,26 @@ func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateReg
 	}
 
 	if credentials != nil {
+		extractRegistry := func(image string) string {
+			parts := strings.Split(image, "/")
+			if len(parts) >= 2 && strings.Contains(parts[0], ".") {
+				return parts[0]
+			}
+			return ""
+		}
 
-		jsonBytes, _ := json.Marshal(map[string]string{
-			"username": credentials.Username,
-			"password": credentials.Password,
-		})
+		auth := base64.StdEncoding.EncodeToString([]byte(credentials.Username + ":" + credentials.Password))
+		authConfig := registry.AuthConfig{
+			Auth:          auth,
+			ServerAddress: extractRegistry(image),
+		}
 
-		opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
+		encoded, err := registry.EncodeAuthConfig(authConfig)
+		if err != nil {
+			return err
+		}
+
+		opts.RegistryAuth = encoded
 	}
 
 	reader, err := cri.Docker.ImagePull(cri.ctx, image, opts)
