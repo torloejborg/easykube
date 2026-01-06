@@ -29,9 +29,10 @@ import (
 )
 
 type ContainerRuntimeImpl struct {
-	Docker *client.Client
-	ctx    context.Context
-	Fs     afero.Fs
+	Docker      *client.Client
+	ctx         context.Context
+	Fs          afero.Fs
+	RuntimeType string
 }
 
 func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
@@ -63,8 +64,9 @@ func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
 	}
 
 	return &ContainerRuntimeImpl{
-		Docker: docker,
-		ctx:    context.Background(),
+		Docker:      docker,
+		ctx:         context.Background(),
+		RuntimeType: runtime,
 	}
 
 }
@@ -210,26 +212,41 @@ func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateReg
 	}
 
 	if credentials != nil {
-		extractRegistry := func(image string) string {
-			parts := strings.Split(image, "/")
-			if len(parts) >= 2 && strings.Contains(parts[0], ".") {
-				return parts[0]
+
+		if cri.RuntimeType == "podman" {
+
+			extractRegistry := func(image string) string {
+				parts := strings.Split(image, "/")
+				if len(parts) >= 2 && strings.Contains(parts[0], ".") {
+					return parts[0]
+				}
+				return ""
 			}
-			return ""
+
+			auth := base64.StdEncoding.EncodeToString([]byte(credentials.Username + ":" + credentials.Password))
+			authConfig := registry.AuthConfig{
+				Auth:          auth,
+				ServerAddress: extractRegistry(image),
+			}
+
+			encoded, err := registry.EncodeAuthConfig(authConfig)
+			if err != nil {
+				return err
+			}
+
+			opts.RegistryAuth = encoded
+
 		}
 
-		auth := base64.StdEncoding.EncodeToString([]byte(credentials.Username + ":" + credentials.Password))
-		authConfig := registry.AuthConfig{
-			Auth:          auth,
-			ServerAddress: extractRegistry(image),
+		if cri.RuntimeType == "docker" {
+			jsonBytes, _ := json.Marshal(map[string]string{
+				"username": credentials.Username,
+				"password": credentials.Password,
+			})
+
+			opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
 		}
 
-		encoded, err := registry.EncodeAuthConfig(authConfig)
-		if err != nil {
-			return err
-		}
-
-		opts.RegistryAuth = encoded
 	}
 
 	reader, err := cri.Docker.ImagePull(cri.ctx, image, opts)
