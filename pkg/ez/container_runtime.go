@@ -44,7 +44,7 @@ type IContainerRuntime interface {
 	Commit(containerID string)
 }
 
-func NewContainerRuntime() IContainerRuntime {
+func NewContainerRuntime() (IContainerRuntime, error) {
 
 	cfg, err := Kube.LoadConfig()
 	if err != nil {

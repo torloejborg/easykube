@@ -35,7 +35,7 @@ type ContainerRuntimeImpl struct {
 	RuntimeType string
 }
 
-func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
+func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
 
 	clientsOpts := make([]client.Opt, 0)
 	clientsOpts = append(clientsOpts, client.WithAPIVersionNegotiation())
@@ -48,7 +48,7 @@ func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
 		// get the socket location
 		sout, _, err := Kube.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
 		if err != nil {
-			panic("Failed to get podman info")
+			return nil, errors.Join(errors.New("Failed to determine podman runtime"), err)
 		}
 		socket := strings.TrimSpace(sout)
 		clientsOpts = append(clientsOpts, client.WithHost("unix:///"+socket))
@@ -67,7 +67,7 @@ func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
 		Docker:      docker,
 		ctx:         context.Background(),
 		RuntimeType: runtime,
-	}
+	}, nil
 
 }
 func (cri *ContainerRuntimeImpl) IsClusterRunning() bool {
@@ -431,9 +431,9 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		}
 
 		binds := make([]string, 3)
-		binds[0] = filepath.Join(configDir, "easykube", "registry-config.yaml") + ":/etc/docker/registry/config.yml"
-		binds[1] = filepath.Join(configDir, "easykube", "localtest.me.crt") + ":/etc/ssl/localtest.me.crt"
-		binds[2] = filepath.Join(configDir, "easykube", "localtest.me.key") + ":/etc/ssl/localtest.me.key"
+		binds[0] = filepath.Join(configDir, "easykube", "registry-config.yaml") + ":/etc/docker/registry/config.yml:z"
+		binds[1] = filepath.Join(configDir, "easykube", "localtest.me.crt") + ":/etc/ssl/localtest.me.crt:z"
+		binds[2] = filepath.Join(configDir, "easykube", "localtest.me.key") + ":/etc/ssl/localtest.me.key:z"
 
 		networkingConfig := &network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{

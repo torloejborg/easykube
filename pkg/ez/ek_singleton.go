@@ -83,7 +83,7 @@ func CreateAddonReaderImpl(config IEasykubeConfig) IAddonReader {
 	return NewAddonReader(config)
 }
 
-func CreateContainerRuntimeImpl() IContainerRuntime {
+func CreateContainerRuntimeImpl() (IContainerRuntime, error) {
 	return NewContainerRuntime()
 }
 
@@ -95,7 +95,7 @@ func CreateOsDetailsImpl() OsDetails {
 	return &OsDetailsImpl{}
 }
 
-func InitializeKubeSingleton() {
+func InitializeKubeSingleton() error {
 
 	// I'm damaged by Java, there we could inject anything anywhere, now this is my attempt at destructuring
 	// the application into smaller parts and assembling it with an initialization function. This allows
@@ -111,7 +111,14 @@ func InitializeKubeSingleton() {
 	Kube.UseEasykubeConfig(config)
 	Kube.UseAddonReader(CreateAddonReaderImpl(config))
 	Kube.UseExternalTools(NewExternalTools())
-	Kube.UseContainerRuntime(CreateContainerRuntimeImpl())
+
+	cri, err := CreateContainerRuntimeImpl()
+	if err != nil {
+		return err
+	}
+
+	Kube.UseContainerRuntime(cri)
 	Kube.UseClusterUtils(CreateClusterUtilsImpl())
 
+	return nil
 }
