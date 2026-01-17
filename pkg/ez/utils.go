@@ -5,12 +5,21 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/torloejborg/easykube/pkg/resources"
 )
+
+func HasBinary(binary string) bool {
+	_, err := exec.LookPath(binary)
+	if err != nil {
+		return false
+	}
+	return true
+}
 
 func FileOrDirExists(path string) bool {
 

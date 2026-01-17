@@ -42,16 +42,24 @@ func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
 
 	switch runtime {
 	case "docker":
+		if !HasBinary("docker") {
+			return nil, errors.New("docker binary not found, is it installed")
+		}
 		clientsOpts = append(clientsOpts, client.FromEnv)
 		break
 	case "podman":
+
+		if !HasBinary("podman") {
+			return nil, errors.New("podman binary not found, is it installed")
+		}
+
 		// get the socket location
 		sout, _, err := Kube.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
 		if err != nil {
 			return nil, errors.Join(errors.New("Failed to determine podman runtime"), err)
 		}
 		socket := strings.TrimSpace(sout)
-		clientsOpts = append(clientsOpts, client.WithHost("unix:///"+socket))
+		clientsOpts = append(clientsOpts, client.WithHost(socket))
 		break
 	default:
 		panic("unknown container runtime")
