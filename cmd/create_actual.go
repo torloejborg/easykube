@@ -61,12 +61,6 @@ func createActualCmd(opts CreateOpts) error {
 		return pdErr
 	}
 
-	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
-		return nil, ez.Kube.CreateContainerRegistry()
-	}, "Ensure container registry"); err != nil {
-		return err
-	}
-
 	addons, aerr := ez.Kube.GetAddons()
 	if aerr != nil {
 		return aerr
@@ -94,6 +88,12 @@ func createActualCmd(opts CreateOpts) error {
 	cerr := ezk.ReloadClientSet()
 	if cerr != nil {
 		return cerr
+	}
+
+	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
+		return nil, ez.Kube.CreateContainerRegistry()
+	}, "Ensure container registry"); err != nil {
+		return err
 	}
 
 	if connected, _ := ezk.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); !connected {
