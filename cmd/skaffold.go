@@ -20,6 +20,13 @@ var skaffoldCmd = &cobra.Command{
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		err := ez.InitializeWithOpts(
+			ez.WithKubernetes(false),
+			ez.WithContainerRuntime(false))
+		if err != nil {
+			return err
+		}
+
 		commandHelper := ez.CommandHelper(cmd)
 		opts := SkaffoldOpts{
 			AddonName:     commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME),

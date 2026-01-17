@@ -39,9 +39,6 @@ func NewStatusBuilder() IStatusBuilder {
 }
 
 func (s *StatusBuilderImpl) DoContainerCheck() error {
-	if !Kube.IsContainerRuntimeAvailable() {
-		return errors.New("container runtime not available, is docker running")
-	}
 
 	running := func(containerID string) {
 

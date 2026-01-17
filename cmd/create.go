@@ -13,6 +13,11 @@ var createCmd = &cobra.Command{
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		err := ez.InitializeWithOpts()
+		if err != nil {
+			return err
+		}
+
 		opts := CreateOpts{
 			Secrets: ez.CommandHelper(cmd).GetStringFlag(constants.ARG_SECRETS),
 		}

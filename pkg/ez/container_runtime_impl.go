@@ -55,6 +55,12 @@ func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
 
 		// get the socket location
 		sout, _, err := Kube.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
+
+		// some podman versions report unix://, others not.
+		if !strings.Contains(string(sout), "unix") {
+			sout = "unix://" + sout
+		}
+
 		if err != nil {
 			return nil, errors.Join(errors.New("Failed to determine podman runtime"), err)
 		}
@@ -67,8 +73,8 @@ func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
 
 	docker, err := client.NewClientWithOpts(clientsOpts...)
 	if err != nil {
-		fmt.Println("No container context/runtime found. Is docker running??")
-		os.Exit(-1)
+		msg := fmt.Sprintf("No container context/runtime found. Is %s running??", runtime)
+		return nil, errors.New(msg)
 	}
 
 	return &ContainerRuntimeImpl{
@@ -86,16 +92,6 @@ func (cri *ContainerRuntimeImpl) IsClusterRunning() bool {
 	} else {
 		return running
 	}
-}
-
-func (cri *ContainerRuntimeImpl) DiscoverContainerRuntimeConnection(runtimeType string) (ContainerConnection, error) {
-
-	res := ContainerConnection{
-		Host: "nil",
-		Type: "docker",
-	}
-
-	return res, nil
 }
 
 func (cri *ContainerRuntimeImpl) IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error) {

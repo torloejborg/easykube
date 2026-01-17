@@ -22,7 +22,6 @@ type PrivateRegistryCredentials struct {
 }
 
 type IContainerRuntime interface {
-	DiscoverContainerRuntimeConnection(runtime string) (ContainerConnection, error)
 	IsContainerRunning(containerID string) (bool, error)
 	PushImage(src, image string) error
 	PullImage(image string, credentials *PrivateRegistryCredentials) error

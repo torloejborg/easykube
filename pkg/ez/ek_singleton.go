@@ -95,30 +95,94 @@ func CreateOsDetailsImpl() OsDetails {
 	return &OsDetailsImpl{}
 }
 
-func InitializeKubeSingleton() error {
+type Easykube struct {
+	initializeContainerRuntime bool
+	initializeKubernetesClient bool
+}
 
-	// I'm damaged by Java, there we could inject anything anywhere, now this is my attempt at destructuring
-	// the application into smaller parts and assembling it with an initialization function. This allows
-	// parts or aspects of the application to be configured differently for tests.
+type EkOpt func(easykube *Easykube) error
+
+func WithContainerRuntime(useit bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeContainerRuntime = useit
+		return nil
+	}
+}
+
+func WithKubernetes(useit bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeKubernetesClient = useit
+		return nil
+	}
+}
+
+func InitializeWithOpts(opts ...EkOpt) error {
+
+	ekOpts := Easykube{
+		initializeContainerRuntime: true,
+		initializeKubernetesClient: true,
+	}
+
+	for _, opt := range opts {
+		if err := opt(&ekOpts); err != nil {
+			return err
+		}
+	}
 
 	osd := CreateOsDetailsImpl()
 	config := CreateEasykubeConfigImpl(osd)
+	Kube.UseEasykubeConfig(config)
 
 	Kube.UseFilesystemLayer(afero.NewOsFs())
 	Kube.UsePrinter(textutils.NewPrinter())
 	Kube.UseOsDetails(osd)
-	Kube.UseK8sUtils(CreateK8sUtilsImpl())
-	Kube.UseEasykubeConfig(config)
+
+	if ekOpts.initializeKubernetesClient {
+		Kube.UseK8sUtils(CreateK8sUtilsImpl())
+	}
+
 	Kube.UseAddonReader(CreateAddonReaderImpl(config))
 	Kube.UseExternalTools(NewExternalTools())
 
-	cri, err := CreateContainerRuntimeImpl()
-	if err != nil {
-		return err
+	if ekOpts.initializeContainerRuntime {
+		cri, err := CreateContainerRuntimeImpl()
+		if err != nil {
+			return err
+		}
+		Kube.UseContainerRuntime(cri)
 	}
 
-	Kube.UseContainerRuntime(cri)
 	Kube.UseClusterUtils(CreateClusterUtilsImpl())
 
 	return nil
+
 }
+
+//func InitializeKubeSingleton() error {
+//
+//	// I'm damaged by Java, there we could inject anything anywhere, now this is my attempt at destructuring
+//	// the application into smaller parts and assembling it with an initialization function. This allows
+//	// parts or aspects of the application to be configured differently for tests.
+//
+//	osd := CreateOsDetailsImpl()
+//	config := CreateEasykubeConfigImpl(osd)
+//
+//	Kube.UseFilesystemLayer(afero.NewOsFs())
+//	Kube.UsePrinter(textutils.NewPrinter())
+//	Kube.UseOsDetails(osd)
+//	Kube.UseK8sUtils(CreateK8sUtilsImpl())
+//	Kube.UseEasykubeConfig(config)
+//	Kube.UseAddonReader(CreateAddonReaderImpl(config))
+//	Kube.UseExternalTools(NewExternalTools())
+//
+//	cri, err := CreateContainerRuntimeImpl()
+//	if err != nil {
+//		return err
+//	}
+//
+//	Kube.UseContainerRuntime(cri)
+//
+//	Kube.UseClusterUtils(CreateClusterUtilsImpl())
+//
+//	return nil
+//}

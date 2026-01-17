@@ -14,6 +14,11 @@ func NewAddCmd() *cobra.Command {
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			err := ez.InitializeWithOpts()
+			if err != nil {
+				return err
+			}
+
 			cmdhelper := ez.CommandHelper(cmd)
 
 			addOpts := AddOptions{
