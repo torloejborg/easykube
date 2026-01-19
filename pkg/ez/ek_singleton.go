@@ -116,7 +116,7 @@ func WithKubernetes(useit bool) EkOpt {
 	}
 }
 
-func InitializeWithOpts(opts ...EkOpt) error {
+func InitializeEasykube(opts ...EkOpt) error {
 
 	ekOpts := Easykube{
 		initializeContainerRuntime: true,
@@ -157,32 +157,3 @@ func InitializeWithOpts(opts ...EkOpt) error {
 	return nil
 
 }
-
-//func InitializeKubeSingleton() error {
-//
-//	// I'm damaged by Java, there we could inject anything anywhere, now this is my attempt at destructuring
-//	// the application into smaller parts and assembling it with an initialization function. This allows
-//	// parts or aspects of the application to be configured differently for tests.
-//
-//	osd := CreateOsDetailsImpl()
-//	config := CreateEasykubeConfigImpl(osd)
-//
-//	Kube.UseFilesystemLayer(afero.NewOsFs())
-//	Kube.UsePrinter(textutils.NewPrinter())
-//	Kube.UseOsDetails(osd)
-//	Kube.UseK8sUtils(CreateK8sUtilsImpl())
-//	Kube.UseEasykubeConfig(config)
-//	Kube.UseAddonReader(CreateAddonReaderImpl(config))
-//	Kube.UseExternalTools(NewExternalTools())
-//
-//	cri, err := CreateContainerRuntimeImpl()
-//	if err != nil {
-//		return err
-//	}
-//
-//	Kube.UseContainerRuntime(cri)
-//
-//	Kube.UseClusterUtils(CreateClusterUtilsImpl())
-//
-//	return nil
-//}

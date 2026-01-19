@@ -12,7 +12,7 @@ var destroyCmd = &cobra.Command{
 	Long:  `stops and removes the easykube container, leaves the registry running`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeWithOpts()
+		err := ez.InitializeEasykube()
 		if err != nil {
 			return err
 		}

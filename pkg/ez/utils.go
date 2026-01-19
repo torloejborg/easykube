@@ -81,6 +81,23 @@ func SaveFile(data string, dest string) {
 	}
 }
 
+func SaveFileByte(data []byte, dest string) {
+
+	file, err := Kube.Fs.Create(dest)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = file.Write(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	e := file.Close()
+	if e != nil {
+		panic(e)
+	}
+}
+
 func ReadPropertyFile(path string) (map[string]string, error) {
 	props, err := Kube.Fs.OpenFile(path, os.O_RDONLY, os.ModePerm)
 	if err != nil {

@@ -11,7 +11,7 @@ var startCmd = &cobra.Command{
 	Short: "starts the cluster node and registry container",
 	Long:  "", RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeWithOpts(
+		err := ez.InitializeEasykube(
 			ez.WithKubernetes(false))
 		if err != nil {
 			return err

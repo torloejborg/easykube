@@ -12,7 +12,7 @@ var removeCmd = &cobra.Command{
 	Short: "removes a previously installed addon",
 	Long:  "",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := ez.InitializeWithOpts()
+		err := ez.InitializeEasykube()
 		if err != nil {
 			return err
 		}

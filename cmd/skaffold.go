@@ -20,7 +20,7 @@ var skaffoldCmd = &cobra.Command{
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeWithOpts(
+		err := ez.InitializeEasykube(
 			ez.WithKubernetes(false),
 			ez.WithContainerRuntime(false))
 		if err != nil {

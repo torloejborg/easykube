@@ -14,7 +14,7 @@ func NewAddCmd() *cobra.Command {
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			err := ez.InitializeWithOpts()
+			err := ez.InitializeEasykube()
 			if err != nil {
 				return err
 			}

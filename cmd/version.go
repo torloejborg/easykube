@@ -14,7 +14,7 @@ var versionCmd = &cobra.Command{
 	Short: "shows the version of easykube CLI",
 	Long:  `shows the version of easykube CLI`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := ez.InitializeWithOpts(
+		err := ez.InitializeEasykube(
 			ez.WithKubernetes(false),
 			ez.WithContainerRuntime(false))
 		if err != nil {

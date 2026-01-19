@@ -12,7 +12,7 @@ var configCmd = &cobra.Command{
 	Long:  "editor is chosen via VISUAL or EDITOR environment variable",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeWithOpts(
+		err := ez.InitializeEasykube(
 			ez.WithKubernetes(false),
 			ez.WithContainerRuntime(false))
 		if err != nil {
