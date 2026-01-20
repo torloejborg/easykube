@@ -1,6 +1,6 @@
 package constants
 
-const KIND_IMAGE = "docker.io/kindest/node:v1.34.0"
+const KIND_IMAGE = "docker.io/kindest/node:v1.35.0"
 const KIND_CONTAINER = "easykube-control-plane"
 const CLUSTER_NAME = "easykube"
 const CLUSTER_CONTEXT = "kind-easykube"
