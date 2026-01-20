@@ -9,7 +9,7 @@ easykube:
   # this is used by kind to store persistent data, it will survive cluster deletion
   persistence-dir: {{ .PersistenceDir }}
 
-  # Container Runtime (as of now, only docker is supported. podman support is planned)
+  # Container Runtime docker or podman
   container-runtime: docker
 
   # Declare private registries. Whenever easykube pulls an image, and the registry name contains a substring
@@ -17,4 +17,4 @@ easykube:
   #private-registries:
   #  - repositoryMatch: partial-domain-name.io
   #    userKey: userCredentialsKey
-  #    passwordKey: userCredntialPasswordKey
+  #    passwordKey: userCredentialPasswordKey

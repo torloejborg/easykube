@@ -44,6 +44,7 @@ func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 	check(easykubeObj.Set(EXEC, e.Exec()))
 	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
 	check(easykubeObj.Set(ADDON_DIR, e.AddonDir()))
+	check(easykubeObj.Set(CONFIG, e.Config()))
 
 	addon.ExportFunction("_ek", easykubeObj)
 

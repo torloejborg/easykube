@@ -13,6 +13,11 @@ var listCmd = &cobra.Command{
 	Long:  "installed addons has a tick-mark",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		err := ez.InitializeEasykube()
+		if err != nil {
+			return err
+		}
+
 		helper := ez.CommandHelper(cmd)
 
 		opts := ListOpts{

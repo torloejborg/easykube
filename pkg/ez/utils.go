@@ -5,12 +5,21 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/torloejborg/easykube/pkg/resources"
 )
+
+func HasBinary(binary string) bool {
+	_, err := exec.LookPath(binary)
+	if err != nil {
+		return false
+	}
+	return true
+}
 
 func FileOrDirExists(path string) bool {
 
@@ -63,6 +72,23 @@ func SaveFile(data string, dest string) {
 	}
 
 	_, err = file.WriteString(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	e := file.Close()
+	if e != nil {
+		panic(e)
+	}
+}
+
+func SaveFileByte(data []byte, dest string) {
+
+	file, err := Kube.Fs.Create(dest)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = file.Write(data)
 	if err != nil {
 		log.Fatal(err)
 	}

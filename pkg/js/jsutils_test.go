@@ -22,8 +22,7 @@ func SetUpJsTestEnvironment(t *testing.T, controller *gomock.Controller) {
 	ez.Kube.UseEasykubeConfig(config)
 	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
 	ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
-	ez.Kube.UseContainerRuntime(ez.CreateContainerRuntimeImpl())
-
+	
 	_ = ez.Kube.MakeConfig()
 	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
 }

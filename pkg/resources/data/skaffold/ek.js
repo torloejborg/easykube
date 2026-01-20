@@ -34,7 +34,7 @@ let deployment = "{{.DeploymentName}}"
 
 // You can preload multiple images into the local registry, this will prevent Kind
 // from fetching images from network, thus accelerating deployment times.
-const images = {"nginx:latest":"localhost:5001/nginx:latest"}
+const images = {"docker.io/library/nginx:latest":"registry.localtest.me:5001/nginx:latest"}
 
 // This invokes the 'kustomize' command, which assembles all your deployment yaml, and
 // applies it Kind with 'kubectl'.

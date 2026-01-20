@@ -13,6 +13,7 @@ import (
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"github.com/torloejborg/easykube/pkg/textutils"
 )
@@ -204,6 +205,15 @@ func (ec *EasykubeConfig) MakeConfig() error {
 			return err
 		}
 
+		// Make podman aware of a selfsigned certificate
+		certData, err := resources.AppResources.ReadFile("data/cert/localtest.me.ca.crt")
+		if nil != err {
+			return err
+		}
+		certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LOCAL_REGISTRY)
+		Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
+		cert := filepath.Join(certDestDir, "ca.crt")
+		SaveFileByte(certData, cert)
 	}
 
 	return nil

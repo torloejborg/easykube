@@ -1,6 +1,6 @@
 package constants
 
-const KIND_IMAGE = "docker.io/kindest/node:v1.34.0"
+const KIND_IMAGE = "docker.io/kindest/node:v1.35.0"
 const KIND_CONTAINER = "easykube-control-plane"
 const CLUSTER_NAME = "easykube"
 const CLUSTER_CONTEXT = "kind-easykube"
@@ -29,6 +29,8 @@ const ARG_SKAFFOLD_NAME = "name"
 const ARG_SKAFFOLD_LOCATION = "location"
 const FLAG_KEYVALUE = "kv"
 const FLAG_CLUSTER = "cluster"
+const INGRESS_HTTP_PORT = "http-port"
+const INGRESS_HTTPS_PORT = "https-port"
 
 //
 // Binary dependencies
