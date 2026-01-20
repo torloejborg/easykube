@@ -16,6 +16,9 @@ schema = 3
   [mod."github.com/Microsoft/go-winio"]
     version = "v0.6.2"
     hash = "sha256-tVNWDUMILZbJvarcl/E7tpSnkn7urqgSHa2Eaka5vSU="
+  [mod."github.com/clipperhouse/displaywidth"]
+    version = "v0.6.2"
+    hash = "sha256-BZ6sBZJXzS50do3OLK0UApMz/KVV7jnLEcyddWJ1Q1w="
   [mod."github.com/clipperhouse/stringish"]
     version = "v0.1.1"
     hash = "sha256-Mp8M1CRbwr6dcJ4BD9tXD5I78ZgCFEm0GDxJv0GYReg="
@@ -173,11 +176,11 @@ schema = 3
     version = "v1.1.0"
     hash = "sha256-XYJzcbMX5iQsQ5k122a0QeoL5wbcLgh+LklcLsa6cv4="
   [mod."github.com/olekukonko/ll"]
-    version = "v0.1.1"
-    hash = "sha256-iXIjnXLGwzKOlqw4OgnrSHF1AAyjOK/WjZW+Hoabz7s="
+    version = "v0.1.4-0.20260115111900-9e59c2286df0"
+    hash = "sha256-bAzMGeDdOhZnE7bnz1dd/lrSlB8FXH+CR8F2xwwefKc="
   [mod."github.com/olekukonko/tablewriter"]
-    version = "v1.1.0"
-    hash = "sha256-jD8gWhmvhO2X0nqsE/eGO/K2IowKYJYaXavDXhwmz0I="
+    version = "v1.1.3"
+    hash = "sha256-9doZFXVtyqPDC2H1Zjzx1m2XLDPQRc6EHxacf1uaHmM="
   [mod."github.com/onsi/ginkgo/v2"]
     version = "v2.27.3"
     hash = "sha256-8rYXtDcKRStw+j1kXcAsMGxxRfszj3qRut1SxJHKI9k="
@@ -199,9 +202,6 @@ schema = 3
   [mod."github.com/pmezard/go-difflib"]
     version = "v1.0.1-0.20181226105442-5d4384ee4fb2"
     hash = "sha256-XA4Oj1gdmdV/F/+8kMI+DBxKPthZ768hbKsO3d9Gx90="
-  [mod."github.com/rivo/uniseg"]
-    version = "v0.4.7"
-    hash = "sha256-rDcdNYH6ZD8KouyyiZCUEy8JrjOQoAkxHBhugrfHjFo="
   [mod."github.com/sirupsen/logrus"]
     version = "v1.9.4-0.20251023124752-b61f268f75b6"
     hash = "sha256-ltRvmtM3XTCAFwY0IesfRqYIivyXPPuvkFjL4ARh1wg="
@@ -287,8 +287,8 @@ schema = 3
     version = "v1.36.11"
     hash = "sha256-7W+6jntfI/awWL3JP6yQedxqP5S9o3XvPgJ2XxxsIeE="
   [mod."gopkg.in/evanphx/json-patch.v4"]
-    version = "v4.12.0"
-    hash = "sha256-rUOokb3XW30ftpHp0fsF2WiJln1S0FSt2El7fTHq3CM="
+    version = "v4.13.0"
+    hash = "sha256-1iyZpBaeBLmNkJ3T4A9fAEXEYB9nk9V02ug4pwl5dy0="
   [mod."gopkg.in/inf.v0"]
     version = "v0.9.1"
     hash = "sha256-z84XlyeWLcoYOvWLxPkPFgLkpjyb2Y4pdeGMyySOZQI="
@@ -311,17 +311,17 @@ schema = 3
     version = "v2.130.1"
     hash = "sha256-n5vls1o1a0V0KYv+3SULq4q3R2Is15K8iDHhFlsSH4o="
   [mod."k8s.io/kube-openapi"]
-    version = "v0.0.0-20250710124328-f3f2b991d03b"
-    hash = "sha256-0v0MN67pora3UCA8vXSJDgkosx/1RaB2HkjUnwdVLbY="
+    version = "v0.0.0-20250910181357-589584f1c912"
+    hash = "sha256-p34xQitGZDlha75SDiavMn6Cxilvo7L46p0C05wqwhQ="
   [mod."k8s.io/utils"]
     version = "v0.0.0-20250820121507-0af2bda4dd1d"
     hash = "sha256-AnfZdK93DG4SAN5XizeX+sCnYppFdquHBloCpYJPM0o="
   [mod."sigs.k8s.io/json"]
-    version = "v0.0.0-20241014173422-cfa47c3a1cc8"
-    hash = "sha256-dkegDkyjp/niYirIdhbQrBYt/uttCZQAfsBzKSzOMh0="
+    version = "v0.0.0-20250730193827-2d320260d730"
+    hash = "sha256-y3vUPJYL6oxu/8c0j4vgX6fzqHtVPSCjfyuWkZYf6+I="
   [mod."sigs.k8s.io/kind"]
-    version = "v0.30.0"
-    hash = "sha256-BHwrJ6qW4KA8UfM99GBHigM+fk+nxbeM7RoHHztU3cE="
+    version = "v0.31.0"
+    hash = "sha256-LFM3/awplTvzdfUox5fuGEtT+xXadGUzRIaD0iCLSwY="
   [mod."sigs.k8s.io/randfill"]
     version = "v1.0.0"
     hash = "sha256-xldQxDwW84hmlihdSOFfjXyauhxEWV9KmIDLZMTcYNo="
