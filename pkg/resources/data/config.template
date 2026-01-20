@@ -17,4 +17,4 @@ easykube:
   #private-registries:
   #  - repositoryMatch: partial-domain-name.io
   #    userKey: userCredentialsKey
-  #    passwordKey: userCredntialPasswordKey
+  #    passwordKey: userCredentialPasswordKey

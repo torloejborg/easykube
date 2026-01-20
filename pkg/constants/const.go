@@ -29,6 +29,8 @@ const ARG_SKAFFOLD_NAME = "name"
 const ARG_SKAFFOLD_LOCATION = "location"
 const FLAG_KEYVALUE = "kv"
 const FLAG_CLUSTER = "cluster"
+const INGRESS_HTTP_PORT = "http-port"
+const INGRESS_HTTPS_PORT = "https-port"
 
 //
 // Binary dependencies
