@@ -94,9 +94,6 @@ schema = 3
   [mod."github.com/goccy/go-yaml"]
     version = "v1.18.0"
     hash = "sha256-7WH1WraWyGj7SvrOCnZkWdoGOVrQ9dkpj/zrckHq9+I="
-  [mod."github.com/gogo/protobuf"]
-    version = "v1.3.2"
-    hash = "sha256-pogILFrrk+cAtb0ulqn9+gRZJ7sGnnLLdtqITvxvG6c="
   [mod."github.com/google/gnostic-models"]
     version = "v0.7.0"
     hash = "sha256-sxShRxqOUVlz9IkAz0C/NP/7CmLBW3ffwoZTdh+rIOc="
@@ -299,14 +296,14 @@ schema = 3
     version = "v3.5.2"
     hash = "sha256-eAxnRrF2bQugeFYzGLOr+4sLyCPOpaTWpoZsIKNP1WE="
   [mod."k8s.io/api"]
-    version = "v0.34.1"
-    hash = "sha256-Jf5Cbj4blJlxj3vAU0TKR8joddVquLqoFEg8PSsab+o="
+    version = "v0.35.0"
+    hash = "sha256-eIie0MFXkmNsfiO58pg+ThJ1wPcYh3T7Gch9p2GrT64="
   [mod."k8s.io/apimachinery"]
-    version = "v0.34.1"
-    hash = "sha256-y6GVugdaX81lHwVWgDgFoIi/v6K9A3YC2kKlGUritVU="
+    version = "v0.35.0"
+    hash = "sha256-+dplbHUOfaCaD2E9IS4F3lnjSCr/a4LjTgdB9de92Pw="
   [mod."k8s.io/client-go"]
-    version = "v0.34.1"
-    hash = "sha256-WArPoSdqOeKzg1eHw6Ut1mYvoYFZba5eo1FVMn0k1E4="
+    version = "v0.35.0"
+    hash = "sha256-s+o7ybLe83chueBIVvYRibI2HCk+QQoWTjfXqmzsjHs="
   [mod."k8s.io/klog/v2"]
     version = "v2.130.1"
     hash = "sha256-n5vls1o1a0V0KYv+3SULq4q3R2Is15K8iDHhFlsSH4o="
@@ -314,8 +311,8 @@ schema = 3
     version = "v0.0.0-20250910181357-589584f1c912"
     hash = "sha256-p34xQitGZDlha75SDiavMn6Cxilvo7L46p0C05wqwhQ="
   [mod."k8s.io/utils"]
-    version = "v0.0.0-20250820121507-0af2bda4dd1d"
-    hash = "sha256-AnfZdK93DG4SAN5XizeX+sCnYppFdquHBloCpYJPM0o="
+    version = "v0.0.0-20251002143259-bc988d571ff4"
+    hash = "sha256-Z3gfQXu5D5U58IyV7dYamQjrLbFSB0BmlJtFWvgHIgg="
   [mod."sigs.k8s.io/json"]
     version = "v0.0.0-20250730193827-2d320260d730"
     hash = "sha256-y3vUPJYL6oxu/8c0j4vgX6fzqHtVPSCjfyuWkZYf6+I="

@@ -70,35 +70,81 @@ func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 }
 
 func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
-
 	addons := make(map[string]IAddon)
-	addonExpre, _ := regexp.Compile(`^.+\.(ek.js)$`)
+	addonExpre := regexp.MustCompile(`^.+\.(ek.js)$`)
 
 	if adr.EkConfig == nil {
 		panic("expected ekconfig pointer!")
 	}
 
-	if _, err := Kube.Stat(adr.EkConfig.AddonDir); err != nil {
+	// Resolve the root directory in case it's a symlink.
+	root := adr.EkConfig.AddonDir
+	if _, err := Kube.Stat(root); err != nil {
 		return nil, err
 	}
+	if resolved, err := filepath.EvalSymlinks(root); err == nil {
+		root = resolved
+	}
 
-	walkFunc := func(path string, entry fs.FileInfo, err error) error {
-		if !entry.IsDir() && addonExpre.MatchString(entry.Name()) {
+	visited := make(map[string]struct{})
+
+	var walkFunc func(path string, info fs.FileInfo, err error) error
+
+	walkFunc = func(path string, info fs.FileInfo, err error) error {
+
+		if strings.Contains(path, ".git") {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		// Resolve and guard against walking the same real path multiple times
+		realPath, err := filepath.EvalSymlinks(path)
+		if err == nil {
+			if _, seen := visited[realPath]; seen {
+				return nil
+			}
+			visited[realPath] = struct{}{}
+		}
+
+		// If this is a symlink to a directory, recursively walk its target.
+		if info.Mode()&os.ModeSymlink != 0 {
+			target, err := filepath.EvalSymlinks(path)
+			if err != nil {
+				return err
+			}
+			// Stat target to see if it is a directory.
+			tinfo, err := Kube.Stat(target)
+			if err != nil {
+				return err
+			}
+			if tinfo.IsDir() {
+				return afero.Walk(Kube.Fs, target, walkFunc)
+			}
+			// If it’s a symlink to a file, treat it below as a regular file.
+			info = tinfo
+			path = target
+		}
+
+		if !info.IsDir() && addonExpre.MatchString(info.Name()) {
 			file, openErr := Kube.Fs.Open(path)
-			abs, _ := filepath.Abs(file.Name())
 			if openErr != nil {
 				return openErr
 			}
+			defer file.Close()
+
+			abs, _ := filepath.Abs(file.Name())
 
 			foundAddon := &Addon{
-				Name:      entry.Name(),
-				ShortName: strings.ReplaceAll(entry.Name(), ".ek.js", ""),
+				Name:      info.Name(),
+				ShortName: strings.ReplaceAll(info.Name(), ".ek.js", ""),
 				File:      abs,
-				RootDir:   adr.EkConfig.AddonDir,
+				RootDir:   root,
 			}
 
 			cfg, parseErr := adr.ExtractConfiguration(foundAddon)
-
 			if parseErr != nil {
 				return errors.Join(errors.New("problem in addon: "+foundAddon.Name), parseErr)
 			}
@@ -110,9 +156,8 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 		return nil
 	}
 
-	walkErr := afero.Walk(Kube.Fs, adr.EkConfig.AddonDir, walkFunc)
-	if walkErr != nil {
-		return nil, walkErr
+	if err := afero.Walk(Kube.Fs, root, walkFunc); err != nil {
+		return nil, err
 	}
 
 	return addons, nil
