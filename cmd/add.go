@@ -33,10 +33,12 @@ func NewAddCmd() *cobra.Command {
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
+			_ = ez.InitializeEasykube()
 			addons := make([]string, 0)
 			a, e := ez.Kube.GetAddons()
 			if e != nil {
 				// ignore for now
+				panic(e)
 			}
 			for _, i := range a {
 				addons = append(addons, i.GetShortName())

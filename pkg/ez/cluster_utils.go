@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
@@ -75,19 +74,19 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 		homedir, _ := Kube.GetUserHomeDir()
 
 		configDir, _ := os.UserConfigDir()
-		configFile := u.RenderToYAML(addonList,u.EkConfig)
+		configFile := u.RenderToYAML(addonList, u.EkConfig)
 
 		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)
 		optNoGreeting := cluster.CreateWithDisplaySalutation(false)
-		optReady := cluster.CreateWithWaitForReady(20 * time.Second)
+		//optReady := cluster.CreateWithWaitForReady(10 * time.Second)
 
 		kubeconfigPath := filepath.Join(homedir, ".kube", "easykube")
 		optKubeConfig := cluster.CreateWithKubeconfigPath(kubeconfigPath)
 		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
-		err := cp.Create(constants.CLUSTER_NAME, optKubeConfig, optConfig, optNodeImage, optNoGreeting, optReady)
+		err := cp.Create(constants.CLUSTER_NAME, optKubeConfig, optConfig, optNodeImage, optNoGreeting)
 		if nil != err {
 			panic(err)
 		}
@@ -108,7 +107,6 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 				if err := Kube.Exec(search.ContainerID, registryReg); err != nil {
 					return nil, err
 				}
-
 
 				localhost, _ := resources.AppResources.ReadFile("data/reg-localhost.toml")
 				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", localhost); err != nil {
@@ -142,10 +140,10 @@ func (u *ClusterUtils) RenderToYAML(addonList []IAddon, config *EasykubeConfigDa
 		panic(err)
 	}
 
-	x:= struct {
-		Config *EasykubeConfigData
+	x := struct {
+		Config    *EasykubeConfigData
 		AddonList []IAddon
-	} {Config: config, AddonList: addonList}
+	}{Config: config, AddonList: addonList}
 
 	templ := template.New("config")
 	templ, err = templ.Parse(string(data))
