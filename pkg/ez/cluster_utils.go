@@ -79,14 +79,11 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)
-		optNoGreeting := cluster.CreateWithDisplaySalutation(false)
-		//optReady := cluster.CreateWithWaitForReady(10 * time.Second)
-
 		kubeconfigPath := filepath.Join(homedir, ".kube", "easykube")
 		optKubeConfig := cluster.CreateWithKubeconfigPath(kubeconfigPath)
 		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
-		err := cp.Create(constants.CLUSTER_NAME, optKubeConfig, optConfig, optNodeImage, optNoGreeting)
+		err := cp.Create(constants.CLUSTER_NAME, optKubeConfig, optConfig, optNodeImage)
 		if nil != err {
 			panic(err)
 		}
