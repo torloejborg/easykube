@@ -36,7 +36,7 @@ const INGRESS_HTTPS_PORT = "https-port"
 // Binary dependencies
 //
 
-const KUBECTL_SEMVER = "~1.34"
+const KUBECTL_SEMVER = "~1.35"
 const DOCKER_SEMVER = "^29"
 const HELM_SEMVER = "~3.19"
 const KUSTOMIZE_SEMVER = "~5.8"
