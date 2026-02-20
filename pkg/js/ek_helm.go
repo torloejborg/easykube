@@ -24,6 +24,7 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 		values := filepath.Join(addonDir, call.Argument(1).String())
 		destination := filepath.Join(addonDir, call.Argument(2).String())
 		namespace := call.Argument(3).String()
+		releasename := call.Argument(4).String()
 
 		if !ez.FileOrDirExists(chart) {
 			ez.Kube.FmtRed("specified chart %s does not exist", chart)
@@ -40,9 +41,19 @@ func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
 		}
 
 		cmd := "helm"
-		args := []string{"template", chart,
-			"--values", values,
-			"--namespace", namespace}
+		var args = []string{}
+		if len(releasename) > 0 {
+			args = append(args, "template", chart,
+				"--name-template", releasename,
+				"--values", values,
+				"--namespace", namespace)
+
+		} else {
+			args = append(args, "template", chart,
+				"--values", values,
+				"--namespace", namespace)
+
+		}
 
 		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 		if ezk.IsVerbose() {

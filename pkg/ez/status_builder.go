@@ -39,9 +39,6 @@ func NewStatusBuilder() IStatusBuilder {
 }
 
 func (s *StatusBuilderImpl) DoContainerCheck() error {
-	if !Kube.IsContainerRuntimeAvailable() {
-		return errors.New("container runtime not available, is docker running")
-	}
 
 	running := func(containerID string) {
 
@@ -65,26 +62,25 @@ func (s *StatusBuilderImpl) DoContainerCheck() error {
 	return nil
 }
 
-func (s *StatusBuilderImpl) DoBinaryCheck() error {
+func checkBinary(name string, vFunc func() string) binaryCheckStatus {
+	_, err := exec.LookPath(name)
+	if err != nil {
+		Kube.FmtRed("⚠ " + name)
+		return binaryCheckStatus{HasVersionMismatch: false}
+	} else {
 
-	checkBinary := func(name string, vFunc func() string) binaryCheckStatus {
-		_, err := exec.LookPath(name)
-		if err != nil {
-			Kube.FmtRed("⚠ " + name)
-			return binaryCheckStatus{HasVersionMismatch: false}
+		version := vFunc()
+		if strings.Contains(version, "easykube") {
+			Kube.FmtYellow("%s %s", name, version)
+			return binaryCheckStatus{HasVersionMismatch: true}
 		} else {
-
-			version := vFunc()
-			if strings.Contains(version, "easykube") {
-				Kube.FmtYellow("%s %s", name, version)
-				return binaryCheckStatus{HasVersionMismatch: true}
-			} else {
-				Kube.FmtGreen("✓ %s %s", name, version)
-				return binaryCheckStatus{HasVersionMismatch: false}
-			}
+			Kube.FmtGreen("✓ %s %s", name, version)
+			return binaryCheckStatus{HasVersionMismatch: false}
 		}
 	}
+}
 
+func (s *StatusBuilderImpl) DoBinaryCheck() error {
 	cfg, err := Kube.IEasykubeConfig.LoadConfig()
 	if err != nil {
 		return err
@@ -96,10 +92,16 @@ func (s *StatusBuilderImpl) DoBinaryCheck() error {
 	runtime := cfg.ContainerRuntime
 
 	if runtime == "docker" {
+		if !HasBinary("docker") {
+			return errors.New("docker runtime not available")
+		}
 		versionCheck = append(versionCheck, checkBinary("docker", s.getDockerVersion))
 	}
 
 	if runtime == "podman" {
+		if !HasBinary("podman") {
+			return errors.New("podman runtime not available")
+		}
 		versionCheck = append(versionCheck, checkBinary("podman", s.getPodmanVersion))
 	}
 
@@ -181,7 +183,7 @@ func (s *StatusBuilderImpl) getKustomizeVersion() string {
 }
 
 func (s *StatusBuilderImpl) getPodmanVersion() string {
-	out, _, err := Kube.RunCommand("/usr/bin/podman", []string{"version", "--format", " {{.Version}}"}...)
+	out, _, err := Kube.RunCommand("podman", []string{"version", "--format", " {{.Version}}"}...)
 	return s.getVersionStr(out, constants.PODMAN_SEMVER, err)
 }
 

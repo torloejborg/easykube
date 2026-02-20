@@ -77,6 +77,44 @@ func (c *MockICobraCommandHelperGetBoolFlagCall) DoAndReturn(f func(string) bool
 	return c
 }
 
+// GetIntFlag mocks base method.
+func (m *MockICobraCommandHelper) GetIntFlag(name string) int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIntFlag", name)
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetIntFlag indicates an expected call of GetIntFlag.
+func (mr *MockICobraCommandHelperMockRecorder) GetIntFlag(name any) *MockICobraCommandHelperGetIntFlagCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIntFlag", reflect.TypeOf((*MockICobraCommandHelper)(nil).GetIntFlag), name)
+	return &MockICobraCommandHelperGetIntFlagCall{Call: call}
+}
+
+// MockICobraCommandHelperGetIntFlagCall wrap *gomock.Call
+type MockICobraCommandHelperGetIntFlagCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockICobraCommandHelperGetIntFlagCall) Return(arg0 int) *MockICobraCommandHelperGetIntFlagCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockICobraCommandHelperGetIntFlagCall) Do(f func(string) int) *MockICobraCommandHelperGetIntFlagCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockICobraCommandHelperGetIntFlagCall) DoAndReturn(f func(string) int) *MockICobraCommandHelperGetIntFlagCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // GetStringFlag mocks base method.
 func (m *MockICobraCommandHelper) GetStringFlag(name string) string {
 	m.ctrl.T.Helper()

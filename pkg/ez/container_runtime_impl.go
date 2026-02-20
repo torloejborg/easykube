@@ -21,6 +21,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	image2 "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/spf13/afero"
@@ -28,28 +29,43 @@ import (
 )
 
 type ContainerRuntimeImpl struct {
-	Docker *client.Client
-	ctx    context.Context
-	Fs     afero.Fs
+	Docker      *client.Client
+	ctx         context.Context
+	Fs          afero.Fs
+	RuntimeType string
 }
 
-func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
+func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
 
 	clientsOpts := make([]client.Opt, 0)
 	clientsOpts = append(clientsOpts, client.WithAPIVersionNegotiation())
 
 	switch runtime {
 	case "docker":
+		if !HasBinary("docker") {
+			return nil, errors.New("docker binary not found, is it installed")
+		}
 		clientsOpts = append(clientsOpts, client.FromEnv)
 		break
 	case "podman":
-		// get the socket location
-		sout, _, err := Kube.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
-		if err != nil {
-			panic("Failed to get podman info")
+
+		if !HasBinary("podman") {
+			return nil, errors.New("podman binary not found, is it installed")
 		}
 
-		clientsOpts = append(clientsOpts, client.WithHost("unix:///"+sout))
+		// get the socket location
+		sout, _, err := Kube.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
+
+		// some podman versions report unix://, others not.
+		if !strings.Contains(string(sout), "unix") {
+			sout = "unix://" + sout
+		}
+
+		if err != nil {
+			return nil, errors.Join(errors.New("Failed to determine podman runtime"), err)
+		}
+		socket := strings.TrimSpace(sout)
+		clientsOpts = append(clientsOpts, client.WithHost(socket))
 		break
 	default:
 		panic("unknown container runtime")
@@ -57,14 +73,15 @@ func NewContainerRuntimeImpl(runtime string) IContainerRuntime {
 
 	docker, err := client.NewClientWithOpts(clientsOpts...)
 	if err != nil {
-		fmt.Println("No container context/runtime found. Is docker running??")
-		os.Exit(-1)
+		msg := fmt.Sprintf("No container context/runtime found. Is %s running??", runtime)
+		return nil, errors.New(msg)
 	}
 
 	return &ContainerRuntimeImpl{
-		Docker: docker,
-		ctx:    context.Background(),
-	}
+		Docker:      docker,
+		ctx:         context.Background(),
+		RuntimeType: runtime,
+	}, nil
 
 }
 func (cri *ContainerRuntimeImpl) IsClusterRunning() bool {
@@ -75,16 +92,6 @@ func (cri *ContainerRuntimeImpl) IsClusterRunning() bool {
 	} else {
 		return running
 	}
-}
-
-func (cri *ContainerRuntimeImpl) DiscoverContainerRuntimeConnection(runtimeType string) (ContainerConnection, error) {
-
-	res := ContainerConnection{
-		Host: "nil",
-		Type: "docker",
-	}
-
-	return res, nil
 }
 
 func (cri *ContainerRuntimeImpl) IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error) {
@@ -210,12 +217,40 @@ func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateReg
 
 	if credentials != nil {
 
-		jsonBytes, _ := json.Marshal(map[string]string{
-			"username": credentials.Username,
-			"password": credentials.Password,
-		})
+		if cri.RuntimeType == "podman" {
 
-		opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
+			extractRegistry := func(image string) string {
+				parts := strings.Split(image, "/")
+				if len(parts) >= 2 && strings.Contains(parts[0], ".") {
+					return parts[0]
+				}
+				return ""
+			}
+
+			auth := base64.StdEncoding.EncodeToString([]byte(credentials.Username + ":" + credentials.Password))
+			authConfig := registry.AuthConfig{
+				Auth:          auth,
+				ServerAddress: extractRegistry(image),
+			}
+
+			encoded, err := registry.EncodeAuthConfig(authConfig)
+			if err != nil {
+				return err
+			}
+
+			opts.RegistryAuth = encoded
+
+		}
+
+		if cri.RuntimeType == "docker" {
+			jsonBytes, _ := json.Marshal(map[string]string{
+				"username": credentials.Username,
+				"password": credentials.Password,
+			})
+
+			opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
+		}
+
 	}
 
 	reader, err := cri.Docker.ImagePull(cri.ctx, image, opts)
@@ -400,9 +435,9 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		}
 
 		binds := make([]string, 3)
-		binds[0] = filepath.Join(configDir, "easykube", "registry-config.yaml") + ":/etc/docker/registry/config.yml"
-		binds[1] = filepath.Join(configDir, "easykube", "localtest.me.crt") + ":/etc/ssl/localtest.me.crt"
-		binds[2] = filepath.Join(configDir, "easykube", "localtest.me.key") + ":/etc/ssl/localtest.me.key"
+		binds[0] = filepath.Join(configDir, "easykube", "registry-config.yaml") + ":/etc/docker/registry/config.yml:z"
+		binds[1] = filepath.Join(configDir, "easykube", "localtest.me.crt") + ":/etc/ssl/localtest.me.crt:z"
+		binds[2] = filepath.Join(configDir, "easykube", "localtest.me.key") + ":/etc/ssl/localtest.me.key:z"
 
 		networkingConfig := &network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{

@@ -14,6 +14,11 @@ func NewAddCmd() *cobra.Command {
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			err := ez.InitializeEasykube()
+			if err != nil {
+				return err
+			}
+
 			cmdhelper := ez.CommandHelper(cmd)
 
 			addOpts := AddOptions{
@@ -28,10 +33,12 @@ func NewAddCmd() *cobra.Command {
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
+			_ = ez.InitializeEasykube()
 			addons := make([]string, 0)
 			a, e := ez.Kube.GetAddons()
 			if e != nil {
 				// ignore for now
+				panic(e)
 			}
 			for _, i := range a {
 				addons = append(addons, i.GetShortName())

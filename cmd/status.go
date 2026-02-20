@@ -14,6 +14,12 @@ var statusCmd = &cobra.Command{
 	Short: "inspects you environment to see if prerequisites are met",
 	Long:  "",
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		err := ez.InitializeEasykube()
+		if err != nil {
+			return err
+		}
+
 		status := ez.NewStatusBuilder()
 
 		_ = status.DoBinaryCheck()

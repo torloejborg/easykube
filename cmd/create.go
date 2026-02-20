@@ -13,6 +13,11 @@ var createCmd = &cobra.Command{
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		err := ez.InitializeEasykube()
+		if err != nil {
+			return err
+		}
+
 		opts := CreateOpts{
 			Secrets: ez.CommandHelper(cmd).GetStringFlag(constants.ARG_SECRETS),
 		}
@@ -24,5 +29,4 @@ var createCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(createCmd)
 	createCmd.Flags().StringP(constants.ARG_SECRETS, "s", "", "Property file to load as 'easykube-secrets', useful for image pull secrets and other custom configuration")
-	//createCmd.Flags().StringP(constants.ARG_CONFIG_FILE, "c", "", "specifies an alternate easykube config file")
 }

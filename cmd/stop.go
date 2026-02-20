@@ -12,6 +12,13 @@ var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "stops the cluster node and registry container",
 	Long:  "", RunE: func(cmd *cobra.Command, args []string) error {
+
+		err := ez.InitializeEasykube(
+			ez.WithKubernetes(false))
+		if err != nil {
+			return err
+		}
+
 		ezk := ez.Kube
 		if running, err := ezk.IsContainerRunning(constants.KIND_CONTAINER); err != nil {
 			return err
