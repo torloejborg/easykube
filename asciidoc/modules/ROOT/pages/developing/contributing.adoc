@@ -1,9 +1,9 @@
 = Contributing
 
-This is an open-source project, so pull requests are welcome.
+This is an open-source project, pull requests are welcome.
 
 Use Nix to get all the tools you need for development.
-The Nix flake provides three shell variants:
+A Nix flake provides three shell variants:
 
 * default
 * light

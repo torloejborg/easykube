@@ -202,7 +202,7 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td><a id="addons-dependencies"></a>Addons allow you to express dependencies on other addons. In this case, the Temporal addon requires a database and an ingress controller for its UI. Internally, during addon scanning, a dependency graph is created and a topological sort determines the installation order—similar to a build system where tasks depend on other tasks.</td>
+<td><a id="addons-dependencies"></a>Addons allow you to express dependencies to other addons. In this case, the Temporal addon requires a database and an ingress controller for its UI. Internally, during addon scanning, a dependency graph is created and a topological sort determines the installation order — similar to a build system like maven, gradle, ant, or make. Tasks depends on other tasks.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>

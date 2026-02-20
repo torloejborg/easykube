@@ -32,3 +32,8 @@ If an interface is changed, remember to regenerate the mocks.
 Run:
 
 `make mock`
+
+== Keeping up-to-date
+
+If you forked the repository, bought into the Nix philosophy, and think things
+should be stable and reproducible. Just remember, after each new depencney added you should run `make gomod2nix`. This will sync go-packages to a known, reproducible state.

@@ -8,18 +8,10 @@ Next, visit the xref:install.adoc[installation] page.
 
 Also, you should familiarize yourself with the concepts of xref:addons.adoc[addons].
 
-== Example Terminal Session
-
-[asciinema]
-----
-.create a local cluster, install and create an addon (apologies for the delays in the screencast - the player can be scrubbed)
-include::example$create.cast[]
-----
-
 == History
 
-Easykube started out as a collection of Gradle build scripts. The primary use case was to enable mobile developers to install real backends locally, allowing them to work offline and not require a personal instance of a test system on some random cluster.
+Easykube started out as a collection of Gradle build scripts. The primary use case was to enable mobile developers to install real backends locally, allowing them to work offline and not require a personal instance of some test system on a random cluster, incurring a real monetary cost.
 
-The fontender's fancy MacBooks were powerful enough to drive a small Kubernetes instance, even with multiple backends, so why have their machines sit idle ?
+The fontenders fancy MacBooks were powerful enough to drive a small Kubernetes instance, even with multiple backends. So why have their machines do idle time?
 
 Later, easykube was reimplemented in Go. And here we are :)

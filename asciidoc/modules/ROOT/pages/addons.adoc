@@ -74,7 +74,7 @@ A lot is happening here, so let’s break it down:
 
 <1> Every addon has a configuration directive. This JSON structure is extracted by the main easykube program and used to construct the Kind cluster configuration.
 
-<2> [[addons-dependencies]]Addons allow you to express dependencies on other addons. In this case, the Temporal addon requires a database and an ingress controller for its UI. Internally, during addon scanning, a dependency graph is created and a topological sort determines the installation order—similar to a build system where tasks depend on other tasks.
+<2> [[addons-dependencies]]Addons allow you to express dependencies to other addons. In this case, the Temporal addon requires a database and an ingress controller for its UI. Internally, during addon scanning, a dependency graph is created and a topological sort determines the installation order — similar to a build system like maven, gradle, ant, or make. Tasks depends on other tasks.
 
 <3> The extraPorts section contributes to the cluster configuration. Your deployments should define a NodePort service using the same values, but only if the deployment needs to be accessible from your host machine (localhost). In this case, Temporal becomes available on 127.0.0.1:7233.
 

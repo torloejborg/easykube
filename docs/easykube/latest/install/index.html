@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Install, Configure, and Create :: Easykube Documentation</title>
+    <title>Install, Configure, Create :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/install/">
     <meta name="generator" content="Antora 3.1.9">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -95,24 +95,28 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Install, Configure, and Create<a id="install"></a></h1>
+<h1 class="page">Install, Configure, Create<a id="install"></a></h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_installation">Installation</a>
 <ul class="sectlevel2">
 <li><a href="#install-nix">Nix</a></li>
-<li><a href="#_manual_installation">Manual installation</a></li>
+<li><a href="#_manual_installation">Manual Installation</a></li>
 <li><a href="#install-postcheck">Post-installation check</a></li>
 </ul>
 </li>
-<li><a href="#install-configuration">Configuration</a></li>
+<li><a href="#install-configuration">Configuration</a>
+<ul class="sectlevel2">
+<li><a href="#_certificates">Certificates</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Welcome! On these pages you will find guides on how to install, operate, and extend Easykube software to suit your own use cases.</p>
+<p>Welcome! On these pages you will find guides on how to install, operate, and extend Easykube to suit your own use cases.</p>
 </div>
 </div>
 </div>
@@ -120,21 +124,24 @@
 <h2 id="_installation"><a class="anchor" href="#_installation"></a>Installation<a id="install-install"></a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are many ways to install Easykube; below are some of the paths you can choose.</p>
+<p>There are many ways to install Easykube; here are some of the paths you can choose.</p>
 </div>
 <div class="paragraph">
-<p>Please note that pre-built easykube binaries exist for Windows, Linux, and macOS. It will run on Windows, but it is recommended to run easykube in WSL2. On never macs you will need to explicitly allow the binary to run, I simply can&#8217;t be arsed to communicate with Apple about signing and approval procedures, if you are trapped in that pit - build from source.</p>
+<p>Please note that pre-built easykube binaries do exist for Windows, Linux, and macOS (Binaries for macOS are not signed with Apple). Easykube can run on Windows, but it&#8217;s recommended to run easykube in WSL2 or a pure Linux environment. Apple uses should build from source, you are at your own peril.</p>
+</div>
+<div class="paragraph">
+<p>Starting from scratch, it&#8217;s recommended to use the Nix approach. (You can download a binary, but external binary dependencies must be explicitly managed by <strong>yourself</strong>)</p>
 </div>
 <div class="sect2">
 <h3 id="install-nix"><a class="anchor" href="#install-nix"></a>Nix</h3>
 <div class="paragraph">
-<p>You can use <a href="https://nixos.org/download/#download-nix">nix</a> to speed up the process.</p>
+<p>You can use <a href="https://nixos.org/download/#download-nix">nix</a> to speed up the process. This will build from source and grab the required dependent binaries.</p>
 </div>
 <div class="paragraph">
 <p><code>nix develop github:/torloejborg/easykube</code></p>
 </div>
 <div class="paragraph">
-<p>This will fetch and build from source and automatically pull in the required binary dependencies (except Docker). You will then be dropped into a shell with all tooling available and can start using easykube.</p>
+<p>The Above command will fetch and build from sources, automatically make available the required binary dependencies (except Docker). Then, you will be dropped into a shell with all tooling available and can start using easykube.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -154,10 +161,14 @@ extra-experimental-features = flakes</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The Nix flake has two shells. The default will build easykube from source.</p>
+<p>The Nix flake has three shells. The default <code>nix develop github:/torloejborg/easykube</code> will build easykube from source and run tests.</p>
 </div>
 <div class="paragraph">
-<p><code>nix develop .#light</code> will drop you into a shell with supporting tools <strong>without building</strong>. Useful if you cloned the repository.</p>
+<p>If you cloned the repository, enter the directory and issue <code>nix develop .#light</code> This will drop you into a shell with supporting tools, no build test stage. Useful for development. Build with <code>go build</code></p>
+</div>
+<div class="paragraph">
+<p>To contribute documentaion, invoke the third shell.
+<code>nix develop .#docs</code>. This installs the antroa toolchain. Edit the AsciiDoc files, render with <code>make docs</code>.</p>
 </div>
 </td>
 </tr>
@@ -165,10 +176,10 @@ extra-experimental-features = flakes</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_manual_installation"><a class="anchor" href="#_manual_installation"></a>Manual installation<a id="install-manual"></a></h3>
+<h3 id="_manual_installation"><a class="anchor" href="#_manual_installation"></a>Manual Installation<a id="install-manual"></a></h3>
 <div class="paragraph">
 <p>Download the latest easykube binary for your platform <a href="https://github.com/torloejborg/easykube/releases">here</a>.
-Extract the archive, rename the binary to <code>easykube</code>, <code>ek</code>, or whatever you prefer, and make sure it is on your system’s PATH.</p>
+Extract the archive, rename the binary to <code>easykube</code>, <code>ek</code>, or whatever you prefer, make sure it is on your system’s PATH.</p>
 </div>
 <div class="paragraph">
 <p>Use a package manager or download the following software yourself:</p>
@@ -221,7 +232,7 @@ hint: start with 'easykube config'
 </div>
 </div>
 <div class="paragraph">
-<p>Also try <code>easykube status</code>; this should yield additional warnings and errors.</p>
+<p>Also try <code>easykube status</code>; this should yield additional warnings.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -235,7 +246,10 @@ Inspecting binary dependencies
 </div>
 </div>
 <div class="paragraph">
-<p>The checks for the dependent binaries pass. Next, proceed to configuration.</p>
+<p>If the checks for the dependent binaries passed. Proceed to configuration. If you get a warning about version mismatches for binaries, rectify, or try your luck.</p>
+</div>
+<div class="paragraph">
+<p>(We try our best to keep binary dependencies up-to-date)</p>
 </div>
 </div>
 </div>
@@ -244,7 +258,7 @@ Inspecting binary dependencies
 <h2 id="install-configuration"><a class="anchor" href="#install-configuration"></a>Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By itself, easykube is not very interesting—it cannot do anything without its companion addons, which you will find <a href="https://github.com/torloejborg/easykube-addons">here</a>. Clone (or download) the repository to your local machine.</p>
+<p>By itself, easykube is not very interesting — it cannot do anything without its companion addons. You will find addons <a href="https://github.com/torloejborg/easykube-addons)">here</a>. Clone (or download) the repository to your local machine.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -257,6 +271,42 @@ The next sections assume the addon repository is placed in <code>/home/jane/code
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>When you have cloned an addon repository, proceed to configure easykube with <code>$ easykube config</code> - You might get an error complaining about the <code>VISUAL</code> environment variable not being set. Set it to something familiar; code, nano, vi, notepad.</p>
+</div>
+<div class="sect2">
+<h3 id="_certificates"><a class="anchor" href="#_certificates"></a>Certificates</h3>
+<div class="paragraph">
+<p>After installation, Easykube is configured to use a default SSL certificate. The <code>ingress</code> addon and the <code>registry:2</code> container are wired to use this certificate.</p>
+</div>
+<div class="paragraph">
+<p>The certificate is self-signed and issued by 'UFST' - to have a good out-of-the box experience, you can choose to trust the certificate found in <code>~/.config/easykube/localtest.me.ca.crt</code></p>
+</div>
+<div class="paragraph">
+<p>Install the certificate in your systems truststore</p>
+</div>
+<div class="paragraph">
+<p><strong>If you refuse to trust that certificate - That&#8217;s OK.</strong></p>
+</div>
+<div class="paragraph">
+<p>To make a self-signed certificate which you explicitly trust, then you have to make a custom distribution of Easykube.</p>
+</div>
+<div class="paragraph">
+<p>(fork the repository and change the certificates in <code>pkg/resources/data/cert</code>, also make sure the ingress addon will use your own certificate)</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+We will improve certificate handling by offering automatic generation at installation time. This is on the todo list. Pull Requests are welcome.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>

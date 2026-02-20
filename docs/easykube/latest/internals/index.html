@@ -113,7 +113,40 @@
 <div class="sect1">
 <h2 id="_local_image_registry"><a class="anchor" href="#_local_image_registry"></a>Local image registry</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>The registry is your local image cache. When operating a kind-cluster, it&#8217;s possible to bootstrap an application by directly pushing images into the control plane - Easykube maintains a local registry. This is a trade-off between time  and diskspace.</p>
+</div>
+<div class="paragraph">
+<p>After <code>easykube create</code>, <code>docker ps</code> reveals a
+container named <code>registry:2</code> - This container survives <code>easykube destroy</code> and <code>easykube create</code> commands.</p>
+</div>
+<div class="paragraph">
+<p><code>easykube stop</code> will stop the registry and kind-control plane.</p>
+</div>
+<div class="paragraph">
+<p><code>easykube start</code> will attempt to start the registry and kind-control plane.</p>
+</div>
+<div class="paragraph">
+<p>Whenever your easykube cluster is recreated, there is no need to pull images from the internet. By default your addons should pull from the local registry. You will see this pattern repeated across all addons.</p>
+</div>
+<div class="paragraph">
+<p>Normally, an image is pulled from the internet, re-tagged, and pushed to the local registry.</p>
+</div>
+<div class="paragraph">
+<p>Deployments will pull from the registry: <strong>registry.localtest.me:5001</strong> - Do explore how addons scripts retags, and patch deployments to use local images.</p>
+</div>
+<div class="paragraph">
+<p>A common naming convention is used for images in deployments;</p>
+</div>
+<div class="paragraph">
+<p><code>registry.localtest.me:5001/myimage:x</code></p>
+</div>
+<div class="paragraph">
+<p>If Easykube should to pull images directly from private registries, an ImagePullSecret must be manually created, and your deployments amended to use this pull secret.</p>
+</div>
+<div class="paragraph">
+<p>The registry is configured to use HTTPS, this is because Podman refuses to use insecure registries. To make SSL errors go away generate new certificates, or install the <code>localtest.me.ca.crt</code> found in <code>~/.config/easykube</code> to your trust store.</p>
+</div>
 </div>
 </div>
 <div class="sect1">

@@ -5,6 +5,28 @@ On this page we describe some of the internals, and how easykube differs from a 
 
 == Local image registry
 
+The registry is your local image cache. When operating a kind-cluster, it's possible to bootstrap an application by directly pushing images into the control plane - Easykube maintains a local registry. This is a trade-off between time  and diskspace.
+
+After `easykube create`, `docker ps` reveals a
+container named `registry:2` - This container survives `easykube destroy` and `easykube create` commands.
+
+`easykube stop` will stop the registry and kind-control plane.
+
+`easykube start` will attempt to start the registry and kind-control plane.
+
+Whenever your easykube cluster is recreated, there is no need to pull images from the internet. By default your addons should pull from the local registry. You will see this pattern repeated across all addons.
+
+Normally, an image is pulled from the internet, re-tagged, and pushed to the local registry.
+
+Deployments will pull from the registry: *registry.localtest.me:5001* - Do explore how addons scripts retags, and patch deployments to use local images.
+
+A common naming convention is used for images in deployments;
+
+`registry.localtest.me:5001/myimage:x`
+
+If Easykube should to pull images directly from private registries, an ImagePullSecret must be manually created, and your deployments amended to use this pull secret.
+
+The registry is configured to use HTTPS, this is because Podman refuses to use insecure registries. To make SSL errors go away generate new certificates, or install the `localtest.me.ca.crt` found in `~/.config/easykube` to your trust store.
 
 == DNS Resolution[[internals-dns]]
 

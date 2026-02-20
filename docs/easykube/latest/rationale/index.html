@@ -99,9 +99,10 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#rationale-easykube">Easykube</a></li>
-<li><a href="#rationale-dowith">What you can do with it</a></li>
-<li><a href="#rationale-donot">Please do not</a></li>
+<li><a href="#rationale-easykube">What is it?</a></li>
+<li><a href="#_easykube_helps_you_with">Easykube helps you with</a></li>
+<li><a href="#_torches_and_spanners">Torches and spanners</a></li>
+<li><a href="#rationale-donot">When not to use Easykube</a></li>
 </ul>
 </div>
 <div id="preamble">
@@ -109,86 +110,133 @@
 <div class="ulist">
 <ul>
 <li>
-<p>Easykube aims to enable sharing and distribution of development "platforms" via its companion addon repositories.</p>
+<p>Easykube aims to enable shared development "platforms" via its companion addon repositories.</p>
 </li>
 <li>
-<p>It is meant as a team and individual enabler: everyone can install and work with an application’s particular stack locally, without breaking a shared environment.</p>
+<p>If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse.. Experiment, develop locally. Breaking "the system" - Eliminate the "docker-compose" shadow workflow.</p>
 </li>
 <li>
-<p>This is certainly doable with existing tooling—Docker Compose and friends are popular choices. So what’s the point of another tool?</p>
-</li>
-<li>
-<p>Kubernetes is also an orchestration platform.</p>
-</li>
-<li>
-<p>If you use Kubernetes for your workloads, why not re-use the deployments that already exist?</p>
+<p>Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack  locally, without breaking any shared environment.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="rationale-easykube"><a class="anchor" href="#rationale-easykube"></a>Easykube</h2>
+<h2 id="rationale-easykube"><a class="anchor" href="#rationale-easykube"></a>What is it?</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>Easykube is built on top of the Kind project (Kubernetes in Docker) and the Goja JavaScript runtime Go library.</p>
+<p>Easykube is builds on the Kind project (Kubernetes in Docker) and the Goja JavaScript runtime Go library.</p>
 </li>
 <li>
-<p>It bootstraps a single-node Kind cluster with some small modifications.</p>
+<p>It bootstraps a single-node Kind cluster with opinionated modifications.</p>
 </li>
 <li>
-<p>It automatically sets up a local Docker registry for the cluster and connects it, allowing air-gapped environments.</p>
+<p>It automatically sets up a local Docker registry for the cluster and connects it locally, permits air-gapped environments.</p>
 </li>
 <li>
-<p>Based on discovered addons, a Kind cluster configuration is generated for the particular addon repository’s use case (host ports and extra mounts).</p>
+<p>Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s use case. Port forwarding and storage requirements are handled automatically.</p>
 </li>
 <li>
-<p>Persistent data (if used) survives cluster deletion.</p>
+<p>Persistent data (if used) survives cluster deletion and recreation. Databases remain intact - real databases, with indexes and everything, no in-memory nonsense.</p>
 </li>
 <li>
-<p>Addon dependency resolution.</p>
+<p>Addon installation is programmable via the embedded JavaScript library. Highly customizable, extensible; Provision databases, caches, inject secrets, patch deployments - It&#8217;s local, do anything, break everything!</p>
 </li>
 <li>
-<p>Addon installation is programmable via the embedded JavaScript runtime, making it highly customizable.</p>
+<p>Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, you can choose to install the parts you need.</p>
 </li>
 <li>
-<p>A CoreDNS hack lets you access everything from "localtest.me" — never edit your /etc/hosts file again!</p>
+<p>A CoreDNS hack lets you access everything from "localtest.me" — never touch the /etc/hosts (or that c:\windows\system32\drivers\etc\hosts) file again. If your addon workloads define 100+ ingresses, you can still make everything work locally.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="rationale-dowith"><a class="anchor" href="#rationale-dowith"></a>What you can do with it</h2>
+<h2 id="_easykube_helps_you_with"><a class="anchor" href="#_easykube_helps_you_with"></a>Easykube helps you with<a id="rationale-dowith"></a></h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>Enable your team to install and run your cloud-native application(s) locally—especially powerful when combined with tools like mirrord.</p>
+<p>Enabling your team to install and run your cloud-native application(s) locally.</p>
 </li>
 <li>
-<p>Break things; it’s OK. Just start over.</p>
+<p>Break things; it’s OK. Just start over - We learn everyday!</p>
 </li>
 <li>
-<p>Effortlessly spin up a local development stack: databases, web servers, caches, workflow engines, OAuth servers, S3-compatible storage, etc.</p>
+<p>Effortlessly spin up local development stacks: Databases, Web servers, Caches, Workflow engines, OAuth servers, S3-compatible storage - If it runs in kubernetes (or Docker/Podman) -  It runs on Easykube.</p>
 </li>
 <li>
-<p>Use as a learning or teaching tool for Kubernetes.</p>
+<p>Kubernetes can be complicated, use Easykube as a gateway-drug for new team members - Let them experience the challenges of distributed systems firsthand, on their own machines.</p>
 </li>
 <li>
-<p>Perhaps some team members simply don’t care about Kubernetes—That’s OK, nobody can be forced to fall in love with YAML. Instead, <code>$ easykube add mystack</code> will have stuff running with minimal effort.</p>
+<p>Perhaps some team members refuse to acknowledge the 'cloud' thing, they are brilliant developers, but will never care about Kubernetes — That’s OK, no one can be forced to like YAML (it&#8217;s just a runtime thing anyway).</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>$ easykube add mystack</code> seems like a good tradeoff; Stuff runs, we can figure why things explode before we pay our pensions to a random cloud-provider, all because of an endless loop..</p>
+</li>
+<li>
+<p>Consider the request chain: (Ingress) &#8594; A &#8594; B &#8594; (queue) &#8594; C.
+If you ever had to debug what broke in "C". If you know the pain, you experienced the late night sessions. Otherwise, proceed to be happy.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Become a smart-arse, now you can finally prove, without a doubt, that the pesky devops team has been wrong about everything, Kubernetes is written in Golang, nobody knows Golang better than you!</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="rationale-donot"><a class="anchor" href="#rationale-donot"></a>Please do not</h2>
+<h2 id="_torches_and_spanners"><a class="anchor" href="#_torches_and_spanners"></a>Torches and spanners</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Use in a production setting. Run your real workloads on a secured cluster. Easykube is not built with security in mind, only for local workloads.</p>
+<p><strong>If you live in a permissive environment and have the freedom to install the tooling mentioned below, then Easykube might not be for you. Consider your options.</strong></p>
+</div>
+<div class="paragraph">
+<p>However, working in a constrained environment, your cluster-admin will plain out refuse your request of "Hey, let me install this awesome operator in your cluster, it does stuff like intercept and redirect network traffic, and it can do tricky things the pods.."</p>
+</div>
+<div class="paragraph">
+<p>Nope. Go away. Play your games elsewhere. I will never let this happen - Even in the dev cluster.</p>
+</div>
+<div class="paragraph">
+<p>Harsh, but a fair statement.</p>
+</div>
+<div class="paragraph">
+<p>However. Locally we are (mostly) free to do things. We develop, we experiment, we break things, we amend. Easykube paired with some extra tooling, one option being; 'mirrord' goes extremely well in a local setup. (alternatives do exist)</p>
+</div>
+<div class="paragraph">
+<p><strong>Disclaimer; I am not associated with the mirrord product and the Metalbear company. I just think what they are doing is neat.</strong></p>
+</div>
+<div class="paragraph">
+<p>Use mirrord (or equivalent) to do fast local (or remote) iterations, avoid the <code>compile &#8594; construct image &#8594; deploy &#8594; wait &#8594; repeat cycle.</code></p>
+</div>
+<div class="paragraph">
+<p>Kubernetes is all about orchestrating containers, not live software. However, with specialized tooling we can have an ergonomic developer experience.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rationale-donot"><a class="anchor" href="#rationale-donot"></a>When not to use Easykube</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Not using kubernetes.</p>
+</li>
+<li>
+<p>If you have a multitude of microservices (say, 20+) - Easykube might not be the thing you are looking for (unless developers are issued powerful machines). Continue putting credits in the cloud providers slot machine.</p>
+</li>
+<li>
+<p>Never, ever, spin up easykube in a production setting, or use it for something really important. It&#8217;s meant for trashing; Try, fail, start over.  Run your real workloads on a secured cluster. Easykube is built for local development only.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>

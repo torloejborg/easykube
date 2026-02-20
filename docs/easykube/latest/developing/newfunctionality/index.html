@@ -102,6 +102,7 @@
 <ul class="sectlevel1">
 <li><a href="#internals-js">The Script Runtime</a></li>
 <li><a href="#_mocks">Mocks</a></li>
+<li><a href="#_keeping_up_to_date">Keeping up-to-date</a></li>
 </ul>
 </div>
 <div class="sect1">
@@ -136,6 +137,7 @@ Below is the listing of the Go file where all exported functions are declared.</
 	check(easykubeObj.Set(EXEC, e.Exec()))
 	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
 	check(easykubeObj.Set(ADDON_DIR, e.AddonDir()))
+	check(easykubeObj.Set(CONFIG, e.Config()))
 
 	addon.ExportFunction("_ek", easykubeObj)
 
@@ -186,6 +188,15 @@ If an interface is changed, remember to regenerate the mocks.</p>
 </div>
 <div class="paragraph">
 <p><code>make mock</code></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_keeping_up_to_date"><a class="anchor" href="#_keeping_up_to_date"></a>Keeping up-to-date</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you forked the repository, bought into the Nix philosophy, and think things
+should be stable and reproducible. Just remember, after each new depencney added you should run <code>make gomod2nix</code>. This will sync go-packages to a known, reproducible state.</p>
 </div>
 </div>
 </div>

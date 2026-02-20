@@ -1,19 +1,21 @@
-= Install, Configure, and Create[[install]]
+= Install, Configure, Create[[install]]
 :icons: font
 
-Welcome! On these pages you will find guides on how to install, operate, and extend Easykube software to suit your own use cases.
+Welcome! On these pages you will find guides on how to install, operate, and extend Easykube to suit your own use cases.
 
 == Installation[[install-install]]
-There are many ways to install Easykube; below are some of the paths you can choose.
+There are many ways to install Easykube; here are some of the paths you can choose.
 
-Please note that pre-built easykube binaries exist for Windows, Linux, and macOS. It will run on Windows, but it is recommended to run easykube in WSL2. On never macs you will need to explicitly allow the binary to run, I simply can't be arsed to communicate with Apple about signing and approval procedures, if you are trapped in that pit - build from source.
+Please note that pre-built easykube binaries do exist for Windows, Linux, and macOS (Binaries for macOS are not signed with Apple). Easykube can run on Windows, but it's recommended to run easykube in WSL2 or a pure Linux environment. Apple uses should build from source, you are at your own peril.
+
+Starting from scratch, it's recommended to use the Nix approach. (You can download a binary, but external binary dependencies must be explicitly managed by **yourself**)
 
 === Nix [[install-nix]]
-You can use https://nixos.org/download/#download-nix[nix] to speed up the process.
+You can use https://nixos.org/download/#download-nix[nix] to speed up the process. This will build from source and grab the required dependent binaries.
 
 `nix develop github:/torloejborg/easykube`
 
-This will fetch and build from source and automatically pull in the required binary dependencies (except Docker). You will then be dropped into a shell with all tooling available and can start using easykube.
+The Above command will fetch and build from sources, automatically make available the required binary dependencies (except Docker). Then, you will be dropped into a shell with all tooling available and can start using easykube.
 
 [TIP]
 .nix (~/.config/nix/nix.conf)
@@ -25,15 +27,19 @@ extra-experimental-features = nix-command
 extra-experimental-features = flakes
 ----
 
-The Nix flake has two shells. The default will build easykube from source.
+The Nix flake has three shells. The default `nix develop github:/torloejborg/easykube` will build easykube from source and run tests.
 
-`nix develop .#light` will drop you into a shell with supporting tools *without building*. Useful if you cloned the repository.
+If you cloned the repository, enter the directory and issue `nix develop .#light` This will drop you into a shell with supporting tools, no build test stage. Useful for development. Build with `go build`
+
+To contribute documentaion, invoke the third shell.
+`nix develop .#docs`. This installs the antroa toolchain. Edit the AsciiDoc files, render with `make docs`.
+
 ====
 
-=== Manual installation[[install-manual]]
+=== Manual Installation[[install-manual]]
 
 Download the latest easykube binary for your platform https://github.com/torloejborg/easykube/releases[here].
-Extract the archive, rename the binary to `easykube`, `ek`, or whatever you prefer, and make sure it is on your system’s PATH.
+Extract the archive, rename the binary to `easykube`, `ek`, or whatever you prefer, make sure it is on your system’s PATH.
 
 Use a package manager or download the following software yourself:
 
@@ -58,7 +64,7 @@ hint: start with 'easykube config'
 ...
 ----
 
-Also try `easykube status`; this should yield additional warnings and errors.
+Also try `easykube status`; this should yield additional warnings.
 
 [source,text]
 ----
@@ -71,9 +77,28 @@ Inspecting binary dependencies
 ...
 ----
 
-The checks for the dependent binaries pass. Next, proceed to configuration.
+If the checks for the dependent binaries passed. Proceed to configuration. If you get a warning about version mismatches for binaries, rectify, or try your luck.
+
+(We try our best to keep binary dependencies up-to-date)
 
 == Configuration [[install-configuration]]
-By itself, easykube is not very interesting—it cannot do anything without its companion addons, which you will find https://github.com/torloejborg/easykube-addons[here]. Clone (or download) the repository to your local machine.
+By itself, easykube is not very interesting — it cannot do anything without its companion addons. You will find addons https://github.com/torloejborg/easykube-addons)[here]. Clone (or download) the repository to your local machine.
 
 NOTE: The next sections assume the addon repository is placed in `/home/jane/code/easykube-addons` — adjust accordingly.
+
+When you have cloned an addon repository, proceed to configure easykube with `$ easykube config` - You might get an error complaining about the `VISUAL` environment variable not being set. Set it to something familiar; code, nano, vi, notepad.
+
+=== Certificates
+After installation, Easykube is configured to use a default SSL certificate. The `ingress` addon and the `registry:2` container are wired to use this certificate.
+
+The certificate is self-signed and issued by 'UFST' - to have a good out-of-the box experience, you can choose to trust the certificate found in `~/.config/easykube/localtest.me.ca.crt`
+
+Install the certificate in your systems truststore
+
+*If you refuse to trust that certificate - That's OK.*
+
+To make a self-signed certificate which you explicitly trust, then you have to make a custom distribution of Easykube.
+
+(fork the repository and change the certificates in `pkg/resources/data/cert`, also make sure the ingress addon will use your own certificate)
+
+NOTE: We will improve certificate handling by offering automatic generation at installation time. This is on the todo list. Pull Requests are welcome.

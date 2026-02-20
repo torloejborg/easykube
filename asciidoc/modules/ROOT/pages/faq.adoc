@@ -1,25 +1,25 @@
 = FAQ
 
-Why javascript?? I thought this is a Go program?
+Why javascript?? I thought this were a pure Go program?
 
-** Easykube is designed to be flexible and used in different contexts with different addon repositories. It defines a core set of utility functions that can be combined in useful ways through scripting. Instead of inventing a dedicated easykube-script language (tempting as that may be), it was decided to use an existing library instead. Enter https://github.com/dop251/goja[Goja], a JavaScript VM for Golang.
+* Easykube is designed to be flexible, used in different contexts with different addon repositories. Easykube defines a core set of utility functions that can be combined in useful ways, using https://github.com/dop251/goja[Goja], a JavaScript VM for Golang.
 
-When creating the cluster, easykube complains about occupied ports, what should I do?
+When i try `*$ easykube create*` it complains about occupied ports, what should I do?
 
-** As the error states, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the extraPorts section in the offending addon.
+* As the error state, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the *extraPorts* section in the offending addon.
 
 Where did all my diskspace go?
 
-** Some Docker images are quite large, and easykube may keep images in triplicate. When an image is pulled from a remote registry, it is stored in your local Docker context. Then it is pushed to the local registry, and finally pulled into the kind control plane. This becomes noticeable if the cluster is repeatedly created and destroyed. Cleaning up old containers and volumes will reclaim the space.
+* Some Docker images are quite large, easykube may keep images in triplicate. When an image is pulled, it is stored in your local Docker context, then the local registry, and finally the kind control plane. This becomes noticeable if the cluster is repeatedly created and destroyed (using fresh images). Cleaning up old containers and volumes will reclaim the space. Disk space is traded for speed and convince.
 
-My javascript throws errors, how can I debug what's going on?
+My Easykube addon javascript throws errors, how can I debug what's going on?
 
-** Unfortunately, there is no straightforward way to attach an external debugger to a Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.
+* Unfortunately, there is no straightforward way to attach an external debugger to the Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.
 
 Sometimes easykube fails with an error about 'deployment not ready' when adding something.
 
-** Some workloads simply take longer to become ready. The waitForDeployment function times out after 1 minute. This depends on your machine and the nature of the deployment. In most cases you can just retry. If possible, lowering readiness/liveness probe thresholds may also help.
+* Some workloads simply take longer to become ready, if you are using a machine with constrained resources, this might be an issue. The *waitForDeployment* function times out after 1 minute. In most cases you can just retry. If possible, tweaking or removing readiness/liveness probe thresholds from a deployment may help.
 
-I cannot create postgres databases, it throws errors when creating or starting the database, what can I do?
+I cannot create postgres databases. It throws errors when creating or starting the database, what can I do?
 
-** If you switched to a newer postgres version, existing database files might not be compatible. Either revert to the previous version or delete the files in the Postgres persistence directory.
+* If you switched to a newer postgres version, existing database files might not be compatible. Either revert to the previous version or delete the files in the Postgres persistence directory, look for postgres stuff in `~/.config/easykube/persistence`

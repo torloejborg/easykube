@@ -8,30 +8,31 @@ $ easykube config
 
 == Docker
 
-Docker is widely used and available on many platforms, often bundled with a desktop manager. In most cases Docker runs with permissive privileges (on default installations it runs as the superuser, root), which has both pros and cons.
+Docker is widely used and available on many platforms, often bundled with a desktop manager. In most cases Docker runs with permissive privileges (on default installations it runs as the superuser - root), which has both pros and cons.
 
 On a developer machine, elevated permissions are often acceptable. However, in some organizations Docker is banned due to security concerns.
 
 Easykube has not been tested with rootless Docker. For rootless operation, consider using Podman instead.
 
-Privileged Docker generally results in less friction.
+However; Privileged Docker generally results in less friction.
 
 == Podman
 
-In constrained environments, it is possible to use easykube together with rootless Podman. If you are new to Podman, there are a few subtle differences you should be aware of.
+In constrained environments, it is possible to use easykube together with rootless Podman. If you are migrating from docker to Podman, there are a few subtle differences you should be aware of.
 
 Image names are not automatically resolved.
 
-This means you must specify the fully qualified registry name for an image.
-For instance, the image busybox:latest will not automatically resolve when using the Podman Go API. With Docker, it is assumed that the image lives on Docker Hub. With Podman, the image must be specified explicitly as:
+This means you must specify the fully qualified registry name of an image.
+For instance, the image busybox:latest will not automatically resolve when using the Podman. Using Docker, it is assumed that the image will naturally live on DockerHub. Using Podman, the image must be specified explicitly as:
 
 dockerhub.io/library/busybox:latest
 
 [NOTE]
-Easykube expects to communicate with Podman via a socket.
-On Linux systems, this socket is typically found at:
-/run/user/<uid>/podman/podman.socket
+Easykube expects to communicate with Podman via a socket. On Linux systems, this socket is typically found at:
+
+`/run/user/<uid>/podman/podman.socket`
+
 If the socket is not present, and you are using a systemd-based OS, try starting it with:
 systemctl --user start podman.socket
 
-You can override the podman socket location by setting the CONTAINER_HOST environment variable.
+You can override the podman socket location by setting the CONTAINER_HOST environment variable. (useful when running a corpo-machine with `toolbox`)

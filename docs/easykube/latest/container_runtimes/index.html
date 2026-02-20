@@ -120,7 +120,7 @@
 <h2 id="_docker"><a class="anchor" href="#_docker"></a>Docker</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Docker is widely used and available on many platforms, often bundled with a desktop manager. In most cases Docker runs with permissive privileges (on default installations it runs as the superuser, root), which has both pros and cons.</p>
+<p>Docker is widely used and available on many platforms, often bundled with a desktop manager. In most cases Docker runs with permissive privileges (on default installations it runs as the superuser - root), which has both pros and cons.</p>
 </div>
 <div class="paragraph">
 <p>On a developer machine, elevated permissions are often acceptable. However, in some organizations Docker is banned due to security concerns.</p>
@@ -129,7 +129,7 @@
 <p>Easykube has not been tested with rootless Docker. For rootless operation, consider using Podman instead.</p>
 </div>
 <div class="paragraph">
-<p>Privileged Docker generally results in less friction.</p>
+<p>However; Privileged Docker generally results in less friction.</p>
 </div>
 </div>
 </div>
@@ -137,14 +137,14 @@
 <h2 id="_podman"><a class="anchor" href="#_podman"></a>Podman</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In constrained environments, it is possible to use easykube together with rootless Podman. If you are new to Podman, there are a few subtle differences you should be aware of.</p>
+<p>In constrained environments, it is possible to use easykube together with rootless Podman. If you are migrating from docker to Podman, there are a few subtle differences you should be aware of.</p>
 </div>
 <div class="paragraph">
 <p>Image names are not automatically resolved.</p>
 </div>
 <div class="paragraph">
-<p>This means you must specify the fully qualified registry name for an image.
-For instance, the image busybox:latest will not automatically resolve when using the Podman Go API. With Docker, it is assumed that the image lives on Docker Hub. With Podman, the image must be specified explicitly as:</p>
+<p>This means you must specify the fully qualified registry name of an image.
+For instance, the image busybox:latest will not automatically resolve when using the Podman. Using Docker, it is assumed that the image will naturally live on DockerHub. Using Podman, the image must be specified explicitly as:</p>
 </div>
 <div class="paragraph">
 <p>dockerhub.io/library/busybox:latest</p>
@@ -156,17 +156,20 @@ For instance, the image busybox:latest will not automatically resolve when using
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Easykube expects to communicate with Podman via a socket.
-On Linux systems, this socket is typically found at:
-/run/user/&lt;uid&gt;/podman/podman.socket
-If the socket is not present, and you are using a systemd-based OS, try starting it with:
-systemctl --user start podman.socket
+Easykube expects to communicate with Podman via a socket. On Linux systems, this socket is typically found at:
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>You can override the podman socket location by setting the CONTAINER_HOST environment variable.</p>
+<p><code>/run/user/&lt;uid&gt;/podman/podman.socket</code></p>
+</div>
+<div class="paragraph">
+<p>If the socket is not present, and you are using a systemd-based OS, try starting it with:
+systemctl --user start podman.socket</p>
+</div>
+<div class="paragraph">
+<p>You can override the podman socket location by setting the CONTAINER_HOST environment variable. (useful when running a corpo-machine with <code>toolbox</code>)</p>
 </div>
 </div>
 </div>
