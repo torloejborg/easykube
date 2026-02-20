@@ -1,6 +1,6 @@
 = Easykube documentation site
 
-This site contains more detailed information about easykube.
+Not enough space in the README.md were available, This site contain elaborated documentation on easykube.
 
 If you want to know why easykube exists and what it’s all about, read the xref:rationale.adoc#rationale-rationale[rationale] page.
 
@@ -8,10 +8,10 @@ Next, visit the xref:install.adoc[installation] page.
 
 Also, you should familiarize yourself with the concepts of xref:addons.adoc[addons].
 
-== History
+== Background
 
 Easykube started out as a collection of Gradle build scripts. The primary use case was to enable mobile developers to install real backends locally, allowing them to work offline and not require a personal instance of some test system on a random cluster, incurring a real monetary cost.
 
-The fontenders fancy MacBooks were powerful enough to drive a small Kubernetes instance, even with multiple backends. So why have their machines do idle time?
+Our mobile developers fancy MacBooks were powerful enough to drive a small Kubernetes instance, even with multiple backends. So why have their machines sit idle?
 
 Later, easykube was reimplemented in Go. And here we are :)

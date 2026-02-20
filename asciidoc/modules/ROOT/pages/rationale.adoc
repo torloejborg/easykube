@@ -8,7 +8,7 @@
 
 == What is it? [[rationale-easykube]]
 
-* Easykube is builds on the Kind project (Kubernetes in Docker) and the Goja JavaScript runtime Go library.
+* Easykube is built using the https://kind.sigs.k8s.io/[Kind] project (Kubernetes in Docker) and the https://github.com/dop251/goja[Goja] JavaScript runtime Go library.
 
 * It bootstraps a single-node Kind cluster with opinionated modifications.
 
