@@ -398,7 +398,7 @@ func (cri *ContainerRuntimeImpl) IsContainerRuntimeAvailable() bool {
 
 func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
-	registry := constants.REGISTRY_IMAGE
+	registryImage := constants.REGISTRY_IMAGE
 	containerName := constants.REGISTRY_CONTAINER
 
 	// make sure that the registry-config file exists
@@ -415,9 +415,9 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		return err
 	}
 
-	imageSearch, err := cri.HasImage(registry)
+	imageSearch, err := cri.HasImage(registryImage)
 	if !imageSearch {
-		if err := cri.PullImage(registry, nil); err != nil {
+		if err := cri.PullImage(registryImage, nil); err != nil {
 			return err
 		}
 	}
@@ -431,7 +431,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 		containerConfig := &container.Config{
 			ExposedPorts: nat.PortSet{nat.Port("5000"): struct{}{}},
-			Image:        registry,
+			Image:        registryImage,
 		}
 
 		binds := make([]string, 3)
