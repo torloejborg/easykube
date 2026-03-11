@@ -46,6 +46,12 @@ func createActualCmd(opts CreateOpts) error {
 		}
 	}
 
+	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
+		return nil, ez.Kube.CreateContainerRegistry()
+	}, "Ensure container registry"); err != nil {
+		return err
+	}
+
 	if img, err := ezk.HasImage(constants.KIND_IMAGE); err != nil {
 		return err
 	} else if !img {
@@ -55,6 +61,16 @@ func createActualCmd(opts CreateOpts) error {
 			return err
 		}
 	}
+
+	//if img, err := ezk.HasImageInKindRegistry(constants.KIND_IMAGE); err != nil {
+	//	return err
+	//} else if !img {
+	//	if _, err := ezk.FmtSpinner(func() (any, error) {
+	//		return nil, ezk.PushImage(constants.KIND_IMAGE, constants.LOCAL_REGISTRY+"/"+constants.KIND_IMAGE)
+	//	}, "Pushing kind image %s", constants.KIND_IMAGE); err != nil {
+	//		return err
+	//	}
+	//}
 
 	pdErr := ez.Kube.EnsurePersistenceDirectory()
 	if pdErr != nil {
@@ -88,12 +104,6 @@ func createActualCmd(opts CreateOpts) error {
 	cerr := ezk.ReloadClientSet()
 	if cerr != nil {
 		return cerr
-	}
-
-	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
-		return nil, ez.Kube.CreateContainerRegistry()
-	}, "Ensure container registry"); err != nil {
-		return err
 	}
 
 	if connected, _ := ezk.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); !connected {

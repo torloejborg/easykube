@@ -1,0 +1,71 @@
+{
+  "distSpecVersion": "1.1.0",
+  "storage": {
+    "rootDirectory": "/var/lib/zot"
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "port": "5000"
+  },
+  "log": {
+    "level": "info"
+  },
+  "extensions": {
+    "ui": {
+      "enable": true
+    },
+    "search": {
+      "enable": true
+    },
+    "sync": {
+      "enable": true,
+      "registries": [
+        {
+          "urls": [
+            "https://registry-1.docker.io"
+          ],
+          "onDemand": true,
+          "content": [
+            {
+              "prefix": "**"
+            }
+          ]
+        },
+        {
+          "urls": [
+            "https://ghcr.io"
+          ],
+          "onDemand": true,
+          "content": [
+            {
+              "prefix": "**"
+            }
+          ]
+        },
+        {
+          "urls": [
+            "https://quay.io"
+          ],
+          "onDemand": true,
+          "content": [
+            {
+              "prefix": "**"
+            }
+          ]
+        },
+        {
+          "urls": [
+            "https://registry.k8s.io"
+          ],
+          "onDemand": true,
+          "content": [
+            {
+              "prefix": "**"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+

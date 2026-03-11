@@ -27,3 +27,5 @@ nodes:
     {{- end}}
     - hostPath: {{.Config.ConfigurationDir}}/localtest.me.ca.crt
       containerPath: "/etc/ssl/certs/localtest.me.ca.crt"
+#    - hostPath: {{.Config.ConfigurationDir}}/certs.d
+#      containerPath: "/etc/containerd/certs.d"

@@ -95,23 +95,13 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 		if search.IsRunning {
 			_, _ = Kube.FmtSpinner(func() (any, error) {
 
-				localhostReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/localhost:5001"}
+				localhostReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/_default"}
 				if err := Kube.Exec(search.ContainerID, localhostReg); err != nil {
 					return nil, err
 				}
 
-				registryReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/registry.localtest.me:5001"}
-				if err := Kube.Exec(search.ContainerID, registryReg); err != nil {
-					return nil, err
-				}
-
-				localhost, _ := resources.AppResources.ReadFile("data/reg-localhost.toml")
-				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/localhost:5001", "hosts.toml", localhost); err != nil {
-					return nil, err
-				}
-
-				registry, _ := resources.AppResources.ReadFile("data/reg-registry.toml")
-				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/registry.localtest.me:5001", "hosts.toml", registry); err != nil {
+				hosts, _ := resources.AppResources.ReadFile("data/cert.d/hosts.toml")
+				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/_default", "hosts.toml", hosts); err != nil {
 					return nil, err
 				}
 

@@ -43,6 +43,9 @@ func CopyResource(src, dest string) error {
 	Kube.Fs.MkdirAll(configDir, 0755)
 
 	destinationPath := filepath.Join(configDir, dest)
+	base := filepath.Dir(destinationPath)
+	Kube.Fs.MkdirAll(base, 0755)
+
 	stat, _ := Kube.Fs.Stat(destinationPath)
 
 	if stat == nil {

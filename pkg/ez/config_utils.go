@@ -200,7 +200,7 @@ func (ec *EasykubeConfig) MakeConfig() error {
 			return err
 		}
 
-		err = CopyResource("registry-config.yaml", "registry-config.yaml")
+		err = CopyResource("zot-config.json", "zot-config.json")
 		if nil != err {
 			return err
 		}

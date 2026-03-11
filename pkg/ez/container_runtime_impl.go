@@ -403,7 +403,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 	// make sure that the registry-config file exists
 	configDir, _ := os.UserConfigDir()
-	if err := CopyResource("registry-config.yaml", "registry-config.yaml"); err != nil {
+	if err := CopyResource("zot-config.json", "zot-config.json"); err != nil {
 		return err
 	}
 
@@ -435,7 +435,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		}
 
 		binds := make([]string, 3)
-		binds[0] = filepath.Join(configDir, "easykube", "registry-config.yaml") + ":/etc/docker/registry/config.yml:z"
+		binds[0] = filepath.Join(configDir, "easykube", "zot-config.json") + ":/etc/zot/config.json:z"
 		binds[1] = filepath.Join(configDir, "easykube", "localtest.me.crt") + ":/etc/ssl/localtest.me.crt:z"
 		binds[2] = filepath.Join(configDir, "easykube", "localtest.me.key") + ":/etc/ssl/localtest.me.key:z"
 
@@ -452,7 +452,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		hostConfig := &container.HostConfig{
 			LogConfig:    container.LogConfig{},
 			NetworkMode:  "kind",
-			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5001"}}},
+			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5000"}}},
 			RestartPolicy: container.RestartPolicy{
 				Name:              "always",
 				MaximumRetryCount: 0,
