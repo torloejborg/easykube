@@ -1,7 +1,10 @@
 {
   "distSpecVersion": "1.1.1",
   "storage": {
-    "rootDirectory": "/var/lib/zot"
+    "rootDirectory": "/var/lib/zot",
+    "commit": false,
+    "dedupe": true,
+    "gc": false
   },
   "http": {
     "address": "0.0.0.0",
@@ -22,7 +25,7 @@
       "enable": true
     },
     "sync": {
-      "enable": true,
+      "enable": false,
       "registries": [
         {
           "urls": [
@@ -60,6 +63,17 @@
         {
           "urls": [
             "https://registry.k8s.io"
+          ],
+          "onDemand": true,
+          "content": [
+            {
+              "prefix": "**"
+            }
+          ]
+        },
+        {
+          "urls": [
+            "https://docker.elastic.co"
           ],
           "onDemand": true,
           "content": [
