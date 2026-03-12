@@ -36,15 +36,15 @@ func createActualCmd(opts CreateOpts) error {
 		return err
 	}
 
-	if img, err := ezk.HasImage(constants.REGISTRY_IMAGE); err != nil {
-		return err
-	} else if !img {
-		if _, err := ezk.FmtSpinner(func() (any, error) {
-			return nil, ezk.PullImage(constants.REGISTRY_IMAGE, nil)
-		}, "Pulling registry image %s", constants.REGISTRY_IMAGE); err != nil {
-			return err
-		}
-	}
+	//if img, err := ezk.HasImage(constants.REGISTRY_IMAGE); err != nil {
+	//	return err
+	//} else if !img {
+	//	if _, err := ezk.FmtSpinner(func() (any, error) {
+	//		return nil, ezk.PullImage(constants.REGISTRY_IMAGE, nil)
+	//	}, "Pulling registry image %s", constants.REGISTRY_IMAGE); err != nil {
+	//		return err
+	//	}
+	//}
 
 	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
 		return nil, ez.Kube.CreateContainerRegistry()
@@ -52,15 +52,15 @@ func createActualCmd(opts CreateOpts) error {
 		return err
 	}
 
-	if img, err := ezk.HasImage(constants.KIND_IMAGE); err != nil {
-		return err
-	} else if !img {
-		if _, err := ezk.FmtSpinner(func() (any, error) {
-			return nil, ezk.PullImage(constants.KIND_IMAGE, nil)
-		}, "Pulling kind image %s", constants.KIND_IMAGE); err != nil {
-			return err
-		}
-	}
+	//if img, err := ezk.HasImage(constants.KIND_IMAGE); err != nil {
+	//	return err
+	//} else if !img {
+	//	if _, err := ezk.FmtSpinner(func() (any, error) {
+	//		return nil, ezk.PullImage(constants.KIND_IMAGE, nil)
+	//	}, "Pulling kind image %s", constants.KIND_IMAGE); err != nil {
+	//		return err
+	//	}
+	//}
 
 	//if img, err := ezk.HasImageInKindRegistry(constants.KIND_IMAGE); err != nil {
 	//	return err
@@ -99,8 +99,8 @@ func createActualCmd(opts CreateOpts) error {
 		return r, nil
 	}, "Creating kind-easykube control plane")
 
-	// The cluster is created, and so a new context will exist, tell the k8sUtils to
-	// create a new ClientSet, so we can continue bootstrapping
+	//The cluster is created, and so a new context will exist, tell the k8sUtils to
+	//create a new ClientSet, so we can continue bootstrapping
 	cerr := ezk.ReloadClientSet()
 	if cerr != nil {
 		return cerr

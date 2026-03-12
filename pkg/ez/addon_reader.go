@@ -148,7 +148,8 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 			if parseErr != nil {
 				return errors.Join(errors.New("problem in addon: "+foundAddon.Name), parseErr)
 			}
-
+			foundAddon.Dependencies = cfg.DependsOn
+			
 			foundAddon.Config = *cfg
 			addons[foundAddon.ShortName] = foundAddon
 		}
@@ -164,10 +165,10 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 }
 
 func (adr *AddonReader) resolveExecutionOrder(
-	g *Graph,
+	g *Graph[IAddon],
 	toInstall IAddon,
 	allAddons map[string]IAddon,
-	out *[]IAddon, outgraph *Graph) {
+	out *[]IAddon, outgraph *Graph[IAddon]) {
 
 	d := toInstall.GetConfig().DependsOn
 	for x := range d {

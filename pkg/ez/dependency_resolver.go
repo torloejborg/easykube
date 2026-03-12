@@ -6,85 +6,95 @@ import (
 	"strings"
 )
 
-type Graph struct {
-	Nodes    []IAddon
-	adj      map[IAddon][]IAddon
-	inDegree map[IAddon]int
+type EzNode interface {
+	GetName() string
+	GetDependencies() []string
 }
 
-func NewGraph() *Graph {
-	return &Graph{
-		Nodes:    make([]IAddon, 0),
-		adj:      make(map[IAddon][]IAddon),
-		inDegree: make(map[IAddon]int),
+type Graph[T EzNode] struct {
+	Nodes    []T
+	adj      map[string][]T // Key: node ID (string), Value: list of dependent nodes
+	inDegree map[string]int // Key: node ID (string), Value: in-degree count
+	idToNode map[string]T   // Key: node ID (string), Value: node
+}
+
+func NewGraph[T EzNode]() *Graph[T] {
+	return &Graph[T]{
+		Nodes:    make([]T, 0),
+		adj:      make(map[string][]T),
+		inDegree: make(map[string]int),
+		idToNode: make(map[string]T),
 	}
 }
 
-func (g *Graph) AppendNode(v IAddon) {
-	if _, exists := g.inDegree[v]; !exists {
+func (g *Graph[T]) AppendNode(v T) {
+	if _, exists := g.idToNode[v.GetName()]; !exists {
 		g.Nodes = append(g.Nodes, v)
-		g.inDegree[v] = 0
-		g.adj[v] = make([]IAddon, 0)
+		g.inDegree[v.GetName()] = 0
+		g.adj[v.GetName()] = make([]T, 0)
+		g.idToNode[v.GetName()] = v
 	}
 }
 
-func (g *Graph) AddEdge(u, v IAddon) error {
-	g.adj[u] = append(g.adj[u], v)
-	g.inDegree[v]++
+func (g *Graph[T]) AddEdge(u, v T) error {
+	uID := u.GetName()
+	vID := v.GetName()
+	g.adj[uID] = append(g.adj[uID], v)
+	g.inDegree[vID]++
 	if err := g.hasCycle(); err != nil {
-		g.adj[u] = g.adj[u][:len(g.adj[u])-1]
-		g.inDegree[v]--
+		g.adj[uID] = g.adj[uID][:len(g.adj[uID])-1]
+		g.inDegree[vID]--
 		return err
 	}
 	return nil
 }
 
-func (g *Graph) hasCycle() error {
-	visited := map[IAddon]bool{}
-	recStack := map[IAddon]bool{}
-	var cycle []IAddon
-	var dfs func(node IAddon) bool
-	dfs = func(node IAddon) bool {
-		if recStack[node] {
+func (g *Graph[T]) hasCycle() error {
+	visited := map[string]bool{}
+	recStack := map[string]bool{}
+	var cycle []T
+	var dfs func(node T) bool
+	dfs = func(node T) bool {
+		if recStack[node.GetName()] {
 			cycle = append(cycle, node)
 			return true
 		}
-		if visited[node] {
+		if visited[node.GetName()] {
 			return false
 		}
-		visited[node] = true
-		recStack[node] = true
-		for _, neighbor := range g.adj[node] {
+		visited[node.GetName()] = true
+		recStack[node.GetName()] = true
+		for _, neighbor := range g.adj[node.GetName()] {
 			if dfs(neighbor) {
 				cycle = append(cycle, node)
 				return true
 			}
 		}
-		recStack[node] = false
+		recStack[node.GetName()] = false
 		return false
 	}
 	for _, node := range g.Nodes {
-		if !visited[node] && dfs(node) {
+		if !visited[node.GetName()] && dfs(node) {
 			slices.Reverse(cycle)
-			return fmt.Errorf("cycle detected: %s", formatCycle(cycle))
+			return fmt.Errorf("cycle detected: %s", g.formatCycle(cycle))
 		}
 	}
 	return nil
 }
 
-func formatCycle(cycle []IAddon) string {
+func (g *Graph[T]) formatCycle(cycle []T) string {
 	names := make([]string, len(cycle))
 	for i, addon := range cycle {
-		names[i] = addon.GetShortName()
+		names[i] = addon.GetName()
 	}
 	return strings.Join(names, " -> ")
 }
 
-func (g *Graph) TopologicalSort() ([]IAddon, error) {
-	result := make([]IAddon, 0)
-	queue := make([]IAddon, 0)
+func (g *Graph[T]) TopologicalSort() ([]T, error) {
+	result := make([]T, 0)
+	queue := make([]T, 0)
 	for _, node := range g.Nodes {
-		if g.inDegree[node] == 0 {
+		if g.inDegree[node.GetName()] == 0 {
 			queue = append(queue, node)
 		}
 	}
@@ -94,9 +104,9 @@ func (g *Graph) TopologicalSort() ([]IAddon, error) {
 		queue = queue[1:]
 		result = append(result, current)
 		visited++
-		for _, neighbor := range g.adj[current] {
-			g.inDegree[neighbor]--
-			if g.inDegree[neighbor] == 0 {
+		for _, neighbor := range g.adj[current.GetName()] {
+			g.inDegree[neighbor.GetName()]--
+			if g.inDegree[neighbor.GetName()] == 0 {
 				queue = append(queue, neighbor)
 			}
 		}
@@ -107,25 +117,26 @@ func (g *Graph) TopologicalSort() ([]IAddon, error) {
 	return result, nil
 }
 
-func BuildDependencyGraph(roots []IAddon, allAddons map[string]IAddon) (*Graph, error) {
-	g := NewGraph()
+func BuildDependencyGraph[T EzNode](roots []T, allNodes map[string]T) (*Graph[T], error) {
+	g := NewGraph[T]() // Explicitly specify T
 	visited := map[string]bool{}
-	var build func(IAddon) error
-	build = func(addon IAddon) error {
-		if visited[addon.GetShortName()] {
+	var build func(node T) error
+	build = func(node T) error {
+		id := node.GetName()
+		if visited[id] {
 			return nil
 		}
-		visited[addon.GetShortName()] = true
-		g.AppendNode(addon)
-		for _, depName := range addon.GetConfig().DependsOn {
-			dep, ok := allAddons[depName]
+		visited[id] = true
+		g.AppendNode(node)
+		for _, depID := range node.GetDependencies() {
+			dep, ok := allNodes[depID]
 			if !ok {
-				return fmt.Errorf("dependency %s not found", depName)
+				return fmt.Errorf("dependency %s not found", depID)
 			}
 			if err := build(dep); err != nil {
 				return err
 			}
-			if err := g.AddEdge(dep, addon); err != nil {
+			if err := g.AddEdge(dep, node); err != nil {
 				return err
 			}
 		}
@@ -139,8 +150,8 @@ func BuildDependencyGraph(roots []IAddon, allAddons map[string]IAddon) (*Graph, 
 	return g, nil
 }
 
-func ResolveDependencies(roots []IAddon, allAddons map[string]IAddon) ([]IAddon, error) {
-	g, err := BuildDependencyGraph(roots, allAddons)
+func ResolveDependencies[T EzNode](roots []T, allNodes map[string]T) ([]T, error) {
+	g, err := BuildDependencyGraph(roots, allNodes)
 	if err != nil {
 		return nil, err
 	}

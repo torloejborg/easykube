@@ -430,7 +430,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 	if !containerSearch.Found {
 
 		containerConfig := &container.Config{
-			ExposedPorts: nat.PortSet{nat.Port("5000"): struct{}{}},
+			ExposedPorts: nat.PortSet{nat.Port("5001"): struct{}{}},
 			Image:        registry,
 		}
 
@@ -452,7 +452,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		hostConfig := &container.HostConfig{
 			LogConfig:    container.LogConfig{},
 			NetworkMode:  "kind",
-			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5000"}}},
+			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5001"}}},
 			RestartPolicy: container.RestartPolicy{
 				Name:              "always",
 				MaximumRetryCount: 0,

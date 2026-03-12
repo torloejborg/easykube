@@ -1,1 +1,4 @@
-server = "http://registry.localtest.me:5000"
+server = "https://registry.localtest.me:5000"
+
+[host."https://registry.localtest.me:5000"]
+    capabilities = ["pull", "resolve"]

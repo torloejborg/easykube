@@ -1,14 +1,18 @@
 {
-  "distSpecVersion": "1.1.0",
+  "distSpecVersion": "1.1.1",
   "storage": {
     "rootDirectory": "/var/lib/zot"
   },
   "http": {
     "address": "0.0.0.0",
-    "port": "5000"
+    "port": "5000",
+    "tls": {
+      "cert":"/etc/ssl/localtest.me.crt",
+      "key":"/etc/ssl/localtest.me.key"
+    }
   },
   "log": {
-    "level": "info"
+    "level": "error"
   },
   "extensions": {
     "ui": {
