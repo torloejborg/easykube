@@ -20,11 +20,11 @@
     "search": { "enable": true },
     "sync": {
       "enable": true,
+      "credentialsFile": "/var/lib/zot/credentails.json",
       "registries": [
         {
           "urls": [
-            "https://registry-1.docker.io",
-            "https://docker.io"
+            "https://registry-1.docker.io"
           ],
           "onDemand": true,
           "syncTimeout": "10s",
@@ -39,28 +39,18 @@
           "content": [{"prefix": "**"}]
         },
         {
-          "urls": [
-            "https://quay.io"
-          ],
+          "urls": ["https://quay.io"],
           "onDemand": true,
-          "syncTimeout": "10s",
-          "content": [{"prefix": "**"}]
+          "content": [
+            { "prefix": "quay.io/**", "stripPrefix": true }
+          ]
         },
         {
-          "urls": [
-            "https://registry.k8s.io"
-          ],
+          "urls": ["https://registry.k8s.io"],
           "onDemand": true,
-          "syncTimeout": "10s",
-          "content": [{"prefix": "**"}]
-        },
-        {
-          "urls": [
-            "https://docker.elastic.co"
-          ],
-          "onDemand": true,
-          "syncTimeout": "10s",
-          "content": [{"prefix": "**"}]
+          "content": [
+            { "prefix": "registry.k8s.io/**", "stripPrefix": true }
+          ]
         }
       ]
     }
