@@ -1,7 +1,11 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/fatih/color"
 	"github.com/google/uuid"
+	"github.com/slok/gospinner"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
@@ -57,4 +61,32 @@ func NewTaskWithSkip(graph *ez.Graph[Task], description string, execute func() e
 		Execute:       execute,
 		SkipCondition: skip,
 	}
+}
+
+func ExecuteTasks(tasks []Task) {
+
+	for i := range tasks {
+
+		s, _ := gospinner.NewSpinner(gospinner.Dots)
+		_ = s.Start(fmt.Sprintf("%s", tasks[i].Description))
+
+		// Execute task
+		if !tasks[i].SkipCondition() {
+			if err := tasks[i].Execute(); err != nil {
+				_ = s.Stop()
+				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), tasks[i].Description, err.Error())
+				_ = s.Fail()
+				break
+			} else {
+				_ = s.Succeed()
+			}
+		} else {
+			color.Set(color.FgHiBlack, color.CrossedOut)
+			_ = s.FinishWithMessage("✔", tasks[i].Description)
+			color.Unset()
+		}
+		_ = s.Stop()
+
+	}
+
 }

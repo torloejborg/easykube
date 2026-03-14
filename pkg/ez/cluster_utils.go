@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
@@ -56,6 +57,9 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 		addonList = append(addonList, addon)
 	}
 
+	homedir, _ := Kube.GetUserHomeDir()
+	kubeconfigPath := filepath.Join(homedir, ".kube", "easykube")
+
 	if !search.Found {
 		var cp *cluster.Provider
 
@@ -70,7 +74,6 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 		if cp == nil {
 			panic("no cluster provider")
 		}
-		homedir, _ := Kube.GetUserHomeDir()
 
 		configDir, _ := os.UserConfigDir()
 		configFile := u.RenderToYAML(addonList, u.EkConfig)
@@ -78,7 +81,7 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)
-		kubeconfigPath := filepath.Join(homedir, ".kube", "easykube")
+
 		optKubeConfig := cluster.CreateWithKubeconfigPath(kubeconfigPath)
 		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
@@ -111,6 +114,12 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 		if err != nil {
 			return "", err
 		}
+
+	}
+
+	err := Kube.WaitForKindClusterReady(kubeconfigPath, 5*time.Minute)
+	if err != nil {
+		return "", err
 	}
 
 	return u.ConfigurationReport(addonList), nil

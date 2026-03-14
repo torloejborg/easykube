@@ -7,6 +7,39 @@ import (
 
 func destroyActual() error {
 	ezk := ez.Kube
+	tasks := &ez.Graph[Task]{}
+
+	tasks.AppendNode(NewTaskWithSkip(tasks, "stop registry container", func() error {
+		return nil
+	}, func() bool {
+		return false
+	}))
+
+	tasks.AppendNode(NewTaskWithSkip(tasks, "delete registry container", func() error {
+		return nil
+	}, func() bool {
+		return false
+	}))
+
+	tasks.AppendNode(NewTaskWithSkip(tasks, "stop easykube cluster", func() error {
+		return nil
+	}, func() bool {
+		return false
+	}))
+
+	tasks.AppendNode(NewTaskWithSkip(tasks, "delete easykube cluster", func() error {
+		return nil
+	}, func() bool {
+		return false
+	}))
+
+	tasks.AppendNode(NewTaskWithSkip(tasks, "purge data", func() error {
+		return nil
+	}, func() bool {
+		return false
+	}))
+
+	ExecuteTasks(tasks.Nodes)
 
 	err := stopAndDeleteContainer(constants.REGISTRY_CONTAINER)
 	if nil != err {
@@ -19,7 +52,6 @@ func destroyActual() error {
 	}
 
 	if ezk.GetBoolFlag("purge") {
-
 		cfg, err := ezk.LoadConfig()
 		if err != nil {
 			return err

@@ -156,6 +156,8 @@ type IK8SUtils interface {
 	// secret is the source which contains keys and references, mockData specifies the replacements for the keys,
 	// addonName is the source of the mockData, namespace specifies where to create the secret
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) KubernetesSecret
+
+	WaitForKindClusterReady(kubeconfig string, timeout time.Duration) error
 }
 
 func NewK8SUtils() IK8SUtils {
@@ -660,4 +662,59 @@ func (k *K8SUtilsImpl) TransformExternalSecret(secret ExternalSecret, mockData m
 
 	return k8sSecret
 
+}
+
+// WaitForKindClusterReady waits for the Kind cluster to be ready by checking the node status.
+func (k *K8SUtilsImpl) WaitForKindClusterReady(kubeconfig string, timeout time.Duration) error {
+	// Load kubeconfig
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		return fmt.Errorf("failed to load kubeconfig: %v", err)
+	}
+
+	// Create Kubernetes clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return fmt.Errorf("failed to create Kubernetes client: %v", err)
+	}
+
+	// Poll for node readiness
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	for {
+		select {
+		case <-timeoutCtx.Done():
+			return fmt.Errorf("timeout waiting for Kind cluster to be ready")
+		case <-ticker.C:
+			// Get nodes
+			nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+			if err != nil {
+				continue // API server not ready yet
+			}
+
+			// Check if all nodes are ready
+			allReady := true
+			for _, node := range nodes.Items {
+				ready := false
+				for _, condition := range node.Status.Conditions {
+					if condition.Type == "Ready" && condition.Status == "True" {
+						ready = true
+						break
+					}
+				}
+				if !ready {
+					allReady = false
+					break
+				}
+			}
+
+			if allReady {
+				return nil // Cluster is ready
+			}
+		}
+	}
 }

@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatih/color"
-	"github.com/slok/gospinner"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
@@ -21,6 +19,7 @@ func createActualCmd(opts CreateOpts) error {
 
 	ezk := ez.Kube
 	gr := ez.NewGraph[Task]()
+
 	var clusterCreateReport = ""
 
 	pullImageFunc := func(image string) error {
@@ -82,13 +81,13 @@ func createActualCmd(opts CreateOpts) error {
 
 		if len(failed) != 0 {
 
-			errl := make([]string, 0)
+			errorList := make([]string, 0)
 
 			for k, v := range failed {
-				errl = append(errl, fmt.Sprintf("%s->%d", k.GetName(), v))
+				errorList = append(errorList, fmt.Sprintf("%s->%d", k.GetName(), v))
 			}
 
-			return errors.New("some ports are not available: " + strings.Join(errl, ","))
+			return errors.New("some ports are not available: " + strings.Join(errorList, ","))
 		}
 		return nil
 	}, func() bool { return ezk.IsClusterRunning() })
@@ -207,32 +206,10 @@ func createActualCmd(opts CreateOpts) error {
 
 	res := gr.Nodes
 
-	for i := range res {
-
-		s, _ := gospinner.NewSpinner(gospinner.Dots)
-		_ = s.Start(fmt.Sprintf("%s", res[i].Description))
-
-		// Execute task
-		if !res[i].SkipCondition() {
-			if err := res[i].Execute(); err != nil {
-				_ = s.Stop()
-				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), res[i].Description, err.Error())
-				_ = s.Fail()
-				break
-			} else {
-				_ = s.Succeed()
-			}
-		} else {
-			color.Set(color.FgHiBlack, color.CrossedOut)
-			_ = s.FinishWithMessage("✔", res[i].Description)
-			color.Unset()
-		}
-		_ = s.Stop()
-
-	}
+	ExecuteTasks(res)
 
 	if clusterCreateReport != "" {
-
+		fmt.Println(clusterCreateReport)
 	}
 
 	return nil
