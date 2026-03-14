@@ -2,9 +2,9 @@
   "distSpecVersion": "1.1.1",
   "storage": {
     "rootDirectory": "/var/lib/zot",
-    "commit": false,
+    "commit": true,
     "dedupe": true,
-    "gc": false
+    "gc": true
   },
   "http": {
     "address": "0.0.0.0",
@@ -14,73 +14,53 @@
       "key":"/etc/ssl/localtest.me.key"
     }
   },
-  "log": {
-    "level": "error"
-  },
+  "log": {"level": "debug"},
   "extensions": {
-    "ui": {
-      "enable": true
-    },
-    "search": {
-      "enable": true
-    },
+    "ui": { "enable": true },
+    "search": { "enable": true },
     "sync": {
-      "enable": false,
+      "enable": true,
       "registries": [
         {
           "urls": [
-            "https://registry-1.docker.io"
+            "https://registry-1.docker.io",
+            "https://docker.io"
           ],
           "onDemand": true,
-          "content": [
-            {
-              "prefix": "**"
-            }
-          ]
+          "syncTimeout": "10s",
+          "content": [{"prefix": "**"}]
         },
         {
           "urls": [
             "https://ghcr.io"
           ],
           "onDemand": true,
-          "content": [
-            {
-              "prefix": "**"
-            }
-          ]
+          "syncTimeout": "10s",
+          "content": [{"prefix": "**"}]
         },
         {
           "urls": [
             "https://quay.io"
           ],
           "onDemand": true,
-          "content": [
-            {
-              "prefix": "**"
-            }
-          ]
+          "syncTimeout": "10s",
+          "content": [{"prefix": "**"}]
         },
         {
           "urls": [
             "https://registry.k8s.io"
           ],
           "onDemand": true,
-          "content": [
-            {
-              "prefix": "**"
-            }
-          ]
+          "syncTimeout": "10s",
+          "content": [{"prefix": "**"}]
         },
         {
           "urls": [
             "https://docker.elastic.co"
           ],
           "onDemand": true,
-          "content": [
-            {
-              "prefix": "**"
-            }
-          ]
+          "syncTimeout": "10s",
+          "content": [{"prefix": "**"}]
         }
       ]
     }

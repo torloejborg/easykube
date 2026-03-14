@@ -398,7 +398,7 @@ func (cri *ContainerRuntimeImpl) IsContainerRuntimeAvailable() bool {
 
 func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
-	registry := constants.REGISTRY_IMAGE
+	registryImg := constants.REGISTRY_IMAGE
 	containerName := constants.REGISTRY_CONTAINER
 
 	// make sure that the registry-config file exists
@@ -415,9 +415,9 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		return err
 	}
 
-	imageSearch, err := cri.HasImage(registry)
+	imageSearch, err := cri.HasImage(registryImg)
 	if !imageSearch {
-		if err := cri.PullImage(registry, nil); err != nil {
+		if err := cri.PullImage(registryImg, nil); err != nil {
 			return err
 		}
 	}
@@ -430,14 +430,15 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 	if !containerSearch.Found {
 
 		containerConfig := &container.Config{
-			ExposedPorts: nat.PortSet{nat.Port("5001"): struct{}{}},
-			Image:        registry,
+			ExposedPorts: nat.PortSet{nat.Port("5000"): struct{}{}},
+			Image:        registryImg,
 		}
 
-		binds := make([]string, 3)
-		binds[0] = filepath.Join(configDir, "easykube", "zot-config.json") + ":/etc/zot/config.json:z"
-		binds[1] = filepath.Join(configDir, "easykube", "localtest.me.crt") + ":/etc/ssl/localtest.me.crt:z"
-		binds[2] = filepath.Join(configDir, "easykube", "localtest.me.key") + ":/etc/ssl/localtest.me.key:z"
+		binds := make([]string, 0)
+		binds = append(binds, filepath.Join(configDir, "easykube", "zot-config.json")+":/etc/zot/config.json:z")
+		binds = append(binds, filepath.Join(configDir, "easykube", "localtest.me.crt")+":/etc/ssl/localtest.me.crt:z")
+		binds = append(binds, filepath.Join(configDir, "easykube", "localtest.me.key")+":/etc/ssl/localtest.me.key:z")
+		binds = append(binds, filepath.Join(configDir, "easykube", "persistence", "zot"+":/var/lib/zot:z"))
 
 		networkingConfig := &network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{
@@ -452,7 +453,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		hostConfig := &container.HostConfig{
 			LogConfig:    container.LogConfig{},
 			NetworkMode:  "kind",
-			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5001"}}},
+			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5000"}}},
 			RestartPolicy: container.RestartPolicy{
 				Name:              "always",
 				MaximumRetryCount: 0,

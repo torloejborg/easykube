@@ -36,20 +36,14 @@ func createActualCmd(opts CreateOpts) error {
 		return err
 	}
 
-	//if img, err := ezk.HasImage(constants.REGISTRY_IMAGE); err != nil {
-	//	return err
-	//} else if !img {
-	//	if _, err := ezk.FmtSpinner(func() (any, error) {
-	//		return nil, ezk.PullImage(constants.REGISTRY_IMAGE, nil)
-	//	}, "Pulling registry image %s", constants.REGISTRY_IMAGE); err != nil {
-	//		return err
-	//	}
-	//}
-
-	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
-		return nil, ez.Kube.CreateContainerRegistry()
-	}, "Ensure container registry"); err != nil {
+	if img, err := ezk.HasImage(constants.REGISTRY_IMAGE); err != nil {
 		return err
+	} else if !img {
+		if _, err := ezk.FmtSpinner(func() (any, error) {
+			return nil, ezk.PullImage(constants.REGISTRY_IMAGE, nil)
+		}, "Pulling registry image %s", constants.REGISTRY_IMAGE); err != nil {
+			return err
+		}
 	}
 
 	//if img, err := ezk.HasImage(constants.KIND_IMAGE); err != nil {
@@ -98,6 +92,12 @@ func createActualCmd(opts CreateOpts) error {
 		r := ezk.CreateKindCluster(addons)
 		return r, nil
 	}, "Creating kind-easykube control plane")
+
+	if _, err := ez.Kube.FmtSpinner(func() (any, error) {
+		return nil, ez.Kube.CreateContainerRegistry()
+	}, "Ensure container registry"); err != nil {
+		return err
+	}
 
 	//The cluster is created, and so a new context will exist, tell the k8sUtils to
 	//create a new ClientSet, so we can continue bootstrapping

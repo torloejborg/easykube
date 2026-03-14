@@ -14,6 +14,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/resources"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/torloejborg/easykube/pkg/constants"
 
-	"github.com/torloejborg/easykube/pkg/resources"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	applyv1 "k8s.io/client-go/applyconfigurations/core/v1"
@@ -215,25 +215,30 @@ func (k *K8SUtilsImpl) GetSecret(name, namespace string) (map[string][]byte, err
 
 func (k *K8SUtilsImpl) PatchCoreDNS() {
 
-	ctx := context.Background()
-
-	cs, _ := resources.AppResources.ReadFile("data/coredns/coredns-deployment.yaml")
 	corefile, _ := resources.AppResources.ReadFile("data/coredns/coredns.config")
 	localdb, _ := resources.AppResources.ReadFile("data/coredns/local.db")
 
-	k.UpdateConfigMap("coredns", "kube-system", "local.db", localdb)
-	k.UpdateConfigMap("coredns", "kube-system", "Corefile", corefile)
+	ctx := context.Background()
 
-	decode := scheme.Codecs.UniversalDeserializer().Decode
-	obj, gKV, _ := decode(cs, nil, nil)
-	if gKV.Kind == "Deployment" {
-		depl := obj.(*appsv1.Deployment)
-		_, e := k.Clientset.AppsV1().Deployments("kube-system").Update(ctx, depl, metav1.UpdateOptions{
-			TypeMeta: metav1.TypeMeta{},
-		})
-		if e != nil {
-			panic(e)
-		}
+	cm, err := k.Clientset.CoreV1().
+		ConfigMaps("kube-system").
+		Get(ctx, "coredns", metav1.GetOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	if cm.Data == nil {
+		cm.Data = map[string]string{}
+	}
+
+	cm.Data["Corefile"] = string(corefile)
+	cm.Data["local.db"] = string(localdb)
+
+	_, err = k.Clientset.CoreV1().
+		ConfigMaps("kube-system").
+		Update(ctx, cm, metav1.UpdateOptions{})
+	if err != nil {
+		panic(err)
 	}
 }
 

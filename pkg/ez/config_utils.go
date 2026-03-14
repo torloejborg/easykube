@@ -212,6 +212,7 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		}
 		certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LOCAL_REGISTRY)
 		Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
+		Kube.Fs.MkdirAll(filepath.Join(model.PersistenceDir, "zot"), os.ModePerm)
 		cert := filepath.Join(certDestDir, "ca.crt")
 		SaveFileByte(certData, cert)
 	}
