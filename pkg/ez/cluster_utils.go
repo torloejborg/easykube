@@ -2,7 +2,6 @@ package ez
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +13,7 @@ import (
 )
 
 type IClusterUtils interface {
-	CreateKindCluster(modules map[string]IAddon) string
+	CreateKindCluster(modules map[string]IAddon) (string, error)
 	RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string
 	ConfigurationReport(addonList []IAddon) string
 	EnsurePersistenceDirectory() error
@@ -47,10 +46,10 @@ func (u *ClusterUtils) ConfigurationReport(addonList []IAddon) string {
 	return sb.String()
 }
 
-func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
+func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, error) {
 
 	// see if the cluster has been created
-	search, _ := Kube.FindContainer("kind-control-plane")
+	search, _ := Kube.FindContainer(constants.KIND_CONTAINER)
 
 	addonList := make([]IAddon, 0)
 	for _, addon := range modules {
@@ -91,34 +90,30 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) string {
 		// initial cluster should be running now
 		search, _ = Kube.FindContainer(constants.KIND_CONTAINER)
 
-		fmt.Println()
 		if search.IsRunning {
-			_, _ = Kube.FmtSpinner(func() (any, error) {
 
-				localhostReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/_default"}
-				if err := Kube.Exec(search.ContainerID, localhostReg); err != nil {
-					return nil, err
-				}
+			localhostReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/_default"}
+			if err := Kube.Exec(search.ContainerID, localhostReg); err != nil {
+				return "", err
+			}
 
-				hosts, _ := resources.AppResources.ReadFile("data/cert.d/hosts.toml")
-				if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/_default", "hosts.toml", hosts); err != nil {
-					return nil, err
-				}
+			hosts, _ := resources.AppResources.ReadFile("data/cert.d/hosts.toml")
+			if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/_default", "hosts.toml", hosts); err != nil {
+				return "", err
+			}
 
-				return nil, nil
-			}, "Wiring local registry to control plane")
 		}
 	}
 
 	if search.Found && !search.IsRunning {
 
-		_, _ = Kube.FmtSpinner(func() (any, error) {
-			return nil, Kube.StartContainer(search.ContainerID)
-		}, "Starting existing cluster")
-
+		err := Kube.StartContainer(search.ContainerID)
+		if err != nil {
+			return "", err
+		}
 	}
 
-	return u.ConfigurationReport(addonList)
+	return u.ConfigurationReport(addonList), nil
 }
 
 func (u *ClusterUtils) RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string {

@@ -396,6 +396,23 @@ func (cri *ContainerRuntimeImpl) IsContainerRuntimeAvailable() bool {
 	return err == nil
 }
 
+func (cri *ContainerRuntimeImpl) StartContainerRegistry() error {
+
+	containerSearch, err := cri.FindContainer(constants.REGISTRY_CONTAINER)
+	if err != nil {
+		return err
+	}
+
+	if containerSearch.Found && !containerSearch.IsRunning {
+		err = cri.StartContainer(containerSearch.ContainerID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 	registryImg := constants.REGISTRY_IMAGE
@@ -413,13 +430,6 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 	if err := CopyResource("cert/server.key", "localtest.me.key"); err != nil {
 		return err
-	}
-
-	imageSearch, err := cri.HasImage(registryImg)
-	if !imageSearch {
-		if err := cri.PullImage(registryImg, nil); err != nil {
-			return err
-		}
 	}
 
 	containerSearch, err := cri.FindContainer(containerName)
@@ -461,19 +471,11 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 			Binds: binds,
 		}
 
-		resp, err := cri.Docker.ContainerCreate(cri.ctx, containerConfig, hostConfig, networkingConfig, nil, constants.REGISTRY_CONTAINER)
+		_, err := cri.Docker.ContainerCreate(cri.ctx, containerConfig, hostConfig, networkingConfig, nil, constants.REGISTRY_CONTAINER)
 		if err != nil {
 			panic(err)
 		}
 
-		err = cri.Docker.ContainerStart(cri.ctx, resp.ID, container.StartOptions{})
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	if containerSearch.Found && !containerSearch.IsRunning {
-		cri.StartContainer(containerSearch.ContainerID)
 	}
 
 	return nil

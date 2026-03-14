@@ -67,7 +67,7 @@ func startActual() error {
 
 	if !registry.OK && !cluster.OK {
 		ezk.FmtGreen("Hint:\n")
-		_ = createCmd.Help()
+		_ = bootCmd.Help()
 	}
 
 	return nil

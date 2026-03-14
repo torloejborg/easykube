@@ -49,6 +49,19 @@ func (g *Graph[T]) AddEdge(u, v T) error {
 	return nil
 }
 
+func (g *Graph[T]) DependsOn(u, v T) error {
+	uID := u.GetName()
+	vID := v.GetName()
+	g.adj[uID] = append(g.adj[uID], v)
+	g.inDegree[vID]++
+	if err := g.hasCycle(); err != nil {
+		g.adj[uID] = g.adj[uID][:len(g.adj[uID])-1]
+		g.inDegree[vID]--
+		return err
+	}
+	return nil
+}
+
 func (g *Graph[T]) hasCycle() error {
 	visited := map[string]bool{}
 	recStack := map[string]bool{}

@@ -6,10 +6,10 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-// createCmd represents the create command
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "creates the easykube cluster",
+// bootCmd represents the create command
+var bootCmd = &cobra.Command{
+	Use:   "boot",
+	Short: "boots the easykube cluster",
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
@@ -27,6 +27,6 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
-	createCmd.Flags().StringP(constants.ARG_SECRETS, "s", "", "Property file to load as 'easykube-secrets', useful for image pull secrets and other custom configuration")
-	rootCmd.AddCommand(createCmd)
+	bootCmd.Flags().StringP(constants.ARG_SECRETS, "s", "", "Property file to load as 'easykube-secrets', useful for image pull secrets and other custom configuration")
+	rootCmd.AddCommand(bootCmd)
 }

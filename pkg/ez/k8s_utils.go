@@ -515,7 +515,6 @@ func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 		FieldManager: "easykube",
 	})
 
-	// todo: better err handling
 	if e != nil {
 		return e
 	} else {

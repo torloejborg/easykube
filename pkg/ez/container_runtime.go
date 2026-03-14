@@ -40,6 +40,7 @@ type IContainerRuntime interface {
 	CloseContainerRuntime()
 	IsContainerRuntimeAvailable() bool
 	CreateContainerRegistry() error
+	StartContainerRegistry() error
 	Commit(containerID string)
 }
 
