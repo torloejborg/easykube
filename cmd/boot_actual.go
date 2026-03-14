@@ -11,11 +11,11 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-type CreateOpts struct {
+type BootOpts struct {
 	Secrets string
 }
 
-func createActualCmd(opts CreateOpts) error {
+func createActualCmd(opts BootOpts) error {
 
 	ezk := ez.Kube
 	gr := ez.NewGraph[Task]()

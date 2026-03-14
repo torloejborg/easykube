@@ -324,6 +324,7 @@ func (cri *ContainerRuntimeImpl) StopContainer(id string) error {
 }
 
 func (cri *ContainerRuntimeImpl) RemoveContainer(id string) error {
+
 	if err := cri.Docker.ContainerRemove(cri.ctx, id, container.RemoveOptions{}); err != nil {
 		return err
 	} else {

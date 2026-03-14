@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/google/uuid"
@@ -32,8 +33,7 @@ func (t Task) GetDependencies() []string {
 }
 
 func (x Task) DependsOn(t Task) error {
-	x.graph.AddEdge(t, x)
-	return nil
+	return x.graph.AddEdge(t, x)
 }
 
 func NewTask(graph *ez.Graph[Task], description string, execute func() error) Task {
@@ -65,28 +65,34 @@ func NewTaskWithSkip(graph *ez.Graph[Task], description string, execute func() e
 
 func ExecuteTasks(tasks []Task) {
 
+	checkErr := func(err error) {
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+
 	for i := range tasks {
 
-		s, _ := gospinner.NewSpinner(gospinner.Dots)
-		_ = s.Start(fmt.Sprintf("%s", tasks[i].Description))
+		s, err := gospinner.NewSpinner(gospinner.Dots)
+		checkErr(err)
+		checkErr(s.Start(fmt.Sprintf("%s", tasks[i].Description)))
 
 		// Execute task
 		if !tasks[i].SkipCondition() {
+			time.Sleep(10 * time.Millisecond)
 			if err := tasks[i].Execute(); err != nil {
-				_ = s.Stop()
+				checkErr(s.Fail())
 				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), tasks[i].Description, err.Error())
-				_ = s.Fail()
 				break
 			} else {
-				_ = s.Succeed()
+				checkErr(s.Succeed())
 			}
 		} else {
+
 			color.Set(color.FgHiBlack, color.CrossedOut)
 			_ = s.FinishWithMessage("✔", tasks[i].Description)
 			color.Unset()
 		}
-		_ = s.Stop()
-
 	}
 
 }

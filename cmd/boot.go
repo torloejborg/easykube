@@ -18,7 +18,7 @@ var bootCmd = &cobra.Command{
 			return err
 		}
 
-		opts := CreateOpts{
+		opts := BootOpts{
 			Secrets: ez.CommandHelper(cmd).GetStringFlag(constants.ARG_SECRETS),
 		}
 
