@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -210,8 +211,22 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		if nil != err {
 			return err
 		}
-		certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LOCAL_REGISTRY)
-		Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
+
+		var certDestDir = ""
+		// if we are on windows, we cannot make a directory containing ":"
+		if runtime.GOOS == "windows" {
+			certDestDir = filepath.Join(userHomeDir, ".config", "containers", "certs.d",
+				strings.ReplaceAll(constants.LOCAL_REGISTRY, ":", "_"))
+		} else {
+			certDestDir = filepath.Join(userHomeDir, ".config", "containers", "certs.d",
+				constants.LOCAL_REGISTRY)
+		}
+
+		err = Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
+		if nil != err {
+			return err
+		}
+
 		cert := filepath.Join(certDestDir, "ca.crt")
 		SaveFileByte(certData, cert)
 	}
