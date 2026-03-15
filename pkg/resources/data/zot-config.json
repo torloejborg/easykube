@@ -14,20 +14,19 @@
       "key":"/etc/ssl/localtest.me.key"
     }
   },
-  "log": {"level": "debug"},
+  "log": {"level": "info"},
   "extensions": {
     "ui": { "enable": true },
     "search": { "enable": true },
     "sync": {
       "enable": true,
-      "credentialsFile": "/var/lib/zot/credentails.json",
+      "credentialsFile": "/etc/zot/zot-credentails.json",
       "registries": [
         {
           "urls": [
             "https://registry-1.docker.io"
           ],
           "onDemand": true,
-          "syncTimeout": "10s",
           "content": [{"prefix": "**"}]
         },
         {
@@ -35,21 +34,20 @@
             "https://ghcr.io"
           ],
           "onDemand": true,
-          "syncTimeout": "10s",
           "content": [{"prefix": "**"}]
         },
         {
           "urls": ["https://quay.io"],
           "onDemand": true,
           "content": [
-            { "prefix": "quay.io/**", "stripPrefix": true }
+            { "prefix": "**" }
           ]
         },
         {
           "urls": ["https://registry.k8s.io"],
           "onDemand": true,
           "content": [
-            { "prefix": "registry.k8s.io/**", "stripPrefix": true }
+            { "prefix": "**" }
           ]
         }
       ]

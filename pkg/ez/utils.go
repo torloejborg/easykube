@@ -31,7 +31,7 @@ func FileOrDirExists(path string) bool {
 
 // Copies an embedded resource from src into the user configuration directory
 // dest is a relative path to ~/.config/easykube
-func CopyResource(src, dest string) error {
+func CopyResourceToConfigDir(src, dest string) error {
 
 	configDir, err := Kube.GetUserConfigDir()
 	if nil != err {

@@ -10,3 +10,6 @@ const KIND_NETWORK_NAME = "kind"
 const KUSTOMIZE_TARGET_OUTPUT = ".out.yaml"
 const LOCAL_REGISTRY = "registry.localtest.me:5000"
 const CONFIG_DIR_NAME = "easykube"
+
+const ZOT_CREDENTIALS = "zot-credentials.json"
+const ZOT_CONFIG = "zot-config.json"

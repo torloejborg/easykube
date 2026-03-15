@@ -17,44 +17,42 @@ type BootOpts struct {
 
 func createActualCmd(opts BootOpts) error {
 
-	ezk := ez.Kube
-	gr := ez.NewGraph[Task]()
+	tasks := NewTaskContainer()
 
-	var clusterCreateReport = ""
+	tasks.AddTask(ensureContainerRuntimeTask())
+	tasks.AddTask(inspectPortsFreeTask())
+	tasks.AddTask(pullKindImageTask())
+	tasks.AddTask(pullRegistryImageTask())
+	tasks.AddTask(createRegistryTask())
+	tasks.AddTask(startRegistryTask())
+	tasks.AddTask(ensurePersistenceDirectoriesTask())
+	tasks.AddTask(createClusterTask())
+	tasks.AddTask(connectRegistryToKindTask())
+	tasks.AddTask(ensureLocalClusterContextTask())
+	tasks.AddTask(patchCoreDNSTask())
+	tasks.AddTask(ensureAddonConfigMapTask())
 
-	pullImageFunc := func(image string) error {
+	ExecuteTasks(tasks)
 
-		if img, err := ezk.HasImage(image); err != nil {
-			return err
-		} else if !img {
-
-			err := ezk.PullImage(image, nil)
-			if err != nil {
-				return err
-			}
-
-		}
-
-		return nil
+	if clusterCreateReport != "" {
+		fmt.Println(clusterCreateReport)
 	}
 
-	pullRegistryImageTask := NewTaskWithSkip(gr, "pull registry image", func() error {
-		return pullImageFunc(constants.REGISTRY_IMAGE)
+	return nil
+}
+
+func ensureContainerRuntimeTask() Task {
+	return NewTaskWithSkip("ensure container runtime", func() error {
+		return errors.New("container runtime not available check docker/podman started")
 	}, func() bool {
-		has, _ := ezk.HasImage(constants.REGISTRY_IMAGE)
-		return has
+		return ez.Kube.IsContainerRuntimeAvailable()
 	})
+}
 
-	pullKindImageTask := NewTaskWithSkip(gr, "pull kind image", func() error {
-		return pullImageFunc(constants.KIND_IMAGE)
-	}, func() bool {
-		has, _ := ezk.HasImage(constants.KIND_IMAGE)
-		return has
-	})
+func inspectPortsFreeTask() Task {
+	return NewTaskWithSkip("check free ports", func() error {
 
-	inspectPortsFreeTask := NewTaskWithSkip(gr, "check free ports", func() error {
-
-		addons, err := ezk.GetAddons()
+		addons, err := ez.Kube.GetAddons()
 		if err != nil {
 			return err
 		}
@@ -90,127 +88,137 @@ func createActualCmd(opts BootOpts) error {
 			return errors.New("some ports are not available: " + strings.Join(errorList, ","))
 		}
 		return nil
-	}, func() bool { return ezk.IsClusterRunning() })
+	}, func() bool { return ez.Kube.IsClusterRunning() })
 
-	connectRegistryToKindTask := NewTaskWithSkip(gr, "connecting registry to kind network", func() error {
-		if e := ezk.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); e != nil {
+}
+
+func pullKindImageTask() Task {
+	return NewTaskWithSkip("pull kind image", func() error {
+		return pullImageFunc(constants.KIND_IMAGE)
+	}, func() bool {
+		has, _ := ez.Kube.HasImage(constants.KIND_IMAGE)
+		return has
+	})
+}
+
+func pullRegistryImageTask() Task {
+
+	return NewTaskWithSkip("pull registry image", func() error {
+		return pullImageFunc(constants.REGISTRY_IMAGE)
+	}, func() bool {
+		has, _ := ez.Kube.HasImage(constants.REGISTRY_IMAGE)
+		return has
+	})
+}
+
+func pullImageFunc(image string) error {
+
+	if img, err := ez.Kube.HasImage(image); err != nil {
+		return err
+	} else if !img {
+
+		err := ez.Kube.PullImage(image, nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func connectRegistryToKindTask() Task {
+	return NewTaskWithSkip("connecting registry to kind network", func() error {
+		if e := ez.Kube.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); e != nil {
 			return e
 		}
 		return nil
 	}, func() bool {
-		connected, _ := ezk.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
+		connected, _ := ez.Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
 		return connected
 	})
+}
 
-	createClusterTask := NewTaskWithSkip(gr, "create easykube-kind cluster", func() error {
+var clusterCreateReport = ""
 
-		addons, err := ezk.GetAddons()
+func createClusterTask() Task {
+	return NewTaskWithSkip("create easykube-kind cluster", func() error {
+
+		addons, err := ez.Kube.GetAddons()
 		if err != nil {
 			return err
 		}
 
-		clusterCreateReport, err = ezk.CreateKindCluster(addons)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}, func() bool { return ezk.IsClusterRunning() })
-
-	createSecretsTask := NewTaskWithSkip(gr, "importing secrets from property file", func() error {
-		configmap, err := ez.ReadPropertyFile(opts.Secrets)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Error reading property file %s, %v", opts.Secrets, err.Error()))
-		}
-		err = ezk.CreateSecret("default", constants.EASYKUBE_SECRET_NAME, configmap)
+		clusterCreateReport, err = ez.Kube.CreateKindCluster(addons)
 		if err != nil {
 			return err
 		}
 
 		return nil
+	}, func() bool { return ez.Kube.IsClusterRunning() })
+}
 
-	}, func() bool {
-		return len(opts.Secrets) == 0 && ezk.IsClusterRunning()
-	})
-
-	startRegistryTask := NewTaskWithSkip(gr, "start registry", func() error {
+func startRegistryTask() Task {
+	return NewTaskWithSkip("start registry", func() error {
 		return ez.Kube.StartContainerRegistry()
 	}, func() bool {
-		running, _ := ezk.IsContainerRunning(constants.REGISTRY_CONTAINER)
+		running, _ := ez.Kube.IsContainerRunning(constants.REGISTRY_CONTAINER)
 		return running
 	})
+}
 
-	createRegistryTask := NewTaskWithSkip(gr, "create local container registry", func() error {
+func createRegistryTask() Task {
+	return NewTaskWithSkip("create local container registry", func() error {
 		err := ez.Kube.CreateContainerRegistry()
 		if err != nil {
 			return err
 		}
 		return nil
 	}, func() bool { // if already running, return
-		search, _ := ezk.FindContainer(constants.REGISTRY_CONTAINER)
+		search, _ := ez.Kube.FindContainer(constants.REGISTRY_CONTAINER)
 		return search.Found
 	})
+}
 
-	patchCoreDNSTask := NewTaskWithSkip(gr, "patch coreDNS", func() error {
-		ezk.PatchCoreDNS()
+func patchCoreDNSTask() Task {
+	return NewTaskWithSkip("patch coreDNS", func() error {
+		ez.Kube.PatchCoreDNS()
 		return nil
-	}, func() bool { return ezk.IsClusterRunning() })
+	}, func() bool { return ez.Kube.IsClusterRunning() })
+}
 
-	ensureAddonConfigMapTask := NewTaskWithSkip(gr, "ensure addon config map", func() error {
-		if err := ezk.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS); err != nil {
+func ensureAddonConfigMapTask() Task {
+
+	return NewTaskWithSkip("ensure addon config map", func() error {
+		if err := ez.Kube.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS); err != nil {
 			return err
 		}
 		return nil
 	}, func() bool {
-		_, err := ezk.ReadConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
+		_, err := ez.Kube.ReadConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
 		return err == nil
 	})
+}
 
-	ensureLocalClusterContextTask := NewTask(gr, "ensure local cluster context", func() error {
-		err := ezk.ReloadClientSet()
+func ensureLocalClusterContextTask() Task {
+	return NewTask("ensure local cluster context", func() error {
+		err := ez.Kube.ReloadClientSet()
 		if err != nil {
 			return err
 		}
 		return nil
 	})
 
-	ensurePersistenceDirectoriesTask := NewTaskWithSkip(gr, "ensure persistence directories", func() error {
+}
+
+func ensurePersistenceDirectoriesTask() Task {
+	return NewTaskWithSkip("ensure persistence directories", func() error {
 		pdErr := ez.Kube.EnsurePersistenceDirectory()
 		if pdErr != nil {
 			return pdErr
 		}
 		return nil
 	}, func() bool {
-		return ezk.IsClusterRunning()
+		return ez.Kube.IsClusterRunning()
 	})
 
-	ensureContainerRuntimeTask := NewTaskWithSkip(gr, "ensure container runtime", func() error {
-		return errors.New("container runtime not available check docker/podman started")
-	}, func() bool {
-		return ezk.IsContainerRuntimeAvailable()
-	})
-
-	gr.AppendNode(ensureContainerRuntimeTask)
-	gr.AppendNode(inspectPortsFreeTask)
-	gr.AppendNode(pullKindImageTask)
-	gr.AppendNode(pullRegistryImageTask)
-	gr.AppendNode(createRegistryTask)
-	gr.AppendNode(startRegistryTask)
-	gr.AppendNode(ensurePersistenceDirectoriesTask)
-	gr.AppendNode(createClusterTask)
-	gr.AppendNode(connectRegistryToKindTask)
-	gr.AppendNode(ensureLocalClusterContextTask)
-	gr.AppendNode(patchCoreDNSTask)
-	gr.AppendNode(createSecretsTask)
-	gr.AppendNode(ensureAddonConfigMapTask)
-
-	res := gr.Nodes
-
-	ExecuteTasks(res)
-
-	if clusterCreateReport != "" {
-		fmt.Println(clusterCreateReport)
-	}
-
-	return nil
 }

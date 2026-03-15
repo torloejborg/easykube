@@ -421,15 +421,19 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 	// make sure that the registry-config file exists
 	configDir, _ := os.UserConfigDir()
-	if err := CopyResource("zot-config.json", "zot-config.json"); err != nil {
+	if err := CopyResourceToConfigDir(constants.ZOT_CONFIG, constants.ZOT_CONFIG); err != nil {
 		return err
 	}
 
-	if err := CopyResource("cert/server.crt", "localtest.me.crt"); err != nil {
+	if err := CopyResourceToConfigDir(constants.ZOT_CREDENTIALS, constants.ZOT_CREDENTIALS); err != nil {
 		return err
 	}
 
-	if err := CopyResource("cert/server.key", "localtest.me.key"); err != nil {
+	if err := CopyResourceToConfigDir("cert/server.crt", "localtest.me.crt"); err != nil {
+		return err
+	}
+
+	if err := CopyResourceToConfigDir("cert/server.key", "localtest.me.key"); err != nil {
 		return err
 	}
 
@@ -446,10 +450,11 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		}
 
 		binds := make([]string, 0)
-		binds = append(binds, filepath.Join(configDir, "easykube", "zot-config.json")+":/etc/zot/config.json:z")
 		binds = append(binds, filepath.Join(configDir, "easykube", "localtest.me.crt")+":/etc/ssl/localtest.me.crt:z")
 		binds = append(binds, filepath.Join(configDir, "easykube", "localtest.me.key")+":/etc/ssl/localtest.me.key:z")
 		binds = append(binds, filepath.Join(configDir, "easykube", "persistence", "zot"+":/var/lib/zot:z"))
+		binds = append(binds, filepath.Join(configDir, "easykube", constants.ZOT_CREDENTIALS)+":/var/lib/zot/credentials.json:z")
+		binds = append(binds, filepath.Join(configDir, "easykube", constants.ZOT_CONFIG)+":/etc/zot/config.json:z")
 
 		networkingConfig := &network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{

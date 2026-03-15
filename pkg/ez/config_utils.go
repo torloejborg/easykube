@@ -7,15 +7,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
-	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
-	"github.com/torloejborg/easykube/pkg/textutils"
 )
 
 type PrivateRegistry struct {
@@ -38,7 +35,6 @@ type IEasykubeConfig interface {
 	MakeConfig() error
 	EditConfig()
 	LaunchEditor(config, editor string)
-	PatchConfig() error
 	PathToConfigFile() string
 }
 
@@ -185,22 +181,27 @@ func (ec *EasykubeConfig) MakeConfig() error {
 			return err
 		}
 
-		err = CopyResource("cert/localtest.me.crt", "localtest.me.crt")
+		err = CopyResourceToConfigDir("cert/localtest.me.crt", "localtest.me.crt")
 		if nil != err {
 			return err
 		}
 
-		err = CopyResource("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
+		err = CopyResourceToConfigDir("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
 		if nil != err {
 			return err
 		}
 
-		err = CopyResource("cert/localtest.me.key", "localtest.me.key")
+		err = CopyResourceToConfigDir("cert/localtest.me.key", "localtest.me.key")
 		if nil != err {
 			return err
 		}
 
-		err = CopyResource("zot-config.json", "zot-config.json")
+		err = CopyResourceToConfigDir("zot-config.json", "zot-config.json")
+		if nil != err {
+			return err
+		}
+
+		err = CopyResourceToConfigDir("zot-credentials.json", "zot-credentials.json")
 		if nil != err {
 			return err
 		}
@@ -218,54 +219,4 @@ func (ec *EasykubeConfig) MakeConfig() error {
 	}
 
 	return nil
-}
-
-func (ec *EasykubeConfig) PatchConfig() error {
-	cfg, _ := ec.LoadConfig()
-	ec.patchConfigWithPrivateRegistryTemplate(cfg)
-
-	return nil
-}
-
-func (ec *EasykubeConfig) patchConfigWithPrivateRegistryTemplate(cfg *EasykubeConfigData) {
-
-	configStanza := textutils.TrimMargin(`
-	  |  #Declare private registries. Whenever easykube pulls an image, and the registry name contains a substring
-	  |  #defined by repositoryMatch, the credentials are resolved by looking up the values in easykube-secrets.
-	  |  #private-registries:
-	  |   #- repositoryMatch: partial-registry-name.io
-	  |   #  userKey: userCredentialsKey
-	  |   #  passwordKey: userCredentialPasswordKey`, "|")
-
-	cfgFile := ec.PathToConfigFile()
-
-	data, _ := ReadFileToBytes(cfgFile)
-	cfgText := string(data)
-
-	if cfg.PrivateRegistries == nil && !strings.Contains(cfgText, "repositoryMatch") &&
-		!strings.Contains(cfgText, "userKey") &&
-		!strings.Contains(cfgText, "passwordKey") {
-
-		// patch config
-		f, err := Kube.Fs.OpenFile(cfgFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-		if err != nil {
-			panic(err)
-		}
-
-		defer func(f afero.File) {
-			_ = f.Close()
-		}(f)
-
-		_, err = f.WriteString(configStanza)
-		if err != nil {
-			return
-		}
-
-		Kube.FmtGreen("Your configuration was patched with the following stanza")
-		fmt.Println()
-		Kube.FmtGreen(configStanza)
-		fmt.Println()
-		Kube.FmtGreen("Edit your configuration to enable private registries")
-		fmt.Println()
-	}
 }

@@ -10,51 +10,56 @@ import (
 )
 
 func destroyActual() error {
-	ezk := ez.Kube
-	tasks := ez.NewGraph[Task]()
 
-	user, _ := ezk.OsDetails.GetUserConfigDir()
-	configDir := filepath.Join(user, constants.CONFIG_DIR_NAME)
+	tasks := NewTaskContainer()
 
-	running := func(name string) bool {
-		result, _ := ezk.IsContainerRunning(name)
-		return result
-	}
+	tasks.AddTask(stopAndDeleteCluster())
+	tasks.AddTask(stopAndDeleteRegistry())
+	tasks.AddTask(purgeData())
 
-	stopAndDeleteCluster := NewTaskWithSkip(tasks, fmt.Sprintf("stop and delete %s", constants.KIND_CONTAINER), func() error {
+	ExecuteTasks(tasks)
+
+	return nil
+}
+
+func running(name string) bool {
+	result, _ := ez.Kube.IsContainerRunning(name)
+	return result
+}
+
+func stopAndDeleteCluster() Task {
+	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.KIND_CONTAINER), func() error {
 		return stopAndDeleteContainer(constants.KIND_CONTAINER)
 	}, func() bool {
 		return !running(constants.KIND_CONTAINER)
 	})
+}
 
-	stopAndDeleteRegistry := NewTaskWithSkip(tasks, fmt.Sprintf("stop and delete %s", constants.REGISTRY_CONTAINER), func() error {
+func stopAndDeleteRegistry() Task {
+	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.REGISTRY_CONTAINER), func() error {
 		return stopAndDeleteContainer(constants.REGISTRY_CONTAINER)
 	}, func() bool {
 		return !running(constants.REGISTRY_CONTAINER)
 	})
+}
 
-	purgeData := NewTaskWithSkip(tasks, "purge data", func() error {
+func purgeData() Task {
+	return NewTaskWithSkip("purge data", func() error {
 
-		s, _ := ezk.Fs.Stat(configDir)
+		user, _ := ez.Kube.OsDetails.GetUserConfigDir()
+		configDir := filepath.Join(user, constants.CONFIG_DIR_NAME)
+
+		s, _ := ez.Kube.Fs.Stat(configDir)
 		if s.IsDir() {
-			return ezk.Fs.RemoveAll(configDir)
+			return ez.Kube.Fs.RemoveAll(configDir)
 		}
 
 		return nil
 
 	}, func() bool {
-		return !ezk.GetBoolFlag("purge")
+		return !ez.Kube.GetBoolFlag("purge")
 	})
 
-	tasks.AppendNode(stopAndDeleteCluster)
-	tasks.AppendNode(stopAndDeleteRegistry)
-	tasks.AppendNode(purgeData)
-
-	nodes := tasks.Nodes
-
-	ExecuteTasks(nodes)
-
-	return nil
 }
 
 func stopAndDeleteContainer(name string) error {

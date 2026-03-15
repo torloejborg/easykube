@@ -15,6 +15,25 @@ type IOrderedTask interface {
 	GetDependencies() []string
 }
 
+type TaskContainer struct {
+	graph *ez.Graph[Task]
+}
+
+func (t TaskContainer) AddTask(task Task) {
+	task.graph = t.graph
+	t.graph.AppendNode(task)
+}
+
+func (t TaskContainer) GetNodes() []Task {
+	return t.graph.Nodes
+}
+
+func NewTaskContainer() *TaskContainer {
+	return &TaskContainer{
+		graph: ez.NewGraph[Task](),
+	}
+}
+
 type Task struct {
 	Name          string
 	Description   string
@@ -36,12 +55,11 @@ func (x Task) DependsOn(t Task) error {
 	return x.graph.AddEdge(t, x)
 }
 
-func NewTask(graph *ez.Graph[Task], description string, execute func() error) Task {
+func NewTask(description string, execute func() error) Task {
 
 	u, _ := uuid.NewUUID()
 
 	return Task{
-		graph:         graph,
 		Name:          u.String(),
 		Description:   description,
 		Dependencies:  make([]string, 0),
@@ -50,11 +68,10 @@ func NewTask(graph *ez.Graph[Task], description string, execute func() error) Ta
 	}
 }
 
-func NewTaskWithSkip(graph *ez.Graph[Task], description string, execute func() error, skip func() bool) Task {
+func NewTaskWithSkip(description string, execute func() error, skip func() bool) Task {
 	u, _ := uuid.NewUUID()
 
 	return Task{
-		graph:         graph,
 		Name:          u.String(),
 		Description:   description,
 		Dependencies:  make([]string, 0),
@@ -63,13 +80,15 @@ func NewTaskWithSkip(graph *ez.Graph[Task], description string, execute func() e
 	}
 }
 
-func ExecuteTasks(tasks []Task) {
+func ExecuteTasks(taskContainer *TaskContainer) {
 
 	checkErr := func(err error) {
 		if err != nil {
 			fmt.Println(err.Error())
 		}
 	}
+
+	tasks := taskContainer.GetNodes()
 
 	for i := range tasks {
 
@@ -79,7 +98,7 @@ func ExecuteTasks(tasks []Task) {
 
 		// Execute task
 		if !tasks[i].SkipCondition() {
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 			if err := tasks[i].Execute(); err != nil {
 				checkErr(s.Fail())
 				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), tasks[i].Description, err.Error())
@@ -88,8 +107,7 @@ func ExecuteTasks(tasks []Task) {
 				checkErr(s.Succeed())
 			}
 		} else {
-
-			color.Set(color.FgHiBlack, color.CrossedOut)
+			color.Set(color.FgHiBlack)
 			_ = s.FinishWithMessage("✔", tasks[i].Description)
 			color.Unset()
 		}
