@@ -21,6 +21,10 @@ schema = 3
     version = 'v0.6.2'
     hash = 'sha256-tVNWDUMILZbJvarcl/E7tpSnkn7urqgSHa2Eaka5vSU='
 
+  [mod.'github.com/chzyer/readline']
+    version = 'v1.5.1'
+    hash = 'sha256-6wKd6/JZ9/O7FwSyNKE3KOt8fVPZEunqbTHQUxlOUNc='
+
   [mod.'github.com/clipperhouse/displaywidth']
     version = 'v0.6.2'
     hash = 'sha256-BZ6sBZJXzS50do3OLK0UApMz/KVV7jnLEcyddWJ1Q1w='
@@ -92,6 +96,14 @@ schema = 3
   [mod.'github.com/fxamacker/cbor/v2']
     version = 'v2.9.0'
     hash = 'sha256-/IZK76MRCrz9XCiilieH5tKaLnIWyPJhwxDoVKB8dFc='
+
+  [mod.'github.com/gdamore/encoding']
+    version = 'v1.0.1'
+    hash = 'sha256-EfY23Sy/jrcPlw4gKvvVgUicxEcD6iw1QNMPay9ZBhQ='
+
+  [mod.'github.com/gdamore/tcell/v2']
+    version = 'v2.8.1'
+    hash = 'sha256-29T3yNq9H5QxJuGVdLu40e8xD8T3qB6+lg2MxnAOKFM='
 
   [mod.'github.com/go-logr/logr']
     version = 'v1.4.3'
@@ -168,6 +180,10 @@ schema = 3
   [mod.'github.com/json-iterator/go']
     version = 'v1.1.12'
     hash = 'sha256-To8A0h+lbfZ/6zM+2PpRpY3+L6725OPC66lffq6fUoM='
+
+  [mod.'github.com/lucasb-eyer/go-colorful']
+    version = 'v1.2.0'
+    hash = 'sha256-Gg9dDJFCTaHrKHRR1SrJgZ8fWieJkybljybkI9x0gyE='
 
   [mod.'github.com/mailru/easyjson']
     version = 'v0.7.7'
@@ -264,6 +280,14 @@ schema = 3
   [mod.'github.com/pmezard/go-difflib']
     version = 'v1.0.1-0.20181226105442-5d4384ee4fb2'
     hash = 'sha256-XA4Oj1gdmdV/F/+8kMI+DBxKPthZ768hbKsO3d9Gx90='
+
+  [mod.'github.com/rivo/tview']
+    version = 'v0.42.0'
+    hash = 'sha256-oumZKMr558No9AWm3jGKMKAtIXl2Fm0eDXcDKhI8hEs='
+
+  [mod.'github.com/rivo/uniseg']
+    version = 'v0.4.7'
+    hash = 'sha256-rDcdNYH6ZD8KouyyiZCUEy8JrjOQoAkxHBhugrfHjFo='
 
   [mod.'github.com/sirupsen/logrus']
     version = 'v1.9.4-0.20251023124752-b61f268f75b6'
@@ -368,6 +392,10 @@ schema = 3
   [mod.'golang.org/x/time']
     version = 'v0.14.0'
     hash = 'sha256-fVjpq0ieUHVEOTSElDVleMWvfdcqojZchqdUXiC7NnY='
+
+  [mod.'gonum.org/v1/gonum']
+    version = 'v0.16.0'
+    hash = 'sha256-25kwrdIdR6J75uQfqFZwW9cef0ehRodqTDdpnqBNy+c='
 
   [mod.'google.golang.org/grpc']
     version = 'v1.77.0'
