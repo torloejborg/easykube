@@ -16,9 +16,9 @@ import (
 )
 
 type PrivateRegistry struct {
-	RepositoryMatch string
-	UserKey         string
-	PasswordKey     string
+	RepositoryURL string
+	UserKey       string
+	PasswordKey   string
 }
 
 type EasykubeConfigData struct {
@@ -36,6 +36,10 @@ type IEasykubeConfig interface {
 	EditConfig()
 	LaunchEditor(config, editor string)
 	PathToConfigFile() string
+	PathToConfigDir() string
+	SyncWithZot() error
+	WriteConfig(EasykubeConfigData) error
+	CopyConfigResources() error
 }
 
 type EasykubeConfig struct {
@@ -73,8 +77,13 @@ func (ec *EasykubeConfig) PathToConfigFile() string {
 	return filepath.Join(configDir, ec.ConfigDirName, "config.yaml")
 }
 
+func (ec *EasykubeConfig) PathToConfigDir() string {
+	configDir, _ := Kube.GetUserConfigDir()
+	return filepath.Join(configDir, ec.ConfigDirName)
+}
+
 func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
-	// if no config file, create a default
+	//if no config file, create a default
 	if err := ec.MakeConfig(); err != nil {
 		return nil, err
 	}
@@ -127,6 +136,65 @@ func (ec *EasykubeConfig) EditConfig() {
 	}
 }
 
+func (ec *EasykubeConfig) CopyConfigResources() error {
+
+	userConfigDir, err := Kube.GetUserConfigDir()
+	if nil != err {
+		return err
+	}
+
+	userHomeDir, err := Kube.GetUserHomeDir()
+	if nil != err {
+		return err
+	}
+
+	pathToConfigFile := ec.PathToConfigFile()
+	_, err = Kube.Fs.Stat(pathToConfigFile)
+
+	merr := Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
+	if merr != nil {
+		return merr
+	}
+
+	err = CopyResourceToConfigDir("cert/localtest.me.crt", "localtest.me.crt")
+	if nil != err {
+		return err
+	}
+
+	err = CopyResourceToConfigDir("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
+	if nil != err {
+		return err
+	}
+
+	err = CopyResourceToConfigDir("cert/localtest.me.key", "localtest.me.key")
+	if nil != err {
+		return err
+	}
+
+	err = CopyResourceToConfigDir("zot-config.json", "zot-config.json")
+	if nil != err {
+		return err
+	}
+
+	err = CopyResourceToConfigDir("zot-credentials.json", "zot-credentials.json")
+	if nil != err {
+		return err
+	}
+
+	// Make podman aware of a selfsigned certificate
+	certData, err := resources.AppResources.ReadFile("data/cert/localtest.me.ca.crt")
+	if nil != err {
+		return err
+	}
+
+	certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LOCAL_REGISTRY)
+	_ = Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
+	cert := filepath.Join(certDestDir, "ca.crt")
+	SaveFileByte(certData, cert)
+
+	return nil
+}
+
 func (ec *EasykubeConfig) MakeConfig() error {
 	userConfigDir, err := Kube.GetUserConfigDir()
 	if nil != err {
@@ -142,6 +210,8 @@ func (ec *EasykubeConfig) MakeConfig() error {
 	_, err = Kube.Fs.Stat(pathToConfigFile)
 
 	if os.IsNotExist(err) {
+		_ = ec.CopyConfigResources()
+
 		merr := Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
 		if merr != nil {
 			return merr
@@ -218,5 +288,14 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		SaveFileByte(certData, cert)
 	}
 
+	return nil
+}
+
+func (ec *EasykubeConfig) WriteConfig(cfg EasykubeConfigData) error {
+
+	return nil
+}
+
+func (ec *EasykubeConfig) SyncWithZot() error {
 	return nil
 }
