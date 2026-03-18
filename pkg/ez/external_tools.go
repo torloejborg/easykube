@@ -55,7 +55,7 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 			panic(err)
 		} else {
 			// save output to file
-			f, err := os.Create(filepath.Join(dir, constants.KUSTOMIZE_TARGET_OUTPUT))
+			f, err := os.Create(filepath.Join(dir, constants.KustomizeTargetOutput))
 			if err != nil {
 				panic(err)
 			}
@@ -74,7 +74,7 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 		}
 	}
 
-	return filepath.Join(dir, constants.KUSTOMIZE_TARGET_OUTPUT)
+	return filepath.Join(dir, constants.KustomizeTargetOutput)
 }
 
 func (et *ExternalToolsImpl) ApplyYaml(yamlFile string) {
@@ -131,11 +131,11 @@ func (et *ExternalToolsImpl) EnsureLocalContext() {
 		k.FmtYellow("(The cluster is running, but you cannot manage it yet)")
 
 		home, _ := os.UserHomeDir()
-		_ = os.Setenv("KUBECONFIG", filepath.Join(home, ".kube", constants.CLUSTER_NAME))
+		_ = os.Setenv("KUBECONFIG", filepath.Join(home, ".kube", constants.ClusterName))
 	} else {
 
 		cmd := "kubectl"
-		args := []string{"config", "use-context", constants.CLUSTER_CONTEXT}
+		args := []string{"config", "use-context", constants.ClusterContext}
 		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 		if k.IsDryRun() {
 			k.FmtDryRun(cmdStr)

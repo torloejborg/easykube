@@ -54,8 +54,18 @@ func prompt(promptMessage, defaultValue string, validate func(string) error) str
 func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 
 	userConfigDir := ez.Kube.PathToConfigDir()
-	ekConfigDir := ez.Kube.PathToConfigFile()
-	persistenceDir := filepath.Join(userConfigDir, "persistence")
+	loadedCfg, _ := ez.Kube.LoadConfig()
+
+	if loadedCfg == nil {
+		loadedCfg = &ez.EasykubeConfigData{
+			AddonDir:          "",
+			PersistenceDir:    filepath.Join(userConfigDir, "persistence"),
+			ConfigurationDir:  userConfigDir,
+			ContainerRuntime:  "docker",
+			ConfigurationFile: ez.Kube.PathToConfigFile(),
+			PrivateRegistries: nil,
+		}
+	}
 
 	nopValidator := func(s string) error { return nil }
 	yesNoValidator := func(s string) error {
@@ -66,7 +76,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	}
 
 	// Prompt for addon repository path
-	addonRepoPath := prompt("Enter the path to the addon repository:", "", func(s string) error {
+	addonDir := prompt("Enter the path to the addon repository:", loadedCfg.AddonDir, func(s string) error {
 
 		fi, err := ez.Kube.Fs.Stat(s)
 		if err != nil {
@@ -81,19 +91,21 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	})
 
 	// prompt for configuration dir
-	ekConfigDir = prompt("Enter the path to the easykube config dir:", ekConfigDir, nopValidator)
+	configurationDir := prompt("Enter the path to the easykube config dir:", loadedCfg.ConfigurationDir, nopValidator)
 
 	// prompt for configuration dir
-	persistenceDir = prompt("Enter the path to the ek easykube persistence directory:", persistenceDir, nopValidator)
+	persistenceDir := prompt("Enter the path to the ek easykube persistence directory:", loadedCfg.PersistenceDir, nopValidator)
+
+	//func(s string) error {
+	//if s != "docker" && s != "podman" {
+	//	return errors.New("invalid choice. Please enter 'docker' or 'podman'")
+	//
+	//}
+	//return nil
+	//}
 
 	// Prompt for container runtime
-	containerRuntime := prompt("Which container runtime do you wish to use (docker/podman)", "docker", func(s string) error {
-		if s != "docker" && s != "podman" {
-			return errors.New("invalid choice. Please enter 'docker' or 'podman'")
-
-		}
-		return nil
-	})
+	containerRuntime := prompt("Which container runtime do you wish to use (docker/podman)", loadedCfg.ContainerRuntime, nopValidator)
 
 	// Prompt for private registries
 	configureRegistries := strings.ToLower(
@@ -120,17 +132,19 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	cfg := ez.EasykubeConfigData{
-		AddonDir:          addonRepoPath,
+	cfg := &ez.EasykubeConfigData{
+		AddonDir:          addonDir,
 		PersistenceDir:    persistenceDir,
-		ConfigurationDir:  ekConfigDir,
+		ConfigurationDir:  configurationDir,
 		ContainerRuntime:  containerRuntime,
-		ConfigurationFile: "config.yaml",
+		ConfigurationFile: ez.Kube.PathToConfigFile(),
 		PrivateRegistries: registries,
 	}
 
-	// Print collected data
-	fmt.Println(cfg)
+	err := ez.Kube.WriteConfig(cfg)
+	if err != nil {
+		panic(err)
+	}
 
 	return nil
 }

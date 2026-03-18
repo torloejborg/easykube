@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
@@ -21,12 +22,17 @@ var configCmd = &cobra.Command{
 			return err
 		}
 
-		if ez.Kube.GetBoolFlag("use-defaults") {
+		if ez.Kube.GetStringFlag(constants.FlagConfigDir) != "" {
 			ez.Kube.MakeConfig()
 			os.Exit(0)
 		}
 
-		if ez.Kube.GetBoolFlag("edit") {
+		if ez.Kube.GetBoolFlag(constants.FlagUseDefaults) {
+			ez.Kube.MakeConfig()
+			os.Exit(0)
+		}
+
+		if ez.Kube.GetBoolFlag(constants.FlagEdit) {
 			ez.Kube.EditConfig()
 			os.Exit(0)
 		}

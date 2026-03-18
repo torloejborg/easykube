@@ -13,7 +13,7 @@ import (
 func (ctx *Easykube) KeyValue() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, KEY_VALUE)
-		inputStr := ctx.CobraCommandHelder.GetStringFlag(constants.FLAG_KEYVALUE)
+		inputStr := ctx.CobraCommandHelder.GetStringFlag(constants.FlagKeyValue)
 		if inputStr == "" {
 			return goja.Undefined()
 		}

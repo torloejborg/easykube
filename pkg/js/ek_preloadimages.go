@@ -19,7 +19,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			return call.This
 		}
 
-		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FLAG_PULL)
+		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FlagPull)
 		ctx.checkArgs(call, PRELOAD)
 		config, _ := ez.Kube.LoadConfig()
 

@@ -136,7 +136,7 @@ type IK8SUtils interface {
 	ListPods(namespace string) ([]string, error)
 	// GetInstalledAddons
 	//
-	// Queries the constants.ADDON_CM configmap for installed addons
+	// Queries the constants.AddonCm configmap for installed addons
 	GetInstalledAddons() ([]string, error)
 
 	// PatchCoreDNS
@@ -297,7 +297,7 @@ func (k *K8SUtilsImpl) UpdateConfigMap(name, namespace, key string, data []byte)
 
 func (k8s *K8SUtilsImpl) GetInstalledAddons() ([]string, error) {
 	result := make([]string, 0)
-	addons, err := k8s.ReadConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
+	addons, err := k8s.ReadConfigmap(constants.AddonCm, constants.DefaultNs)
 
 	if err != nil {
 		return result, err

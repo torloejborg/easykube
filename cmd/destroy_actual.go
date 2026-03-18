@@ -28,18 +28,18 @@ func running(name string) bool {
 }
 
 func stopAndDeleteCluster() Task {
-	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.KIND_CONTAINER), func() error {
-		return stopAndDeleteContainer(constants.KIND_CONTAINER)
+	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.KindContainer), func() error {
+		return stopAndDeleteContainer(constants.KindContainer)
 	}, func() bool {
-		return !running(constants.KIND_CONTAINER)
+		return !running(constants.KindContainer)
 	})
 }
 
 func stopAndDeleteRegistry() Task {
-	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.REGISTRY_CONTAINER), func() error {
-		return stopAndDeleteContainer(constants.REGISTRY_CONTAINER)
+	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.RegistryContainer), func() error {
+		return stopAndDeleteContainer(constants.RegistryContainer)
 	}, func() bool {
-		return !running(constants.REGISTRY_CONTAINER)
+		return !running(constants.RegistryContainer)
 	})
 }
 
@@ -47,7 +47,7 @@ func purgeData() Task {
 	return NewTaskWithSkip("purge data", func() error {
 
 		user, _ := ez.Kube.OsDetails.GetUserConfigDir()
-		configDir := filepath.Join(user, constants.CONFIG_DIR_NAME)
+		configDir := filepath.Join(user, constants.ConfigDirName)
 
 		s, _ := ez.Kube.Fs.Stat(configDir)
 		if s.IsDir() {

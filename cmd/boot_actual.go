@@ -20,12 +20,12 @@ func createActualCmd(opts BootOpts) error {
 	tasks := NewTaskContainer()
 
 	tasks.AddTask(ensureContainerRuntimeTask())
+	tasks.AddTask(ensurePersistenceDirectoriesTask())
 	tasks.AddTask(inspectPortsFreeTask())
 	tasks.AddTask(pullKindImageTask())
 	tasks.AddTask(pullRegistryImageTask())
 	tasks.AddTask(createRegistryTask())
 	tasks.AddTask(startRegistryTask())
-	tasks.AddTask(ensurePersistenceDirectoriesTask())
 	tasks.AddTask(createClusterTask())
 	tasks.AddTask(connectRegistryToKindTask())
 	tasks.AddTask(ensureLocalClusterContextTask())
@@ -94,9 +94,9 @@ func inspectPortsFreeTask() Task {
 
 func pullKindImageTask() Task {
 	return NewTaskWithSkip("pull kind image", func() error {
-		return pullImageFunc(constants.KIND_IMAGE)
+		return pullImageFunc(constants.KindImage)
 	}, func() bool {
-		has, _ := ez.Kube.HasImage(constants.KIND_IMAGE)
+		has, _ := ez.Kube.HasImage(constants.KindImage)
 		return has
 	})
 }
@@ -104,9 +104,9 @@ func pullKindImageTask() Task {
 func pullRegistryImageTask() Task {
 
 	return NewTaskWithSkip("pull registry image", func() error {
-		return pullImageFunc(constants.REGISTRY_IMAGE)
+		return pullImageFunc(constants.RegistryImage)
 	}, func() bool {
-		has, _ := ez.Kube.HasImage(constants.REGISTRY_IMAGE)
+		has, _ := ez.Kube.HasImage(constants.RegistryImage)
 		return has
 	})
 }
@@ -128,12 +128,12 @@ func pullImageFunc(image string) error {
 
 func connectRegistryToKindTask() Task {
 	return NewTaskWithSkip("connecting registry to kind network", func() error {
-		if e := ez.Kube.NetworkConnect(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME); e != nil {
+		if e := ez.Kube.NetworkConnect(constants.RegistryContainer, constants.KindNetworkName); e != nil {
 			return e
 		}
 		return nil
 	}, func() bool {
-		connected, _ := ez.Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, constants.KIND_NETWORK_NAME)
+		connected, _ := ez.Kube.IsNetworkConnectedToContainer(constants.RegistryContainer, constants.KindNetworkName)
 		return connected
 	})
 }
@@ -161,7 +161,7 @@ func startRegistryTask() Task {
 	return NewTaskWithSkip("start registry", func() error {
 		return ez.Kube.StartContainerRegistry()
 	}, func() bool {
-		running, _ := ez.Kube.IsContainerRunning(constants.REGISTRY_CONTAINER)
+		running, _ := ez.Kube.IsContainerRunning(constants.RegistryContainer)
 		return running
 	})
 }
@@ -174,7 +174,7 @@ func createRegistryTask() Task {
 		}
 		return nil
 	}, func() bool { // if already running, return
-		search, _ := ez.Kube.FindContainer(constants.REGISTRY_CONTAINER)
+		search, _ := ez.Kube.FindContainer(constants.RegistryContainer)
 		return search.Found
 	})
 }
@@ -189,12 +189,12 @@ func patchCoreDNSTask() Task {
 func ensureAddonConfigMapTask() Task {
 
 	return NewTaskWithSkip("ensure addon config map", func() error {
-		if err := ez.Kube.CreateConfigmap(constants.ADDON_CM, constants.DEFAULT_NS); err != nil {
+		if err := ez.Kube.CreateConfigmap(constants.AddonCm, constants.DefaultNs); err != nil {
 			return err
 		}
 		return nil
 	}, func() bool {
-		_, err := ez.Kube.ReadConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
+		_, err := ez.Kube.ReadConfigmap(constants.AddonCm, constants.DefaultNs)
 		return err == nil
 	})
 }

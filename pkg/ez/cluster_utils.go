@@ -50,7 +50,7 @@ func (u *ClusterUtils) ConfigurationReport(addonList []IAddon) string {
 func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, error) {
 
 	// see if the cluster has been created
-	search, _ := Kube.FindContainer(constants.KIND_CONTAINER)
+	search, _ := Kube.FindContainer(constants.KindContainer)
 
 	addonList := make([]IAddon, 0)
 	for _, addon := range modules {
@@ -80,18 +80,18 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 
 		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
-		optNodeImage := cluster.CreateWithNodeImage(constants.KIND_IMAGE)
+		optNodeImage := cluster.CreateWithNodeImage(constants.KindImage)
 
 		optKubeConfig := cluster.CreateWithKubeconfigPath(kubeconfigPath)
 		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
 
-		err := cp.Create(constants.CLUSTER_NAME, optKubeConfig, optConfig, optNodeImage)
+		err := cp.Create(constants.ClusterName, optKubeConfig, optConfig, optNodeImage)
 		if nil != err {
 			panic(err)
 		}
 
 		// initial cluster should be running now
-		search, _ = Kube.FindContainer(constants.KIND_CONTAINER)
+		search, _ = Kube.FindContainer(constants.KindContainer)
 
 		if search.IsRunning {
 

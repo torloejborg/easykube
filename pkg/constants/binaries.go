@@ -1,7 +1,7 @@
 package constants
 
-const DOCKER_SEMVER = "^29"
-const HELM_SEMVER = "~3.19"
-const KUBECTL_SEMVER = "~1.35"
-const KUSTOMIZE_SEMVER = "~5.8"
-const PODMAN_SEMVER = "~5.8"
+const DockerSemver = "^29"
+const HelmSemver = "~3.19"
+const KubectlSemver = "~1.35"
+const KustomizeSemver = "~5.8"
+const PodmanSemver = "~5.8"

@@ -19,7 +19,7 @@ var bootCmd = &cobra.Command{
 		}
 
 		opts := BootOpts{
-			Secrets: ez.CommandHelper(cmd).GetStringFlag(constants.ARG_SECRETS),
+			Secrets: ez.CommandHelper(cmd).GetStringFlag(constants.ArgSecrets),
 		}
 
 		return createActualCmd(opts)
@@ -27,6 +27,6 @@ var bootCmd = &cobra.Command{
 }
 
 func init() {
-	bootCmd.Flags().StringP(constants.ARG_SECRETS, "s", "", "Property file to load as 'easykube-secrets', useful for image pull secrets and other custom configuration")
+	bootCmd.Flags().StringP(constants.ArgSecrets, "s", "", "Property file to load as 'easykube-secrets', useful for image pull secrets and other custom configuration")
 	rootCmd.AddCommand(bootCmd)
 }

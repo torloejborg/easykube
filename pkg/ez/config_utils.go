@@ -16,9 +16,9 @@ import (
 )
 
 type PrivateRegistry struct {
-	RepositoryURL string
-	UserKey       string
-	PasswordKey   string
+	RepositoryURL string `mapstructure:"repository-url"`
+	UserKey       string `mapstructure:"username"`
+	PasswordKey   string `mapstructure:"password"`
 }
 
 type EasykubeConfigData struct {
@@ -38,7 +38,7 @@ type IEasykubeConfig interface {
 	PathToConfigFile() string
 	PathToConfigDir() string
 	SyncWithZot() error
-	WriteConfig(EasykubeConfigData) error
+	WriteConfig(*EasykubeConfigData) error
 	CopyConfigResources() error
 }
 
@@ -83,10 +83,6 @@ func (ec *EasykubeConfig) PathToConfigDir() string {
 }
 
 func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
-	//if no config file, create a default
-	if err := ec.MakeConfig(); err != nil {
-		return nil, err
-	}
 
 	config.ClearAll()
 	// config.ParseEnv: will parse env var in string value. eg: shell: ${SHELL}
@@ -127,12 +123,7 @@ func (ec *EasykubeConfig) EditConfig() {
 			fmt.Println("Could not determine $HOMEDIR")
 			os.Exit(-1)
 		}
-
-		if err := ec.MakeConfig(); err == nil {
-			ec.LaunchEditor(ec.PathToConfigFile(), editor)
-		} else {
-			Kube.FmtRed("Failed to launch editor: %s", err.Error())
-		}
+		ec.LaunchEditor(ec.PathToConfigFile(), editor)
 	}
 }
 
@@ -187,7 +178,7 @@ func (ec *EasykubeConfig) CopyConfigResources() error {
 		return err
 	}
 
-	certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LOCAL_REGISTRY)
+	certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LocalRegistry)
 	_ = Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
 	cert := filepath.Join(certDestDir, "ca.crt")
 	SaveFileByte(certData, cert)
@@ -196,10 +187,6 @@ func (ec *EasykubeConfig) CopyConfigResources() error {
 }
 
 func (ec *EasykubeConfig) MakeConfig() error {
-	userConfigDir, err := Kube.GetUserConfigDir()
-	if nil != err {
-		return err
-	}
 
 	userHomeDir, err := Kube.GetUserHomeDir()
 	if nil != err {
@@ -209,89 +196,77 @@ func (ec *EasykubeConfig) MakeConfig() error {
 	pathToConfigFile := ec.PathToConfigFile()
 	_, err = Kube.Fs.Stat(pathToConfigFile)
 
-	if os.IsNotExist(err) {
-		_ = ec.CopyConfigResources()
+	_ = ec.CopyConfigResources()
 
-		merr := Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
-		if merr != nil {
-			return merr
-		}
+	model := EasykubeConfigData{
+		AddonDir:         filepath.Join(userHomeDir, "addons"),
+		ConfigurationDir: filepath.Join(ec.UserConfigDir, ec.ConfigDirName),
+		PersistenceDir:   filepath.Join(ec.UserConfigDir, ec.ConfigDirName, "persistence"),
+	}
 
-		model := EasykubeConfigData{
-			AddonDir:         filepath.Join(userHomeDir, "addons"),
-			ConfigurationDir: filepath.Join(ec.UserConfigDir, ec.ConfigDirName),
-			PersistenceDir:   filepath.Join(ec.UserConfigDir, ec.ConfigDirName, "persistence"),
-		}
+	file, err := Kube.Fs.Create(pathToConfigFile)
+	if nil != err {
+		return err
+	}
 
-		file, err := Kube.Fs.Create(pathToConfigFile)
-		if nil != err {
-			return err
-		}
+	configData, err := resources.AppResources.ReadFile("data/config.template")
+	if nil != err {
+		return err
+	}
 
-		configData, err := resources.AppResources.ReadFile("data/config.template")
-		if nil != err {
-			return err
-		}
+	templ := template.New("config")
+	templ, err = templ.Parse(string(configData))
+	if err != nil {
+		return err
+	}
 
-		templ := template.New("config")
-		templ, err = templ.Parse(string(configData))
-		if err != nil {
-			return err
-		}
+	buf := &bytes.Buffer{}
 
-		buf := &bytes.Buffer{}
+	err = templ.Execute(buf, model)
+	if err != nil {
+		return err
+	}
 
-		err = templ.Execute(buf, model)
-		if err != nil {
-			return err
-		}
-
-		_, err = file.WriteString(buf.String())
-		if nil != err {
-			return err
-		}
-
-		err = CopyResourceToConfigDir("cert/localtest.me.crt", "localtest.me.crt")
-		if nil != err {
-			return err
-		}
-
-		err = CopyResourceToConfigDir("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
-		if nil != err {
-			return err
-		}
-
-		err = CopyResourceToConfigDir("cert/localtest.me.key", "localtest.me.key")
-		if nil != err {
-			return err
-		}
-
-		err = CopyResourceToConfigDir("zot-config.json", "zot-config.json")
-		if nil != err {
-			return err
-		}
-
-		err = CopyResourceToConfigDir("zot-credentials.json", "zot-credentials.json")
-		if nil != err {
-			return err
-		}
-
-		// Make podman aware of a selfsigned certificate
-		certData, err := resources.AppResources.ReadFile("data/cert/localtest.me.ca.crt")
-		if nil != err {
-			return err
-		}
-		certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LOCAL_REGISTRY)
-		Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
-		Kube.Fs.MkdirAll(filepath.Join(model.PersistenceDir, "zot"), os.ModePerm)
-		cert := filepath.Join(certDestDir, "ca.crt")
-		SaveFileByte(certData, cert)
+	_, err = file.WriteString(buf.String())
+	if nil != err {
+		return err
 	}
 
 	return nil
 }
 
-func (ec *EasykubeConfig) WriteConfig(cfg EasykubeConfigData) error {
+func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
+	configData, err := resources.AppResources.ReadFile("data/config.template")
+	if nil != err {
+		return err
+	}
+
+	templ := template.New("config")
+	templ, err = templ.Parse(string(configData))
+	if err != nil {
+		return err
+	}
+
+	buf := &bytes.Buffer{}
+
+	fmt.Println(cfg)
+
+	err = templ.Execute(buf, cfg)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(buf.String())
+
+	file, err := Kube.Fs.OpenFile(cfg.ConfigurationFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if nil != err {
+		panic(err)
+	}
+
+	_, err = file.WriteString(buf.String())
+	if nil != err {
+		panic(err)
+	}
 
 	return nil
 }
