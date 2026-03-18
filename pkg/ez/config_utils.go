@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/gookit/config/v2"
@@ -16,7 +17,7 @@ import (
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
-type PrivateRegistry struct {
+type MirrroRegistry struct {
 	RepositoryURL string `mapstructure:"repository-url"`
 	UserKey       string `mapstructure:"username"`
 	PasswordKey   string `mapstructure:"password"`
@@ -28,7 +29,7 @@ type EasykubeConfigData struct {
 	ConfigurationDir  string `mapstructure:"config-dir"`
 	ContainerRuntime  string `mapstructure:"container-runtime"`
 	ConfigurationFile string
-	PrivateRegistries []PrivateRegistry `mapstructure:"private-registries"`
+	MirrorRegistries  []MirrroRegistry `mapstructure:"mirror-registries"`
 }
 
 type IEasykubeConfig interface {
@@ -37,7 +38,7 @@ type IEasykubeConfig interface {
 	EditConfig() error
 	LaunchEditor(config, editor string)
 	PathToConfigFile() string
-	SyncWithZot() error
+	SyncWithZot(*EasykubeConfigData) error
 	WriteConfig(*EasykubeConfigData) error
 	CopyConfigResources() error
 }
@@ -194,11 +195,25 @@ func (ec *EasykubeConfig) MakeConfig() error {
 
 	_ = ec.CopyConfigResources()
 
-	model := EasykubeConfigData{
+	modelData := EasykubeConfigData{
 		AddonDir:         filepath.Join(userHomeDir, "addons"),
 		ConfigurationDir: configurationDir,
 		PersistenceDir:   filepath.Join(configurationDir, "persistence"),
 		ContainerRuntime: "docker",
+		MirrorRegistries: []MirrroRegistry{
+			{
+				RepositoryURL: "https://registry-1.docker.io",
+			},
+			{
+				RepositoryURL: "https://ghcr.io",
+			},
+			{
+				RepositoryURL: "https://quay.io",
+			},
+			{
+				RepositoryURL: "https://registry.k8s.io",
+			},
+		},
 	}
 
 	file, err := Kube.Fs.Create(pathToConfigFile)
@@ -219,7 +234,7 @@ func (ec *EasykubeConfig) MakeConfig() error {
 
 	buf := &bytes.Buffer{}
 
-	err = templ.Execute(buf, model)
+	err = templ.Execute(buf, modelData)
 	if err != nil {
 		return err
 	}
@@ -246,8 +261,6 @@ func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
 
 	buf := &bytes.Buffer{}
 
-	fmt.Println(cfg)
-
 	err = templ.Execute(buf, cfg)
 	if err != nil {
 		return err
@@ -266,6 +279,38 @@ func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
 	return nil
 }
 
-func (ec *EasykubeConfig) SyncWithZot() error {
+func (ec *EasykubeConfig) SyncWithZot(cfg *EasykubeConfigData) error {
+
+	zotRegistry := `
+	      {
+	        "urls": [
+   	          "%s"
+	         ],
+	         "onDemand": true,
+	         "content": [{"prefix": "**"}]
+	      }`
+
+	zotRegistryM := zotRegistry
+
+	if len(cfg.MirrorRegistries) > 0 {
+		// make registries
+		registries := make([]string, 0, len(cfg.MirrorRegistries))
+
+		for _, reg := range cfg.MirrorRegistries {
+			registries = append(registries, fmt.Sprintf(zotRegistryM, reg.RepositoryURL))
+		}
+
+		configTemplate, err := resources.AppResources.ReadFile("data/zot-config.json.template")
+		if err != nil {
+			return err
+		}
+		templ := template.Must(template.New("zot-config").Funcs(template.FuncMap{
+			"join": strings.Join, // Add strings.Join as a helper
+		}).Parse(string(configTemplate)))
+
+		templ.Execute(os.Stdout, registries)
+	}
+
+	// propagate private registries to zot config
 	return nil
 }

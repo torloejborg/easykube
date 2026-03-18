@@ -66,7 +66,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 			ConfigurationDir:  userConfigDir,
 			ContainerRuntime:  "docker",
 			ConfigurationFile: ez.Kube.PathToConfigFile(),
-			PrivateRegistries: nil,
+			MirrorRegistries:  nil,
 		}
 	}
 
@@ -114,7 +114,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	configureRegistries := strings.ToLower(
 		prompt("Do you wish to configure any private registries? (y/n):", "y", yesNoValidator)) == "y"
 
-	var registries []ez.PrivateRegistry
+	var registries []ez.MirrroRegistry
 	if configureRegistries {
 		for {
 			// Prompt for registry URL
@@ -122,7 +122,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 			registryUsername := prompt(fmt.Sprintf("Username for %s", registryURL), "", nopValidator)
 			registryPassword := prompt(fmt.Sprintf("Password/token for %s", registryURL), "", nopValidator)
 
-			registries = append(registries, ez.PrivateRegistry{
+			registries = append(registries, ez.MirrroRegistry{
 				RepositoryURL: registryURL,
 				UserKey:       registryUsername,
 				PasswordKey:   registryPassword,
@@ -141,13 +141,15 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 		ConfigurationDir:  configurationDir,
 		ContainerRuntime:  containerRuntime,
 		ConfigurationFile: ez.Kube.PathToConfigFile(),
-		PrivateRegistries: registries,
+		MirrorRegistries:  registries,
 	}
 
 	err = ez.Kube.WriteConfig(cfg)
 	if err != nil {
 		return err
 	}
+
+	ez.Kube.SyncWithZot(cfg)
 
 	return nil
 }

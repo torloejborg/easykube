@@ -14,14 +14,15 @@ import (
 func initConfigTests(t *testing.T) {
 
 	osd := test.CreateOsDetailsMock(t)
-	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	_ = ez.Kube.MakeConfig()
-
 	osd.EXPECT().GetEasykubeConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
 	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
-	config := ez.NewEasykubeConfig()
 
+	ez.Kube.UseOsDetails(osd)
+	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	config := ez.NewEasykubeConfig()
 	ez.Kube.UseEasykubeConfig(config)
+	_ = ez.Kube.MakeConfig()
+
 	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
 	ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
 
@@ -58,13 +59,13 @@ func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
 	|  config-dir: /home/tor/.config/easykube
 	|  persistence-dir: /home/tor/.config/easykube/persistence
 	|  container-runtime: docker
-	|  private-registries:
+	|  mirror-registries:
 	|   - repository-url: https://foo.com
-	|     userKey: userkey1
-	|     passwordKey: passkey1
+	|     username: userkey1
+	|     password: passkey1
 	|   - repository-url: https://bar.com
-	|     userKey: userkey2
-	|     passwordKey: passkey2
+	|     username: userkey2
+	|     password: passkey2
 	`, "|")
 
 	f, _ := ez.Kube.Fs.OpenFile(ez.Kube.IEasykubeConfig.PathToConfigFile(), os.O_TRUNC|os.O_WRONLY, os.ModePerm)
@@ -80,8 +81,8 @@ func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
 		panic(err)
 	}
 
-	reg1 := data.PrivateRegistries[0]
-	reg2 := data.PrivateRegistries[1]
+	reg1 := data.MirrorRegistries[0]
+	reg2 := data.MirrorRegistries[1]
 
 	if reg1.RepositoryURL != "https://foo.com" {
 		t.Errorf("expected https://foo.com got %s", reg1.RepositoryURL)
@@ -117,4 +118,29 @@ func TestVerifyConfigurationFilesCopiedToConfigDir(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestZotConfigGeneration(t *testing.T) {
+	initConfigTests(t)
+
+	cfg := &ez.EasykubeConfigData{
+		AddonDir:          "",
+		PersistenceDir:    "",
+		ConfigurationDir:  "",
+		ContainerRuntime:  "",
+		ConfigurationFile: "",
+		MirrorRegistries: []ez.MirrroRegistry{
+			{
+				RepositoryURL: "https://foo.com",
+				UserKey:       "none",
+				PasswordKey:   "nil",
+			},
+			{
+				RepositoryURL: "https://bar.com",
+			},
+		},
+	}
+
+	ez.Kube.SyncWithZot(cfg)
+
 }

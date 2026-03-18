@@ -43,7 +43,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			wg.Add(1)
 			go func() {
 
-				registryCredentials := getPrivateRegistryCredentials(source, config.PrivateRegistries)
+				registryCredentials := getPrivateRegistryCredentials(source, config.MirrorRegistries)
 				if hasImage, err := ezk.HasImageInKindRegistry(dest); err != nil {
 					panic(err)
 				} else if !hasImage || mustPull {
@@ -83,7 +83,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	}
 }
 
-func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) *ez.PrivateRegistryCredentials {
+func getPrivateRegistryCredentials(registry string, config []ez.MirrroRegistry) *ez.PrivateRegistryCredentials {
 
 	secret, err := ez.Kube.GetSecret("easykube-secrets", "default")
 

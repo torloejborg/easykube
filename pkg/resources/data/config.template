@@ -14,9 +14,13 @@ easykube:
   container-runtime: {{ .ContainerRuntime }}
 
   # Private container registries
-  private-registries:
-    {{- range .PrivateRegistries }}
+  mirror-registries:
+    {{- range .MirrorRegistries }}
     - registry-url: {{ .RepositoryURL }}
+      {{- if .UserKey }}
       username: {{ .UserKey }}
+      {{- end -}}
+      {{- if .PasswordKey }}
       password: {{ .PasswordKey }}
+      {{- end -}}
     {{- end }}
