@@ -33,12 +33,10 @@ func FileOrDirExists(path string) bool {
 // dest is a relative path to ~/.config/easykube
 func CopyResourceToConfigDir(src, dest string) error {
 
-	configDir, err := Kube.GetUserConfigDir()
+	configDir, err := Kube.GetEasykubeConfigDir()
 	if nil != err {
 		return err
 	}
-
-	configDir = filepath.Join(configDir, "easykube")
 
 	Kube.Fs.MkdirAll(configDir, 0755)
 

@@ -53,7 +53,10 @@ func prompt(promptMessage, defaultValue string, validate func(string) error) str
 
 func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 
-	userConfigDir := ez.Kube.PathToConfigDir()
+	userConfigDir, err := ez.Kube.GetEasykubeConfigDir()
+	if err != nil {
+		return err
+	}
 	loadedCfg, _ := ez.Kube.LoadConfig()
 
 	if loadedCfg == nil {
@@ -141,7 +144,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 		PrivateRegistries: registries,
 	}
 
-	err := ez.Kube.WriteConfig(cfg)
+	err = ez.Kube.WriteConfig(cfg)
 	if err != nil {
 		panic(err)
 	}

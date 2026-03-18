@@ -449,12 +449,14 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 			Image:        registryImg,
 		}
 
+		configDir, err = Kube.GetEasykubeConfigDir()
+
 		binds := make([]string, 0)
-		binds = append(binds, filepath.Join(configDir, "easykube", "localtest.me.crt")+":/etc/ssl/localtest.me.crt:z")
-		binds = append(binds, filepath.Join(configDir, "easykube", "localtest.me.key")+":/etc/ssl/localtest.me.key:z")
-		binds = append(binds, filepath.Join(configDir, "easykube", "persistence", "zot"+":/var/lib/zot:z"))
-		binds = append(binds, filepath.Join(configDir, "easykube", constants.ZotCredentials)+":/var/lib/zot/credentials.json:z")
-		binds = append(binds, filepath.Join(configDir, "easykube", constants.ZotConfig)+":/etc/zot/config.json:z")
+		binds = append(binds, filepath.Join(configDir, "localtest.me.crt")+":/etc/ssl/localtest.me.crt:z")
+		binds = append(binds, filepath.Join(configDir, "localtest.me.key")+":/etc/ssl/localtest.me.key:z")
+		binds = append(binds, filepath.Join(configDir, "persistence", "zot"+":/var/lib/zot:z"))
+		binds = append(binds, filepath.Join(configDir, constants.ZotCredentials)+":/var/lib/zot/credentials.json:z")
+		binds = append(binds, filepath.Join(configDir, constants.ZotConfig)+":/etc/zot/config.json:z")
 
 		networkingConfig := &network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{

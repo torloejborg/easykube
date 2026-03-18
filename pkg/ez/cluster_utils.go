@@ -2,7 +2,6 @@ package ez
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -75,18 +74,24 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 			panic("no cluster provider")
 		}
 
-		configDir, _ := os.UserConfigDir()
-		configFile := u.RenderToYAML(addonList, u.EkConfig)
+		configDir, _ := Kube.GetEasykubeConfigDir()
 
-		SaveFile(configFile, filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
+		cfg, err := Kube.LoadConfig()
+		if err != nil {
+			panic(err)
+		}
+
+		configFile := u.RenderToYAML(addonList, cfg)
+
+		SaveFile(configFile, filepath.Join(configDir, "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KindImage)
 
 		optKubeConfig := cluster.CreateWithKubeconfigPath(kubeconfigPath)
-		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube", "easykube-cluster.yaml"))
+		optConfig := cluster.CreateWithConfigFile(filepath.Join(configDir, "easykube-cluster.yaml"))
 
-		err := cp.Create(constants.ClusterName, optKubeConfig, optConfig, optNodeImage)
-		if nil != err {
+		clusterErr := cp.Create(constants.ClusterName, optKubeConfig, optConfig, optNodeImage)
+		if nil != clusterErr {
 			panic(err)
 		}
 

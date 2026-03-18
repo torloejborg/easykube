@@ -36,7 +36,6 @@ type IEasykubeConfig interface {
 	EditConfig()
 	LaunchEditor(config, editor string)
 	PathToConfigFile() string
-	PathToConfigDir() string
 	SyncWithZot() error
 	WriteConfig(*EasykubeConfigData) error
 	CopyConfigResources() error
@@ -48,11 +47,7 @@ type EasykubeConfig struct {
 }
 
 func NewEasykubeConfig(os OsDetails) IEasykubeConfig {
-	configDir, _ := os.GetUserConfigDir()
-	return &EasykubeConfig{
-		UserConfigDir: configDir,
-		ConfigDirName: "easykube",
-	}
+	return &EasykubeConfig{}
 }
 
 func (ec *EasykubeConfig) LaunchEditor(config, editor string) {
@@ -73,13 +68,9 @@ func (ec *EasykubeConfig) LaunchEditor(config, editor string) {
 }
 
 func (ec *EasykubeConfig) PathToConfigFile() string {
-	configDir, _ := Kube.GetUserConfigDir()
-	return filepath.Join(configDir, ec.ConfigDirName, "config.yaml")
-}
 
-func (ec *EasykubeConfig) PathToConfigDir() string {
-	configDir, _ := Kube.GetUserConfigDir()
-	return filepath.Join(configDir, ec.ConfigDirName)
+	configDir, _ := Kube.GetEasykubeConfigDir()
+	return filepath.Join(configDir, "config.yaml")
 }
 
 func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
@@ -129,9 +120,14 @@ func (ec *EasykubeConfig) EditConfig() {
 
 func (ec *EasykubeConfig) CopyConfigResources() error {
 
-	userConfigDir, err := Kube.GetUserConfigDir()
+	easykubeConfigDir, err := Kube.GetEasykubeConfigDir()
 	if nil != err {
 		return err
+	}
+
+	merr := Kube.Fs.MkdirAll(easykubeConfigDir, os.ModePerm)
+	if merr != nil {
+		return merr
 	}
 
 	userHomeDir, err := Kube.GetUserHomeDir()
@@ -141,11 +137,6 @@ func (ec *EasykubeConfig) CopyConfigResources() error {
 
 	pathToConfigFile := ec.PathToConfigFile()
 	_, err = Kube.Fs.Stat(pathToConfigFile)
-
-	merr := Kube.Fs.MkdirAll(filepath.Join(userConfigDir, "easykube"), os.ModePerm)
-	if merr != nil {
-		return merr
-	}
 
 	err = CopyResourceToConfigDir("cert/localtest.me.crt", "localtest.me.crt")
 	if nil != err {
@@ -189,6 +180,7 @@ func (ec *EasykubeConfig) CopyConfigResources() error {
 func (ec *EasykubeConfig) MakeConfig() error {
 
 	userHomeDir, err := Kube.GetUserHomeDir()
+	configurationDir, err := Kube.GetEasykubeConfigDir()
 	if nil != err {
 		return err
 	}
@@ -200,8 +192,9 @@ func (ec *EasykubeConfig) MakeConfig() error {
 
 	model := EasykubeConfigData{
 		AddonDir:         filepath.Join(userHomeDir, "addons"),
-		ConfigurationDir: filepath.Join(ec.UserConfigDir, ec.ConfigDirName),
-		PersistenceDir:   filepath.Join(ec.UserConfigDir, ec.ConfigDirName, "persistence"),
+		ConfigurationDir: configurationDir,
+		PersistenceDir:   filepath.Join(configurationDir, "persistence"),
+		ContainerRuntime: "docker",
 	}
 
 	file, err := Kube.Fs.Create(pathToConfigFile)

@@ -17,18 +17,18 @@ var configCmd = &cobra.Command{
 
 		err := ez.InitializeEasykube(
 			ez.WithKubernetes(false),
-			ez.WithContainerRuntime(false))
+			ez.WithContainerRuntime(false),
+			ez.WithAddonReader(false),
+			ez.WithClusterUtils(false))
 		if err != nil {
 			return err
 		}
 
-		if ez.Kube.GetStringFlag(constants.FlagConfigDir) != "" {
-			ez.Kube.MakeConfig()
-			os.Exit(0)
-		}
-
 		if ez.Kube.GetBoolFlag(constants.FlagUseDefaults) {
-			ez.Kube.MakeConfig()
+			err := ez.Kube.MakeConfig()
+			if err != nil {
+				panic(err)
+			}
 			os.Exit(0)
 		}
 

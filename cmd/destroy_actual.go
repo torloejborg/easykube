@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"path/filepath"
 	"time"
 
 	"github.com/torloejborg/easykube/pkg/constants"
@@ -46,8 +45,10 @@ func stopAndDeleteRegistry() Task {
 func purgeData() Task {
 	return NewTaskWithSkip("purge data", func() error {
 
-		user, _ := ez.Kube.OsDetails.GetUserConfigDir()
-		configDir := filepath.Join(user, constants.ConfigDirName)
+		configDir, err := ez.Kube.GetEasykubeConfigDir()
+		if err != nil {
+			return err
+		}
 
 		s, _ := ez.Kube.Fs.Stat(configDir)
 		if s.IsDir() {

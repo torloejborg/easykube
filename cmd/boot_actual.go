@@ -20,13 +20,13 @@ func createActualCmd(opts BootOpts) error {
 	tasks := NewTaskContainer()
 
 	tasks.AddTask(ensureContainerRuntimeTask())
-	tasks.AddTask(ensurePersistenceDirectoriesTask())
 	tasks.AddTask(inspectPortsFreeTask())
 	tasks.AddTask(pullKindImageTask())
 	tasks.AddTask(pullRegistryImageTask())
 	tasks.AddTask(createRegistryTask())
 	tasks.AddTask(startRegistryTask())
 	tasks.AddTask(createClusterTask())
+	tasks.AddTask(ensurePersistenceDirectoriesTask())
 	tasks.AddTask(connectRegistryToKindTask())
 	tasks.AddTask(ensureLocalClusterContextTask())
 	tasks.AddTask(patchCoreDNSTask())
@@ -142,7 +142,6 @@ var clusterCreateReport = ""
 
 func createClusterTask() Task {
 	return NewTaskWithSkip("create easykube-kind cluster", func() error {
-
 		addons, err := ez.Kube.GetAddons()
 		if err != nil {
 			return err

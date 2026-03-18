@@ -98,20 +98,35 @@ func CreateOsDetailsImpl() OsDetails {
 type Easykube struct {
 	initializeContainerRuntime bool
 	initializeKubernetesClient bool
+	initializeAddonReader      bool
+	initializeClusterUtils     bool
 }
 
 type EkOpt func(easykube *Easykube) error
 
-func WithContainerRuntime(useit bool) EkOpt {
+func WithContainerRuntime(initialize bool) EkOpt {
 	return func(e *Easykube) error {
-		e.initializeContainerRuntime = useit
+		e.initializeContainerRuntime = initialize
 		return nil
 	}
 }
 
-func WithKubernetes(useit bool) EkOpt {
+func WithKubernetes(initialize bool) EkOpt {
 	return func(e *Easykube) error {
-		e.initializeKubernetesClient = useit
+		e.initializeKubernetesClient = initialize
+		return nil
+	}
+}
+func WithAddonReader(initialize bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeAddonReader = initialize
+		return nil
+	}
+}
+
+func WithClusterUtils(initialize bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeClusterUtils = initialize
 		return nil
 	}
 }
@@ -121,6 +136,8 @@ func InitializeEasykube(opts ...EkOpt) error {
 	ekOpts := Easykube{
 		initializeContainerRuntime: true,
 		initializeKubernetesClient: true,
+		initializeAddonReader:      true,
+		initializeClusterUtils:     true,
 	}
 
 	for _, opt := range opts {
@@ -130,6 +147,7 @@ func InitializeEasykube(opts ...EkOpt) error {
 	}
 
 	osd := CreateOsDetailsImpl()
+
 	config := CreateEasykubeConfigImpl(osd)
 	Kube.UseEasykubeConfig(config)
 
@@ -141,7 +159,10 @@ func InitializeEasykube(opts ...EkOpt) error {
 		Kube.UseK8sUtils(CreateK8sUtilsImpl())
 	}
 
-	Kube.UseAddonReader(CreateAddonReaderImpl(config))
+	if ekOpts.initializeAddonReader {
+		Kube.UseAddonReader(CreateAddonReaderImpl(config))
+	}
+
 	Kube.UseExternalTools(NewExternalTools())
 
 	if ekOpts.initializeContainerRuntime {
@@ -152,7 +173,9 @@ func InitializeEasykube(opts ...EkOpt) error {
 		Kube.UseContainerRuntime(cri)
 	}
 
-	Kube.UseClusterUtils(CreateClusterUtilsImpl())
+	if ekOpts.initializeClusterUtils {
+		Kube.UseClusterUtils(CreateClusterUtilsImpl())
+	}
 
 	return nil
 
