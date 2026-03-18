@@ -11,12 +11,12 @@ easykube:
   persistence-dir: {{ .PersistenceDir }}
 
   # Container Runtime docker or podman
-  container-runtime:  {{ .ContainerRuntime }}
+  container-runtime: {{ .ContainerRuntime }}
+
+  # Private container registries
   private-registries:
-  {{- range .PrivateRegistries -}}
-    - registry-url: {{.RepositoryURL}}
-      username: {{.UserKey}}
-      password: {{.PasswordKey}}
-  {{- end -}}
-
-
+    {{- range .PrivateRegistries }}
+    - registry-url: {{ .RepositoryURL }}
+      username: {{ .UserKey }}
+      password: {{ .PasswordKey }}
+    {{- end }}
