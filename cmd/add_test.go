@@ -15,7 +15,7 @@ func setupForDryRun(ctrl *gomock.Controller, t *testing.T) {
 	_ = os.Setenv("KUBECONFIG", "mock-kubeconfig")
 
 	osd := mock_ez.NewMockOsDetails(ctrl)
-	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
+	osd.EXPECT().GetEasykubeConfigDir().Return("/home/some-user/easykube/.config", nil).AnyTimes()
 	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
 
 	mk8s := mock_ez.NewMockIK8SUtils(ctrl)
@@ -30,19 +30,19 @@ func setupForDryRun(ctrl *gomock.Controller, t *testing.T) {
 	commandHelper.EXPECT().IsDryRun().Return(true).AnyTimes()
 	commandHelper.EXPECT().IsVerbose().Return(true).AnyTimes()
 
-	config := ez.NewEasykubeConfig(osd)
+	ez.Kube.OsDetails = osd
+	ez.Kube.Fs = afero.NewMemMapFs()
+	config := ez.NewEasykubeConfig()
+	ez.Kube.IEasykubeConfig = config
+	_ = ez.Kube.MakeConfig()
 
 	ez.Kube.ICobraCommandHelper = commandHelper
-	ez.Kube.OsDetails = osd
-	ez.Kube.IEasykubeConfig = config
-	ez.Kube.Fs = afero.NewMemMapFs()
+
 	ez.Kube.IK8SUtils = mk8s
 	ez.Kube.IClusterUtils = clusterUtils
 	ez.Kube.IContainerRuntime = containerRuntime
 	ez.Kube.IAddonReader = ez.NewAddonReader(config)
 	ez.Kube.IExternalTools = ez.NewExternalTools()
-
-	_ = ez.Kube.MakeConfig()
 
 }
 

@@ -14,26 +14,25 @@ import (
 func initConfigTests(t *testing.T) {
 
 	osd := test.CreateOsDetailsMock(t)
-	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
-	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
-	config := ez.NewEasykubeConfig(osd)
-
-	ez.Kube.UseOsDetails(osd)
 	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	_ = ez.Kube.MakeConfig()
+
+	osd.EXPECT().GetEasykubeConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
+	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
+	config := ez.NewEasykubeConfig()
+
 	ez.Kube.UseEasykubeConfig(config)
 	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
 	ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
-
-	_ = ez.Kube.MakeConfig()
 
 }
 
 func TestMakeDefaultConfig(t *testing.T) {
 	initConfigTests(t)
-	cfgdir, _ := ez.Kube.GetUserConfigDir()
+	cfgdir, _ := ez.Kube.GetEasykubeConfigDir()
 	homeDir, _ := ez.Kube.GetUserHomeDir()
 
-	exists := ez.FileOrDirExists(filepath.Join(cfgdir, "easykube", "config.yaml"))
+	exists := ez.FileOrDirExists(filepath.Join(cfgdir, "config.yaml"))
 	if !exists {
 		t.Errorf("expected easykube config file to exist")
 	}
@@ -60,10 +59,10 @@ func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
 	|  persistence-dir: /home/tor/.config/easykube/persistence
 	|  container-runtime: docker
 	|  private-registries:
-	|   - repositoryMatch: ccta.dk
+	|   - repository-url: https://foo.com
 	|     userKey: userkey1
 	|     passwordKey: passkey1
-	|   - repositoryMatch: anotherRepo
+	|   - repository-url: https://bar.com
 	|     userKey: userkey2
 	|     passwordKey: passkey2
 	`, "|")
@@ -84,12 +83,12 @@ func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
 	reg1 := data.PrivateRegistries[0]
 	reg2 := data.PrivateRegistries[1]
 
-	if reg1.RepositoryMatch != "ccta.dk" {
-		t.Errorf("expected ccta.dk got %s", reg1.RepositoryMatch)
+	if reg1.RepositoryURL != "https://foo.com" {
+		t.Errorf("expected https://foo.com got %s", reg1.RepositoryURL)
 	}
 
-	if reg2.RepositoryMatch != "anotherRepo" {
-		t.Errorf("expected anotherRepo got %s", reg2.RepositoryMatch)
+	if reg2.RepositoryURL != "https://bar.com" {
+		t.Errorf("expected https://bar.com got %s", reg2.RepositoryURL)
 	}
 
 }
@@ -101,18 +100,18 @@ var filesExist = []struct {
 	{"config.yaml", true},
 	{"localtest.me.crt", true},
 	{"localtest.me.key", true},
-	{"registry-config.yaml", true},
+	{"zot-config.json", true},
 	{"persistence", false},
 	{"easykube-cluster.yaml", false},
 }
 
 func TestVerifyConfigurationFilesCopiedToConfigDir(t *testing.T) {
 	initConfigTests(t)
-	cfgdir, _ := ez.Kube.GetUserConfigDir()
+	cfgdir, _ := ez.Kube.GetEasykubeConfigDir()
 
 	for _, tt := range filesExist {
 		t.Run(tt.file, func(t *testing.T) {
-			found := ez.FileOrDirExists(filepath.Join(cfgdir, "easykube", tt.file))
+			found := ez.FileOrDirExists(filepath.Join(cfgdir, tt.file))
 			if found != tt.exists {
 				t.Errorf("expected file %v file to exist in %v, was %v", tt.file, cfgdir, found)
 			}

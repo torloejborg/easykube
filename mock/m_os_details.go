@@ -39,41 +39,41 @@ func (m *MockOsDetails) EXPECT() *MockOsDetailsMockRecorder {
 	return m.recorder
 }
 
-// GetUserConfigDir mocks base method.
-func (m *MockOsDetails) GetUserConfigDir() (string, error) {
+// GetEasykubeConfigDir mocks base method.
+func (m *MockOsDetails) GetEasykubeConfigDir() (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserConfigDir")
+	ret := m.ctrl.Call(m, "GetEasykubeConfigDir")
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUserConfigDir indicates an expected call of GetUserConfigDir.
-func (mr *MockOsDetailsMockRecorder) GetUserConfigDir() *MockOsDetailsGetUserConfigDirCall {
+// GetEasykubeConfigDir indicates an expected call of GetEasykubeConfigDir.
+func (mr *MockOsDetailsMockRecorder) GetEasykubeConfigDir() *MockOsDetailsGetEasykubeConfigDirCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserConfigDir", reflect.TypeOf((*MockOsDetails)(nil).GetUserConfigDir))
-	return &MockOsDetailsGetUserConfigDirCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEasykubeConfigDir", reflect.TypeOf((*MockOsDetails)(nil).GetEasykubeConfigDir))
+	return &MockOsDetailsGetEasykubeConfigDirCall{Call: call}
 }
 
-// MockOsDetailsGetUserConfigDirCall wrap *gomock.Call
-type MockOsDetailsGetUserConfigDirCall struct {
+// MockOsDetailsGetEasykubeConfigDirCall wrap *gomock.Call
+type MockOsDetailsGetEasykubeConfigDirCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockOsDetailsGetUserConfigDirCall) Return(arg0 string, arg1 error) *MockOsDetailsGetUserConfigDirCall {
+func (c *MockOsDetailsGetEasykubeConfigDirCall) Return(arg0 string, arg1 error) *MockOsDetailsGetEasykubeConfigDirCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOsDetailsGetUserConfigDirCall) Do(f func() (string, error)) *MockOsDetailsGetUserConfigDirCall {
+func (c *MockOsDetailsGetEasykubeConfigDirCall) Do(f func() (string, error)) *MockOsDetailsGetEasykubeConfigDirCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOsDetailsGetUserConfigDirCall) DoAndReturn(f func() (string, error)) *MockOsDetailsGetUserConfigDirCall {
+func (c *MockOsDetailsGetEasykubeConfigDirCall) DoAndReturn(f func() (string, error)) *MockOsDetailsGetEasykubeConfigDirCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

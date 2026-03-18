@@ -90,6 +90,8 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 			return errors.New("addon dir %s is not a directory")
 		}
 
+		// detect addons
+
 		return nil
 	})
 
@@ -99,16 +101,14 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	// prompt for configuration dir
 	persistenceDir := prompt("Enter the path to the ek easykube persistence directory:", loadedCfg.PersistenceDir, nopValidator)
 
-	//func(s string) error {
-	//if s != "docker" && s != "podman" {
-	//	return errors.New("invalid choice. Please enter 'docker' or 'podman'")
-	//
-	//}
-	//return nil
-	//}
-
 	// Prompt for container runtime
-	containerRuntime := prompt("Which container runtime do you wish to use (docker/podman)", loadedCfg.ContainerRuntime, nopValidator)
+	containerRuntime := prompt("Which container runtime do you wish to use (docker/podman)", loadedCfg.ContainerRuntime, func(s string) error {
+		if s != "docker" && s != "podman" {
+			return errors.New("invalid choice. Please enter 'docker' or 'podman'")
+
+		}
+		return nil
+	})
 
 	// Prompt for private registries
 	configureRegistries := strings.ToLower(
@@ -146,7 +146,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 
 	err = ez.Kube.WriteConfig(cfg)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	return nil

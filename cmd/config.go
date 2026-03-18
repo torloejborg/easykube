@@ -33,7 +33,10 @@ var configCmd = &cobra.Command{
 		}
 
 		if ez.Kube.GetBoolFlag(constants.FlagEdit) {
-			ez.Kube.EditConfig()
+			err := ez.Kube.EditConfig()
+			if err != nil {
+				ez.Kube.FmtGreen(err.Error())
+			}
 			os.Exit(0)
 		}
 

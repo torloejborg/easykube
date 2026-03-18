@@ -11,12 +11,13 @@ import (
 
 func initCreateAddonsTest(t *testing.T) {
 	osd := test.CreateOsDetailsMock(t)
-	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
+	osd.EXPECT().GetEasykubeConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
 	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
-	config := ez.NewEasykubeConfig(osd)
+	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	_ = ez.Kube.MakeConfig()
+	config := ez.NewEasykubeConfig()
 
 	ez.Kube.UseOsDetails(osd)
-	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
 	ez.Kube.UseEasykubeConfig(config)
 
 }

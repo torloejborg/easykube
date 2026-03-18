@@ -2,6 +2,7 @@ package ez
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -33,7 +34,7 @@ type EasykubeConfigData struct {
 type IEasykubeConfig interface {
 	LoadConfig() (*EasykubeConfigData, error)
 	MakeConfig() error
-	EditConfig()
+	EditConfig() error
 	LaunchEditor(config, editor string)
 	PathToConfigFile() string
 	SyncWithZot() error
@@ -46,7 +47,7 @@ type EasykubeConfig struct {
 	UserConfigDir string
 }
 
-func NewEasykubeConfig(os OsDetails) IEasykubeConfig {
+func NewEasykubeConfig() IEasykubeConfig {
 	return &EasykubeConfig{}
 }
 
@@ -102,20 +103,23 @@ func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
 	return &easykube, nil
 }
 
-func (ec *EasykubeConfig) EditConfig() {
+func (ec *EasykubeConfig) EditConfig() error {
 	editor := os.Getenv("VISUAL")
 	if len(editor) == 0 {
 		fmt.Println("VISUAL environment variable not set")
 		os.Exit(-1)
 	} else {
-		_, err := os.UserConfigDir()
 
+		cfgFile := ec.PathToConfigFile()
+		_, err := os.Stat(cfgFile)
 		if err != nil {
-			fmt.Println("Could not determine $HOMEDIR")
-			os.Exit(-1)
+			return errors.New("nothing to edit. create a default with config --use-defaults, or config")
 		}
+
 		ec.LaunchEditor(ec.PathToConfigFile(), editor)
 	}
+
+	return nil
 }
 
 func (ec *EasykubeConfig) CopyConfigResources() error {
@@ -248,8 +252,6 @@ func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(buf.String())
 
 	file, err := Kube.Fs.OpenFile(cfg.ConfigurationFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if nil != err {

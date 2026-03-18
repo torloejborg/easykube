@@ -75,8 +75,8 @@ func CreateK8sUtilsImpl() IK8SUtils {
 	return NewK8SUtils()
 }
 
-func CreateEasykubeConfigImpl(osd OsDetails) IEasykubeConfig {
-	return NewEasykubeConfig(osd)
+func CreateEasykubeConfigImpl() IEasykubeConfig {
+	return NewEasykubeConfig()
 }
 
 func CreateAddonReaderImpl(config IEasykubeConfig) IAddonReader {
@@ -148,7 +148,7 @@ func InitializeEasykube(opts ...EkOpt) error {
 
 	osd := CreateOsDetailsImpl()
 
-	config := CreateEasykubeConfigImpl(osd)
+	config := CreateEasykubeConfigImpl()
 	Kube.UseEasykubeConfig(config)
 
 	Kube.UseFilesystemLayer(afero.NewOsFs())
