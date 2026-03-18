@@ -83,7 +83,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	}
 }
 
-func getPrivateRegistryCredentials(registry string, config []ez.MirrroRegistry) *ez.PrivateRegistryCredentials {
+func getPrivateRegistryCredentials(registry string, config []ez.MirrorRegistry) *ez.PrivateRegistryCredentials {
 
 	secret, err := ez.Kube.GetSecret("easykube-secrets", "default")
 
@@ -93,10 +93,10 @@ func getPrivateRegistryCredentials(registry string, config []ez.MirrroRegistry) 
 
 	for i := range config {
 
-		if strings.Contains(registry, config[i].RepositoryURL) {
+		if strings.Contains(registry, config[i].RegistryUrl) {
 
 			if secret[config[i].UserKey] == nil || secret[config[i].PasswordKey] == nil {
-				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RepositoryURL)
+				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RegistryUrl)
 				return nil
 			}
 			return &ez.PrivateRegistryCredentials{

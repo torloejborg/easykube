@@ -13,10 +13,10 @@ easykube:
   # Container Runtime docker or podman
   container-runtime: {{ .ContainerRuntime }}
 
-  # Private container registries
+  # use pull through caching on these container registries
   mirror-registries:
     {{- range .MirrorRegistries }}
-    - registry-url: {{ .RepositoryURL }}
+    - registry-url: {{ .RegistryUrl }}
       {{- if .UserKey }}
       username: {{ .UserKey }}
       {{- end -}}

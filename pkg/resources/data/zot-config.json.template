@@ -20,7 +20,7 @@
     "search": { "enable": true },
     "sync": {
       "enable": true,
-      "credentialsFile": "/etc/zot/zot-credentails.json",
+      "credentialsFile": "/etc/zot/zot-credentials.json",
       "registries": [
            {{- $joined := join . "," -}}
            {{ $joined }}

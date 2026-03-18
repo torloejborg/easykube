@@ -13,14 +13,15 @@ import (
 
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
+	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
-type MirrroRegistry struct {
-	RepositoryURL string `mapstructure:"repository-url"`
-	UserKey       string `mapstructure:"username"`
-	PasswordKey   string `mapstructure:"password"`
+type MirrorRegistry struct {
+	RegistryUrl string `mapstructure:"registry-url"`
+	UserKey     string `mapstructure:"username"`
+	PasswordKey string `mapstructure:"password"`
 }
 
 type EasykubeConfigData struct {
@@ -29,7 +30,7 @@ type EasykubeConfigData struct {
 	ConfigurationDir  string `mapstructure:"config-dir"`
 	ContainerRuntime  string `mapstructure:"container-runtime"`
 	ConfigurationFile string
-	MirrorRegistries  []MirrroRegistry `mapstructure:"mirror-registries"`
+	MirrorRegistries  []MirrorRegistry `mapstructure:"mirror-registries"`
 }
 
 type IEasykubeConfig interface {
@@ -38,7 +39,8 @@ type IEasykubeConfig interface {
 	EditConfig() error
 	LaunchEditor(config, editor string)
 	PathToConfigFile() string
-	SyncWithZot(*EasykubeConfigData) error
+	GenerateZotRegistryConfig(*EasykubeConfigData) error
+	GenerateZotRegistryCredentials(*EasykubeConfigData) error
 	WriteConfig(*EasykubeConfigData) error
 	CopyConfigResources() error
 }
@@ -94,14 +96,14 @@ func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
 		return nil, err
 	}
 
-	easykube := EasykubeConfigData{}
-	err = config.BindStruct("easykube", &easykube)
+	easykube := &EasykubeConfigData{}
+	err = config.BindStruct("easykube", easykube)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &easykube, nil
+	return easykube, nil
 }
 
 func (ec *EasykubeConfig) EditConfig() error {
@@ -158,16 +160,6 @@ func (ec *EasykubeConfig) CopyConfigResources() error {
 		return err
 	}
 
-	err = CopyResourceToConfigDir("zot-config.json", "zot-config.json")
-	if nil != err {
-		return err
-	}
-
-	err = CopyResourceToConfigDir("zot-credentials.json", "zot-credentials.json")
-	if nil != err {
-		return err
-	}
-
 	// Make podman aware of a selfsigned certificate
 	certData, err := resources.AppResources.ReadFile("data/cert/localtest.me.ca.crt")
 	if nil != err {
@@ -200,18 +192,18 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		ConfigurationDir: configurationDir,
 		PersistenceDir:   filepath.Join(configurationDir, "persistence"),
 		ContainerRuntime: "docker",
-		MirrorRegistries: []MirrroRegistry{
+		MirrorRegistries: []MirrorRegistry{
 			{
-				RepositoryURL: "https://registry-1.docker.io",
+				RegistryUrl: "https://registry-1.docker.io",
 			},
 			{
-				RepositoryURL: "https://ghcr.io",
+				RegistryUrl: "https://ghcr.io",
 			},
 			{
-				RepositoryURL: "https://quay.io",
+				RegistryUrl: "https://quay.io",
 			},
 			{
-				RepositoryURL: "https://registry.k8s.io",
+				RegistryUrl: "https://registry.k8s.io",
 			},
 		},
 	}
@@ -279,7 +271,7 @@ func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
 	return nil
 }
 
-func (ec *EasykubeConfig) SyncWithZot(cfg *EasykubeConfigData) error {
+func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *EasykubeConfigData) error {
 
 	zotRegistry := `
 	      {
@@ -297,7 +289,7 @@ func (ec *EasykubeConfig) SyncWithZot(cfg *EasykubeConfigData) error {
 		registries := make([]string, 0, len(cfg.MirrorRegistries))
 
 		for _, reg := range cfg.MirrorRegistries {
-			registries = append(registries, fmt.Sprintf(zotRegistryM, reg.RepositoryURL))
+			registries = append(registries, fmt.Sprintf(zotRegistryM, reg.RegistryUrl))
 		}
 
 		configTemplate, err := resources.AppResources.ReadFile("data/zot-config.json.template")
@@ -308,7 +300,74 @@ func (ec *EasykubeConfig) SyncWithZot(cfg *EasykubeConfigData) error {
 			"join": strings.Join, // Add strings.Join as a helper
 		}).Parse(string(configTemplate)))
 
-		templ.Execute(os.Stdout, registries)
+		buf := &bytes.Buffer{}
+
+		err = templ.Execute(buf, registries)
+		if err != nil {
+			return err
+		}
+
+		configDir, _ := Kube.GetEasykubeConfigDir()
+		zotconfig := filepath.Join(configDir, constants.ZotConfig)
+
+		file, err := Kube.Fs.OpenFile(zotconfig, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		defer func(file afero.File) {
+			_ = file.Close()
+		}(file)
+
+		if nil != err {
+			panic(err)
+		}
+
+		_, err = file.WriteString(buf.String())
+		if nil != err {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+func (ec *EasykubeConfig) GenerateZotRegistryCredentials(cfg *EasykubeConfigData) error {
+
+	if len(cfg.MirrorRegistries) > 0 {
+
+		mirrorsWithCredentials := make([]MirrorRegistry, 0)
+
+		for _, reg := range cfg.MirrorRegistries {
+			if reg.PasswordKey != "" {
+				mirrorsWithCredentials = append(mirrorsWithCredentials, reg)
+			}
+		}
+
+		configTemplate, err := resources.AppResources.ReadFile("data/zot-credentials.json.template")
+		if err != nil {
+			return err
+		}
+		templ := template.Must(template.New("zot-credentials").Funcs(template.FuncMap{
+			"sub": func(a, b int) int { return a - b }, // Add the sub function
+		}).Parse(string(configTemplate)))
+
+		buf := &bytes.Buffer{}
+		err = templ.Execute(buf, mirrorsWithCredentials)
+		if err != nil {
+			return err
+		}
+
+		configDir, _ := Kube.GetEasykubeConfigDir()
+		zotconfig := filepath.Join(configDir, constants.ZotCredentials)
+
+		file, err := Kube.Fs.OpenFile(zotconfig, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		if nil != err {
+			panic(err)
+		}
+
+		_, err = file.WriteString(buf.String())
+
+		if nil != err {
+			return err
+		}
 	}
 
 	// propagate private registries to zot config

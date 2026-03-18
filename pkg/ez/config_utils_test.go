@@ -1,6 +1,7 @@
 package ez_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -60,10 +61,10 @@ func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
 	|  persistence-dir: /home/tor/.config/easykube/persistence
 	|  container-runtime: docker
 	|  mirror-registries:
-	|   - repository-url: https://foo.com
+	|   - registry-url: https://foo.com
 	|     username: userkey1
 	|     password: passkey1
-	|   - repository-url: https://bar.com
+	|   - registry-url: https://bar.com
 	|     username: userkey2
 	|     password: passkey2
 	`, "|")
@@ -84,12 +85,12 @@ func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
 	reg1 := data.MirrorRegistries[0]
 	reg2 := data.MirrorRegistries[1]
 
-	if reg1.RepositoryURL != "https://foo.com" {
-		t.Errorf("expected https://foo.com got %s", reg1.RepositoryURL)
+	if reg1.RegistryUrl != "https://foo.com" {
+		t.Errorf("expected https://foo.com got %s", reg1.RegistryUrl)
 	}
 
-	if reg2.RepositoryURL != "https://bar.com" {
-		t.Errorf("expected https://bar.com got %s", reg2.RepositoryURL)
+	if reg2.RegistryUrl != "https://bar.com" {
+		t.Errorf("expected https://bar.com got %s", reg2.RegistryUrl)
 	}
 
 }
@@ -101,7 +102,6 @@ var filesExist = []struct {
 	{"config.yaml", true},
 	{"localtest.me.crt", true},
 	{"localtest.me.key", true},
-	{"zot-config.json", true},
 	{"persistence", false},
 	{"easykube-cluster.yaml", false},
 }
@@ -129,18 +129,25 @@ func TestZotConfigGeneration(t *testing.T) {
 		ConfigurationDir:  "",
 		ContainerRuntime:  "",
 		ConfigurationFile: "",
-		MirrorRegistries: []ez.MirrroRegistry{
+		MirrorRegistries: []ez.MirrorRegistry{
 			{
-				RepositoryURL: "https://foo.com",
-				UserKey:       "none",
-				PasswordKey:   "nil",
+				RegistryUrl: "https://foo.com",
+				UserKey:     "none",
+				PasswordKey: "nil",
 			},
 			{
-				RepositoryURL: "https://bar.com",
+				RegistryUrl: "https://bar.com",
+			},
+			{
+				RegistryUrl: "https://secret-registry.com",
+				UserKey:     "xxxxx",
+				PasswordKey: "********",
 			},
 		},
 	}
 
-	ez.Kube.SyncWithZot(cfg)
+	ez.Kube.GenerateZotRegistryConfig(cfg)
+	ez.Kube.GenerateZotRegistryCredentials(cfg)
 
+	fmt.Println("done")
 }

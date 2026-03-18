@@ -270,7 +270,7 @@ func (c *MockIEasykubeConfigPathToConfigFileCall) DoAndReturn(f func() string) *
 // SyncWithZot mocks base method.
 func (m *MockIEasykubeConfig) SyncWithZot() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SyncWithZot")
+	ret := m.ctrl.Call(m, "GenerateZotRegistryConfig")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -278,7 +278,7 @@ func (m *MockIEasykubeConfig) SyncWithZot() error {
 // SyncWithZot indicates an expected call of SyncWithZot.
 func (mr *MockIEasykubeConfigMockRecorder) SyncWithZot() *MockIEasykubeConfigSyncWithZotCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SyncWithZot", reflect.TypeOf((*MockIEasykubeConfig)(nil).SyncWithZot))
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateZotRegistryConfig", reflect.TypeOf((*MockIEasykubeConfig)(nil).SyncWithZot))
 	return &MockIEasykubeConfigSyncWithZotCall{Call: call}
 }
 

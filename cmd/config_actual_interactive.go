@@ -114,7 +114,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	configureRegistries := strings.ToLower(
 		prompt("Do you wish to configure any private registries? (y/n):", "y", yesNoValidator)) == "y"
 
-	var registries []ez.MirrroRegistry
+	var registries []ez.MirrorRegistry
 	if configureRegistries {
 		for {
 			// Prompt for registry URL
@@ -122,10 +122,10 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 			registryUsername := prompt(fmt.Sprintf("Username for %s", registryURL), "", nopValidator)
 			registryPassword := prompt(fmt.Sprintf("Password/token for %s", registryURL), "", nopValidator)
 
-			registries = append(registries, ez.MirrroRegistry{
-				RepositoryURL: registryURL,
-				UserKey:       registryUsername,
-				PasswordKey:   registryPassword,
+			registries = append(registries, ez.MirrorRegistry{
+				RegistryUrl: registryURL,
+				UserKey:     registryUsername,
+				PasswordKey: registryPassword,
 			})
 
 			// Ask if user wants to configure another registry
@@ -148,8 +148,6 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-
-	ez.Kube.SyncWithZot(cfg)
 
 	return nil
 }

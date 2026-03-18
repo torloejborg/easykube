@@ -23,6 +23,8 @@ func createActualCmd(opts BootOpts) error {
 	tasks.AddTask(inspectPortsFreeTask())
 	tasks.AddTask(pullKindImageTask())
 	tasks.AddTask(pullRegistryImageTask())
+	tasks.AddTask(zotRegistryConfigurationTask())
+	tasks.AddTask(zotRegistryCredentialConfigurationTask())
 	tasks.AddTask(createRegistryTask())
 	tasks.AddTask(startRegistryTask())
 	tasks.AddTask(createClusterTask())
@@ -220,4 +222,45 @@ func ensurePersistenceDirectoriesTask() Task {
 		return ez.Kube.IsClusterRunning()
 	})
 
+}
+
+func zotRegistryConfigurationTask() Task {
+
+	return NewTaskWithSkip("update zot mirror registries", func() error {
+
+		cfg, err := ez.Kube.LoadConfig()
+		if err != nil {
+			return err
+		}
+
+		err = ez.Kube.GenerateZotRegistryConfig(cfg)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}, func() bool {
+		// todo: find a good skip condition
+		return false
+	})
+}
+
+func zotRegistryCredentialConfigurationTask() Task {
+	return NewTaskWithSkip("update zot mirror credentials", func() error {
+
+		cfg, err := ez.Kube.LoadConfig()
+		if err != nil {
+			return err
+		}
+
+		err = ez.Kube.GenerateZotRegistryCredentials(cfg)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}, func() bool {
+		// todo: find a good skip condition
+		return false
+	})
 }
