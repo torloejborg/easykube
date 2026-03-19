@@ -68,6 +68,8 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 			ConfigurationFile: ez.Kube.PathToConfigFile(),
 			MirrorRegistries:  nil,
 		}
+	} else {
+
 	}
 
 	nopValidator := func(s string) error { return nil }
@@ -112,15 +114,15 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 
 	// Prompt for private registries
 	configureRegistries := strings.ToLower(
-		prompt("Do you wish to configure any private registries? (y/n):", "y", yesNoValidator)) == "y"
+		prompt("Do you wish to configure any mirror registries? (y/n):", "y", yesNoValidator)) == "y"
 
 	var registries []ez.MirrorRegistry
 	if configureRegistries {
 		for {
 			// Prompt for registry URL
-			registryURL := prompt("Enter the URL of the registry:", "", nopValidator)
-			registryUsername := prompt(fmt.Sprintf("Username for %s", registryURL), "", nopValidator)
-			registryPassword := prompt(fmt.Sprintf("Password/token for %s", registryURL), "", nopValidator)
+			registryURL := prompt("Enter URL of the mirror registry:", "", nopValidator)
+			registryUsername := prompt(fmt.Sprintf("Username for %s (leave blank for no credentials)", registryURL), "", nopValidator)
+			registryPassword := prompt(fmt.Sprintf("Password/token for %s (leave blank for no credentials)", registryURL), "", nopValidator)
 
 			registries = append(registries, ez.MirrorRegistry{
 				RegistryUrl: registryURL,
@@ -135,13 +137,17 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	for _, registry := range registries {
+		loadedCfg.MirrorRegistries = append(loadedCfg.MirrorRegistries, registry)
+	}
+
 	cfg := &ez.EasykubeConfigData{
 		AddonDir:          addonDir,
 		PersistenceDir:    persistenceDir,
 		ConfigurationDir:  configurationDir,
 		ContainerRuntime:  containerRuntime,
 		ConfigurationFile: ez.Kube.PathToConfigFile(),
-		MirrorRegistries:  registries,
+		MirrorRegistries:  loadedCfg.MirrorRegistries,
 	}
 
 	err = ez.Kube.WriteConfig(cfg)
