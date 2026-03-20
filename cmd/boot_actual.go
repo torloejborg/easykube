@@ -15,6 +15,8 @@ type BootOpts struct {
 	Secrets string
 }
 
+var skipRestartRegistryTask bool = true
+
 func createActualCmd(opts BootOpts, currentConfig *ez.EasykubeConfigData) error {
 
 	tasks := ez.NewTaskContainer()
@@ -25,6 +27,7 @@ func createActualCmd(opts BootOpts, currentConfig *ez.EasykubeConfigData) error 
 	tasks.AddTask(pullRegistryImageTask())
 	tasks.AddTask(configureZotRegistry(currentConfig))
 	tasks.AddTask(createRegistryTask())
+	tasks.AddTask(restartRegistryTask())
 	tasks.AddTask(startRegistryTask())
 	tasks.AddTask(createClusterTask())
 	tasks.AddTask(ensurePersistenceDirectoriesTask())
@@ -158,11 +161,23 @@ func createClusterTask() ez.Task {
 }
 
 func startRegistryTask() ez.Task {
-	return ez.NewTaskWithSkip("start registry", func() error {
+	return ez.NewTaskWithSkip("start zot-registry", func() error {
 		return ez.Kube.StartContainerRegistry()
 	}, func() bool {
 		running, _ := ez.Kube.IsContainerRunning(constants.RegistryContainer)
 		return running
+	})
+}
+
+func restartRegistryTask() ez.Task {
+	return ez.NewTaskWithSkip("restart zot-registry", func() error {
+		err := ez.Kube.StopContainer(constants.RegistryContainer)
+		if err != nil {
+			return err
+		}
+		return ez.Kube.StartContainer(constants.RegistryContainer)
+	}, func() bool {
+		return skipRestartRegistryTask
 	})
 }
 
@@ -241,6 +256,7 @@ func configureZotRegistry(config *ez.EasykubeConfigData) ez.Task {
 	}, func() bool {
 
 		sync, err := ez.Kube.IsZotConfigInSync(config)
+		skipRestartRegistryTask = sync
 		if err != nil {
 			panic(err)
 		}

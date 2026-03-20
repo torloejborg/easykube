@@ -1,6 +1,8 @@
 package ez
 
 import (
+	"errors"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/pkg/textutils"
@@ -96,10 +98,11 @@ func CreateOsDetailsImpl() OsDetails {
 }
 
 type Easykube struct {
-	initializeContainerRuntime bool
-	initializeKubernetesClient bool
-	initializeAddonReader      bool
-	initializeClusterUtils     bool
+	initializeContainerRuntime          bool
+	initializeKubernetesClient          bool
+	initializeAddonReader               bool
+	initializeClusterUtils              bool
+	initializeWithMustHaveConfiguration bool
 }
 
 type EkOpt func(easykube *Easykube) error
@@ -131,13 +134,21 @@ func WithClusterUtils(initialize bool) EkOpt {
 	}
 }
 
+func WithMustHaveConfiguration(configIsCreated bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeWithMustHaveConfiguration = configIsCreated
+		return nil
+	}
+}
+
 func InitializeEasykube(opts ...EkOpt) error {
 
 	ekOpts := Easykube{
-		initializeContainerRuntime: true,
-		initializeKubernetesClient: true,
-		initializeAddonReader:      true,
-		initializeClusterUtils:     true,
+		initializeContainerRuntime:          true,
+		initializeKubernetesClient:          true,
+		initializeAddonReader:               true,
+		initializeClusterUtils:              true,
+		initializeWithMustHaveConfiguration: true,
 	}
 
 	for _, opt := range opts {
@@ -154,6 +165,13 @@ func InitializeEasykube(opts ...EkOpt) error {
 	Kube.UseFilesystemLayer(afero.NewOsFs())
 	Kube.UsePrinter(textutils.NewPrinter())
 	Kube.UseOsDetails(osd)
+
+	if ekOpts.initializeWithMustHaveConfiguration {
+		_, err := Kube.LoadConfig()
+		if err != nil {
+			return errors.New("failed to load configuration")
+		}
+	}
 
 	if ekOpts.initializeKubernetesClient {
 		Kube.UseK8sUtils(CreateK8sUtilsImpl())

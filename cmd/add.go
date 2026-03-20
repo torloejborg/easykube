@@ -13,13 +13,13 @@ func NewAddCmd() *cobra.Command {
 		Long:  `by default addons also applies their dependencies`,
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmdhelper := ez.CommandHelper(cmd)
 
-			err := ez.InitializeEasykube()
+			err := ez.InitializeEasykube(ez.WithMustHaveConfiguration(true))
+
 			if err != nil {
 				return err
 			}
-
-			cmdhelper := ez.CommandHelper(cmd)
 
 			addOpts := AddOptions{
 				Args:          args,

@@ -45,6 +45,7 @@ type IEasykubeConfig interface {
 	GenerateZotRegistryCredentials(*EasykubeConfigData) error
 	WriteConfig(*EasykubeConfigData) error
 	CopyConfigResources() error
+	HasConfiguration() bool
 }
 
 type EasykubeConfig struct {
@@ -54,6 +55,11 @@ type EasykubeConfig struct {
 
 func NewEasykubeConfig() IEasykubeConfig {
 	return &EasykubeConfig{}
+}
+
+func (ec *EasykubeConfig) HasConfiguration() bool {
+	_, err := ec.LoadConfig()
+	return err == nil
 }
 
 func (ec *EasykubeConfig) LaunchEditor(config, editor string) {
@@ -303,10 +309,17 @@ func (ec *EasykubeConfig) IsZotConfigInSync(configData *EasykubeConfigData) (boo
 		return false, nil
 	}
 
-	// registries
+	// registries & credentials
 	registries := make([]string, 0)
+	credentials := make([]string, 0)
+
 	for _, reg := range configData.MirrorRegistries {
 		registries = append(registries, reg.RegistryUrl)
+
+		if reg.UserKey != "" {
+			credentials = append(credentials, reg.RegistryUrl)
+		}
+
 	}
 
 	// compare with zot credentials
@@ -315,9 +328,18 @@ func (ec *EasykubeConfig) IsZotConfigInSync(configData *EasykubeConfigData) (boo
 		_ = zotConfig.Close()
 	}(zotConfig)
 
-	matches, err := searchInFile(zotConfig, []string{"urls"})
+	zotCredentials, err := Kube.Fs.Open(filepath.Join(configDir, constants.ZotCredentials))
+	defer func(zotCredentials afero.File) {
+		_ = zotCredentials.Close()
+	}(zotCredentials)
 
-	return len(registries) == matches, err
+	// config
+	configMatches, err := searchInFile(zotConfig, []string{"urls"})
+	credentialMatches, err := searchInFile(zotCredentials, credentials)
+
+	inSync := len(registries) == configMatches && len(credentials) == credentialMatches
+
+	return inSync, err
 
 }
 

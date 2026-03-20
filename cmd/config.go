@@ -16,10 +16,12 @@ var configCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		err := ez.InitializeEasykube(
+			ez.WithMustHaveConfiguration(false),
 			ez.WithKubernetes(false),
 			ez.WithContainerRuntime(false),
 			ez.WithAddonReader(false),
-			ez.WithClusterUtils(false))
+			ez.WithClusterUtils(false),
+		)
 		if err != nil {
 			return err
 		}

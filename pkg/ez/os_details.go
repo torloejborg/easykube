@@ -32,20 +32,6 @@ func (d *OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
 	}
 }
 
-//func (d *OsDetailsImpl) GetUserConfigDir() (string, error) {
-//
-//	// allow user to override default configuration directory
-//	if Kube.GetStringFlag(constants.FlagConfigDir) != "" {
-//		return Kube.GetStringFlag(constants.FlagConfigDir), nil
-//	} else {
-//		r, err := os.UserConfigDir()
-//		if err != nil {
-//			return "", err
-//		}
-//		return r, nil
-//	}
-//}
-
 func (d *OsDetailsImpl) GetUserHomeDir() (string, error) {
 	r, err := os.UserHomeDir()
 
