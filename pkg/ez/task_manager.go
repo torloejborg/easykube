@@ -1,0 +1,136 @@
+package ez
+
+import (
+	"fmt"
+	"slices"
+	"sync"
+
+	"github.com/fatih/color"
+	"github.com/google/uuid"
+	"github.com/slok/gospinner"
+)
+
+type IOrderedTask interface {
+	GetName() string
+	GetDependencies() []string
+}
+
+type TaskContainer struct {
+	graph *Graph[Task]
+	mu    sync.Mutex // Mutex to synchronize spinner access
+}
+
+func (t *TaskContainer) AddTask(task Task) {
+	task.graph = t.graph
+	t.graph.AppendNode(task)
+}
+
+func (t *TaskContainer) GetNodes() Stack[Task] {
+	var s Stack[Task]
+
+	slices.Reverse(t.graph.Nodes)
+	for _, node := range t.graph.Nodes {
+		s.Push(node)
+	}
+
+	return s
+}
+
+func NewTaskContainer() *TaskContainer {
+	return &TaskContainer{
+		graph: NewGraph[Task](),
+	}
+}
+
+type Task struct {
+	Name          string
+	Description   string
+	Dependencies  []string
+	SkipCondition func() bool
+	Execute       func() error
+	graph         *Graph[Task]
+}
+
+func (t Task) GetName() string {
+	return t.Name
+}
+
+func (t Task) GetDependencies() []string {
+	return t.Dependencies
+}
+
+func (x Task) DependsOn(t Task) error {
+	return x.graph.AddEdge(t, x)
+}
+
+func NewTask(description string, execute func() error) Task {
+
+	u, _ := uuid.NewUUID()
+
+	return Task{
+		Name:          u.String(),
+		Description:   description,
+		Dependencies:  make([]string, 0),
+		Execute:       execute,
+		SkipCondition: func() bool { return false },
+	}
+}
+
+func NewTaskWithSkip(description string, execute func() error, skip func() bool) Task {
+	u, _ := uuid.NewUUID()
+
+	return Task{
+		Name:          u.String(),
+		Description:   description,
+		Dependencies:  make([]string, 0),
+		Execute:       execute,
+		SkipCondition: skip,
+	}
+}
+
+func ExecuteTasks(taskContainer *TaskContainer) {
+
+	checkErr := func(err error) {
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+
+	tasks := taskContainer.GetNodes()
+
+	// first pass
+	for !tasks.IsEmpty() {
+
+		currentTask, _ := tasks.Pop()
+
+		s, err := gospinner.NewSpinner(gospinner.Dots)
+		checkErr(err)
+		taskContainer.mu.Lock()
+		checkErr(s.Start(fmt.Sprintf("%s", currentTask.Description)))
+		taskContainer.mu.Unlock()
+
+		// Execute task
+		if !currentTask.SkipCondition() {
+
+			if err := currentTask.Execute(); err != nil {
+				taskContainer.mu.Lock()
+				checkErr(s.Fail())
+				taskContainer.mu.Unlock()
+
+				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), currentTask.Description, err.Error())
+				break
+			} else {
+				taskContainer.mu.Lock()
+				checkErr(s.Succeed())
+				taskContainer.mu.Unlock()
+			}
+		} else {
+			taskContainer.mu.Lock()
+			color.Set(color.FgHiBlack)
+			_ = s.FinishWithMessage("✔", currentTask.Description)
+			color.Unset()
+			taskContainer.mu.Unlock()
+		}
+	}
+
+}

@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
@@ -13,16 +16,38 @@ var configCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		err := ez.InitializeEasykube(
+			ez.WithMustHaveConfiguration(false),
 			ez.WithKubernetes(false),
-			ez.WithContainerRuntime(false))
+			ez.WithContainerRuntime(false),
+			ez.WithAddonReader(false),
+			ez.WithClusterUtils(false),
+		)
 		if err != nil {
 			return err
 		}
 
-		return runConfigActual(cmd, args)
+		if ez.Kube.GetBoolFlag(constants.FlagUseDefaults) {
+			err := ez.Kube.MakeConfig()
+			if err != nil {
+				panic(err)
+			}
+			os.Exit(0)
+		}
+
+		if ez.Kube.GetBoolFlag(constants.FlagEdit) {
+			err := ez.Kube.EditConfig()
+			if err != nil {
+				ez.Kube.FmtGreen(err.Error())
+			}
+			os.Exit(0)
+		}
+
+		return runConfigActualInteractive(cmd, args)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(configCmd)
+	configCmd.Flags().BoolP("edit", "e", false, "edit config file with editor")
+	configCmd.Flags().BoolP("use-defaults", "u", false, "create a configuration with default values")
 }

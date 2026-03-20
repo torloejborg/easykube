@@ -79,11 +79,12 @@ func (c *MockIClusterUtilsConfigurationReportCall) DoAndReturn(f func([]ez.IAddo
 }
 
 // CreateKindCluster mocks base method.
-func (m *MockIClusterUtils) CreateKindCluster(modules map[string]ez.IAddon) string {
+func (m *MockIClusterUtils) CreateKindCluster(modules map[string]ez.IAddon) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKindCluster", modules)
 	ret0, _ := ret[0].(string)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateKindCluster indicates an expected call of CreateKindCluster.
@@ -99,19 +100,19 @@ type MockIClusterUtilsCreateKindClusterCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIClusterUtilsCreateKindClusterCall) Return(arg0 string) *MockIClusterUtilsCreateKindClusterCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockIClusterUtilsCreateKindClusterCall) Return(arg0 string, arg1 error) *MockIClusterUtilsCreateKindClusterCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIClusterUtilsCreateKindClusterCall) Do(f func(map[string]ez.IAddon) string) *MockIClusterUtilsCreateKindClusterCall {
+func (c *MockIClusterUtilsCreateKindClusterCall) Do(f func(map[string]ez.IAddon) (string, error)) *MockIClusterUtilsCreateKindClusterCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIClusterUtilsCreateKindClusterCall) DoAndReturn(f func(map[string]ez.IAddon) string) *MockIClusterUtilsCreateKindClusterCall {
+func (c *MockIClusterUtilsCreateKindClusterCall) DoAndReturn(f func(map[string]ez.IAddon) (string, error)) *MockIClusterUtilsCreateKindClusterCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

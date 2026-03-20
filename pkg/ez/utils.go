@@ -31,18 +31,19 @@ func FileOrDirExists(path string) bool {
 
 // Copies an embedded resource from src into the user configuration directory
 // dest is a relative path to ~/.config/easykube
-func CopyResource(src, dest string) error {
+func CopyResourceToConfigDir(src, dest string) error {
 
-	configDir, err := Kube.GetUserConfigDir()
+	configDir, err := Kube.GetEasykubeConfigDir()
 	if nil != err {
 		return err
 	}
 
-	configDir = filepath.Join(configDir, "easykube")
-
 	Kube.Fs.MkdirAll(configDir, 0755)
 
 	destinationPath := filepath.Join(configDir, dest)
+	base := filepath.Dir(destinationPath)
+	Kube.Fs.MkdirAll(base, 0755)
+
 	stat, _ := Kube.Fs.Stat(destinationPath)
 
 	if stat == nil {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/pkg/ez"
@@ -41,6 +42,11 @@ func Execute() {
 }
 
 func init() {
+
+	userConfDir, _ := os.UserConfigDir()
+	configDir := filepath.Join(userConfDir, "easykube")
+
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	rootCmd.PersistentFlags().BoolP("dry-run", "d", false, "dry-run")
+	rootCmd.PersistentFlags().String("config-dir", configDir, "override the config dir")
 }

@@ -19,7 +19,7 @@ func CopyTestAddonToMemFs(addonDir, testAddonName, dest string, destFs afero.Fs)
 		panic(err)
 	}
 
-	err = copyDirToMemFS(osfs, destFs, filepath.Join(addonDir, constants.JS_LIB), filepath.Join(dest, constants.JS_LIB))
+	err = copyDirToMemFS(osfs, destFs, filepath.Join(addonDir, constants.JsLib), filepath.Join(dest, constants.JsLib))
 	if err != nil {
 		panic(err)
 	}

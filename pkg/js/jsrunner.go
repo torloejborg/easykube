@@ -97,7 +97,7 @@ func (jsu *JsUtils) ExecAddonScript(a ez.IAddon) error {
 // GetPseudoJsIncludes Concatenates all the library javascript functions found in the _jslib directory into
 // one string and returns it for loading in the JS vm.
 func (jsu *JsUtils) GetPseudoJsIncludes() string {
-	jsScriptDir := filepath.Join(jsu.AddonRoot, constants.JS_LIB)
+	jsScriptDir := filepath.Join(jsu.AddonRoot, constants.JsLib)
 	data := make([]string, 0)
 	exists, _ := afero.DirExists(ez.Kube.Fs, jsScriptDir)
 

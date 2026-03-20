@@ -14,6 +14,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/resources"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/torloejborg/easykube/pkg/constants"
 
-	"github.com/torloejborg/easykube/pkg/resources"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	applyv1 "k8s.io/client-go/applyconfigurations/core/v1"
@@ -136,7 +136,7 @@ type IK8SUtils interface {
 	ListPods(namespace string) ([]string, error)
 	// GetInstalledAddons
 	//
-	// Queries the constants.ADDON_CM configmap for installed addons
+	// Queries the constants.AddonCm configmap for installed addons
 	GetInstalledAddons() ([]string, error)
 
 	// PatchCoreDNS
@@ -156,6 +156,8 @@ type IK8SUtils interface {
 	// secret is the source which contains keys and references, mockData specifies the replacements for the keys,
 	// addonName is the source of the mockData, namespace specifies where to create the secret
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) KubernetesSecret
+
+	WaitForKindClusterReady(kubeconfig string, timeout time.Duration) error
 }
 
 func NewK8SUtils() IK8SUtils {
@@ -215,25 +217,30 @@ func (k *K8SUtilsImpl) GetSecret(name, namespace string) (map[string][]byte, err
 
 func (k *K8SUtilsImpl) PatchCoreDNS() {
 
-	ctx := context.Background()
-
-	cs, _ := resources.AppResources.ReadFile("data/coredns/coredns-deployment.yaml")
 	corefile, _ := resources.AppResources.ReadFile("data/coredns/coredns.config")
 	localdb, _ := resources.AppResources.ReadFile("data/coredns/local.db")
 
-	k.UpdateConfigMap("coredns", "kube-system", "local.db", localdb)
-	k.UpdateConfigMap("coredns", "kube-system", "Corefile", corefile)
+	ctx := context.Background()
 
-	decode := scheme.Codecs.UniversalDeserializer().Decode
-	obj, gKV, _ := decode(cs, nil, nil)
-	if gKV.Kind == "Deployment" {
-		depl := obj.(*appsv1.Deployment)
-		_, e := k.Clientset.AppsV1().Deployments("kube-system").Update(ctx, depl, metav1.UpdateOptions{
-			TypeMeta: metav1.TypeMeta{},
-		})
-		if e != nil {
-			panic(e)
-		}
+	cm, err := k.Clientset.CoreV1().
+		ConfigMaps("kube-system").
+		Get(ctx, "coredns", metav1.GetOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	if cm.Data == nil {
+		cm.Data = map[string]string{}
+	}
+
+	cm.Data["Corefile"] = string(corefile)
+	cm.Data["local.db"] = string(localdb)
+
+	_, err = k.Clientset.CoreV1().
+		ConfigMaps("kube-system").
+		Update(ctx, cm, metav1.UpdateOptions{})
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -290,7 +297,7 @@ func (k *K8SUtilsImpl) UpdateConfigMap(name, namespace, key string, data []byte)
 
 func (k8s *K8SUtilsImpl) GetInstalledAddons() ([]string, error) {
 	result := make([]string, 0)
-	addons, err := k8s.ReadConfigmap(constants.ADDON_CM, constants.DEFAULT_NS)
+	addons, err := k8s.ReadConfigmap(constants.AddonCm, constants.DefaultNs)
 
 	if err != nil {
 		return result, err
@@ -510,7 +517,6 @@ func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 		FieldManager: "easykube",
 	})
 
-	// todo: better err handling
 	if e != nil {
 		return e
 	} else {
@@ -656,4 +662,59 @@ func (k *K8SUtilsImpl) TransformExternalSecret(secret ExternalSecret, mockData m
 
 	return k8sSecret
 
+}
+
+// WaitForKindClusterReady waits for the Kind cluster to be ready by checking the node status.
+func (k *K8SUtilsImpl) WaitForKindClusterReady(kubeconfig string, timeout time.Duration) error {
+	// Load kubeconfig
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		return fmt.Errorf("failed to load kubeconfig: %v", err)
+	}
+
+	// Create Kubernetes clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return fmt.Errorf("failed to create Kubernetes client: %v", err)
+	}
+
+	// Poll for node readiness
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	for {
+		select {
+		case <-timeoutCtx.Done():
+			return fmt.Errorf("timeout waiting for Kind cluster to be ready")
+		case <-ticker.C:
+			// Get nodes
+			nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+			if err != nil {
+				continue // API server not ready yet
+			}
+
+			// Check if all nodes are ready
+			allReady := true
+			for _, node := range nodes.Items {
+				ready := false
+				for _, condition := range node.Status.Conditions {
+					if condition.Type == "Ready" && condition.Status == "True" {
+						ready = true
+						break
+					}
+				}
+				if !ready {
+					allReady = false
+					break
+				}
+			}
+
+			if allReady {
+				return nil // Cluster is ready
+			}
+		}
+	}
 }

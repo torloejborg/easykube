@@ -9,7 +9,7 @@ import (
 )
 
 func TestTopologicalSort(t *testing.T) {
-	graph := ez.NewGraph()
+	graph := ez.NewGraph[ez.IAddon]()
 
 	ingress := &ez.Addon{Name: "nginx-controller"}
 	jenkins := &ez.Addon{Name: "jenkins-lts"}
@@ -43,7 +43,7 @@ func TestTopologicalSort(t *testing.T) {
 }
 
 func TestDiamondGraph(t *testing.T) {
-	graph := ez.NewGraph()
+	graph := ez.NewGraph[ez.IAddon]()
 
 	a := &ez.Addon{Name: "a"}
 	b := &ez.Addon{Name: "b"}
