@@ -19,7 +19,6 @@ func createActualCmd(opts BootOpts, currentConfig *ez.EasykubeConfigData) error 
 
 	tasks := ez.NewTaskContainer()
 
-	tasks.AddTask(inspectConfigurationPresent(currentConfig))
 	tasks.AddTask(ensureContainerRuntimeTask())
 	tasks.AddTask(inspectPortsFreeTask())
 	tasks.AddTask(pullKindImageTask())
@@ -95,7 +94,7 @@ func inspectPortsFreeTask() ez.Task {
 }
 
 func pullKindImageTask() ez.Task {
-	return ez.NewTaskWithSkip("pull kind image", func() error {
+	return ez.NewTaskWithSkip(fmt.Sprintf("pull kind image: %s", constants.KindImage), func() error {
 		return pullImageFunc(constants.KindImage)
 	}, func() bool {
 		has, _ := ez.Kube.HasImage(constants.KindImage)
@@ -105,7 +104,7 @@ func pullKindImageTask() ez.Task {
 
 func pullRegistryImageTask() ez.Task {
 
-	return ez.NewTaskWithSkip("pull registry image", func() error {
+	return ez.NewTaskWithSkip(fmt.Sprintf("pull registry image: %s", constants.RegistryImage), func() error {
 		return pullImageFunc(constants.RegistryImage)
 	}, func() bool {
 		has, _ := ez.Kube.HasImage(constants.RegistryImage)
@@ -224,40 +223,28 @@ func ensurePersistenceDirectoriesTask() ez.Task {
 
 }
 
-func configureZotRegistry(cfg *ez.EasykubeConfigData) ez.Task {
+func configureZotRegistry(config *ez.EasykubeConfigData) ez.Task {
 
-	return ez.NewTaskWithSkip("configure zot", func() error {
-		err := ez.Kube.GenerateZotRegistryConfig(cfg)
+	return ez.NewTaskWithSkip("re-configure zot registry", func() error {
+
+		err := ez.Kube.GenerateZotRegistryConfig(config)
 		if err != nil {
 			panic(err)
 		}
 
-		err = ez.Kube.GenerateZotRegistryCredentials(cfg)
+		err = ez.Kube.GenerateZotRegistryCredentials(config)
 		if err != nil {
 			panic(err)
 		}
 
 		return nil
 	}, func() bool {
-		update, err := ez.Kube.ShouldRegenerateZotConfig(cfg)
+
+		sync, err := ez.Kube.IsZotConfigInSync(config)
 		if err != nil {
 			panic(err)
 		}
-		return update
-	})
-}
 
-func inspectConfigurationPresent(curr *ez.EasykubeConfigData) ez.Task {
-	return ez.NewTaskWithSkip("inspect configuration", func() error {
-
-		_, err := ez.Kube.LoadConfig()
-		if err != nil {
-			return errors.New("configuration not found, please run `easykube config | config --use-defaults`")
-		}
-
-		return nil
-	}, func() bool {
-
-		return curr != nil
+		return sync
 	})
 }

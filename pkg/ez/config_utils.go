@@ -40,7 +40,7 @@ type IEasykubeConfig interface {
 	EditConfig() error
 	LaunchEditor(config, editor string)
 	PathToConfigFile() string
-	ShouldRegenerateZotConfig(configData *EasykubeConfigData) (bool, error)
+	IsZotConfigInSync(configData *EasykubeConfigData) (bool, error)
 	GenerateZotRegistryConfig(*EasykubeConfigData) error
 	GenerateZotRegistryCredentials(*EasykubeConfigData) error
 	WriteConfig(*EasykubeConfigData) error
@@ -289,11 +289,18 @@ func searchInFile(source afero.File, searchFor []string) (int, error) {
 	return matches, nil
 }
 
-func (ec *EasykubeConfig) ShouldRegenerateZotConfig(configData *EasykubeConfigData) (bool, error) {
+// return false if config and zot-config has drifted
+func (ec *EasykubeConfig) IsZotConfigInSync(configData *EasykubeConfigData) (bool, error) {
 
 	configDir, err := Kube.GetEasykubeConfigDir()
 	if nil != err {
 		return false, err
+	}
+
+	// if the zot-config is not generated yet, return false
+	_, err = Kube.Fs.Stat(filepath.Join(configDir, constants.ZotConfig))
+	if err != nil {
+		return false, nil
 	}
 
 	// registries

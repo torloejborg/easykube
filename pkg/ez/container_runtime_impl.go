@@ -425,10 +425,6 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		return err
 	}
 
-	if err := CopyResourceToConfigDir(constants.ZotCredentials, constants.ZotCredentials); err != nil {
-		return err
-	}
-
 	if err := CopyResourceToConfigDir("cert/server.crt", "localtest.me.crt"); err != nil {
 		return err
 	}
@@ -455,6 +451,8 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		binds = append(binds, filepath.Join(configDir, "localtest.me.crt")+":/etc/ssl/localtest.me.crt:z")
 		binds = append(binds, filepath.Join(configDir, "localtest.me.key")+":/etc/ssl/localtest.me.key:z")
 		binds = append(binds, filepath.Join(configDir, "persistence", "zot"+":/var/lib/zot:z"))
+
+		// the zot config files are generated in the boot process
 		binds = append(binds, filepath.Join(configDir, constants.ZotCredentials)+":/var/lib/zot/credentials.json:z")
 		binds = append(binds, filepath.Join(configDir, constants.ZotConfig)+":/etc/zot/config.json:z")
 
