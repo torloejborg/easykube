@@ -66,7 +66,12 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 			ConfigurationDir:  userConfigDir,
 			ContainerRuntime:  "docker",
 			ConfigurationFile: ez.Kube.PathToConfigFile(),
-			MirrorRegistries:  nil,
+			MirrorRegistries: []ez.MirrorRegistry{
+				{RegistryUrl: "https://registry-1.docker.io"},
+				{RegistryUrl: "https://quay.io"},
+				{RegistryUrl: "https://ghcr.io"},
+				{RegistryUrl: "https://registry.k8s.io"},
+			},
 		}
 	} else {
 

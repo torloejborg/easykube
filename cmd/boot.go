@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"errors"
+
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/ez"
@@ -13,7 +15,18 @@ var bootCmd = &cobra.Command{
 	Long:  `bootstraps a kind cluster with an opinionated configuration`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeEasykube()
+		_ = ez.InitializeEasykube(
+			ez.WithKubernetes(false),
+			ez.WithContainerRuntime(false),
+			ez.WithAddonReader(false),
+			ez.WithClusterUtils(false))
+
+		currentConfig, err := ez.Kube.LoadConfig()
+		if err != nil {
+			return errors.New("no configuration detected, create a configuration before booting")
+		}
+
+		err = ez.InitializeEasykube()
 		if err != nil {
 			return err
 		}
@@ -22,7 +35,7 @@ var bootCmd = &cobra.Command{
 			Secrets: ez.CommandHelper(cmd).GetStringFlag(constants.ArgSecrets),
 		}
 
-		return createActualCmd(opts)
+		return createActualCmd(opts, currentConfig)
 	},
 }
 

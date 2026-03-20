@@ -15,10 +15,11 @@ type BootOpts struct {
 	Secrets string
 }
 
-func createActualCmd(opts BootOpts) error {
+func createActualCmd(opts BootOpts, currentConfig *ez.EasykubeConfigData) error {
 
 	tasks := NewTaskContainer()
 
+	tasks.AddTask(inspectConfigurationPresent(currentConfig))
 	tasks.AddTask(ensureContainerRuntimeTask())
 	tasks.AddTask(inspectPortsFreeTask())
 	tasks.AddTask(pullKindImageTask())
@@ -129,7 +130,7 @@ func pullImageFunc(image string) error {
 }
 
 func connectRegistryToKindTask() Task {
-	return NewTaskWithSkip("connecting registry to kind network", func() error {
+	return NewTaskWithSkip("connect registry to kind network", func() error {
 		if e := ez.Kube.NetworkConnect(constants.RegistryContainer, constants.KindNetworkName); e != nil {
 			return e
 		}
@@ -262,5 +263,20 @@ func zotRegistryCredentialConfigurationTask() Task {
 	}, func() bool {
 		// todo: find a good skip condition
 		return false
+	})
+}
+
+func inspectConfigurationPresent(curr *ez.EasykubeConfigData) Task {
+	return NewTaskWithSkip("inspect configuration", func() error {
+
+		_, err := ez.Kube.LoadConfig()
+		if err != nil {
+			return errors.New("configuration not found, please run `easykube config | config --use-defaults`")
+		}
+
+		return nil
+	}, func() bool {
+
+		return curr != nil
 	})
 }
