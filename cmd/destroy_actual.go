@@ -10,13 +10,13 @@ import (
 
 func destroyActual() error {
 
-	tasks := NewTaskContainer()
+	tasks := ez.NewTaskContainer()
 
 	tasks.AddTask(stopAndDeleteCluster())
 	tasks.AddTask(stopAndDeleteRegistry())
 	tasks.AddTask(purgeData())
 
-	ExecuteTasks(tasks)
+	ez.ExecuteTasks(tasks)
 
 	return nil
 }
@@ -26,24 +26,24 @@ func running(name string) bool {
 	return result
 }
 
-func stopAndDeleteCluster() Task {
-	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.KindContainer), func() error {
+func stopAndDeleteCluster() ez.Task {
+	return ez.NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.KindContainer), func() error {
 		return stopAndDeleteContainer(constants.KindContainer)
 	}, func() bool {
 		return !running(constants.KindContainer)
 	})
 }
 
-func stopAndDeleteRegistry() Task {
-	return NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.RegistryContainer), func() error {
+func stopAndDeleteRegistry() ez.Task {
+	return ez.NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.RegistryContainer), func() error {
 		return stopAndDeleteContainer(constants.RegistryContainer)
 	}, func() bool {
 		return !running(constants.RegistryContainer)
 	})
 }
 
-func purgeData() Task {
-	return NewTaskWithSkip("purge data", func() error {
+func purgeData() ez.Task {
+	return ez.NewTaskWithSkip("purge data", func() error {
 
 		configDir, err := ez.Kube.GetEasykubeConfigDir()
 		if err != nil {

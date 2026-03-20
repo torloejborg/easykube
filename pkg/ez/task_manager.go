@@ -1,13 +1,13 @@
-package cmd
+package ez
 
 import (
 	"fmt"
-	"time"
+	"slices"
+	"sync"
 
 	"github.com/fatih/color"
 	"github.com/google/uuid"
 	"github.com/slok/gospinner"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type IOrderedTask interface {
@@ -16,21 +16,29 @@ type IOrderedTask interface {
 }
 
 type TaskContainer struct {
-	graph *ez.Graph[Task]
+	graph *Graph[Task]
+	mu    sync.Mutex // Mutex to synchronize spinner access
 }
 
-func (t TaskContainer) AddTask(task Task) {
+func (t *TaskContainer) AddTask(task Task) {
 	task.graph = t.graph
 	t.graph.AppendNode(task)
 }
 
-func (t TaskContainer) GetNodes() []Task {
-	return t.graph.Nodes
+func (t *TaskContainer) GetNodes() Stack[Task] {
+	var s Stack[Task]
+
+	slices.Reverse(t.graph.Nodes)
+	for _, node := range t.graph.Nodes {
+		s.Push(node)
+	}
+
+	return s
 }
 
 func NewTaskContainer() *TaskContainer {
 	return &TaskContainer{
-		graph: ez.NewGraph[Task](),
+		graph: NewGraph[Task](),
 	}
 }
 
@@ -40,7 +48,7 @@ type Task struct {
 	Dependencies  []string
 	SkipCondition func() bool
 	Execute       func() error
-	graph         *ez.Graph[Task]
+	graph         *Graph[Task]
 }
 
 func (t Task) GetName() string {
@@ -90,26 +98,38 @@ func ExecuteTasks(taskContainer *TaskContainer) {
 
 	tasks := taskContainer.GetNodes()
 
-	for i := range tasks {
+	// first pass
+	for !tasks.IsEmpty() {
+
+		currentTask, _ := tasks.Pop()
 
 		s, err := gospinner.NewSpinner(gospinner.Dots)
 		checkErr(err)
-		checkErr(s.Start(fmt.Sprintf("%s", tasks[i].Description)))
+		taskContainer.mu.Lock()
+		checkErr(s.Start(fmt.Sprintf("%s", currentTask.Description)))
+		taskContainer.mu.Unlock()
 
 		// Execute task
-		if !tasks[i].SkipCondition() {
-			time.Sleep(5 * time.Millisecond)
-			if err := tasks[i].Execute(); err != nil {
+		if !currentTask.SkipCondition() {
+
+			if err := currentTask.Execute(); err != nil {
+				taskContainer.mu.Lock()
 				checkErr(s.Fail())
-				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), tasks[i].Description, err.Error())
+				taskContainer.mu.Unlock()
+
+				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), currentTask.Description, err.Error())
 				break
 			} else {
+				taskContainer.mu.Lock()
 				checkErr(s.Succeed())
+				taskContainer.mu.Unlock()
 			}
 		} else {
+			taskContainer.mu.Lock()
 			color.Set(color.FgHiBlack)
-			_ = s.FinishWithMessage("✔", tasks[i].Description)
+			_ = s.FinishWithMessage("✔", currentTask.Description)
 			color.Unset()
+			taskContainer.mu.Unlock()
 		}
 	}
 

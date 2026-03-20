@@ -1,6 +1,7 @@
 package ez
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -39,6 +40,7 @@ type IEasykubeConfig interface {
 	EditConfig() error
 	LaunchEditor(config, editor string)
 	PathToConfigFile() string
+	ShouldRegenerateZotConfig(configData *EasykubeConfigData) (bool, error)
 	GenerateZotRegistryConfig(*EasykubeConfigData) error
 	GenerateZotRegistryCredentials(*EasykubeConfigData) error
 	WriteConfig(*EasykubeConfigData) error
@@ -271,6 +273,47 @@ func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
 	return nil
 }
 
+func searchInFile(source afero.File, searchFor []string) (int, error) {
+	matches := 0
+
+	scanner := bufio.NewScanner(source)
+	for scanner.Scan() {
+		line := scanner.Text()
+		for _, search := range searchFor {
+			if strings.Contains(line, search) {
+				matches = matches + 1
+			}
+		}
+	}
+
+	return matches, nil
+}
+
+func (ec *EasykubeConfig) ShouldRegenerateZotConfig(configData *EasykubeConfigData) (bool, error) {
+
+	configDir, err := Kube.GetEasykubeConfigDir()
+	if nil != err {
+		return false, err
+	}
+
+	// registries
+	registries := make([]string, 0)
+	for _, reg := range configData.MirrorRegistries {
+		registries = append(registries, reg.RegistryUrl)
+	}
+
+	// compare with zot credentials
+	zotConfig, err := Kube.Fs.Open(filepath.Join(configDir, constants.ZotConfig))
+	defer func(zotConfig afero.File) {
+		_ = zotConfig.Close()
+	}(zotConfig)
+
+	matches, err := searchInFile(zotConfig, []string{"urls"})
+
+	return len(registries) == matches, err
+
+}
+
 func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *EasykubeConfigData) error {
 
 	zotRegistry := `
@@ -282,14 +325,12 @@ func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *EasykubeConfigData) err
 	         "content": [{"prefix": "**"}]
 	      }`
 
-	zotRegistryM := zotRegistry
-
 	if len(cfg.MirrorRegistries) > 0 {
 		// make registries
 		registries := make([]string, 0, len(cfg.MirrorRegistries))
 
 		for _, reg := range cfg.MirrorRegistries {
-			registries = append(registries, fmt.Sprintf(zotRegistryM, reg.RegistryUrl))
+			registries = append(registries, fmt.Sprintf(zotRegistry, reg.RegistryUrl))
 		}
 
 		configTemplate, err := resources.AppResources.ReadFile("data/zot-config.json.template")
@@ -316,7 +357,7 @@ func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *EasykubeConfigData) err
 		}(file)
 
 		if nil != err {
-			panic(err)
+			return err
 		}
 
 		_, err = file.WriteString(buf.String())
@@ -356,9 +397,9 @@ func (ec *EasykubeConfig) GenerateZotRegistryCredentials(cfg *EasykubeConfigData
 		}
 
 		configDir, _ := Kube.GetEasykubeConfigDir()
-		zotconfig := filepath.Join(configDir, constants.ZotCredentials)
+		zotCredentials := filepath.Join(configDir, constants.ZotCredentials)
 
-		file, err := Kube.Fs.OpenFile(zotconfig, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		file, err := Kube.Fs.OpenFile(zotCredentials, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if nil != err {
 			panic(err)
 		}
@@ -370,6 +411,5 @@ func (ec *EasykubeConfig) GenerateZotRegistryCredentials(cfg *EasykubeConfigData
 		}
 	}
 
-	// propagate private registries to zot config
 	return nil
 }

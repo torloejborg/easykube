@@ -17,15 +17,14 @@ type BootOpts struct {
 
 func createActualCmd(opts BootOpts, currentConfig *ez.EasykubeConfigData) error {
 
-	tasks := NewTaskContainer()
+	tasks := ez.NewTaskContainer()
 
 	tasks.AddTask(inspectConfigurationPresent(currentConfig))
 	tasks.AddTask(ensureContainerRuntimeTask())
 	tasks.AddTask(inspectPortsFreeTask())
 	tasks.AddTask(pullKindImageTask())
 	tasks.AddTask(pullRegistryImageTask())
-	tasks.AddTask(zotRegistryConfigurationTask())
-	tasks.AddTask(zotRegistryCredentialConfigurationTask())
+	tasks.AddTask(configureZotRegistry(currentConfig))
 	tasks.AddTask(createRegistryTask())
 	tasks.AddTask(startRegistryTask())
 	tasks.AddTask(createClusterTask())
@@ -35,7 +34,7 @@ func createActualCmd(opts BootOpts, currentConfig *ez.EasykubeConfigData) error 
 	tasks.AddTask(patchCoreDNSTask())
 	tasks.AddTask(ensureAddonConfigMapTask())
 
-	ExecuteTasks(tasks)
+	ez.ExecuteTasks(tasks)
 
 	if clusterCreateReport != "" {
 		fmt.Println(clusterCreateReport)
@@ -44,16 +43,16 @@ func createActualCmd(opts BootOpts, currentConfig *ez.EasykubeConfigData) error 
 	return nil
 }
 
-func ensureContainerRuntimeTask() Task {
-	return NewTaskWithSkip("ensure container runtime", func() error {
+func ensureContainerRuntimeTask() ez.Task {
+	return ez.NewTaskWithSkip("ensure container runtime", func() error {
 		return errors.New("container runtime not available check docker/podman started")
 	}, func() bool {
 		return ez.Kube.IsContainerRuntimeAvailable()
 	})
 }
 
-func inspectPortsFreeTask() Task {
-	return NewTaskWithSkip("check free ports", func() error {
+func inspectPortsFreeTask() ez.Task {
+	return ez.NewTaskWithSkip("check free ports", func() error {
 
 		addons, err := ez.Kube.GetAddons()
 		if err != nil {
@@ -95,8 +94,8 @@ func inspectPortsFreeTask() Task {
 
 }
 
-func pullKindImageTask() Task {
-	return NewTaskWithSkip("pull kind image", func() error {
+func pullKindImageTask() ez.Task {
+	return ez.NewTaskWithSkip("pull kind image", func() error {
 		return pullImageFunc(constants.KindImage)
 	}, func() bool {
 		has, _ := ez.Kube.HasImage(constants.KindImage)
@@ -104,9 +103,9 @@ func pullKindImageTask() Task {
 	})
 }
 
-func pullRegistryImageTask() Task {
+func pullRegistryImageTask() ez.Task {
 
-	return NewTaskWithSkip("pull registry image", func() error {
+	return ez.NewTaskWithSkip("pull registry image", func() error {
 		return pullImageFunc(constants.RegistryImage)
 	}, func() bool {
 		has, _ := ez.Kube.HasImage(constants.RegistryImage)
@@ -129,8 +128,8 @@ func pullImageFunc(image string) error {
 	return nil
 }
 
-func connectRegistryToKindTask() Task {
-	return NewTaskWithSkip("connect registry to kind network", func() error {
+func connectRegistryToKindTask() ez.Task {
+	return ez.NewTaskWithSkip("connect registry to kind network", func() error {
 		if e := ez.Kube.NetworkConnect(constants.RegistryContainer, constants.KindNetworkName); e != nil {
 			return e
 		}
@@ -143,8 +142,8 @@ func connectRegistryToKindTask() Task {
 
 var clusterCreateReport = ""
 
-func createClusterTask() Task {
-	return NewTaskWithSkip("create easykube-kind cluster", func() error {
+func createClusterTask() ez.Task {
+	return ez.NewTaskWithSkip("create easykube-kind cluster", func() error {
 		addons, err := ez.Kube.GetAddons()
 		if err != nil {
 			return err
@@ -159,8 +158,8 @@ func createClusterTask() Task {
 	}, func() bool { return ez.Kube.IsClusterRunning() })
 }
 
-func startRegistryTask() Task {
-	return NewTaskWithSkip("start registry", func() error {
+func startRegistryTask() ez.Task {
+	return ez.NewTaskWithSkip("start registry", func() error {
 		return ez.Kube.StartContainerRegistry()
 	}, func() bool {
 		running, _ := ez.Kube.IsContainerRunning(constants.RegistryContainer)
@@ -168,8 +167,8 @@ func startRegistryTask() Task {
 	})
 }
 
-func createRegistryTask() Task {
-	return NewTaskWithSkip("create local container registry", func() error {
+func createRegistryTask() ez.Task {
+	return ez.NewTaskWithSkip("create local container registry", func() error {
 		err := ez.Kube.CreateContainerRegistry()
 		if err != nil {
 			return err
@@ -181,16 +180,16 @@ func createRegistryTask() Task {
 	})
 }
 
-func patchCoreDNSTask() Task {
-	return NewTaskWithSkip("patch coreDNS", func() error {
+func patchCoreDNSTask() ez.Task {
+	return ez.NewTaskWithSkip("patch coreDNS", func() error {
 		ez.Kube.PatchCoreDNS()
 		return nil
 	}, func() bool { return ez.Kube.IsClusterRunning() })
 }
 
-func ensureAddonConfigMapTask() Task {
+func ensureAddonConfigMapTask() ez.Task {
 
-	return NewTaskWithSkip("ensure addon config map", func() error {
+	return ez.NewTaskWithSkip("ensure addon config map", func() error {
 		if err := ez.Kube.CreateConfigmap(constants.AddonCm, constants.DefaultNs); err != nil {
 			return err
 		}
@@ -201,8 +200,8 @@ func ensureAddonConfigMapTask() Task {
 	})
 }
 
-func ensureLocalClusterContextTask() Task {
-	return NewTask("ensure local cluster context", func() error {
+func ensureLocalClusterContextTask() ez.Task {
+	return ez.NewTask("ensure local cluster context", func() error {
 		err := ez.Kube.ReloadClientSet()
 		if err != nil {
 			return err
@@ -212,8 +211,8 @@ func ensureLocalClusterContextTask() Task {
 
 }
 
-func ensurePersistenceDirectoriesTask() Task {
-	return NewTaskWithSkip("ensure persistence directories", func() error {
+func ensurePersistenceDirectoriesTask() ez.Task {
+	return ez.NewTaskWithSkip("ensure persistence directories", func() error {
 		pdErr := ez.Kube.EnsurePersistenceDirectory()
 		if pdErr != nil {
 			return pdErr
@@ -225,49 +224,31 @@ func ensurePersistenceDirectoriesTask() Task {
 
 }
 
-func zotRegistryConfigurationTask() Task {
+func configureZotRegistry(cfg *ez.EasykubeConfigData) ez.Task {
 
-	return NewTaskWithSkip("update zot mirror registries", func() error {
-
-		cfg, err := ez.Kube.LoadConfig()
+	return ez.NewTaskWithSkip("configure zot", func() error {
+		err := ez.Kube.GenerateZotRegistryConfig(cfg)
 		if err != nil {
-			return err
-		}
-
-		err = ez.Kube.GenerateZotRegistryConfig(cfg)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}, func() bool {
-		// todo: find a good skip condition
-		return false
-	})
-}
-
-func zotRegistryCredentialConfigurationTask() Task {
-	return NewTaskWithSkip("update zot mirror credentials", func() error {
-
-		cfg, err := ez.Kube.LoadConfig()
-		if err != nil {
-			return err
+			panic(err)
 		}
 
 		err = ez.Kube.GenerateZotRegistryCredentials(cfg)
 		if err != nil {
-			return err
+			panic(err)
 		}
 
 		return nil
 	}, func() bool {
-		// todo: find a good skip condition
-		return false
+		update, err := ez.Kube.ShouldRegenerateZotConfig(cfg)
+		if err != nil {
+			panic(err)
+		}
+		return update
 	})
 }
 
-func inspectConfigurationPresent(curr *ez.EasykubeConfigData) Task {
-	return NewTaskWithSkip("inspect configuration", func() error {
+func inspectConfigurationPresent(curr *ez.EasykubeConfigData) ez.Task {
+	return ez.NewTaskWithSkip("inspect configuration", func() error {
 
 		_, err := ez.Kube.LoadConfig()
 		if err != nil {
