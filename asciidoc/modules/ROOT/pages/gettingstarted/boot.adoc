@@ -1,0 +1,76 @@
+= Boot / Operate [[boot]]
+:icons: font
+:source-highlighter: rouge
+
+Prerequisite: xref:./configure.adoc#["asd"]
+
+Now you're ready to boot easykube
+
+`easkube boot` is the main command for operating easykube, try it out. You should see the following output
+
+----
+✔ ensure container runtime
+✔ check free ports
+✔ pull kind image: kindest/node:v1.35.0
+✔ pull registry image: ghcr.io/project-zot/zot-linux-amd64:v2.1.15
+✔ re-configure zot registry
+✔ create local container registry
+✔ start zot-registry
+✔ create easykube-kind cluster
+✔ ensure persistence directories
+✔ connect registry to kind network
+✔ ensure local cluster context
+✔ patch coreDNS
+✔ ensure addon config map
+
+These addons contribute to cluster configuration
+
+Addon: "temporal.ek.js"
+  Ports:
+        - 127.0.0.1 7233/TCP -> NodePort 30950
+
+Addon: "immich.ek.js"
+  Mounts:
+        - /home/jane/.config/easykube/persistence/immich-data -> /sjaneage/immich-data
+        - /home/jane/.config/easykube/persistence/immich-extra-volume -> /sjaneage/ext-pictures
+
+Addon: "redis.ek.js"
+  Ports:
+        - 127.0.0.1 6379/TCP -> NodePort 30971
+
+Addon: "gitea.ek.js"
+  Mounts:
+        - /home/jane/.config/easykube/persistence/gitea -> /storage/gitea
+
+Addon: "ingress.ek.js"
+  Ports:
+        - 127.0.0.1 80/TCP -> NodePort 80
+        - 127.0.0.1 443/TCP -> NodePort 443
+
+Addon: "postgres.ek.js"
+  Ports:
+        - 127.0.0.1 5432/TCP -> NodePort 32000
+
+  Mounts:
+        - /home/jane/.config/easykube/persistence/postgres-data -> /storage/pg-data
+
+----
+
+Some of the lines with beginning with ✔ might be greyed out, this is because we try to keep each step in the booting process idempotent.
+
+The cluster creation report tells us how each addon influenced the kind configuration. You can inspect the kind config by viewing the file `~/.config/easykube/easykube-cluster.yaml`
+
+== Reloading configuration changes
+
+There are some limitations on what can be reloaded, for instance, if you create an addon that expose a new port or defines storage, you will need to destroy and re-create the cluster (because docker containers are immutable)
+
+However, mirror registries can be configured at will. Simply add a new registry to the main configuration file `~/.config/easykube/config.yaml` and re-isssue `easykube boot` then you should see green lines like.
+
+----
+✔ re-configure zot registry
+✔ restart zot-registry
+✔ ensure local cluster context
+----
+
+Easykube manages the zot configuration files.
+

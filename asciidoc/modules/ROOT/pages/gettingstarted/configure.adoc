@@ -1,0 +1,88 @@
+= Configuration[[configure]]
+
+Prerequisite: installed
+
+You configure easykube with the `config` command
+
+.easykube config --help
+[source, yaml]
+----
+editor is chosen via VISUAL or EDITOR environment variable
+
+Usage:
+  easykube config [flags]
+
+Flags:
+  -e, --edit           edit config file with editor
+  -h, --help           help for config
+  -u, --use-defaults   create a configuration with default values
+
+Global Flags:
+      --config-dir string   override the config dir (default "/home/jane/.config/easykube")
+  -d, --dry-run             dry-run
+  -v, --verbose             verbose output
+----
+
+`easykube config` without any arguments will start an interactive session, where you are prompted for the addon-root and persistence directories.
+
+
+Create a default configuration with `easykube config --use-defaults`
+
+Next, try opening it with `easykube config --edit`, the listing below should pop up in your editor.
+
+[source, yaml]
+----
+version: 1
+easykube:
+# location of addons dir
+addon-root: /home/user/addons <1>
+
+# where local configuration is stored
+config-dir: /home/user/.config/easykube
+
+# if an absolute path is not given, persistence will be located in config-dir
+# this is used by kind to store persistent data, it will survive cluster deletion
+persistence-dir: /home/user/.config/easykube/persistence <2>
+
+# Container Runtime docker or podman
+container-runtime: docker <3>
+
+# use pull through caching on these container registries
+mirror-registries:
+  - registry-url: https://my-internal-registry.domain.name <4>
+      username: <username> <5>
+      password: <password or access token> <6>
+  - registry-url: https://registry-1.docker.io
+  - registry-url: https://ghcr.io
+  - registry-url: https://quay.io
+  - registry-url: https://registry.k8s.io
+----
+
+<1> This is where you cloned an addon repository, use the default repo as an inspiration for your own stack
+<2>  This where were your application stores data, cached images also live here
+<3> It's possible to run easykube on podman, refer to the container runtimes page for details
+<4> registries defined here automatically provide configuration for the zot container registry.
+<5> Username for your private registry
+<6> Password / access token
+
+If you are in an organization with an internal registry, configure that and remove the defaults.
+
+== Addons [[install-configuration]]
+By itself, easykube is not very interesting — it cannot do anything without its companion addons. You will find addons https://github.com/torloejborg/easykube-addons)[here]. Clone (or download) the repository to your local machine.
+
+NOTE: The next sections assume the addon repository is placed in `/home/jane/code/easykube-addons` — adjust accordingly.
+
+When you have cloned an addon repository, proceed to configure easykube with `$ easykube config --edit` - You might get an error complaining about the `VISUAL` environment variable not being set. Set it to something familiar; code, nano, vi, notepad.
+
+=== Default certificates
+Easykube is configured to use a default SSL certificate. The `ingress` addon and the `zot-registry` container are wired to use this certificate.
+
+The certificate is self-signed and issued by 'UFST' - to have a good out-of-the box experience, you can choose to trust the certificate found in `~/.config/easykube/localtest.me.ca.crt`
+
+Install the certificate in your systems truststore
+
+*Using your own certificates*
+
+To make a self-signed certificate which you explicitly trust, you will have to make a custom distribution of Easykube.
+
+(fork the repository and change the certificates in `pkg/resources/data/cert`, also make sure the ingress addon will use your own certificate)

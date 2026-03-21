@@ -1,12 +1,18 @@
 * xref:index.adoc[Home]
-* xref:rationale.adoc[Why Easykube]
-* xref:install.adoc[Install Easykube]
-* xref:addons.adoc[Addons explained]
-* xref:using.adoc[Usage]
-* xref:internals.adoc[Internals]
-* xref:container_runtimes.adoc[Container Runtimes]
-* xref:faq.adoc[FAQ]
+
+* About
+** xref:about/rationale.adoc[Why Easykube]
+** xref:about/faq.adoc[FAQ]
+
+* Getting started
+** xref:gettingstarted/install.adoc[Install]
+** xref:gettingstarted/configure.adoc[Configure]
+** xref:gettingstarted/boot.adoc[Operate]
+** xref:gettingstarted/container_runtimes.adoc[Container Runtimes]
+** xref:addons.adoc[Addons explained]
+** xref:gettingstarted/internals.adoc[Internals]
 
 * Development
 ** xref:developing/contributing.adoc[Contributing]
 ** xref:developing/newfunctionality.adoc[Adding new functionality]
+

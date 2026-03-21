@@ -1,4 +1,4 @@
-= Install, Configure, Create[[install]]
+= Install
 :icons: font
 
 Welcome! On these pages you will find guides on how to install, operate, and extend Easykube to suit your own use cases.
@@ -80,24 +80,4 @@ Inspecting binary dependencies
 If the checks for the dependent binaries passed. Proceed to configuration. If you get a warning about version mismatches for binaries, rectify, or try your luck.
 
 (We try our best to keep binary dependencies up-to-date)
-
-== Configuration [[install-configuration]]
-By itself, easykube is not very interesting — it cannot do anything without its companion addons. You will find addons https://github.com/torloejborg/easykube-addons)[here]. Clone (or download) the repository to your local machine.
-
-NOTE: The next sections assume the addon repository is placed in `/home/jane/code/easykube-addons` — adjust accordingly.
-
-When you have cloned an addon repository, proceed to configure easykube with `$ easykube config --edit` - You might get an error complaining about the `VISUAL` environment variable not being set. Set it to something familiar; code, nano, vi, notepad.
-
-=== Certificates
-After installation, Easykube is configured to use a default SSL certificate. The `ingress` addon and the `zot-registry` container are wired to use this certificate.
-
-The certificate is self-signed and issued by 'UFST' - to have a good out-of-the box experience, you can choose to trust the certificate found in `~/.config/easykube/localtest.me.ca.crt`
-
-Install the certificate in your systems truststore
-
-*If you refuse to trust that certificate - That's OK.*
-
-To make a self-signed certificate which you explicitly trust, then you have to make a custom distribution of Easykube.
-
-(fork the repository and change the certificates in `pkg/resources/data/cert`, also make sure the ingress addon will use your own certificate)
 
