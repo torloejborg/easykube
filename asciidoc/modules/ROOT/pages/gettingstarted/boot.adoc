@@ -74,3 +74,7 @@ However, mirror registries can be configured at will. Simply add a new registry 
 
 Easykube manages the zot configuration files whenever the boot command is invoked.
 
+Next steps:
+
+* Discover xref:../addons.adoc#addons-addons[how to use addons icon:arrow-right[role="big"]]
+* Read about xref:./internals.adoc#internals-internals[the internals of easykube icon:arrow-right[role="big"]]

@@ -11,7 +11,7 @@ A Nix flake provides three shell variants:
 
 == Default
 
-First, make sure you have Nix installed; this is described xref:install.adoc#install-nix[here].
+First, make sure you have Nix installed; this is described xref:../gettingstarted/install.adoc#install-nix[here].
 
 Then clone the repository. The default shell will set everything up and compile easykube. However, this can get tedious during development, so it is recommended to use the *light* variant instead.
 

@@ -22,6 +22,8 @@ In constrained environments, it is possible to use easykube together with rootle
 
 Image names are not automatically resolved.
 
+Also, you would need to change the ingress node ports to unprivileged ports, you cannot bind to 80 and 443 (unless explicitly configured on our host)
+
 This means you must specify the fully qualified registry name of an image.
 For instance, the image busybox:latest will not automatically resolve when using the Podman. Using Docker, it is assumed that the image will naturally live on DockerHub. Using Podman, the image must be specified explicitly as:
 

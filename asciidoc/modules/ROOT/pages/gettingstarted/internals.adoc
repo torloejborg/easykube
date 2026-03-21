@@ -38,4 +38,4 @@ answer auto
 NOTE: Currently, ext services can only reside in the default namespace.
 The patch will translate foo.localtest.me into ext-foo.default.svc.cluster.local. So if you create a ClusterIP service with that name, requests originating from within the cluster will resolve to the ClusterIP. External requests will hit the ingress as usual.
 
-TIP: Use ext services to emulate services that need to communicate in a transparent way. For example, when testing a CI workflow setup with a Git server (Gitea) and a Jenkins instance, Gitea will define an ext-* ClusterIP service, and Jenkins can then refer to the server with just gitea.localtest.me instead of gitea.default.svc.cluster.local.
+TIP: Use *ext services* to emulate services that need to communicate in a transparent way. For example, when testing a CI workflow setup with a Git server (Gitea) and a Jenkins instance, Gitea will define an ext-* ClusterIP service, and Jenkins can then refer to the server with just gitea.localtest.me instead of gitea.default.svc.cluster.local.

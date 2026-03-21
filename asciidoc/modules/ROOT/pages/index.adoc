@@ -4,7 +4,7 @@ Not enough space in the README.md were available, This site contain elaborated d
 
 If you want to know why easykube exists and what it’s all about, read the xref:about/rationale.adoc#rationale-rationale[rationale] page.
 
-Next, visit the xref:install.adoc[installation] page.
+Next, visit the xref:gettingstarted/install.adoc[installation] page.
 
 Also, you should familiarize yourself with the concepts of xref:addons.adoc[addons].
 
