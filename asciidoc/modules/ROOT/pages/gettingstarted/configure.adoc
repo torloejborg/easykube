@@ -1,6 +1,6 @@
 = Configuration[[configure]]
 
-Prerequisite: installed
+Prerequisite: xref:./install.adoc#install-install[icon:arrow-left[role="big"] easykube installed]
 
 You configure easykube with the `config` command
 
@@ -86,3 +86,6 @@ Install the certificate in your systems truststore
 To make a self-signed certificate which you explicitly trust, you will have to make a custom distribution of Easykube.
 
 (fork the repository and change the certificates in `pkg/resources/data/cert`, also make sure the ingress addon will use your own certificate)
+
+
+Next: proceed to xref:./boot.adoc#boot[operate easykube icon:arrow-right[role="big"]]

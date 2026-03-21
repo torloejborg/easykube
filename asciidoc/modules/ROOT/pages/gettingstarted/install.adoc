@@ -79,5 +79,5 @@ Inspecting binary dependencies
 
 If the checks for the dependent binaries passed. Proceed to configuration. If you get a warning about version mismatches for binaries, rectify, or try your luck.
 
-(We try our best to keep binary dependencies up-to-date)
 
+Next: proceed to xref:./configure.adoc#configure[configuration icon:arrow-right[role="big"]]

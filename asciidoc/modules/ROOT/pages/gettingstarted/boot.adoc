@@ -2,7 +2,7 @@
 :icons: font
 :source-highlighter: rouge
 
-Prerequisite: xref:./configure.adoc#["asd"]
+Prerequisite: xref:./configure.adoc#configure[ icon:arrow-left[role="big"] easykube configured]
 
 Now you're ready to boot easykube
 
@@ -72,5 +72,5 @@ However, mirror registries can be configured at will. Simply add a new registry 
 ✔ ensure local cluster context
 ----
 
-Easykube manages the zot configuration files.
+Easykube manages the zot configuration files whenever the boot command is invoked.
 
