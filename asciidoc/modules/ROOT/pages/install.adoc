@@ -6,9 +6,9 @@ Welcome! On these pages you will find guides on how to install, operate, and ext
 == Installation[[install-install]]
 There are many ways to install Easykube; here are some of the paths you can choose.
 
-Please note that pre-built easykube binaries do exist for Windows, Linux, and macOS (Binaries for macOS are not signed with Apple). Easykube can run on Windows, but it's recommended to run easykube in WSL2 or a pure Linux environment. Apple uses should build from source, you are at your own peril.
+Please note that pre-built easykube binaries do exist for Windows, Linux, and macOS (Binaries for macOS are not signed with Apple). Easykube can run on Windows, but it's recommended to run easykube in WSL2 or a pure Linux environment. Apple users should build from source.
 
-Starting from scratch, it's recommended to use the Nix approach. (You can download a binary, but external binary dependencies must be explicitly managed by **yourself**)
+Starting clean, we recommended to use the Nix approach. (You can download a binary, but external binary dependencies must be explicitly managed by **yourself**)
 
 === Nix [[install-nix]]
 You can use https://nixos.org/download/#download-nix[nix] to speed up the process. This will build from source and grab the required dependent binaries.
@@ -31,7 +31,7 @@ The Nix flake has three shells. The default `nix develop github:/torloejborg/eas
 
 If you cloned the repository, enter the directory and issue `nix develop .#light` This will drop you into a shell with supporting tools, no build test stage. Useful for development. Build with `go build`
 
-To contribute documentaion, invoke the third shell.
+To contribute documentation, invoke the third shell.
 `nix develop .#docs`. This installs the antroa toolchain. Edit the AsciiDoc files, render with `make docs`.
 
 ====
@@ -86,10 +86,10 @@ By itself, easykube is not very interesting — it cannot do anything without it
 
 NOTE: The next sections assume the addon repository is placed in `/home/jane/code/easykube-addons` — adjust accordingly.
 
-When you have cloned an addon repository, proceed to configure easykube with `$ easykube config` - You might get an error complaining about the `VISUAL` environment variable not being set. Set it to something familiar; code, nano, vi, notepad.
+When you have cloned an addon repository, proceed to configure easykube with `$ easykube config --edit` - You might get an error complaining about the `VISUAL` environment variable not being set. Set it to something familiar; code, nano, vi, notepad.
 
 === Certificates
-After installation, Easykube is configured to use a default SSL certificate. The `ingress` addon and the `registry:2` container are wired to use this certificate.
+After installation, Easykube is configured to use a default SSL certificate. The `ingress` addon and the `zot-registry` container are wired to use this certificate.
 
 The certificate is self-signed and issued by 'UFST' - to have a good out-of-the box experience, you can choose to trust the certificate found in `~/.config/easykube/localtest.me.ca.crt`
 
@@ -101,4 +101,3 @@ To make a self-signed certificate which you explicitly trust, then you have to m
 
 (fork the repository and change the certificates in `pkg/resources/data/cert`, also make sure the ingress addon will use your own certificate)
 
-NOTE: We will improve certificate handling by offering automatic generation at installation time. This is on the todo list. Pull Requests are welcome.

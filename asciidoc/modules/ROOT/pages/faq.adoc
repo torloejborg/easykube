@@ -10,7 +10,7 @@ When i try `*$ easykube create*` it complains about occupied ports, what should 
 
 Where did all my diskspace go?
 
-* Some Docker images are quite large, easykube may keep images in triplicate. When an image is pulled, it is stored in your local Docker context, then the local registry, and finally the kind control plane. This becomes noticeable if the cluster is repeatedly created and destroyed (using fresh images). Cleaning up old containers and volumes will reclaim the space. Disk space is traded for speed and convince.
+* Images are cached in the local zot registry. They will exist there and on the kind-control plane. You can delete images in the registry ui - or simply wipe your persistence directory.
 
 My Easykube addon javascript throws errors, how can I debug what's going on?
 

@@ -95,6 +95,11 @@
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             export PS1="ek-docs $ "
+
+             kroki-start() {
+                  docker run -d -p 8000:8000 yuzutech/kroki
+             }
+
             echo "Welcome to the easykube doc builder shell (no build)"
           '';
         };

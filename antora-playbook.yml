@@ -28,7 +28,7 @@ asciidoc:
     linenums: true
     toc: left
     toclevels: 3
-    kroki-server-url: https://kroki.io
+    kroki-server-url: http://localhost:8000
     kroki-fetch-diagram: true
   extensions:
     - asciidoctor-kroki
