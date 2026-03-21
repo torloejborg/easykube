@@ -8,7 +8,8 @@
   },
   "http": {
     "address": "0.0.0.0",
-    "port": "5000",
+    "port": "5001",
+    "compat": ["docker2s2"],
     "tls": {
       "cert":"/etc/ssl/localtest.me.crt",
       "key":"/etc/ssl/localtest.me.key"

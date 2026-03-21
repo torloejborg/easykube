@@ -7,7 +7,8 @@ const DefaultNs = "default"
 const JsLib = "__jslib"
 const KindNetworkName = "kind"
 const KustomizeTargetOutput = ".out.yaml"
-const LocalRegistry = "registry.localtest.me:5000"
+const LocalRegistryPort = "5001"
+const LocalRegistry = "registry.localtest.me:" + LocalRegistryPort
 const ConfigDirName = "easykube"
 
 const ZotCredentials = "zot-credentials.json"

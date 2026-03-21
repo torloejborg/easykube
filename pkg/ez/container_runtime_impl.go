@@ -469,7 +469,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		hostConfig := &container.HostConfig{
 			LogConfig:    container.LogConfig{},
 			NetworkMode:  "kind",
-			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5000"}}},
+			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port(constants.LocalRegistryPort): {{HostIP: "127.0.0.1", HostPort: constants.LocalRegistryPort}}},
 			RestartPolicy: container.RestartPolicy{
 				Name:              "always",
 				MaximumRetryCount: 0,
