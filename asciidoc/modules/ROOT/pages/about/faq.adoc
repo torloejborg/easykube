@@ -1,32 +1,22 @@
 = FAQ
 
-Why javascript?? I thought this were a pure Go program?
+== Why javascript?? I thought this were a pure Go program?
 
-* Easykube is designed to be flexible, used in different contexts with different addon repositories. Easykube defines a core set of utility functions that can be combined in useful ways, using https://github.com/dop251/goja[Goja], a JavaScript VM for Golang.
+! Easykube is designed to be flexible, used in different contexts with different addon repositories. Easykube defines a core set of utility functions that can be combined in useful ways, using https://github.com/dop251/goja[Goja], a JavaScript VM for Golang.
 
-When i try `*$ easykube boot*` it complains about occupied ports, what should I do?
+== When I try icon:terminal[]`*$ easykube boot*` it complains about occupied ports, what should I do?
 
-* As the error state, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the *extraPorts* section in the offending addon.
+As the error state, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the *extraPorts* section in the offending addon.
 
-Where did all my diskspace go?
+== Where did all my diskspace go?
 
-* Images are cached in the local zot registry. They will exist there and on the kind-control plane. You can delete images in the registry ui - or simply wipe your persistence directory.
+Images are cached in the local zot registry. They will exist there and on the kind-control plane. You can delete images in the registry ui - or simply wipe your persistence directory.
 
- Run `mvn clean install` to rebuild the project.
 
-[.faq-important]
-* icon:exclamation-triangle[] Important: This feature is deprecated in v3.5.5.
+== My Easykube addon javascript throws errors, how can I debug what's going on?
 
-== icon:tools[] Troubleshooting
+Unfortunately, there is no straightforward way to attach an external debugger to the Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.
 
-My Easykube addon javascript throws errors, how can I debug what's going on?
+== Sometimes easykube fails with an error about 'deployment not ready' when adding something.
 
-* Unfortunately, there is no straightforward way to attach an external debugger to the Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.
-
-Sometimes easykube fails with an error about 'deployment not ready' when adding something.
-
-* Some workloads simply take longer to become ready, if you are using a machine with constrained resources, this might be an issue. The *waitForDeployment* function times out after 1 minute. In most cases you can just retry. If possible, tweaking or removing readiness/liveness probe thresholds from a deployment may help.
-
-I cannot create postgres databases. It throws errors when creating or starting the database, what can I do?
-
-* If you switched to a newer postgres version, existing database files might not be compatible. Either revert to the previous version or delete the files in the Postgres persistence directory, look for postgres stuff in `~/.config/easykube/persistence`
+Some workloads simply take longer to become ready, if you are using a machine with constrained resources, this might be an issue. The *waitForDeployment* function times out after 1 minute. In most cases you can just retry. If possible, tweaking or removing readiness/liveness probe thresholds from a deployment may help.

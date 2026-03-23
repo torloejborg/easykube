@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Configuration :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/gettingstarted/configure/">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">Easykube Documentation</div>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+<script src="../../../../_/js/vendor/asciinema-player.js"></script>
+<div class="body">
+<div class="nav-container" data-component="easykube" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../">EasyKube</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../">Home</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">About</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../about/rationale/">Why Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../about/faq/">FAQ</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Getting started</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../install/">Install</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="./">Configure</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../boot/">Operate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../addons/">Addons explained</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../internals/">Internals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Development</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/contributing/">Contributing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/newfunctionality/">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#js_reference/easykube-api.md">Core Javascript functions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../">EasyKube</a></li>
+    <li>Getting started</li>
+    <li><a href="./">Configure</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Configuration<a id="configure"></a></h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#install-configuration">Addons</a></li>
+<li><a href="#_default_certificates">Default certificates</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Prerequisite: <a href="../install/#install-install" class="xref page"><span class="icon big"><i class="fa fa-arrow-left"></i></span> easykube installed</a></p>
+</div>
+<div class="paragraph">
+<p>You configure easykube with the <span class="icon"><i class="fa fa-terminal"></i></span> <code>config</code> command</p>
+</div>
+<div class="listingblock">
+<div class="title">easykube config --help</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">editor is chosen via VISUAL or EDITOR environment variable
+
+Usage:
+  easykube config [flags]
+
+Flags:
+  -e, --edit           edit config file with editor
+  -h, --help           help for config
+  -u, --use-defaults   create a configuration with default values
+
+Global Flags:
+      --config-dir string   override the config dir (default "/home/jane/.config/easykube")
+  -d, --dry-run             dry-run
+  -v, --verbose             verbose output</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config</code> without any arguments will start an interactive session, where you are prompted for the addon-root and persistence directories.</p>
+</div>
+<div class="paragraph">
+<p>Create a default configuration with <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config --use-defaults</code></p>
+</div>
+<div class="paragraph">
+<p>Next, try opening it with <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config --edit</code>, the listing below should pop up in your editor.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">version: 1
+easykube:
+# location of addons dir
+addon-root: /home/user/addons <i class="conum" data-value="1"></i><b>(1)</b>
+
+# where local configuration is stored
+config-dir: /home/user/.config/easykube
+
+# if an absolute path is not given, persistence will be located in config-dir
+# this is used by kind to store persistent data, it will survive cluster deletion
+persistence-dir: /home/user/.config/easykube/persistence <i class="conum" data-value="2"></i><b>(2)</b>
+
+# Container Runtime docker or podman
+container-runtime: docker <i class="conum" data-value="3"></i><b>(3)</b>
+
+# use pull through caching on these container registries
+mirror-registries:
+  - registry-url: https://my-internal-registry.domain.name <i class="conum" data-value="4"></i><b>(4)</b>
+      username: &lt;username&gt; <i class="conum" data-value="5"></i><b>(5)</b>
+      password: &lt;password or access token&gt; <i class="conum" data-value="6"></i><b>(6)</b>
+  - registry-url: https://registry-1.docker.io
+  - registry-url: https://ghcr.io
+  - registry-url: https://quay.io
+  - registry-url: https://registry.k8s.io</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is where you cloned an addon repository, use the default repo as an inspiration for your own stack</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>This where were your application stores data, cached images also live here</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>It&#8217;s possible to run easykube on podman, refer to the container runtimes page for details</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>registries defined here automatically provide configuration for the zot container registry.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Username for your private registry</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Password / access token</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you are in an organization with an internal registry, configure that and remove the defaults.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="install-configuration"><a class="anchor" href="#install-configuration"></a>Addons</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By itself, easykube is not very interesting — it cannot do anything without its companion addons. You will find addons <a href="https://github.com/torloejborg/easykube-addons)">here</a>. Clone (or download) the repository to your local machine.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The next sections assume the addon repository is placed in <code>/home/jane/code/easykube-addons</code> — adjust accordingly.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When you have cloned an addon repository, proceed to configure easykube with <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config --edit</code> - You might get an error complaining about the <code>VISUAL</code> environment variable not being set. Set it to something familiar; code, nano, vi, notepad.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+It&#8217;s possible to override the default configuration directory&#8217;s location with the global argument <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube --config-dir &lt;command&gt;</code> or set the environment variable <code>EASYKUBE_CONFIG_DIR</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_default_certificates"><a class="anchor" href="#_default_certificates"></a>Default certificates</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Easykube is configured to use a default SSL certificate. The <code>ingress</code> addon and the <code>zot-registry</code> container are wired to use this certificate.</p>
+</div>
+<div class="paragraph">
+<p>The certificate is self-signed and issued by 'UFST' - to have a good out-of-the box experience, you can choose to trust the certificate found in <code>~/.config/easykube/localtest.me.ca.crt</code></p>
+</div>
+<div class="paragraph">
+<p>Install the certificate in your systems truststore</p>
+</div>
+<div class="paragraph">
+<p><strong>Using your own certificates</strong></p>
+</div>
+<div class="paragraph">
+<p>To make a self-signed certificate which you explicitly trust, you will have to make a custom distribution of Easykube.</p>
+</div>
+<div class="paragraph">
+<p>(fork the repository and change the certificates in <code>pkg/resources/data/cert</code>, also make sure the ingress addon will use your own certificate)</p>
+</div>
+<div class="paragraph">
+<p>Next: proceed to <a href="../boot/#boot" class="xref page">operate easykube <span class="icon big"><i class="fa fa-arrow-right"></i></span></a></p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using a customized version of Antora default UI.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

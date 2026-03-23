@@ -8,7 +8,7 @@ class Easykube {
      * The go binary will extract this, and compare it to its own version, if there is a version
      * mismatch, the status command will complain.
      */
-    EASYKUBE_BINARY_COMPAT="~1.1.6";
+    EASYKUBE_BINARY_COMPAT="~3.0";
 
     /**
      * Creates a new Easykube JavaScript handler. This class is for your IDE's enjoyment.
@@ -32,9 +32,10 @@ class Easykube {
      * @param {string} values the values file to use
      * @param {string} destination output file for rendered template
      * @param {string} namespace sets namespace in templated output
+     * @param {string} nametemplate sets release name in templated output
      */
-    helmTemplate(chart, values, destination, namespace = 'default') {
-        _ek.helmTemplate(chart, values, destination, namespace);
+    helmTemplate(chart, values, destination, namespace = 'default',nametemplate= '') {
+        _ek.helmTemplate(chart, values, destination, namespace, nametemplate);
         return this;
     }
 
@@ -71,11 +72,9 @@ class Easykube {
     }
 
     /**
-     * Runs a command in a container     * @returns {Postgres}
-
+     * Runs a command in a container
      * @param {string} deployment - Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)
      * @param {string} namespace , args) {
-     return _ek.execInContainer(deployment, namespace, - Namespace of container
      * @param {string} command - The command to run, example "ls" or "/usr/local/bin/whatever"
      * @param {string[]} args - Arguments to the command, example ["-la","-v"]
      * @returns {string}
@@ -168,7 +167,7 @@ class Easykube {
     }
 
 
-    /**
+    /*
      * Represents an HTTP response object.
      * @typedef {Object} HttpResponse
      * @property {(cb: (body: string) => any) => HttpResponse} onSuccess callback to handle successes 2xx
@@ -187,7 +186,7 @@ class Easykube {
         return  _ek.http(url,method,header,body);
     }
 
-    /**
+    /*
      * Represents a result of exec, this is created and exposed from go
      * @typedef {Object} ExecResult
      * @property {(cb: (output: string) => any) => string} onSuccess
@@ -205,15 +204,24 @@ class Easykube {
     }
 
     /**
+     * Gets the directory of the current addon being evaluated
+     * @returns {string} absolute path to the addon directory
+     */
+    addonDir() {
+        return _ek.addonDir(null);
+    }
+
+    /**
      * Gets the directory of the current addon
      * @param {string} name optional addon name, if specificed will return the path to another addon in the respository
-     * @returns {string} absoultue path to the addon directory
+     * @returns {string} absolute path to the addon directory
      */
-    addonDir(name) {
+    addonDirForName(name) {
         return _ek.addonDir(name);
     }
 }
 
 const easykube = new Easykube();
+const local_registry = "registry.localtest.me:5001";
 
 // newline at end-of-file is needed

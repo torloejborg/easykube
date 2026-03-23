@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FAQ :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/about/faq/">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">Easykube Documentation</div>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+<script src="../../../../_/js/vendor/asciinema-player.js"></script>
+<div class="body">
+<div class="nav-container" data-component="easykube" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../">EasyKube</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../">Home</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">About</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../rationale/">Why Easykube</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="./">FAQ</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Getting started</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/install/">Install</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/configure/">Configure</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/boot/">Operate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/container_runtimes/">Container Runtimes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../addons/">Addons explained</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/internals/">Internals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Development</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/contributing/">Contributing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/newfunctionality/">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#js_reference/easykube-api.md">Core Javascript functions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../">EasyKube</a></li>
+    <li>About</li>
+    <li><a href="./">FAQ</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">FAQ</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_why_javascript_i_thought_this_were_a_pure_go_program">Why javascript?? I thought this were a pure Go program?</a></li>
+<li><a href="#_when_i_try_easykube_boot_it_complains_about_occupied_ports_what_should_i_do">When I try <span class="icon"><i class="fa fa-terminal"></i></span><code><strong>$ easykube boot</strong></code> it complains about occupied ports, what should I do?</a></li>
+<li><a href="#_where_did_all_my_diskspace_go">Where did all my diskspace go?</a></li>
+<li><a href="#_my_easykube_addon_javascript_throws_errors_how_can_i_debug_whats_going_on">My Easykube addon javascript throws errors, how can I debug what&#8217;s going on?</a></li>
+<li><a href="#_sometimes_easykube_fails_with_an_error_about_deployment_not_ready_when_adding_something">Sometimes easykube fails with an error about 'deployment not ready' when adding something.</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_why_javascript_i_thought_this_were_a_pure_go_program"><a class="anchor" href="#_why_javascript_i_thought_this_were_a_pure_go_program"></a>Why javascript?? I thought this were a pure Go program?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>! Easykube is designed to be flexible, used in different contexts with different addon repositories. Easykube defines a core set of utility functions that can be combined in useful ways, using <a href="https://github.com/dop251/goja">Goja</a>, a JavaScript VM for Golang.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_when_i_try_easykube_boot_it_complains_about_occupied_ports_what_should_i_do"><a class="anchor" href="#_when_i_try_easykube_boot_it_complains_about_occupied_ports_what_should_i_do"></a>When I try <span class="icon"><i class="fa fa-terminal"></i></span><code><strong>$ easykube boot</strong></code> it complains about occupied ports, what should I do?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As the error state, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the <strong>extraPorts</strong> section in the offending addon.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_where_did_all_my_diskspace_go"><a class="anchor" href="#_where_did_all_my_diskspace_go"></a>Where did all my diskspace go?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Images are cached in the local zot registry. They will exist there and on the kind-control plane. You can delete images in the registry ui - or simply wipe your persistence directory.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_my_easykube_addon_javascript_throws_errors_how_can_i_debug_whats_going_on"><a class="anchor" href="#_my_easykube_addon_javascript_throws_errors_how_can_i_debug_whats_going_on"></a>My Easykube addon javascript throws errors, how can I debug what&#8217;s going on?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Unfortunately, there is no straightforward way to attach an external debugger to the Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sometimes_easykube_fails_with_an_error_about_deployment_not_ready_when_adding_something"><a class="anchor" href="#_sometimes_easykube_fails_with_an_error_about_deployment_not_ready_when_adding_something"></a>Sometimes easykube fails with an error about 'deployment not ready' when adding something.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some workloads simply take longer to become ready, if you are using a machine with constrained resources, this might be an issue. The <strong>waitForDeployment</strong> function times out after 1 minute. In most cases you can just retry. If possible, tweaking or removing readiness/liveness probe thresholds from a deployment may help.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using a customized version of Antora default UI.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

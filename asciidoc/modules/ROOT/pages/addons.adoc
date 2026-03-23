@@ -4,7 +4,7 @@
 
 == Addon repositories [[addons-repositories]]
 
-In essence, an addon is a collection of Kubernetes YAML files, Kustomize files, or Helm charts, orchestrated by JavaScript, with built-in dependency management and convenient tooling.
+In essence, an addon is just some collection of Kubernetes YAML files; Kustomize files, or Helm charts, orchestrated by JavaScript, with built-in dependency management and convenient tooling.
 
 Addons are organized in directory structures, typically Git repositories shared within an organization or team. Below is an excerpt from the companion addon repository.
 
@@ -25,7 +25,7 @@ Addons are organized in directory structures, typically Git repositories shared 
 
 <1> The jslib is a core component of a repository. Here, the easykube API is defined as a JavaScript class that wraps function calls and delegates to the _ek object exposed by the Go program. You can write common functionality and place it in this folder.
 
-<2> The addon script determines how the manifests will be applied. In this example we can see that regular Kubernetes YAML files live in subdirectories.
+<2> The addon script determines how the manifests will be applied. In this example we can see that regular Kubernetes YAML files live in subdirectories. Other addons invoke helm, kustomize, or other tooling before applying rendered yaml with kubectl.
 
 When easykube is invoked, it recursively scans the addon repository and discovers all addons.
 
@@ -33,6 +33,7 @@ When easykube is invoked, it recursively scans the addon repository and discover
 
 Let's examine an addon in detail. We'll look at the Temporal addon, as it uses some non-trivial features. Below is its listing:
 
+.Temporal addon
 [source,javascript,linenums]
 ----
 let configuration = { //<1>

@@ -31,6 +31,18 @@ class Git {
         _ek.sparseCheckout(repository,branch,directories,destination)
     }
 
+    /**
+     * Downloads a particular directory in a git repository
+     * @param {string} repository the git repository
+     * @param {string} branch which branch to check out
+     * @param {string[]} directories which directories in the repository to check out sparsely
+     * @param {string} destination directory for checkout
+     */
+    checkout(repository, branch,destination) {
+        _ek.checkout(repository,branch,destination)
+    }
+
+
 }
 
 const git = new Git();

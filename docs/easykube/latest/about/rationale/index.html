@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Rationale :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/about/rationale/">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">Easykube Documentation</div>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+<script src="../../../../_/js/vendor/asciinema-player.js"></script>
+<div class="body">
+<div class="nav-container" data-component="easykube" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../">EasyKube</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../">Home</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">About</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="./">Why Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../faq/">FAQ</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Getting started</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/install/">Install</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/configure/">Configure</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/boot/">Operate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/container_runtimes/">Container Runtimes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../addons/">Addons explained</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/internals/">Internals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Development</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/contributing/">Contributing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/newfunctionality/">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#js_reference/easykube-api.md">Core Javascript functions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../">EasyKube</a></li>
+    <li>About</li>
+    <li><a href="./">Why Easykube</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Rationale</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#rationale-easykube">What is it?</a></li>
+<li><a href="#_easykube_helps_you_with">Easykube helps you with</a></li>
+<li><a href="#rationale-donot">When not to use Easykube</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Easykube aims to enable shared development "platforms" via its companion addon repositories.</p>
+</li>
+<li>
+<p>If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse.. Experiment, develop locally. Breaking "the system" - Eliminate the "docker-compose" shadow workflow.</p>
+</li>
+<li>
+<p>Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack  locally, without breaking any shared environment.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rationale-easykube"><a class="anchor" href="#rationale-easykube"></a>What is it?</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Easykube is built using the <a href="https://kind.sigs.k8s.io/">Kind</a> project (Kubernetes in Docker) and the <a href="https://github.com/dop251/goja">Goja</a> JavaScript runtime Go library.</p>
+</li>
+<li>
+<p>It bootstraps a single-node Kind cluster with opinionated modifications.</p>
+</li>
+<li>
+<p>It automatically sets up a local zot docker registry for the cluster and connects it locally.</p>
+</li>
+<li>
+<p>Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s shape. Port forwarding and storage requirements are handled automatically.</p>
+</li>
+<li>
+<p>Persistent data (if used) survives cluster deletion and recreation. Databases files remain intact.</p>
+</li>
+<li>
+<p>Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It&#8217;s local, do anything, break everything!</p>
+</li>
+<li>
+<p>Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, with some planning, you can choose to install only the parts you need.</p>
+</li>
+<li>
+<p>A CoreDNS hack lets you access everything from "localtest.me" — never touch the /etc/hosts (or c:\windows\system32\drivers\etc\hosts) file again. If your addon workloads define many ingresses, you can still make everything work locally.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_easykube_helps_you_with"><a class="anchor" href="#_easykube_helps_you_with"></a>Easykube helps you with<a id="rationale-dowith"></a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Enabling your team to install and run your cloud-native application(s) locally.</p>
+</li>
+<li>
+<p>Break things; it’s OK. Just start over - We learn every day!</p>
+</li>
+<li>
+<p>Effortlessly spin up local development stacks: Databases, Web servers, Caches, Workflow engines, OAuth servers, S3-compatible storage - If it runs in kubernetes (or Docker/Podman) -  It runs on Easykube.</p>
+</li>
+<li>
+<p>Kubernetes can be complicated, use Easykube as a gateway-drug for new team members - Let them experience the challenges of distributed systems firsthand, on their own machines.</p>
+</li>
+<li>
+<p>Perhaps some team members refuse to acknowledge the 'cloud' thing, they are brilliant developers, but will never care about Kubernetes — And that’s OK, no one can be forced to like it. But they can still run stuff locally.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rationale-donot"><a class="anchor" href="#rationale-donot"></a>When not to use Easykube</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Not using kubernetes, and don&#8217;t care about it.</p>
+</li>
+<li>
+<p>If you have a multitude of microservices (say, 20+) - Easykube might not be the thing you are looking for (unless developers are issued powerful machines). Continue putting credits in the cloud providers slot machine.</p>
+</li>
+<li>
+<p>Never, ever, spin up easykube in a production setting, or use it for something really important. It&#8217;s meant for trashing; Try, fail, start over.  Run your real workloads on a secured cluster. Easykube is built for local development only.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using a customized version of Antora default UI.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

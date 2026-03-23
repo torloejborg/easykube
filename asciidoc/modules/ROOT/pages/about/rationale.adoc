@@ -12,36 +12,29 @@
 
 * It bootstraps a single-node Kind cluster with opinionated modifications.
 
-* It automatically sets up a local Docker registry for the cluster and connects it locally, permits air-gapped environments.
+* It automatically sets up a local zot docker registry for the cluster and connects it locally.
 
-* Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s use case. Port forwarding and storage requirements are handled automatically.
+* Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s shape. Port forwarding and storage requirements are handled automatically.
 
-* Persistent data (if used) survives cluster deletion and recreation. Databases remain intact - real databases, with indexes and everything, no in-memory nonsense.
+* Persistent data (if used) survives cluster deletion and recreation. Databases files remain intact.
 
-* Addon installation is programmable via the embedded JavaScript library. Highly customizable, extensible; Provision databases, caches, inject secrets, patch deployments - It's local, do anything, break everything!
+* Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It's local, do anything, break everything!
 
-* Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, you can choose to install the parts you need.
+* Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, with some planning, you can choose to install only the parts you need.
 
-* A CoreDNS hack lets you access everything from "localtest.me" — never touch the /etc/hosts (or that c:\windows\system32\drivers\etc\hosts) file again. If your addon workloads define 100+ ingresses, you can still make everything work locally.
+* A CoreDNS hack lets you access everything from "localtest.me" — never touch the /etc/hosts (or c:\windows\system32\drivers\etc\hosts) file again. If your addon workloads define many ingresses, you can still make everything work locally.
 
 == Easykube helps you with[[rationale-dowith]]
 
 * Enabling your team to install and run your cloud-native application(s) locally.
 
-* Break things; it’s OK. Just start over - We learn everyday!
+* Break things; it’s OK. Just start over - We learn every day!
 
 * Effortlessly spin up local development stacks: Databases, Web servers, Caches, Workflow engines, OAuth servers, S3-compatible storage - If it runs in kubernetes (or Docker/Podman) -  It runs on Easykube.
 
 * Kubernetes can be complicated, use Easykube as a gateway-drug for new team members - Let them experience the challenges of distributed systems firsthand, on their own machines.
 
-* Perhaps some team members refuse to acknowledge the 'cloud' thing, they are brilliant developers, but will never care about Kubernetes — That’s OK, no one can be forced to like YAML (it's just a runtime thing anyway).
-
-** `$ easykube add mystack` seems like a good tradeoff; Stuff runs, we can figure why things explode before we pay our pensions to a random cloud-provider, all because of an endless loop..
-
-** Consider the request chain: (Ingress) -> A -> B -> (queue) -> C.
- If you ever had to debug what broke in "C". If you know the pain, you experienced the late night sessions. Otherwise, proceed to be happy.
-
-
+* Perhaps some team members refuse to acknowledge the 'cloud' thing, they are brilliant developers, but will never care about Kubernetes — And that’s OK, no one can be forced to like it. But they can still run stuff locally.
 
 == When not to use Easykube [[rationale-donot]]
 

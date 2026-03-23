@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Install :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/gettingstarted/install/">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">Easykube Documentation</div>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+<script src="../../../../_/js/vendor/asciinema-player.js"></script>
+<div class="body">
+<div class="nav-container" data-component="easykube" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../">EasyKube</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../">Home</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">About</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../about/rationale/">Why Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../about/faq/">FAQ</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Getting started</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="./">Install</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configure/">Configure</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../boot/">Operate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../addons/">Addons explained</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../internals/">Internals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Development</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/contributing/">Contributing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/newfunctionality/">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#js_reference/easykube-api.md">Core Javascript functions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../">EasyKube</a></li>
+    <li>Getting started</li>
+    <li><a href="./">Install</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Install</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_installation">Installation</a>
+<ul class="sectlevel2">
+<li><a href="#install-nix">Nix</a></li>
+<li><a href="#_manual_installation">Manual Installation</a></li>
+<li><a href="#install-postcheck">Post-installation check</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Welcome! On these pages you will find guides on how to install, operate, and extend Easykube to suit your own use cases.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation"><a class="anchor" href="#_installation"></a>Installation<a id="install-install"></a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can install Easykube in a few ways; here are some of the paths you can choose.</p>
+</div>
+<div class="paragraph">
+<p>Please note that pre-built easykube binaries do exist for Windows, Linux, and macOS (Binaries for macOS are not signed with Apple). Easykube can run on Windows, but it&#8217;s recommended to run easykube in WSL2 or a pure Linux environment. Apple users should build from source.</p>
+</div>
+<div class="paragraph">
+<p>Starting clean, we recommended to use the Nix approach. (You can download a binary, but external binary dependencies must be explicitly managed by <strong>yourself</strong>)</p>
+</div>
+<div class="sect2">
+<h3 id="install-nix"><a class="anchor" href="#install-nix"></a>Nix</h3>
+<div class="paragraph">
+<p>You can use <a href="https://nixos.org/download/#download-nix">nix</a> to speed up the process. This will build from source and grab the required dependent binaries.</p>
+</div>
+<div class="paragraph">
+<p><code>nix develop github:/torloejborg/easykube</code></p>
+</div>
+<div class="paragraph">
+<p>The Above command will fetch and build from sources, automatically make available the required binary dependencies (except Docker). Then, you will be dropped into a shell with all tooling available and can start using easykube.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">nix (~/.config/nix/nix.conf)</div>
+<div class="paragraph">
+<p>You may have to add the following to your nix.conf in order to silence Nix warnings:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>extra-experimental-features = nix-command
+extra-experimental-features = flakes</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Nix flake has three shells. The default <code>nix develop github:/torloejborg/easykube</code> will build easykube from source and run tests.</p>
+</div>
+<div class="paragraph">
+<p>If you cloned the repository, enter the directory and issue <code>nix develop .#light</code> This will drop you into a shell with supporting tools, no build test stage. Useful for development. Build with <code>go build</code></p>
+</div>
+<div class="paragraph">
+<p>To contribute documentation, invoke the third shell.
+<code>nix develop .#docs</code>. This installs the antroa toolchain. Edit the AsciiDoc files, render with <code>make docs</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_manual_installation"><a class="anchor" href="#_manual_installation"></a>Manual Installation<a id="install-manual"></a></h3>
+<div class="paragraph">
+<p>Download the latest easykube binary for your platform <a href="https://github.com/torloejborg/easykube/releases">here</a>.
+Extract the archive, rename the binary to <code>easykube</code>, <code>ek</code>, or whatever you prefer, make sure it is on your system’s PATH.</p>
+</div>
+<div class="paragraph">
+<p>Use a package manager or download the following software yourself:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.docker.com/">docker</a></p>
+</li>
+<li>
+<p><a href="https://kubernetes.io/docs/tasks/tools/">kubectl</a></p>
+</li>
+<li>
+<p><a href="https://kubectl.docs.kubernetes.io/installation/kustomize/">kustomize</a></p>
+</li>
+<li>
+<p><a href="https://helm.sh/docs/intro/quickstart/#install-helm">helm</a></p>
+</li>
+<li>
+<p><a href="https://k9scli.io/topics/install/">k9s</a> (optional)</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+On some Linux systems, installing the above packages via snap has proved troublesome for easykube. It may work for you; it may not.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="install-postcheck"><a class="anchor" href="#install-postcheck"></a>Post-installation check</h3>
+<div class="paragraph">
+<p>Typing <code>easykube</code> in your shell should show a warning and usage description.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-text" data-lang="text">⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear
+
+bootstrap a single node kubernetes cluster, install development platforms via addon-repositories
+
+hint: start with 'easykube config'
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also try <code>easykube status</code>; this should yield additional warnings.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-text" data-lang="text">⚠ expecting /home/jane/.kube/easykube to exist, create the cluster and this message will disappear
+Inspecting binary dependencies
+✓ kubectl 1.34.1 (~1.34)
+✓ docker 28.4.0 (^28)
+✓ helm 3.19.0 (~3.19)
+✓ kustomize 5.7.1 (~5.7)
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the checks for the dependent binaries passed. Proceed to configuration. If you get a warning about version mismatches for binaries, rectify, or try your luck.</p>
+</div>
+<div class="paragraph">
+<p>Next: proceed to <a href="../configure/#configure" class="xref page">configure easykube <span class="icon big"><i class="fa fa-arrow-right"></i></span></a></p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using a customized version of Antora default UI.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

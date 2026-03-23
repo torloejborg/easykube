@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Boot / Operate :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/gettingstarted/boot/">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+<link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
+
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">Easykube Documentation</div>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+<script src="../../../../_/js/vendor/asciinema-player.js"></script>
+<div class="body">
+<div class="nav-container" data-component="easykube" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../../">EasyKube</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../../">Home</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">About</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../about/rationale/">Why Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../about/faq/">FAQ</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Getting started</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../install/">Install</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../configure/">Configure</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="./">Operate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../addons/">Addons explained</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../internals/">Internals</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Development</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/contributing/">Contributing</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../developing/newfunctionality/">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#js_reference/easykube-api.md">Core Javascript functions</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../">EasyKube</a></li>
+    <li>Getting started</li>
+    <li><a href="./">Operate</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Boot / Operate</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_reloading_configuration_changes">Reloading configuration changes</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Prerequisite: <a href="../configure/#configure" class="xref page"><span class="icon big"><i class="fa fa-arrow-left"></i></span> easykube configured</a></p>
+</div>
+<div class="paragraph">
+<p>Now you&#8217;re ready to boot easykube</p>
+</div>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-terminal"></i></span><code>easkube boot</code> is the main command for operating easykube, try it out. You should see the following output</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>✔ ensure container runtime
+✔ check free ports
+✔ pull kind image: kindest/node:v1.35.0
+✔ pull registry image: ghcr.io/project-zot/zot-linux-amd64:v2.1.15
+✔ re-configure zot registry
+✔ create local container registry
+✔ start zot-registry
+✔ create easykube-kind cluster
+✔ ensure persistence directories
+✔ connect registry to kind network
+✔ ensure local cluster context
+✔ patch coreDNS
+✔ ensure addon config map
+
+These addons contribute to cluster configuration
+
+Addon: "temporal.ek.js"
+  Ports:
+        - 127.0.0.1 7233/TCP -&gt; NodePort 30950
+
+Addon: "immich.ek.js"
+  Mounts:
+        - /home/jane/.config/easykube/persistence/immich-data -&gt; /sjaneage/immich-data
+        - /home/jane/.config/easykube/persistence/immich-extra-volume -&gt; /sjaneage/ext-pictures
+
+Addon: "redis.ek.js"
+  Ports:
+        - 127.0.0.1 6379/TCP -&gt; NodePort 30971
+
+Addon: "gitea.ek.js"
+  Mounts:
+        - /home/jane/.config/easykube/persistence/gitea -&gt; /storage/gitea
+
+Addon: "ingress.ek.js"
+  Ports:
+        - 127.0.0.1 80/TCP -&gt; NodePort 80
+        - 127.0.0.1 443/TCP -&gt; NodePort 443
+
+Addon: "postgres.ek.js"
+  Ports:
+        - 127.0.0.1 5432/TCP -&gt; NodePort 32000
+
+  Mounts:
+        - /home/jane/.config/easykube/persistence/postgres-data -&gt; /storage/pg-data</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Some of the lines with beginning with ✔ might be greyed out, this is because we try to keep each step in the booting process idempotent.</p>
+</div>
+<div class="paragraph">
+<p>The cluster creation report tells us how each addon influenced the kind configuration. You can inspect the kind config by viewing the file <code>~/.config/easykube/easykube-cluster.yaml</code></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reloading_configuration_changes"><a class="anchor" href="#_reloading_configuration_changes"></a>Reloading configuration changes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are some limitations on what can be reloaded, for instance, if you create an addon that expose a new port or defines storage, you will need to destroy and re-create the cluster (because docker containers are immutable)</p>
+</div>
+<div class="paragraph">
+<p>However, mirror registries can be configured at will. Simply add a new registry to the main configuration file <code>~/.config/easykube/config.yaml</code> and re-isssue <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube boot</code> then you should see green lines like.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>✔ re-configure zot registry
+✔ restart zot-registry
+✔ ensure local cluster context</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Easykube manages the zot configuration files whenever the boot command is invoked.</p>
+</div>
+<div class="paragraph">
+<p>Next steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Discover <a href="../../addons/#addons-addons" class="xref page">how to use addons <span class="icon big"><i class="fa fa-arrow-right"></i></span></a></p>
+</li>
+<li>
+<p>Read about <a href="../internals/#internals-internals" class="xref page">the internals of easykube <span class="icon big"><i class="fa fa-arrow-right"></i></span></a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using a customized version of Antora default UI.</p>
+</footer>
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
