@@ -17,7 +17,13 @@ type OsDetailsImpl struct {
 
 func (d *OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
 
-	// allow user to override default configuration directory
+	// setting config dir from environment takes precedence
+	value, present := os.LookupEnv(constants.EnvEasykubeConfigDir)
+	if present {
+		return value, nil
+	}
+
+	// allow user to override default configuration directory with program argument
 	if Kube.GetStringFlag(constants.FlagConfigDir) != "" {
 		return Kube.GetStringFlag(constants.FlagConfigDir), nil
 	} else {

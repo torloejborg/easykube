@@ -9,7 +9,7 @@ const KindNetworkName = "kind"
 const KustomizeTargetOutput = ".out.yaml"
 const LocalRegistryPort = "5001"
 const LocalRegistry = "registry.localtest.me:" + LocalRegistryPort
-const ConfigDirName = "easykube"
+const EnvEasykubeConfigDir = "EASYKUBE_CONFIG_DIR"
 
 const ZotCredentials = "zot-credentials.json"
 const ZotConfig = "zot-config.json"
