@@ -4,13 +4,20 @@ Why javascript?? I thought this were a pure Go program?
 
 * Easykube is designed to be flexible, used in different contexts with different addon repositories. Easykube defines a core set of utility functions that can be combined in useful ways, using https://github.com/dop251/goja[Goja], a JavaScript VM for Golang.
 
-When i try `*$ easykube create*` it complains about occupied ports, what should I do?
+When i try `*$ easykube boot*` it complains about occupied ports, what should I do?
 
 * As the error state, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the *extraPorts* section in the offending addon.
 
 Where did all my diskspace go?
 
 * Images are cached in the local zot registry. They will exist there and on the kind-control plane. You can delete images in the registry ui - or simply wipe your persistence directory.
+
+ Run `mvn clean install` to rebuild the project.
+
+[.faq-important]
+* icon:exclamation-triangle[] Important: This feature is deprecated in v3.5.5.
+
+== icon:tools[] Troubleshooting
 
 My Easykube addon javascript throws errors, how can I debug what's going on?
 

@@ -12,4 +12,4 @@ Also, you should familiarize yourself with the concepts of xref:addons.adoc[addo
 
 Easykube started out as a collection of Gradle build scripts. The primary use case was to enable mobile developers to install real backends locally, allowing them to work offline and not require a personal instance of some test system on a random cluster, incurring a real monetary cost.
 
-Later, easykube was reimplemented in Go. And currently enables developers to reason about complex microservice based applications.
+Later, easykube was reimplemented in Go. And currently enables teams of developers to reason about complex microservice based applications.

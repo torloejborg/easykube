@@ -29,7 +29,7 @@ Addons are organized in directory structures, typically Git repositories shared 
 
 When easykube is invoked, it recursively scans the addon repository and discovers all addons.
 
-=== Dissecting an Addon [[addons-dissecting]]
+== Dissecting an Addon [[addons-dissecting]]
 
 Let's examine an addon in detail. We'll look at the Temporal addon, as it uses some non-trivial features. Below is its listing:
 
@@ -88,11 +88,11 @@ A lot is happening here, so let’s break it down:
 
 <8> waitForDeployment halts execution until the specified deployment becomes ready (with a 30-second timeout). This is useful in local scenarios where we may need to wait for a database to finish initializing. Real workloads should use better readiness strategies.
 
-<9> Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and more.
+<9> Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and much much more.
 
 == Limitations [[addons-limitations]]
 
-It may appear that the jslib is some sort of global context, but this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside that context.
+It may appear that the jslib has some sort of global context, but this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside each addon's context.
 
 This means you cannot share or maintain global state between addons during script execution.
 

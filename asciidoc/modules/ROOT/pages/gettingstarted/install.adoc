@@ -4,7 +4,7 @@
 Welcome! On these pages you will find guides on how to install, operate, and extend Easykube to suit your own use cases.
 
 == Installation[[install-install]]
-There are many ways to install Easykube; here are some of the paths you can choose.
+You can install Easykube in a few ways; here are some of the paths you can choose.
 
 Please note that pre-built easykube binaries do exist for Windows, Linux, and macOS (Binaries for macOS are not signed with Apple). Easykube can run on Windows, but it's recommended to run easykube in WSL2 or a pure Linux environment. Apple users should build from source.
 
@@ -80,4 +80,4 @@ Inspecting binary dependencies
 If the checks for the dependent binaries passed. Proceed to configuration. If you get a warning about version mismatches for binaries, rectify, or try your luck.
 
 
-Next: proceed to xref:./configure.adoc#configure[configuration icon:arrow-right[role="big"]]
+Next: proceed to xref:./configure.adoc#configure[configure easykube icon:arrow-right[role="big"]]

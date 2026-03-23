@@ -6,7 +6,7 @@ Prerequisite: xref:./configure.adoc#configure[ icon:arrow-left[role="big"] easyk
 
 Now you're ready to boot easykube
 
-`easkube boot` is the main command for operating easykube, try it out. You should see the following output
+icon:terminal[]`easkube boot` is the main command for operating easykube, try it out. You should see the following output
 
 ----
 ✔ ensure container runtime
@@ -64,7 +64,7 @@ The cluster creation report tells us how each addon influenced the kind configur
 
 There are some limitations on what can be reloaded, for instance, if you create an addon that expose a new port or defines storage, you will need to destroy and re-create the cluster (because docker containers are immutable)
 
-However, mirror registries can be configured at will. Simply add a new registry to the main configuration file `~/.config/easykube/config.yaml` and re-isssue `easykube boot` then you should see green lines like.
+However, mirror registries can be configured at will. Simply add a new registry to the main configuration file `~/.config/easykube/config.yaml` and re-isssue icon:terminal[]`easykube boot` then you should see green lines like.
 
 ----
 ✔ re-configure zot registry

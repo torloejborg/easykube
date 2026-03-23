@@ -5,7 +5,7 @@ On this page we describe some of the internals, and how easykube differs from a 
 
 == Local image registry
 
-The registry is your local image cache. When operating a kind-cluster, it's possible to bootstrap an application by directly pushing images into the control plane - easykube maintains a local registry. This is a trade-off between time and diskspace.
+The local zot registry is your local image cache. You can use the registry as a pull through reqistry, or push images directly into it.
 
 `easykube stop` will stop the registry and kind-control plane.
 

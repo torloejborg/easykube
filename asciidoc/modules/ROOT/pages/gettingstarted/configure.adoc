@@ -2,7 +2,7 @@
 
 Prerequisite: xref:./install.adoc#install-install[icon:arrow-left[role="big"] easykube installed]
 
-You configure easykube with the `config` command
+You configure easykube with the icon:terminal[] `config` command
 
 .easykube config --help
 [source, yaml]
@@ -23,12 +23,12 @@ Global Flags:
   -v, --verbose             verbose output
 ----
 
-`easykube config` without any arguments will start an interactive session, where you are prompted for the addon-root and persistence directories.
+icon:terminal[]`easykube config` without any arguments will start an interactive session, where you are prompted for the addon-root and persistence directories.
 
 
-Create a default configuration with `easykube config --use-defaults`
+Create a default configuration with icon:terminal[]`easykube config --use-defaults`
 
-Next, try opening it with `easykube config --edit`, the listing below should pop up in your editor.
+Next, try opening it with icon:terminal[]`easykube config --edit`, the listing below should pop up in your editor.
 
 [source, yaml]
 ----
@@ -72,9 +72,12 @@ By itself, easykube is not very interesting — it cannot do anything without it
 
 NOTE: The next sections assume the addon repository is placed in `/home/jane/code/easykube-addons` — adjust accordingly.
 
-When you have cloned an addon repository, proceed to configure easykube with `$ easykube config --edit` - You might get an error complaining about the `VISUAL` environment variable not being set. Set it to something familiar; code, nano, vi, notepad.
+When you have cloned an addon repository, proceed to configure easykube with icon:terminal[]`easykube config --edit` - You might get an error complaining about the `VISUAL` environment variable not being set. Set it to something familiar; code, nano, vi, notepad.
 
-=== Default certificates
+NOTE: It's possible to override the default configuration directory's location with the global argument icon:terminal[]`easykube --config-dir <command>` or set the environment variable `EASYKUBE_CONFIG_DIR`
+
+
+== Default certificates
 Easykube is configured to use a default SSL certificate. The `ingress` addon and the `zot-registry` container are wired to use this certificate.
 
 The certificate is self-signed and issued by 'UFST' - to have a good out-of-the box experience, you can choose to trust the certificate found in `~/.config/easykube/localtest.me.ca.crt`
