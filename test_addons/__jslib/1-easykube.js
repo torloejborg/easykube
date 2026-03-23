@@ -186,7 +186,7 @@ class Easykube {
         return  _ek.http(url,method,header,body);
     }
 
-    /*
+    /**
      * Represents a result of exec, this is created and exposed from go
      * @typedef {Object} ExecResult
      * @property {(cb: (output: string) => any) => string} onSuccess

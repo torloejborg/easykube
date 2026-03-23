@@ -15,6 +15,3 @@
 * Development
 ** xref:developing/contributing.adoc[Contributing]
 ** xref:developing/newfunctionality.adoc[Adding new functionality]
-
-* Reference
-** xref:js_reference/easykube-api.md[Core Javascript functions]
