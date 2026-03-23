@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"slices"
 	"sync"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/google/uuid"
-	"github.com/slok/gospinner"
 )
 
 type IOrderedTask interface {
@@ -89,48 +90,30 @@ func NewTaskWithSkip(description string, execute func() error, skip func() bool)
 }
 
 func ExecuteTasks(taskContainer *TaskContainer) {
-
-	checkErr := func(err error) {
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
-
 	tasks := taskContainer.GetNodes()
 
-	// first pass
 	for !tasks.IsEmpty() {
-
 		currentTask, _ := tasks.Pop()
 
-		s, err := gospinner.NewSpinner(gospinner.Dots)
-		checkErr(err)
-		taskContainer.mu.Lock()
-		checkErr(s.Start(fmt.Sprintf("%s", currentTask.Description)))
-		taskContainer.mu.Unlock()
+		// Create a new spinner
+		s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+		s.Prefix = currentTask.Description + " "
+		s.Start()
 
 		// Execute task
 		if !currentTask.SkipCondition() {
-
 			if err := currentTask.Execute(); err != nil {
-				taskContainer.mu.Lock()
-				checkErr(s.Fail())
-				taskContainer.mu.Unlock()
-
+				s.Stop()
 				fmt.Printf("\r%s %s: %s\n", color.RedString("✗"), currentTask.Description, err.Error())
 				break
 			} else {
-				taskContainer.mu.Lock()
-				checkErr(s.Succeed())
-				taskContainer.mu.Unlock()
+				s.Stop()
+				fmt.Printf("\r%s %s\n", color.GreenString("✓"), currentTask.Description)
 			}
 		} else {
-			taskContainer.mu.Lock()
-			color.Set(color.FgHiBlack)
-			_ = s.FinishWithMessage("✔", currentTask.Description)
-			color.Unset()
-			taskContainer.mu.Unlock()
+			s.Stop()
+			// Print skipped task in grey
+			fmt.Printf("\r%s\n", color.New(color.FgHiBlack).Sprintf("✔ %s", currentTask.Description))
 		}
 	}
-
 }
