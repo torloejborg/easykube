@@ -1,4 +1,4 @@
-server = "https://registry.localtest.me:5000"
+server = "https://registry.localtest.me:5001"
 
-[host."https://registry.localtest.me:5000"]
+[host."https://registry.localtest.me:5001"]
     capabilities = ["pull","resolve"]
