@@ -29,8 +29,8 @@ var skaffoldCmd = &cobra.Command{
 
 		commandHelper := ez.CommandHelper(cmd)
 		opts := SkaffoldOpts{
-			AddonName:     commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_NAME),
-			AddonLocation: commandHelper.GetStringFlag(constants.ARG_SKAFFOLD_LOCATION),
+			AddonName:     commandHelper.GetStringFlag(constants.ArgSkaffoldName),
+			AddonLocation: commandHelper.GetStringFlag(constants.ArgSkaffoldLocation),
 		}
 
 		return skaffoldActual(opts)
@@ -39,10 +39,10 @@ var skaffoldCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(skaffoldCmd)
-	skaffoldCmd.Flags().String(constants.ARG_SKAFFOLD_NAME, "", "Name of new addon")
-	skaffoldCmd.Flags().String(constants.ARG_SKAFFOLD_LOCATION, "", "Destination within the addons repository")
+	skaffoldCmd.Flags().String(constants.ArgSkaffoldName, "", "Name of new addon")
+	skaffoldCmd.Flags().String(constants.ArgSkaffoldLocation, "", "Destination within the addons repository")
 
-	_ = skaffoldCmd.MarkFlagRequired(constants.ARG_SKAFFOLD_NAME)
-	_ = skaffoldCmd.MarkFlagRequired(constants.ARG_SKAFFOLD_LOCATION)
+	_ = skaffoldCmd.MarkFlagRequired(constants.ArgSkaffoldName)
+	_ = skaffoldCmd.MarkFlagRequired(constants.ArgSkaffoldLocation)
 
 }

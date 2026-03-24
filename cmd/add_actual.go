@@ -36,7 +36,7 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 
 	if opts.TargetCluster != "" {
 		ezk.SwitchContext(opts.TargetCluster)
-		defer ezk.SwitchContext(constants.CLUSTER_CONTEXT)
+		defer ezk.SwitchContext(constants.ClusterContext)
 	}
 
 	if opts.NoDepends {

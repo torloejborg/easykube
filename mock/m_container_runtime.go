@@ -687,6 +687,44 @@ func (c *MockIContainerRuntimeStartContainerCall) DoAndReturn(f func(string) err
 	return c
 }
 
+// StartContainerRegistry mocks base method.
+func (m *MockIContainerRuntime) StartContainerRegistry() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartContainerRegistry")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// StartContainerRegistry indicates an expected call of StartContainerRegistry.
+func (mr *MockIContainerRuntimeMockRecorder) StartContainerRegistry() *MockIContainerRuntimeStartContainerRegistryCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartContainerRegistry", reflect.TypeOf((*MockIContainerRuntime)(nil).StartContainerRegistry))
+	return &MockIContainerRuntimeStartContainerRegistryCall{Call: call}
+}
+
+// MockIContainerRuntimeStartContainerRegistryCall wrap *gomock.Call
+type MockIContainerRuntimeStartContainerRegistryCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIContainerRuntimeStartContainerRegistryCall) Return(arg0 error) *MockIContainerRuntimeStartContainerRegistryCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIContainerRuntimeStartContainerRegistryCall) Do(f func() error) *MockIContainerRuntimeStartContainerRegistryCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIContainerRuntimeStartContainerRegistryCall) DoAndReturn(f func() error) *MockIContainerRuntimeStartContainerRegistryCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // StopContainer mocks base method.
 func (m *MockIContainerRuntime) StopContainer(id string) error {
 	m.ctrl.T.Helper()

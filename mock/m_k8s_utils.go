@@ -688,3 +688,41 @@ func (c *MockIK8SUtilsWaitForDeploymentReadyWatchCall) DoAndReturn(f func(string
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// WaitForKindClusterReady mocks base method.
+func (m *MockIK8SUtils) WaitForKindClusterReady(kubeconfig string, timeout time.Duration) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForKindClusterReady", kubeconfig, timeout)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForKindClusterReady indicates an expected call of WaitForKindClusterReady.
+func (mr *MockIK8SUtilsMockRecorder) WaitForKindClusterReady(kubeconfig, timeout any) *MockIK8SUtilsWaitForKindClusterReadyCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForKindClusterReady", reflect.TypeOf((*MockIK8SUtils)(nil).WaitForKindClusterReady), kubeconfig, timeout)
+	return &MockIK8SUtilsWaitForKindClusterReadyCall{Call: call}
+}
+
+// MockIK8SUtilsWaitForKindClusterReadyCall wrap *gomock.Call
+type MockIK8SUtilsWaitForKindClusterReadyCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIK8SUtilsWaitForKindClusterReadyCall) Return(arg0 error) *MockIK8SUtilsWaitForKindClusterReadyCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIK8SUtilsWaitForKindClusterReadyCall) Do(f func(string, time.Duration) error) *MockIK8SUtilsWaitForKindClusterReadyCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIK8SUtilsWaitForKindClusterReadyCall) DoAndReturn(f func(string, time.Duration) error) *MockIK8SUtilsWaitForKindClusterReadyCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}

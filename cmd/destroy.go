@@ -22,5 +22,6 @@ var destroyCmd = &cobra.Command{
 }
 
 func init() {
+	destroyCmd.Flags().BoolP("purge", "p", false, "deletes configuration, local registry, and persisted data")
 	rootCmd.AddCommand(destroyCmd)
 }

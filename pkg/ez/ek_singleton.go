@@ -1,6 +1,8 @@
 package ez
 
 import (
+	"errors"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/pkg/textutils"
@@ -75,8 +77,8 @@ func CreateK8sUtilsImpl() IK8SUtils {
 	return NewK8SUtils()
 }
 
-func CreateEasykubeConfigImpl(osd OsDetails) IEasykubeConfig {
-	return NewEasykubeConfig(osd)
+func CreateEasykubeConfigImpl() IEasykubeConfig {
+	return NewEasykubeConfig()
 }
 
 func CreateAddonReaderImpl(config IEasykubeConfig) IAddonReader {
@@ -96,22 +98,45 @@ func CreateOsDetailsImpl() OsDetails {
 }
 
 type Easykube struct {
-	initializeContainerRuntime bool
-	initializeKubernetesClient bool
+	initializeContainerRuntime          bool
+	initializeKubernetesClient          bool
+	initializeAddonReader               bool
+	initializeClusterUtils              bool
+	initializeWithMustHaveConfiguration bool
 }
 
 type EkOpt func(easykube *Easykube) error
 
-func WithContainerRuntime(useit bool) EkOpt {
+func WithContainerRuntime(initialize bool) EkOpt {
 	return func(e *Easykube) error {
-		e.initializeContainerRuntime = useit
+		e.initializeContainerRuntime = initialize
 		return nil
 	}
 }
 
-func WithKubernetes(useit bool) EkOpt {
+func WithKubernetes(initialize bool) EkOpt {
 	return func(e *Easykube) error {
-		e.initializeKubernetesClient = useit
+		e.initializeKubernetesClient = initialize
+		return nil
+	}
+}
+func WithAddonReader(initialize bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeAddonReader = initialize
+		return nil
+	}
+}
+
+func WithClusterUtils(initialize bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeClusterUtils = initialize
+		return nil
+	}
+}
+
+func WithMustHaveConfiguration(configIsCreated bool) EkOpt {
+	return func(e *Easykube) error {
+		e.initializeWithMustHaveConfiguration = configIsCreated
 		return nil
 	}
 }
@@ -119,8 +144,11 @@ func WithKubernetes(useit bool) EkOpt {
 func InitializeEasykube(opts ...EkOpt) error {
 
 	ekOpts := Easykube{
-		initializeContainerRuntime: true,
-		initializeKubernetesClient: true,
+		initializeContainerRuntime:          true,
+		initializeKubernetesClient:          true,
+		initializeAddonReader:               true,
+		initializeClusterUtils:              true,
+		initializeWithMustHaveConfiguration: true,
 	}
 
 	for _, opt := range opts {
@@ -130,18 +158,29 @@ func InitializeEasykube(opts ...EkOpt) error {
 	}
 
 	osd := CreateOsDetailsImpl()
-	config := CreateEasykubeConfigImpl(osd)
+
+	config := CreateEasykubeConfigImpl()
 	Kube.UseEasykubeConfig(config)
 
 	Kube.UseFilesystemLayer(afero.NewOsFs())
 	Kube.UsePrinter(textutils.NewPrinter())
 	Kube.UseOsDetails(osd)
 
+	if ekOpts.initializeWithMustHaveConfiguration {
+		_, err := Kube.LoadConfig()
+		if err != nil {
+			return errors.New("failed to load configuration")
+		}
+	}
+
 	if ekOpts.initializeKubernetesClient {
 		Kube.UseK8sUtils(CreateK8sUtilsImpl())
 	}
 
-	Kube.UseAddonReader(CreateAddonReaderImpl(config))
+	if ekOpts.initializeAddonReader {
+		Kube.UseAddonReader(CreateAddonReaderImpl(config))
+	}
+
 	Kube.UseExternalTools(NewExternalTools())
 
 	if ekOpts.initializeContainerRuntime {
@@ -152,7 +191,9 @@ func InitializeEasykube(opts ...EkOpt) error {
 		Kube.UseContainerRuntime(cri)
 	}
 
-	Kube.UseClusterUtils(CreateClusterUtilsImpl())
+	if ekOpts.initializeClusterUtils {
+		Kube.UseClusterUtils(CreateClusterUtilsImpl())
+	}
 
 	return nil
 

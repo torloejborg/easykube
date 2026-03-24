@@ -20,20 +20,20 @@ var stopCmd = &cobra.Command{
 		}
 
 		ezk := ez.Kube
-		if running, err := ezk.IsContainerRunning(constants.KIND_CONTAINER); err != nil {
+		if running, err := ezk.IsContainerRunning(constants.KindContainer); err != nil {
 			return err
 		} else if running {
-			ezk.FmtGreen("stopping %s", constants.KIND_CONTAINER)
-			if e := ezk.StopContainer(constants.KIND_CONTAINER); e != nil {
+			ezk.FmtGreen("stopping %s", constants.KindContainer)
+			if e := ezk.StopContainer(constants.KindContainer); e != nil {
 				return e
 			}
 		}
 
-		if running, err := ezk.IsContainerRunning(constants.REGISTRY_CONTAINER); err != nil {
+		if running, err := ezk.IsContainerRunning(constants.RegistryContainer); err != nil {
 			return err
 		} else if running {
-			ezk.FmtGreen("stopping %s", constants.REGISTRY_CONTAINER)
-			if e := ezk.StopContainer(constants.REGISTRY_CONTAINER); e != nil {
+			ezk.FmtGreen("stopping %s", constants.RegistryContainer)
+			if e := ezk.StopContainer(constants.RegistryContainer); e != nil {
 				return e
 			}
 		}

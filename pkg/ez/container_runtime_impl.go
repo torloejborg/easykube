@@ -86,7 +86,7 @@ func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
 }
 func (cri *ContainerRuntimeImpl) IsClusterRunning() bool {
 
-	running, err := cri.IsContainerRunning(constants.KIND_CONTAINER)
+	running, err := cri.IsContainerRunning(constants.KindContainer)
 	if err != nil {
 		return false
 	} else {
@@ -114,7 +114,7 @@ func (cri *ContainerRuntimeImpl) IsContainerRunning(containerID string) (bool, e
 }
 
 func (cri *ContainerRuntimeImpl) HasImageInKindRegistry(image string) (bool, error) {
-	image = strings.ReplaceAll(image, constants.LOCAL_REGISTRY+"/", "")
+	image = strings.ReplaceAll(image, constants.LocalRegistry+"/", "")
 	parts := strings.Split(image, ":")
 	imageWithoutTag := parts[0]
 	imageTag := parts[1]
@@ -128,7 +128,7 @@ func (cri *ContainerRuntimeImpl) HasImageInKindRegistry(image string) (bool, err
 	}
 	httpClient := &http.Client{Transport: tr}
 
-	resp, err := httpClient.Get(fmt.Sprintf("https://%s/v2/%s/tags/list", constants.LOCAL_REGISTRY, imageWithoutTag))
+	resp, err := httpClient.Get(fmt.Sprintf("https://%s/v2/%s/tags/list", constants.LocalRegistry, imageWithoutTag))
 	if nil != err {
 		return false, err
 	}
@@ -324,6 +324,7 @@ func (cri *ContainerRuntimeImpl) StopContainer(id string) error {
 }
 
 func (cri *ContainerRuntimeImpl) RemoveContainer(id string) error {
+
 	if err := cri.Docker.ContainerRemove(cri.ctx, id, container.RemoveOptions{}); err != nil {
 		return err
 	} else {
@@ -396,30 +397,40 @@ func (cri *ContainerRuntimeImpl) IsContainerRuntimeAvailable() bool {
 	return err == nil
 }
 
+func (cri *ContainerRuntimeImpl) StartContainerRegistry() error {
+
+	containerSearch, err := cri.FindContainer(constants.RegistryContainer)
+	if err != nil {
+		return err
+	}
+
+	if containerSearch.Found && !containerSearch.IsRunning {
+		err = cri.StartContainer(containerSearch.ContainerID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
-	registryImage := constants.REGISTRY_IMAGE
-	containerName := constants.REGISTRY_CONTAINER
+	registryImg := constants.RegistryImage
+	containerName := constants.RegistryContainer
 
 	// make sure that the registry-config file exists
 	configDir, _ := os.UserConfigDir()
-	if err := CopyResource("registry-config.yaml", "registry-config.yaml"); err != nil {
+	if err := CopyResourceToConfigDir(constants.ZotConfig, constants.ZotConfig); err != nil {
 		return err
 	}
 
-	if err := CopyResource("cert/server.crt", "localtest.me.crt"); err != nil {
+	if err := CopyResourceToConfigDir("cert/server.crt", "localtest.me.crt"); err != nil {
 		return err
 	}
 
-	if err := CopyResource("cert/server.key", "localtest.me.key"); err != nil {
+	if err := CopyResourceToConfigDir("cert/server.key", "localtest.me.key"); err != nil {
 		return err
-	}
-
-	imageSearch, err := cri.HasImage(registryImage)
-	if !imageSearch {
-		if err := cri.PullImage(registryImage, nil); err != nil {
-			return err
-		}
 	}
 
 	containerSearch, err := cri.FindContainer(containerName)
@@ -431,13 +442,19 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 		containerConfig := &container.Config{
 			ExposedPorts: nat.PortSet{nat.Port("5000"): struct{}{}},
-			Image:        registryImage,
+			Image:        registryImg,
 		}
 
-		binds := make([]string, 3)
-		binds[0] = filepath.Join(configDir, "easykube", "registry-config.yaml") + ":/etc/docker/registry/config.yml:z"
-		binds[1] = filepath.Join(configDir, "easykube", "localtest.me.crt") + ":/etc/ssl/localtest.me.crt:z"
-		binds[2] = filepath.Join(configDir, "easykube", "localtest.me.key") + ":/etc/ssl/localtest.me.key:z"
+		configDir, err = Kube.GetEasykubeConfigDir()
+
+		binds := make([]string, 0)
+		binds = append(binds, filepath.Join(configDir, "localtest.me.crt")+":/etc/ssl/localtest.me.crt:z")
+		binds = append(binds, filepath.Join(configDir, "localtest.me.key")+":/etc/ssl/localtest.me.key:z")
+		binds = append(binds, filepath.Join(configDir, "persistence", "zot"+":/var/lib/zot:z"))
+
+		// the zot config files are generated in the boot process
+		binds = append(binds, filepath.Join(configDir, constants.ZotCredentials)+":/var/lib/zot/credentials.json:z")
+		binds = append(binds, filepath.Join(configDir, constants.ZotConfig)+":/etc/zot/config.json:z")
 
 		networkingConfig := &network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{
@@ -452,7 +469,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 		hostConfig := &container.HostConfig{
 			LogConfig:    container.LogConfig{},
 			NetworkMode:  "kind",
-			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("5000"): {{HostIP: "127.0.0.1", HostPort: "5001"}}},
+			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port(constants.LocalRegistryPort): {{HostIP: "127.0.0.1", HostPort: constants.LocalRegistryPort}}},
 			RestartPolicy: container.RestartPolicy{
 				Name:              "always",
 				MaximumRetryCount: 0,
@@ -460,19 +477,11 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 			Binds: binds,
 		}
 
-		resp, err := cri.Docker.ContainerCreate(cri.ctx, containerConfig, hostConfig, networkingConfig, nil, constants.REGISTRY_CONTAINER)
+		_, err := cri.Docker.ContainerCreate(cri.ctx, containerConfig, hostConfig, networkingConfig, nil, constants.RegistryContainer)
 		if err != nil {
 			panic(err)
 		}
 
-		err = cri.Docker.ContainerStart(cri.ctx, resp.ID, container.StartOptions{})
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	if containerSearch.Found && !containerSearch.IsRunning {
-		cri.StartContainer(containerSearch.ContainerID)
 	}
 
 	return nil

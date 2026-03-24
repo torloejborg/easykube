@@ -50,13 +50,13 @@ func (s *StatusBuilderImpl) DoContainerCheck() error {
 	}
 
 	Kube.FmtGreen("Container configuration")
-	running(constants.REGISTRY_CONTAINER)
-	running(constants.KIND_CONTAINER)
+	running(constants.RegistryContainer)
+	running(constants.KindContainer)
 
-	if connected, _ := Kube.IsNetworkConnectedToContainer(constants.REGISTRY_CONTAINER, "kind"); connected {
-		Kube.FmtGreen("✓ %s connected to kind network", constants.REGISTRY_CONTAINER)
+	if connected, _ := Kube.IsNetworkConnectedToContainer(constants.RegistryContainer, "kind"); connected {
+		Kube.FmtGreen("✓ %s connected to kind network", constants.RegistryContainer)
 	} else {
-		Kube.FmtRed("⚠ %s not connected to kind network", constants.REGISTRY_CONTAINER)
+		Kube.FmtRed("⚠ %s not connected to kind network", constants.RegistryContainer)
 	}
 
 	return nil
@@ -164,27 +164,27 @@ func (s *StatusBuilderImpl) DoAddonRepositoryCheck() error {
 
 func (s *StatusBuilderImpl) getKubectlVersion() string {
 	out, _, err := Kube.RunCommand("kubectl", []string{"version", "--client"}...)
-	return s.getVersionStr(out, constants.KUBECTL_SEMVER, err)
+	return s.getVersionStr(out, constants.KubectlSemver, err)
 }
 
 func (s *StatusBuilderImpl) getDockerVersion() string {
 	out, _, err := Kube.RunCommand("docker", []string{"version", "--format", "{{.Server.Version}}"}...)
-	return s.getVersionStr(out, constants.DOCKER_SEMVER, err)
+	return s.getVersionStr(out, constants.DockerSemver, err)
 }
 
 func (s *StatusBuilderImpl) getHelmVersion() string {
 	out, _, err := Kube.RunCommand("helm", []string{"version", "--template", "{{.Version}}"}...)
-	return s.getVersionStr(out, constants.HELM_SEMVER, err)
+	return s.getVersionStr(out, constants.HelmSemver, err)
 }
 
 func (s *StatusBuilderImpl) getKustomizeVersion() string {
 	out, _, err := Kube.RunCommand("kustomize", []string{"version"}...)
-	return s.getVersionStr(out, constants.KUSTOMIZE_SEMVER, err)
+	return s.getVersionStr(out, constants.KustomizeSemver, err)
 }
 
 func (s *StatusBuilderImpl) getPodmanVersion() string {
 	out, _, err := Kube.RunCommand("podman", []string{"version", "--format", " {{.Version}}"}...)
-	return s.getVersionStr(out, constants.PODMAN_SEMVER, err)
+	return s.getVersionStr(out, constants.PodmanSemver, err)
 }
 
 func (s *StatusBuilderImpl) getVersionStr(in, wants string, inErr error) string {

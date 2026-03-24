@@ -44,11 +44,11 @@ func startActual() error {
 		return &StartStatus{}, nil
 	}
 
-	cluster, err := findAndStart(constants.KIND_CONTAINER)
+	cluster, err := findAndStart(constants.KindContainer)
 	if err != nil {
 		return err
 	}
-	registry, err := findAndStart(constants.REGISTRY_CONTAINER)
+	registry, err := findAndStart(constants.RegistryContainer)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func startActual() error {
 
 	if !registry.OK && !cluster.OK {
 		ezk.FmtGreen("Hint:\n")
-		_ = createCmd.Help()
+		_ = bootCmd.Help()
 	}
 
 	return nil
