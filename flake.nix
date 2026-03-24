@@ -76,7 +76,8 @@
             easykube
           '';
        };
-        light = pkgs.mkShell {
+
+       light = pkgs.mkShell {
           packages = commonPackages;
           shell = pkgs.zsh;
           impureEnv = true;

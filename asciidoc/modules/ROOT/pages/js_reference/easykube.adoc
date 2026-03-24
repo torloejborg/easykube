@@ -1,0 +1,492 @@
+= Easykube API Reference
+
+
+:toc:
+:toclevels: 2
+
+
+
+== Methods
+
+=== helmTemplate
+
+Renders a Helm chart to .out, remember to apply the result
+
+[source,javascript]
+----
+helmTemplate(chart, values, destination, namespace, nametemplate)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `chart`
+| string
+| relative path to the chart directory
+| `values`
+| string
+| the values file to use
+| `destination`
+| string
+| output file for rendered template
+| `namespace`
+| string
+| sets namespace in templated output
+| `nametemplate`
+| string
+| sets release name in templated output
+
+|===
+
+
+=== waitForDeployment
+
+Waits until the specified deployment reaches ready state in the cluster.
+
+[source,javascript]
+----
+waitForDeployment(deployment, namespace)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `deployment`
+| string
+| Deployment to wait for
+| `namespace`
+| string
+| Where the deployment lives
+
+|===
+
+.Returns
+
+`Easykube` —
+
+=== thenApply
+
+Applies a single yaml resource with kubectl
+
+[source,javascript]
+----
+thenApply(manifest)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `manifest`
+| string
+| The yaml file to apply the path must be relative to the addon script
+
+|===
+
+.Returns
+
+`Easykube` —
+
+=== preload
+
+Preloads images by pulling them retagging and pushing them to your local registry,
+this saves bandwidth, and will make subsequent installations faster
+
+[source,javascript]
+----
+preload(images)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `images`
+| Map.&lt;string, string&gt;
+|
+
+|===
+
+.Returns
+
+`Easykube` —
+
+=== runCommand
+
+Runs a command in a container
+
+[source,javascript]
+----
+runCommand(deployment, namespace, command, args)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `deployment`
+| string
+| Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)
+| `namespace`
+| string
+| , args) {
+| `command`
+| string
+| The command to run, example &quot;ls&quot; or &quot;/usr/local/bin/whatever&quot;
+| `args`
+| Array.&lt;string&gt;
+| Arguments to the command, example [&quot;-la&quot;,&quot;-v&quot;]
+
+|===
+
+.Returns
+
+`string` —
+
+=== waitForCustomResourceDefinition
+
+Waits until a custom resource definition appears (Operators exemplifies this issue, it can
+take some time for an operator to apply its own resources)
+
+[source,javascript]
+----
+waitForCustomResourceDefinition(group, version, kind, timeout)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `group`
+| string
+| group name of crd &#x27;acme.io&#x27;
+| `version`
+| string
+| V1
+| `kind`
+| string
+| the kind of resource, &#x27;Widget&#x27;
+| `timeout`
+| number
+| duration in seconds to wait before giving up
+
+|===
+
+.Returns
+
+`Easykube` —
+
+=== copyFile
+
+Copies a local file to a container in a pod. This is done by best effort. A pod can have many containers. If
+two (or more) containers exist which matches the partial container name, the first becomes the target.
+
+Limitation; The destination MUST be aimed at a deployment, you cannot target a bare container. This is
+why you must specify a deployment name. Also tar must be available in the container.
+
+[source,javascript]
+----
+copyFile(deployment, namespace, containerLike, localPath, remotePath)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `deployment`
+| string
+| Name of deployment
+| `namespace`
+| string
+| Where the target deployment lives
+| `containerLike`
+| string
+| The partial name of the target container
+| `localPath`
+| string
+| Source file, relative to the *.ek.js module definition
+| `remotePath`
+| string
+| Destination file in container, destination must be writeable
+
+|===
+
+.Returns
+
+`Easykube` —
+
+=== createSecret
+
+Creates a secret in a given namespace
+
+[source,javascript]
+----
+createSecret(namespace, name, data)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `namespace`
+| string
+| create the secret in this namespace
+| `name`
+| string
+| what to call the secret
+| `data`
+| Object.&lt;string, string&gt;
+| A map, All key and values are strings
+
+|===
+
+
+=== getSecret
+
+
+
+[source,javascript]
+----
+getSecret(namespace, name)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `namespace`
+|
+|
+| `name`
+|
+|
+
+|===
+
+
+=== processExternalSecrets
+
+Preprocesses an addon&#x27;s yaml output and the resources related to the ExternalSecretOperator.
+Secrets will be created without ESO installed, but ESO&#x27;s custom resource definitions needs to be
+available.
+
+[source,javascript]
+----
+processExternalSecrets(secretMap, namespace, manifest)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `secretMap`
+| Map.&lt;string, Map.&lt;string, any&gt;&gt;
+| An arbitrary map which provides the actual keys for the secret
+| `namespace`
+| string
+| where to apply the secret
+| `manifest`
+| string
+| which output to process, by default, it&#x27;s the output from kustomize (.out.yaml)
+
+|===
+
+
+=== kv
+
+Gets a value from the passed kv easykube commandline argument (easykube add fooaddon --kv foo&#x3D;bar, bing&#x3D;baz)
+
+[source,javascript]
+----
+kv(key)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `key`
+| string
+| in the map
+
+|===
+
+.Returns
+
+`string` — value or undefined if key does not exist
+
+=== env
+
+Fetch the value of an environment variable
+
+[source,javascript]
+----
+env(key)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `key`
+| string
+|
+
+|===
+
+.Returns
+
+`string` — value of env-var, undefined if non-existent
+
+=== http
+
+Performs http requests using a very basic client
+
+[source,javascript]
+----
+http(url, method, header, body)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `url`
+| string
+| endpoint for request
+| `method`
+| string
+| the method, POST, GET, etc.
+| `header`
+| string
+| headers for the request
+| `body`
+| Object
+| arbitrary json structure or text
+
+|===
+
+.Returns
+
+`HttpResponse` —
+
+=== exec
+
+Executes an arbitrary OS command, this calls in to go&#x27;s os.Exec
+
+[source,javascript]
+----
+exec(command, args)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `command`
+| string
+| the command
+| `args`
+| Array.&lt;string&gt;
+| arguments for the command
+
+|===
+
+.Returns
+
+`ExecResult` — the result
+
+=== addonDirForName
+
+Gets the directory of the current addon
+
+[source,javascript]
+----
+addonDirForName(name)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `name`
+| string
+| optional addon name, if specificed will return the path to another addon in the respository
+
+|===
+
+.Returns
+
+`string` — absolute path to the addon directory
+
+
+== Types
+
+=== HttpResponse
+
+
+
+[cols="1,2,3"]
+|===
+| Name | Type | Description
+
+| `onSuccess`
+| HttpSuccessCallback
+|
+| `onFail`
+| HttpFailCallback
+|
+
+|===
+=== ExecResult
+
+Represents a result of exec, this is created and exposed from go
+
+[cols="1,2,3"]
+|===
+| Name | Type | Description
+
+| `onSuccess`
+| function
+|
+| `onFail`
+| function
+|
+
+|===
+
+=== HttpSuccessCallback
+
+[source,javascript]
+----
+function(body: string): HttpResponse
+----
+
+
+
+=== HttpFailCallback
+
+[source,javascript]
+----
+function(error: string, httpStatusCode: number): HttpResponse
+----
+
+
+

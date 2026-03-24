@@ -39,25 +39,40 @@
     <a class="nav-link" href="./">Home</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="rationale/">Why Easykube</a>
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">About</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="about/rationale/">Why Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="about/faq/">FAQ</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="install/">Install Easykube</a>
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Getting started</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="gettingstarted/install/">Install</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="gettingstarted/configure/">Configure</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="gettingstarted/boot/">Operate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="gettingstarted/container_runtimes/">Container Runtimes</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="addons/">Addons explained</a>
   </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="using/">Usage</a>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="gettingstarted/internals/">Internals</a>
   </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="internals/">Internals</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="container_runtimes/">Container Runtimes</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="faq/">FAQ</a>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
@@ -68,6 +83,21 @@
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="developing/newfunctionality/">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">JS Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="js_reference/easykube/">Easykube API</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="js_reference/postgres/">Postgres API</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="js_reference/utils/">Utils API</a>
   </li>
 </ul>
   </li>
@@ -96,41 +126,20 @@
 </aside>
 <article class="doc">
 <h1 class="page">Easykube documentation site</h1>
-<div id="toc" class="toc">
-<div id="toctitle">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#_background">Background</a></li>
-</ul>
-</div>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>Not enough space in the README.md were available, This site contain elaborated documentation on easykube.</p>
-</div>
-<div class="paragraph">
-<p>If you want to know why easykube exists and what it’s all about, read the <a href="rationale/#rationale-rationale" class="xref page">rationale</a> page.</p>
-</div>
-<div class="paragraph">
-<p>Next, visit the <a href="install/" class="xref page">installation</a> page.</p>
-</div>
-<div class="paragraph">
-<p>Also, you should familiarize yourself with the concepts of <a href="addons/" class="xref page">addons</a>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_background"><a class="anchor" href="#_background"></a>Background</h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>Easykube started out as a collection of Gradle build scripts. The primary use case was to enable mobile developers to install real backends locally, allowing them to work offline and not require a personal instance of some test system on a random cluster, incurring a real monetary cost.</p>
 </div>
 <div class="paragraph">
-<p>Our mobile developers fancy MacBooks were powerful enough to drive a small Kubernetes instance, even with multiple backends. So why have their machines sit idle?</p>
+<p>Later, easykube was reimplemented in Go. And currently enables teams of developers to reason about complex microservice based applications.</p>
 </div>
 <div class="paragraph">
-<p>Later, easykube was reimplemented in Go. And here we are :)</p>
+<p>If you want to know why easykube exists and what it’s all about, read the <a href="about/rationale/#rationale-rationale" class="xref page">rationale</a> page.</p>
 </div>
+<div class="paragraph">
+<p>Next, visit the <a href="gettingstarted/install/" class="xref page">installation</a> page.</p>
 </div>
+<div class="paragraph">
+<p>Also, you should familiarize yourself with the concepts of <a href="addons/" class="xref page">addons</a>.</p>
 </div>
 </article>
   </div>

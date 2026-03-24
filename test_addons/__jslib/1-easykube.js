@@ -102,7 +102,7 @@ class Easykube {
      * two (or more) containers exist which matches the partial container name, the first becomes the target.
      *
      * Limitation; The destination MUST be aimed at a deployment, you cannot target a bare container. This is
-     * why you must specify a deployment name
+     * why you must specify a deployment name. Also tar must be available in the container.
      *
      * @param {string} deployment Name of deployment
      * @param {string} namespace Where the target deployment lives
@@ -120,7 +120,7 @@ class Easykube {
      * Creates a secret in a given namespace
      * @param {string} namespace create the secret in this namespace
      * @param {string} name what to call the secret
-     * @param {{[key:string]: string}} data A map, All key and values are strings
+     * @param {Object.<string, string>} data A map, All key and values are strings
      */
     createSecret(namespace, name, data) {
         _ek.createSecret(namespace, name, data)
@@ -167,11 +167,23 @@ class Easykube {
     }
 
 
-    /*
-     * Represents an HTTP response object.
+    /**
+     * @callback HttpSuccessCallback
+     * @param {string} body
+     * @returns {HttpResponse}
+     */
+
+    /**
+     * @callback HttpFailCallback
+     * @param {string} error
+     * @param {number} httpStatusCode
+     * @returns {HttpResponse}
+     */
+
+    /**
      * @typedef {Object} HttpResponse
-     * @property {(cb: (body: string) => any) => HttpResponse} onSuccess callback to handle successes 2xx
-     * @property {(cb: (error: string, httpstatuscode: int) => any) => HttpResponse} onFail hard errors, malformed urls, connection failures etc.
+     * @property {HttpSuccessCallback} onSuccess
+     * @property {HttpFailCallback} onFail
      */
 
     /**
@@ -189,8 +201,8 @@ class Easykube {
     /**
      * Represents a result of exec, this is created and exposed from go
      * @typedef {Object} ExecResult
-     * @property {(cb: (output: string) => any) => string} onSuccess
-     * @property {(cb: (output: string) => any) => string} onFail
+     * @property {function(string): string} onSuccess
+     * @property {function(string): string} onFail
      */
 
     /**

@@ -6,7 +6,6 @@
 
 "A tool for learning kubernetes, run various stacks, develop complex applications locally"
 
-
 This README covers the basics, to find out more, visit the [documentation site](https://torloejborg.github.io/easykube/easykube/latest)
 
 ## What it does
@@ -16,7 +15,6 @@ Easykube wraps the awesome [Kind](https://kind.sigs.k8s.io/) and [Goja](https://
 With easykube and it's companion addon repository, you get dependency management for k8s apps and applications with preconfigured defaults. 
 
 This is ideal for team based local development, no more fighting over that dev cluster.
-
 
 
 ## Download the binary for your platform

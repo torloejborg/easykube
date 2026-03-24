@@ -1,10 +1,6 @@
 /**
- * @typedef SchemaOpts
- * @property {string[]} schemas - Name of additional schemas.
- */
-
-/**
  * JS Functions for interacting with the Postgres addon (requires postgres, restoreFromRepository(...) requires datastash)
+ * @class
  */
 class Postgres {
 
@@ -12,6 +8,11 @@ class Postgres {
         this.deployment = "postgres";
         this.namespace = "default";
     }
+
+    /**
+     * @typedef SchemaOpts
+     * @property {string[]} schemas - Name of additional schemas.
+     */
 
     /**
      * Creates a new database in Postgres, the database will only be created if not exists

@@ -15,3 +15,8 @@
 * Development
 ** xref:developing/contributing.adoc[Contributing]
 ** xref:developing/newfunctionality.adoc[Adding new functionality]
+
+* JS Reference
+** xref:js_reference/easykube.adoc[Easykube API]
+** xref:js_reference/postgres.adoc[Postgres API]
+** xref:js_reference/utils.adoc[Utils API]

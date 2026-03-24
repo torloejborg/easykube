@@ -39,25 +39,40 @@
     <a class="nav-link" href="../">Home</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../rationale/">Why Easykube</a>
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">About</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../about/rationale/">Why Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../about/faq/">FAQ</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../install/">Install Easykube</a>
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Getting started</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../gettingstarted/install/">Install</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../gettingstarted/configure/">Configure</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../gettingstarted/boot/">Operate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../gettingstarted/container_runtimes/">Container Runtimes</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="./">Addons explained</a>
   </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../using/">Usage</a>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../gettingstarted/internals/">Internals</a>
   </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../internals/">Internals</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../faq/">FAQ</a>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
@@ -68,6 +83,21 @@
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../developing/newfunctionality/">Adding new functionality</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">JS Reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../js_reference/easykube/">Easykube API</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../js_reference/postgres/">Postgres API</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../js_reference/utils/">Utils API</a>
   </li>
 </ul>
   </li>
@@ -86,6 +116,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../">EasyKube</a></li>
+    <li>Getting started</li>
     <li><a href="./">Addons explained</a></li>
   </ul>
 </nav>
@@ -99,11 +130,8 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#addons-repositories">Addon repositories</a>
-<ul class="sectlevel2">
+<li><a href="#addons-repositories">Addon repositories</a></li>
 <li><a href="#addons-dissecting">Dissecting an Addon</a></li>
-</ul>
-</li>
 <li><a href="#addons-limitations">Limitations</a></li>
 <li><a href="#addons-author">Author a new addon</a></li>
 </ul>
@@ -112,7 +140,7 @@
 <h2 id="addons-repositories"><a class="anchor" href="#addons-repositories"></a>Addon repositories</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In essence, an addon is a collection of Kubernetes YAML files, Kustomize files, or Helm charts, orchestrated by JavaScript, with built-in dependency management and convenient tooling.</p>
+<p>In essence, an addon is just some collection of Kubernetes YAML files; Kustomize files, or Helm charts, orchestrated by JavaScript, with built-in dependency management and convenient tooling.</p>
 </div>
 <div class="paragraph">
 <p>Addons are organized in directory structures, typically Git repositories shared within an organization or team. Below is an excerpt from the companion addon repository.</p>
@@ -142,19 +170,23 @@
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The addon script determines how the manifests will be applied. In this example we can see that regular Kubernetes YAML files live in subdirectories.</td>
+<td>The addon script determines how the manifests will be applied. In this example we can see that regular Kubernetes YAML files live in subdirectories. Other addons invoke helm, kustomize, or other tooling before applying rendered yaml with kubectl.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
 <p>When easykube is invoked, it recursively scans the addon repository and discovers all addons.</p>
 </div>
-<div class="sect2">
-<h3 id="addons-dissecting"><a class="anchor" href="#addons-dissecting"></a>Dissecting an Addon</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="addons-dissecting"><a class="anchor" href="#addons-dissecting"></a>Dissecting an Addon</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>Let&#8217;s examine an addon in detail. We&#8217;ll look at the Temporal addon, as it uses some non-trivial features. Below is its listing:</p>
 </div>
 <div class="listingblock">
+<div class="title">Temporal addon</div>
 <div class="content">
 <pre class="highlight"><code class="language-javascript" data-lang="javascript">let configuration = { <i class="conum" data-value="1"></i><b>(1)</b>
 "description": "An opensource workflow engine", <i class="conum" data-value="2"></i><b>(2)</b>
@@ -230,10 +262,9 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 </tr>
 <tr>
 <td><i class="conum" data-value="9"></i><b>9</b></td>
-<td>Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and more.</td>
+<td>Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and much much more.</td>
 </tr>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -241,7 +272,7 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 <h2 id="addons-limitations"><a class="anchor" href="#addons-limitations"></a>Limitations</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>It may appear that the jslib is some sort of global context, but this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside that context.</p>
+<p>It may appear that the jslib has some sort of global context, but this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside each addon&#8217;s context.</p>
 </div>
 <div class="paragraph">
 <p>This means you cannot share or maintain global state between addons during script execution.</p>

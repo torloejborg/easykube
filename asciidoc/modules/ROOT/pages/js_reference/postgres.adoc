@@ -1,0 +1,82 @@
+= Postgres API Reference
+:toc:
+:toclevels: 2
+
+
+
+== Methods
+
+=== create
+
+Creates a new database in Postgres, the database will only be created if not exists
+
+[source,javascript]
+----
+create(database, schema, force)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `database`
+| string
+| Database name. Owner will the same as database, e.g. mydb, will yield a user mydb.
+| `schema`
+| Array.&lt;string&gt;
+| An optional list of schemas to create, schemas will be owned by the database user
+| `force`
+| boolean
+| if true, the existing database will be dropped and recreated
+
+|===
+
+.Returns
+
+`Postgres` — 
+
+=== runLocalScript
+
+Applies a local sql script to a target database
+
+[source,javascript]
+----
+runLocalScript(localSource, targetDatabase)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `localSource`
+| string
+| Filename of your local SQL script, filename must be relative to the addon *.ek.js file
+| `targetDatabase`
+| string
+| The database in which to apply the SQL script
+
+|===
+
+.Returns
+
+`Postgres` — 
+
+
+== Types
+
+=== SchemaOpts
+
+
+
+[cols="1,2,3"]
+|===
+| Name | Type | Description
+
+| `schemas`
+| Array.&lt;string&gt;
+| Name of additional schemas.
+
+|===
+

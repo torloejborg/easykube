@@ -48,6 +48,9 @@ gomod2nix:
 
 .PHONY:docs
 docs:
-	asciidoc/ensure-spring-extensions.sh
+	asciidoc/ensure-npm-dependencies.sh
+	node asciidoc/generate-doc.js "Easykube API Reference" asciidoc/modules/ROOT/examples/1-easykube.js > asciidoc/modules/ROOT/pages/js_reference/easykube.adoc
+	node asciidoc/generate-doc.js "Postgres API Reference" asciidoc/modules/ROOT/examples/2-postgres.js > asciidoc/modules/ROOT/pages/js_reference/postgres.adoc
+	node asciidoc/generate-doc.js "Postgres API Reference" asciidoc/modules/ROOT/examples/3-utils.js > asciidoc/modules/ROOT/pages/js_reference/utils.adoc
 	antora generate --stacktrace antora-playbook.yml
 	touch docs/.nojekyll

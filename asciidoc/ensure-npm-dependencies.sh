@@ -6,7 +6,5 @@ if [ ! -d node_modules ]; then
   npm install @asciidoctor/diagram
   npm install asciidoctor-kroki
   npm install jsdoc
-  npm install documentation
   touch docs/.nojekyll
-
 fi
