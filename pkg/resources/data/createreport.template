@@ -9,6 +9,6 @@ Addon: "{{ .Name }}"
 	{{end}}{{- end -}}
 	{{ if .Config.ExtraMounts }}
   Mounts:
-	{{ range $m := $addon.Config.ExtraMounts }}- {{.PersistenceDir}}/{{.HostPath}} -> {{.ContainerPath}}
+	{{ range $m := $addon.Config.ExtraMounts }}- {{.PersistenceDir}}{{.HostPath}} -> {{.ContainerPath}}
 	{{ end }}{{- end -}}
 {{ end -}}

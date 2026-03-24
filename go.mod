@@ -11,7 +11,6 @@ require (
 	github.com/gookit/color v1.6.0
 	github.com/gookit/config/v2 v2.2.7
 	github.com/olekukonko/tablewriter v1.1.4
-	github.com/slok/gospinner v0.1.1
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2
 	go.uber.org/mock v0.6.0
@@ -28,6 +27,7 @@ require (
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
+	github.com/briandowns/spinner v1.23.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/displaywidth v0.10.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.6.0 // indirect
@@ -39,6 +39,7 @@ require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
+	github.com/ergochat/readline v0.1.3 // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect

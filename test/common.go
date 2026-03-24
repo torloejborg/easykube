@@ -10,12 +10,8 @@ import (
 func CreateOsDetailsMock(t *testing.T) *mock_ez.MockOsDetails {
 	ctrl := gomock.NewController(t)
 	osd := mock_ez.NewMockOsDetails(ctrl)
-	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
+	osd.EXPECT().GetEasykubeConfigDir().Return("/home/some-user/.config/easykube", nil).AnyTimes()
 	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
 
 	return osd
-}
-
-func SetupKubeForJSTesting(t *testing.T) {
-
 }

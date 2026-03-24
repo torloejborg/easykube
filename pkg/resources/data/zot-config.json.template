@@ -1,0 +1,32 @@
+{
+  "distSpecVersion": "1.1.1",
+  "storage": {
+    "rootDirectory": "/var/lib/zot",
+    "commit": true,
+    "dedupe": true,
+    "gc": true
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "port": "5001",
+    "compat": ["docker2s2"],
+    "tls": {
+      "cert":"/etc/ssl/localtest.me.crt",
+      "key":"/etc/ssl/localtest.me.key"
+    }
+  },
+  "log": {"level": "info"},
+  "extensions": {
+    "ui": { "enable": true },
+    "search": { "enable": true },
+    "sync": {
+      "enable": true,
+      "credentialsFile": "/etc/zot/zot-credentials.json",
+      "registries": [
+           {{- $joined := join . "," -}}
+           {{ $joined }}
+      ]
+    }
+  }
+}
+

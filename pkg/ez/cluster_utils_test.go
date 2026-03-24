@@ -14,15 +14,15 @@ import (
 func initClusterUtilsTest(t *testing.T) {
 
 	osd := test.CreateOsDetailsMock(t)
-	config := ez.NewEasykubeConfig(osd)
+	config := ez.NewEasykubeConfig()
+	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	_ = ez.Kube.MakeConfig()
 
 	ez.Kube.UseOsDetails(osd)
-	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
 	ez.Kube.UseEasykubeConfig(config)
 	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
 	ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
 
-	_ = ez.Kube.MakeConfig()
 }
 
 var expectedPersistenceDirectories = []struct {
@@ -46,8 +46,8 @@ func TestCreatePersistenceDirectories(t *testing.T) {
 
 	for _, tt := range expectedPersistenceDirectories {
 		t.Run(tt.dir, func(t *testing.T) {
-			cfg, _ := ez.Kube.GetUserConfigDir()
-			persistenceDir := filepath.Join(cfg, "easykube", "persistence", tt.dir)
+			cfg, _ := ez.Kube.GetEasykubeConfigDir()
+			persistenceDir := filepath.Join(cfg, "persistence", tt.dir)
 			exists := ez.FileOrDirExists(persistenceDir)
 			if !exists {
 				t.Errorf("expected %v to exist", persistenceDir)

@@ -17,24 +17,18 @@ type CobraCommandHelperImpl struct {
 }
 
 func (e *CobraCommandHelperImpl) GetBoolFlag(name string) bool {
-
 	val, err := e.Command.Flags().GetBool(name)
-
 	if err != nil {
 		panic(err)
 	}
-
 	return val
 }
 
 func (e *CobraCommandHelperImpl) GetIntFlag(name string) int {
-
 	val, err := e.Command.Flags().GetInt(name)
-
 	if err != nil {
 		panic(err)
 	}
-
 	return val
 }
 
@@ -55,13 +49,10 @@ func (e *CobraCommandHelperImpl) IsDryRun() bool {
 }
 
 func (e *CobraCommandHelperImpl) GetStringFlag(name string) string {
-
 	val, err := e.Command.Flags().GetString(name)
-
 	if err != nil {
 		panic(err)
 	}
-
 	return val
 }
 

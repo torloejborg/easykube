@@ -13,19 +13,19 @@ func NewAddCmd() *cobra.Command {
 		Long:  `by default addons also applies their dependencies`,
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmdhelper := ez.CommandHelper(cmd)
 
-			err := ez.InitializeEasykube()
+			err := ez.InitializeEasykube(ez.WithMustHaveConfiguration(true))
+
 			if err != nil {
 				return err
 			}
 
-			cmdhelper := ez.CommandHelper(cmd)
-
 			addOpts := AddOptions{
 				Args:          args,
-				ForceInstall:  cmdhelper.GetBoolFlag(constants.FLAG_FORCE),
-				TargetCluster: cmdhelper.GetStringFlag(constants.FLAG_CLUSTER),
-				NoDepends:     cmdhelper.GetBoolFlag(constants.FLAG_NODEPENDS),
+				ForceInstall:  cmdhelper.GetBoolFlag(constants.FlagForce),
+				TargetCluster: cmdhelper.GetStringFlag(constants.FlagCluster),
+				NoDepends:     cmdhelper.GetBoolFlag(constants.FlagNoDepends),
 				DryRun:        cmdhelper.IsDryRun(),
 			}
 
@@ -53,11 +53,11 @@ func NewAddCmd() *cobra.Command {
 func init() {
 	addCmd := NewAddCmd()
 
-	addCmd.Flags().BoolP(constants.FLAG_NODEPENDS, "n", false, "Do not apply dependent addons")
-	addCmd.Flags().BoolP(constants.FLAG_FORCE, "f", false, "If already applied, force")
-	addCmd.Flags().BoolP(constants.FLAG_PULL, "p", false, "Download newer local images")
-	addCmd.Flags().String(constants.FLAG_CLUSTER, "", "Specify a different kube-context for installation")
-	addCmd.Flags().String(constants.FLAG_KEYVALUE, "", "pass key/value pairs into script context")
+	addCmd.Flags().BoolP(constants.FlagNoDepends, "n", false, "Do not apply dependent addons")
+	addCmd.Flags().BoolP(constants.FlagForce, "f", false, "If already applied, force")
+	addCmd.Flags().BoolP(constants.FlagPull, "p", false, "Download newer local images")
+	addCmd.Flags().String(constants.FlagCluster, "", "Specify a different kube-context for installation")
+	addCmd.Flags().String(constants.FlagKeyValue, "", "pass key/value pairs into script context")
 
 	rootCmd.AddCommand(addCmd)
 

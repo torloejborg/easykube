@@ -13,12 +13,8 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
 		ezk := ez.Kube
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun("skipping preload")
-			return call.This
-		}
 
-		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FLAG_PULL)
+		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FlagPull)
 		ctx.checkArgs(call, PRELOAD)
 		config, _ := ez.Kube.LoadConfig()
 
@@ -42,7 +38,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			wg.Add(1)
 			go func() {
 
-				registryCredentials := getPrivateRegistryCredentials(source, config.PrivateRegistries)
+				registryCredentials := getPrivateRegistryCredentials(source, config.MirrorRegistries)
 				if hasImage, err := ezk.HasImageInKindRegistry(dest); err != nil {
 					panic(err)
 				} else if !hasImage || mustPull {
@@ -82,25 +78,19 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	}
 }
 
-func getPrivateRegistryCredentials(registry string, config []ez.PrivateRegistry) *ez.PrivateRegistryCredentials {
+func getPrivateRegistryCredentials(registry string, config []ez.MirrorRegistry) *ez.PrivateRegistryCredentials {
 
-	secret, err := ez.Kube.GetSecret("easykube-secrets", "default")
-
-	if err != nil {
-		return nil
-	}
+	// get the url of the registry
 
 	for i := range config {
 
-		if strings.Contains(registry, config[i].RepositoryMatch) {
+		x := strings.ReplaceAll(config[i].RegistryUrl, "https://", "")
+		x = strings.ReplaceAll(x, "http://", "")
 
-			if secret[config[i].UserKey] == nil || secret[config[i].PasswordKey] == nil {
-				ez.Kube.FmtYellow("Did not find credential keys for registry-partial %s", config[i].RepositoryMatch)
-				return nil
-			}
+		if strings.Contains(registry, x) {
 			return &ez.PrivateRegistryCredentials{
-				Username: string(secret[config[i].UserKey]),
-				Password: string(secret[config[i].PasswordKey]),
+				Username: config[i].UserKey,
+				Password: config[i].PasswordKey,
 			}
 		}
 	}

@@ -13,13 +13,13 @@ import (
 
 func initAddonReaderTest(t *testing.T) {
 	osd := test.CreateOsDetailsMock(t)
-
-	config := ez.NewEasykubeConfig(osd)
 	ez.Kube.UseOsDetails(osd)
 	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+
+	config := ez.NewEasykubeConfig()
+	_ = config.MakeConfig()
 	ez.Kube.UseEasykubeConfig(config)
 	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
-	_ = ez.Kube.MakeConfig()
 }
 
 var expectedAddonsForDiscoverTest = []struct {

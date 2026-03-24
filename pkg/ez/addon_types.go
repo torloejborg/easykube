@@ -59,6 +59,7 @@ type IAddon interface {
 	GetConfig() AddonConfig
 	GetAddonFile() string
 	GetRootDir() string
+	GetDependencies() []string
 }
 
 type Addon struct {
@@ -72,6 +73,8 @@ type Addon struct {
 	File string
 	// Root of the addon directory
 	RootDir string
+	// The addon's immediate dependencies
+	Dependencies []string
 }
 
 func (a *Addon) ReadScriptFile(fs afero.Fs) string {
@@ -100,4 +103,8 @@ func (a *Addon) GetAddonFile() string {
 
 func (a *Addon) GetRootDir() string {
 	return a.RootDir
+}
+
+func (a *Addon) GetDependencies() []string {
+	return a.Dependencies
 }

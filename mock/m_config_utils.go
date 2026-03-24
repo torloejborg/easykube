@@ -40,10 +40,50 @@ func (m *MockIEasykubeConfig) EXPECT() *MockIEasykubeConfigMockRecorder {
 	return m.recorder
 }
 
-// EditConfig mocks base method.
-func (m *MockIEasykubeConfig) EditConfig() {
+// CopyConfigResources mocks base method.
+func (m *MockIEasykubeConfig) CopyConfigResources() error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "EditConfig")
+	ret := m.ctrl.Call(m, "CopyConfigResources")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CopyConfigResources indicates an expected call of CopyConfigResources.
+func (mr *MockIEasykubeConfigMockRecorder) CopyConfigResources() *MockIEasykubeConfigCopyConfigResourcesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyConfigResources", reflect.TypeOf((*MockIEasykubeConfig)(nil).CopyConfigResources))
+	return &MockIEasykubeConfigCopyConfigResourcesCall{Call: call}
+}
+
+// MockIEasykubeConfigCopyConfigResourcesCall wrap *gomock.Call
+type MockIEasykubeConfigCopyConfigResourcesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigCopyConfigResourcesCall) Return(arg0 error) *MockIEasykubeConfigCopyConfigResourcesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigCopyConfigResourcesCall) Do(f func() error) *MockIEasykubeConfigCopyConfigResourcesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigCopyConfigResourcesCall) DoAndReturn(f func() error) *MockIEasykubeConfigCopyConfigResourcesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// EditConfig mocks base method.
+func (m *MockIEasykubeConfig) EditConfig() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EditConfig")
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // EditConfig indicates an expected call of EditConfig.
@@ -59,19 +99,19 @@ type MockIEasykubeConfigEditConfigCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIEasykubeConfigEditConfigCall) Return() *MockIEasykubeConfigEditConfigCall {
-	c.Call = c.Call.Return()
+func (c *MockIEasykubeConfigEditConfigCall) Return(arg0 error) *MockIEasykubeConfigEditConfigCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIEasykubeConfigEditConfigCall) Do(f func()) *MockIEasykubeConfigEditConfigCall {
+func (c *MockIEasykubeConfigEditConfigCall) Do(f func() error) *MockIEasykubeConfigEditConfigCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIEasykubeConfigEditConfigCall) DoAndReturn(f func()) *MockIEasykubeConfigEditConfigCall {
+func (c *MockIEasykubeConfigEditConfigCall) DoAndReturn(f func() error) *MockIEasykubeConfigEditConfigCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -189,44 +229,6 @@ func (c *MockIEasykubeConfigMakeConfigCall) DoAndReturn(f func() error) *MockIEa
 	return c
 }
 
-// PatchConfig mocks base method.
-func (m *MockIEasykubeConfig) PatchConfig() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PatchConfig")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// PatchConfig indicates an expected call of PatchConfig.
-func (mr *MockIEasykubeConfigMockRecorder) PatchConfig() *MockIEasykubeConfigPatchConfigCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchConfig", reflect.TypeOf((*MockIEasykubeConfig)(nil).PatchConfig))
-	return &MockIEasykubeConfigPatchConfigCall{Call: call}
-}
-
-// MockIEasykubeConfigPatchConfigCall wrap *gomock.Call
-type MockIEasykubeConfigPatchConfigCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockIEasykubeConfigPatchConfigCall) Return(arg0 error) *MockIEasykubeConfigPatchConfigCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockIEasykubeConfigPatchConfigCall) Do(f func() error) *MockIEasykubeConfigPatchConfigCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIEasykubeConfigPatchConfigCall) DoAndReturn(f func() error) *MockIEasykubeConfigPatchConfigCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // PathToConfigFile mocks base method.
 func (m *MockIEasykubeConfig) PathToConfigFile() string {
 	m.ctrl.T.Helper()
@@ -261,6 +263,82 @@ func (c *MockIEasykubeConfigPathToConfigFileCall) Do(f func() string) *MockIEasy
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIEasykubeConfigPathToConfigFileCall) DoAndReturn(f func() string) *MockIEasykubeConfigPathToConfigFileCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SyncWithZot mocks base method.
+func (m *MockIEasykubeConfig) SyncWithZot() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateZotRegistryConfig")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SyncWithZot indicates an expected call of SyncWithZot.
+func (mr *MockIEasykubeConfigMockRecorder) SyncWithZot() *MockIEasykubeConfigSyncWithZotCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateZotRegistryConfig", reflect.TypeOf((*MockIEasykubeConfig)(nil).SyncWithZot))
+	return &MockIEasykubeConfigSyncWithZotCall{Call: call}
+}
+
+// MockIEasykubeConfigSyncWithZotCall wrap *gomock.Call
+type MockIEasykubeConfigSyncWithZotCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigSyncWithZotCall) Return(arg0 error) *MockIEasykubeConfigSyncWithZotCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigSyncWithZotCall) Do(f func() error) *MockIEasykubeConfigSyncWithZotCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigSyncWithZotCall) DoAndReturn(f func() error) *MockIEasykubeConfigSyncWithZotCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// WriteConfig mocks base method.
+func (m *MockIEasykubeConfig) WriteConfig(arg0 *ez.EasykubeConfigData) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteConfig", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteConfig indicates an expected call of WriteConfig.
+func (mr *MockIEasykubeConfigMockRecorder) WriteConfig(arg0 any) *MockIEasykubeConfigWriteConfigCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteConfig", reflect.TypeOf((*MockIEasykubeConfig)(nil).WriteConfig), arg0)
+	return &MockIEasykubeConfigWriteConfigCall{Call: call}
+}
+
+// MockIEasykubeConfigWriteConfigCall wrap *gomock.Call
+type MockIEasykubeConfigWriteConfigCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigWriteConfigCall) Return(arg0 error) *MockIEasykubeConfigWriteConfigCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigWriteConfigCall) Do(f func(*ez.EasykubeConfigData) error) *MockIEasykubeConfigWriteConfigCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigWriteConfigCall) DoAndReturn(f func(*ez.EasykubeConfigData) error) *MockIEasykubeConfigWriteConfigCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

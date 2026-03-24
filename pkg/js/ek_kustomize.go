@@ -19,8 +19,8 @@ func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
 		if ezk.IsDryRun() {
 			return call.This
 		} else {
-			ezk.UpdateConfigMap(constants.ADDON_CM,
-				constants.DEFAULT_NS,
+			ezk.UpdateConfigMap(constants.AddonCm,
+				constants.DefaultNs,
 				ctx.AddonCtx.addon.GetShortName(),
 				[]byte(time.Now().String()))
 			ezk.FmtGreen("kustomize applied for %s", ctx.AddonCtx.addon.GetShortName())

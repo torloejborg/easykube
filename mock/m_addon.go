@@ -117,6 +117,44 @@ func (c *MockIAddonGetConfigCall) DoAndReturn(f func() ez.AddonConfig) *MockIAdd
 	return c
 }
 
+// GetDependencies mocks base method.
+func (m *MockIAddon) GetDependencies() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDependencies")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// GetDependencies indicates an expected call of GetDependencies.
+func (mr *MockIAddonMockRecorder) GetDependencies() *MockIAddonGetDependenciesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDependencies", reflect.TypeOf((*MockIAddon)(nil).GetDependencies))
+	return &MockIAddonGetDependenciesCall{Call: call}
+}
+
+// MockIAddonGetDependenciesCall wrap *gomock.Call
+type MockIAddonGetDependenciesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIAddonGetDependenciesCall) Return(arg0 []string) *MockIAddonGetDependenciesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIAddonGetDependenciesCall) Do(f func() []string) *MockIAddonGetDependenciesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIAddonGetDependenciesCall) DoAndReturn(f func() []string) *MockIAddonGetDependenciesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // GetName mocks base method.
 func (m *MockIAddon) GetName() string {
 	m.ctrl.T.Helper()

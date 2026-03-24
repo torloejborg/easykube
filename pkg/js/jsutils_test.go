@@ -13,17 +13,17 @@ import (
 func SetUpJsTestEnvironment(t *testing.T, controller *gomock.Controller) {
 
 	osd := test.CreateOsDetailsMock(t)
-	osd.EXPECT().GetUserConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
-	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
-	config := ez.NewEasykubeConfig(osd)
 
-	ez.Kube.UseOsDetails(osd)
 	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+	ez.Kube.UseOsDetails(osd)
+
+	config := ez.NewEasykubeConfig()
 	ez.Kube.UseEasykubeConfig(config)
+	_ = ez.Kube.MakeConfig()
+
 	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
 	ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
-	
-	_ = ez.Kube.MakeConfig()
+
 	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
 }
 

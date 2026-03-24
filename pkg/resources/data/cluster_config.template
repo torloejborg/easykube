@@ -6,6 +6,7 @@ containerdConfigPatches:
       config_path = "/etc/containerd/certs.d"
 nodes:
   - role: control-plane
+    image: registry.localtest.me:5001/kindest/node:v1.35.0
     kubeadmConfigPatches:
       - |
         kind: InitConfiguration
@@ -27,3 +28,5 @@ nodes:
     {{- end}}
     - hostPath: {{.Config.ConfigurationDir}}/localtest.me.ca.crt
       containerPath: "/etc/ssl/certs/localtest.me.ca.crt"
+#    - hostPath: {{.Config.ConfigurationDir}}/certs.d
+#      containerPath: "/etc/containerd/certs.d"

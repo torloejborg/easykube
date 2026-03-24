@@ -42,7 +42,7 @@ func NewAddonReader(config IEasykubeConfig) IAddonReader {
 func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 
 	// extract version from 1_easykube.js
-	haystack, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JS_LIB, "1-easykube.js"))
+	haystack, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JsLib, "1-easykube.js"))
 	if err != nil {
 		return "", err
 	}
@@ -148,6 +148,7 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 			if parseErr != nil {
 				return errors.Join(errors.New("problem in addon: "+foundAddon.Name), parseErr)
 			}
+			foundAddon.Dependencies = cfg.DependsOn
 
 			foundAddon.Config = *cfg
 			addons[foundAddon.ShortName] = foundAddon
@@ -164,10 +165,10 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 }
 
 func (adr *AddonReader) resolveExecutionOrder(
-	g *Graph,
+	g *Graph[IAddon],
 	toInstall IAddon,
 	allAddons map[string]IAddon,
-	out *[]IAddon, outgraph *Graph) {
+	out *[]IAddon, outgraph *Graph[IAddon]) {
 
 	d := toInstall.GetConfig().DependsOn
 	for x := range d {
