@@ -158,6 +158,8 @@ type IK8SUtils interface {
 	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) KubernetesSecret
 
 	WaitForKindClusterReady(kubeconfig string, timeout time.Duration) error
+
+	RestartDeployment(deploymentName, namespace string) error
 }
 
 func NewK8SUtils() IK8SUtils {
@@ -717,4 +719,25 @@ func (k *K8SUtilsImpl) WaitForKindClusterReady(kubeconfig string, timeout time.D
 			}
 		}
 	}
+}
+
+func (k *K8SUtilsImpl) RestartDeployment(deploymentName, namespace string) error {
+
+	deployment, err := k.Clientset.AppsV1().Deployments(namespace).Get(context.Background(), deploymentName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	if deployment.Spec.Template.Annotations == nil {
+		deployment.Spec.Template.Annotations = make(map[string]string)
+	}
+
+	deployment.Spec.Template.Annotations["kubectl.kubernetes.io/restartedAt"] = time.Now().Format(time.RFC3339)
+
+	_, err = k.Clientset.AppsV1().Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
