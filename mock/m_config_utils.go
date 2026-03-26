@@ -116,6 +116,159 @@ func (c *MockIEasykubeConfigEditConfigCall) DoAndReturn(f func() error) *MockIEa
 	return c
 }
 
+// GenerateZotRegistryConfig mocks base method.
+func (m *MockIEasykubeConfig) GenerateZotRegistryConfig(arg0 *ez.EasykubeConfigData) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateZotRegistryConfig", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GenerateZotRegistryConfig indicates an expected call of GenerateZotRegistryConfig.
+func (mr *MockIEasykubeConfigMockRecorder) GenerateZotRegistryConfig(arg0 any) *MockIEasykubeConfigGenerateZotRegistryConfigCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateZotRegistryConfig", reflect.TypeOf((*MockIEasykubeConfig)(nil).GenerateZotRegistryConfig), arg0)
+	return &MockIEasykubeConfigGenerateZotRegistryConfigCall{Call: call}
+}
+
+// MockIEasykubeConfigGenerateZotRegistryConfigCall wrap *gomock.Call
+type MockIEasykubeConfigGenerateZotRegistryConfigCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigGenerateZotRegistryConfigCall) Return(arg0 error) *MockIEasykubeConfigGenerateZotRegistryConfigCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigGenerateZotRegistryConfigCall) Do(f func(*ez.EasykubeConfigData) error) *MockIEasykubeConfigGenerateZotRegistryConfigCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigGenerateZotRegistryConfigCall) DoAndReturn(f func(*ez.EasykubeConfigData) error) *MockIEasykubeConfigGenerateZotRegistryConfigCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// GenerateZotRegistryCredentials mocks base method.
+func (m *MockIEasykubeConfig) GenerateZotRegistryCredentials(arg0 *ez.EasykubeConfigData) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateZotRegistryCredentials", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GenerateZotRegistryCredentials indicates an expected call of GenerateZotRegistryCredentials.
+func (mr *MockIEasykubeConfigMockRecorder) GenerateZotRegistryCredentials(arg0 any) *MockIEasykubeConfigGenerateZotRegistryCredentialsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateZotRegistryCredentials", reflect.TypeOf((*MockIEasykubeConfig)(nil).GenerateZotRegistryCredentials), arg0)
+	return &MockIEasykubeConfigGenerateZotRegistryCredentialsCall{Call: call}
+}
+
+// MockIEasykubeConfigGenerateZotRegistryCredentialsCall wrap *gomock.Call
+type MockIEasykubeConfigGenerateZotRegistryCredentialsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigGenerateZotRegistryCredentialsCall) Return(arg0 error) *MockIEasykubeConfigGenerateZotRegistryCredentialsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigGenerateZotRegistryCredentialsCall) Do(f func(*ez.EasykubeConfigData) error) *MockIEasykubeConfigGenerateZotRegistryCredentialsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigGenerateZotRegistryCredentialsCall) DoAndReturn(f func(*ez.EasykubeConfigData) error) *MockIEasykubeConfigGenerateZotRegistryCredentialsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// HasConfiguration mocks base method.
+func (m *MockIEasykubeConfig) HasConfiguration() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HasConfiguration")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// HasConfiguration indicates an expected call of HasConfiguration.
+func (mr *MockIEasykubeConfigMockRecorder) HasConfiguration() *MockIEasykubeConfigHasConfigurationCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasConfiguration", reflect.TypeOf((*MockIEasykubeConfig)(nil).HasConfiguration))
+	return &MockIEasykubeConfigHasConfigurationCall{Call: call}
+}
+
+// MockIEasykubeConfigHasConfigurationCall wrap *gomock.Call
+type MockIEasykubeConfigHasConfigurationCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigHasConfigurationCall) Return(arg0 bool) *MockIEasykubeConfigHasConfigurationCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigHasConfigurationCall) Do(f func() bool) *MockIEasykubeConfigHasConfigurationCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigHasConfigurationCall) DoAndReturn(f func() bool) *MockIEasykubeConfigHasConfigurationCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// IsZotConfigInSync mocks base method.
+func (m *MockIEasykubeConfig) IsZotConfigInSync(configData *ez.EasykubeConfigData) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsZotConfigInSync", configData)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsZotConfigInSync indicates an expected call of IsZotConfigInSync.
+func (mr *MockIEasykubeConfigMockRecorder) IsZotConfigInSync(configData any) *MockIEasykubeConfigIsZotConfigInSyncCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsZotConfigInSync", reflect.TypeOf((*MockIEasykubeConfig)(nil).IsZotConfigInSync), configData)
+	return &MockIEasykubeConfigIsZotConfigInSyncCall{Call: call}
+}
+
+// MockIEasykubeConfigIsZotConfigInSyncCall wrap *gomock.Call
+type MockIEasykubeConfigIsZotConfigInSyncCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIEasykubeConfigIsZotConfigInSyncCall) Return(arg0 bool, arg1 error) *MockIEasykubeConfigIsZotConfigInSyncCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIEasykubeConfigIsZotConfigInSyncCall) Do(f func(*ez.EasykubeConfigData) (bool, error)) *MockIEasykubeConfigIsZotConfigInSyncCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIEasykubeConfigIsZotConfigInSyncCall) DoAndReturn(f func(*ez.EasykubeConfigData) (bool, error)) *MockIEasykubeConfigIsZotConfigInSyncCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // LaunchEditor mocks base method.
 func (m *MockIEasykubeConfig) LaunchEditor(config, editor string) {
 	m.ctrl.T.Helper()
@@ -263,44 +416,6 @@ func (c *MockIEasykubeConfigPathToConfigFileCall) Do(f func() string) *MockIEasy
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIEasykubeConfigPathToConfigFileCall) DoAndReturn(f func() string) *MockIEasykubeConfigPathToConfigFileCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// SyncWithZot mocks base method.
-func (m *MockIEasykubeConfig) SyncWithZot() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateZotRegistryConfig")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SyncWithZot indicates an expected call of SyncWithZot.
-func (mr *MockIEasykubeConfigMockRecorder) SyncWithZot() *MockIEasykubeConfigSyncWithZotCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateZotRegistryConfig", reflect.TypeOf((*MockIEasykubeConfig)(nil).SyncWithZot))
-	return &MockIEasykubeConfigSyncWithZotCall{Call: call}
-}
-
-// MockIEasykubeConfigSyncWithZotCall wrap *gomock.Call
-type MockIEasykubeConfigSyncWithZotCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockIEasykubeConfigSyncWithZotCall) Return(arg0 error) *MockIEasykubeConfigSyncWithZotCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockIEasykubeConfigSyncWithZotCall) Do(f func() error) *MockIEasykubeConfigSyncWithZotCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIEasykubeConfigSyncWithZotCall) DoAndReturn(f func() error) *MockIEasykubeConfigSyncWithZotCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
