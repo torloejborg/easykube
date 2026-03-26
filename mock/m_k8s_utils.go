@@ -539,6 +539,44 @@ func (c *MockIK8SUtilsReloadClientSetCall) DoAndReturn(f func() error) *MockIK8S
 	return c
 }
 
+// RestartDeployment mocks base method.
+func (m *MockIK8SUtils) RestartDeployment(deploymentName, namespace string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RestartDeployment", deploymentName, namespace)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RestartDeployment indicates an expected call of RestartDeployment.
+func (mr *MockIK8SUtilsMockRecorder) RestartDeployment(deploymentName, namespace any) *MockIK8SUtilsRestartDeploymentCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RestartDeployment", reflect.TypeOf((*MockIK8SUtils)(nil).RestartDeployment), deploymentName, namespace)
+	return &MockIK8SUtilsRestartDeploymentCall{Call: call}
+}
+
+// MockIK8SUtilsRestartDeploymentCall wrap *gomock.Call
+type MockIK8SUtilsRestartDeploymentCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIK8SUtilsRestartDeploymentCall) Return(arg0 error) *MockIK8SUtilsRestartDeploymentCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIK8SUtilsRestartDeploymentCall) Do(f func(string, string) error) *MockIK8SUtilsRestartDeploymentCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIK8SUtilsRestartDeploymentCall) DoAndReturn(f func(string, string) error) *MockIK8SUtilsRestartDeploymentCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // TransformExternalSecret mocks base method.
 func (m *MockIK8SUtils) TransformExternalSecret(secret ez.ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) ez.KubernetesSecret {
 	m.ctrl.T.Helper()

@@ -197,8 +197,19 @@ func createRegistryTask() ez.Task {
 func patchCoreDNSTask() ez.Task {
 	return ez.NewTaskWithSkip("patch coreDNS", func() error {
 		ez.Kube.PatchCoreDNS()
+		ez.Kube.IK8SUtils.RestartDeployment("coredns", "kube-system")
 		return nil
-	}, func() bool { return ez.Kube.IsClusterRunning() })
+	}, func() bool {
+
+		if ez.Kube.IsClusterRunning() {
+			cm, _ := ez.Kube.ReadConfigmap("coredns", "kube-system")
+			if len(cm) <= 1 {
+				return false
+			}
+		}
+
+		return ez.Kube.IsClusterRunning()
+	})
 }
 
 func ensureAddonConfigMapTask() ez.Task {
