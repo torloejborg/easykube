@@ -10,16 +10,26 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
+func (e *Easykube) GitCheckout(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return e.gitCheckout()
+}
+
+func (e *Easykube) gitCheckout() func(goja.FunctionCall) goja.Value {
 
 	return func(call goja.FunctionCall) goja.Value {
-		e.checkArgs(call, SPARSE_CHECKOUT)
+		e.checkArgs(call, GitCheckout)
 		ezk := ez.Kube
 
 		currentDir, _ := os.Getwd()
 		defer func() {
 			if !ezk.IsDryRun() {
-				os.Chdir(currentDir)
+				err := os.Chdir(currentDir)
+				if err != nil {
+					panic(err)
+				}
 			}
 			if ezk.IsVerbose() {
 				ezk.FmtVerbose("cd %s", currentDir)
@@ -28,14 +38,11 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 		repo := call.Argument(0).String()
 		branch := call.Argument(1).String()
-		source := call.Argument(2)
-
-		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
 		addonDir := filepath.Dir(e.AddonCtx.addon.GetAddonFile())
-		destination := filepath.Join(addonDir, call.Argument(3).String())
+		destination := filepath.Join(addonDir, call.Argument(2).String())
 
 		if ez.FileOrDirExists(destination) {
-			ezk.FmtYellow("%s already exists, skipping sparseCheckout", destination)
+			ezk.FmtYellow("%s already exists, skipping checkout", destination)
 			return call.This
 		}
 
@@ -44,7 +51,10 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			if err != nil {
 				panic(err)
 			}
-			os.Chdir(destination)
+			err = os.Chdir(destination)
+			if err != nil {
+				panic(err)
+			}
 		} else {
 			ezk.FmtDryRun("mkdir -p %s", destination)
 			ezk.FmtDryRun("cd %s", destination)
@@ -75,15 +85,9 @@ func (e *Easykube) GitSparseCheckout() func(goja.FunctionCall) goja.Value {
 			}
 		}
 
-		gitCmd([]string{"init"})
-		gitCmd([]string{"config", "core.sparsecheckout", "true"})
-		gitCmd([]string{"remote", "add", "-f", "origin", repo})
-		gitCmd([]string{"pull", "origin", branch})
-
-		gitArgs := []string{"sparse-checkout", "set"}
-		allArgs := append(gitArgs, gitSparseDirectoryList...)
-
-		gitCmd(allArgs)
+		gitCmd([]string{"clone", repo, destination})
+		gitCmd([]string{"checkout", branch})
+		gitCmd([]string{"pull"})
 
 		return call.This
 	}

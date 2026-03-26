@@ -73,12 +73,12 @@ func TestVersionCompatibilityReader(t *testing.T) {
 
 	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
 
-	vars.Version = "1.1.9"
+	vars.Version = "2.3.0"
 
 	version, err := ez.Kube.CheckAddonCompatibility()
 	if err != nil {
 		fmt.Println(err.Error())
-		if !strings.Contains(err.Error(), "addon repository want easykube ~1.1.4 but easykube is 1.4.4") {
+		if !strings.Contains(err.Error(), "addon repository want easykube ~3.0 but easykube is 2.3.0") {
 			t.Fail()
 		}
 	}

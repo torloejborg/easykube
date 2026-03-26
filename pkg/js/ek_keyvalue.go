@@ -10,9 +10,16 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) KeyValue() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) KeyValue(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.keyValue()
+}
+
+func (ctx *Easykube) keyValue() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, KEY_VALUE)
+		ctx.checkArgs(call, KeyValue)
 		inputStr := ctx.CobraCommandHelder.GetStringFlag(constants.FlagKeyValue)
 		if inputStr == "" {
 			return goja.Undefined()

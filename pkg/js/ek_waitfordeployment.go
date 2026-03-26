@@ -5,9 +5,16 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) WaitForDeployment() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) WaitForDeployment(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.waitForDeployment()
+}
+
+func (ctx *Easykube) waitForDeployment() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, WAIT_FOR_DEPLOYMENT)
+		ctx.checkArgs(call, WaitForDeployment)
 		ezk := ez.Kube
 
 		if ezk.IsDryRun() {

@@ -7,9 +7,16 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) DockerExec() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) DockerExec(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.dockerExec()
+}
+
+func (ctx *Easykube) dockerExec() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, COPY_TO)
+		ctx.checkArgs(call, CopyTo)
 		ezk := ez.Kube
 
 		container := call.Argument(0).String()

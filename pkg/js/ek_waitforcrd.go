@@ -7,13 +7,20 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) WaitForCRD() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) WaitForCRD(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.waitForCRD()
+}
+
+func (ctx *Easykube) waitForCRD() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 		if ezk.IsDryRun() {
 			ezk.FmtDryRun("skipping waitForCRD")
 		}
-		ctx.checkArgs(call, WAIT_FOR_CRD)
+		ctx.checkArgs(call, WaitForCrd)
 
 		group := call.Argument(0).String()
 		version := call.Argument(1).String()

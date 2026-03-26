@@ -40,7 +40,7 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 	}
 
 	if opts.NoDepends {
-		return jsutils.NewJsUtils(cmdHelper, wanted[0]).ExecAddonScript(wanted[0])
+		return jsutils.NewJsUtils(cmdHelper, wanted[0], false).ExecAddonScript(wanted[0])
 	}
 
 	toInstall, err := ez.ResolveDependencies(wanted, allAddons)
@@ -56,7 +56,7 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 			continue
 		}
 
-		if err := jsutils.NewJsUtils(cmdHelper, addon).ExecAddonScript(addon); err != nil {
+		if err := jsutils.NewJsUtils(cmdHelper, addon, false).ExecAddonScript(addon); err != nil {
 			return err
 		}
 	}

@@ -8,10 +8,17 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) ExecInContainer() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) ExecInContainer(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.execInContainer()
+}
+
+func (ctx *Easykube) execInContainer() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
-		ctx.checkArgs(call, EXEC_IN_CONTAINER)
+		ctx.checkArgs(call, ExecInContainer)
 
 		deployment := call.Argument(0).String()
 		namespace := call.Argument(1).String()

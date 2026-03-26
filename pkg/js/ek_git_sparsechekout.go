@@ -10,10 +10,17 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (e *Easykube) GitCheckout() func(goja.FunctionCall) goja.Value {
+func (e *Easykube) GitSparseCheckout(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return e.gitCheckout()
+}
+
+func (e *Easykube) gitSparseCheckout() func(goja.FunctionCall) goja.Value {
 
 	return func(call goja.FunctionCall) goja.Value {
-		e.checkArgs(call, SPARSE_CHECKOUT)
+		e.checkArgs(call, GitSparseCheckout)
 		ezk := ez.Kube
 
 		currentDir, _ := os.Getwd()
@@ -28,11 +35,14 @@ func (e *Easykube) GitCheckout() func(goja.FunctionCall) goja.Value {
 
 		repo := call.Argument(0).String()
 		branch := call.Argument(1).String()
+		source := call.Argument(2)
+
+		gitSparseDirectoryList := e.extractStringSliceFromArgument(source)
 		addonDir := filepath.Dir(e.AddonCtx.addon.GetAddonFile())
-		destination := filepath.Join(addonDir, call.Argument(2).String())
+		destination := filepath.Join(addonDir, call.Argument(3).String())
 
 		if ez.FileOrDirExists(destination) {
-			ezk.FmtYellow("%s already exists, skipping checkout", destination)
+			ezk.FmtYellow("%s already exists, skipping sparseCheckout", destination)
 			return call.This
 		}
 
@@ -72,9 +82,15 @@ func (e *Easykube) GitCheckout() func(goja.FunctionCall) goja.Value {
 			}
 		}
 
-		gitCmd([]string{"clone", repo, destination})
-		gitCmd([]string{"checkout", branch})
-		gitCmd([]string{"pull"})
+		gitCmd([]string{"init"})
+		gitCmd([]string{"config", "core.sparsecheckout", "true"})
+		gitCmd([]string{"remote", "add", "-f", "origin", repo})
+		gitCmd([]string{"pull", "origin", branch})
+
+		gitArgs := []string{"sparse-checkout", "set"}
+		allArgs := append(gitArgs, gitSparseDirectoryList...)
+
+		gitCmd(allArgs)
 
 		return call.This
 	}

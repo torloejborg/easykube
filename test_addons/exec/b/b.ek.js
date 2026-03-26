@@ -1,13 +1,13 @@
 let configuration = {
-    "dependsOn": ["a"],
-    "extraPorts": [{
-        "nodePort": 32000,
-        "hostPort": 9999,
-        "protocol": "TCP"
+    dependsOn: ["a"],
+    extraPorts: [{
+        nodePort: 32000,
+        hostPort: 9999,
+        protocol: "TCP"
     }],
-    "extraMounts": [{
-        "hostPath": "addon-a-data",
-        "containerPath": "/storage/addon-a"
+    extraMounts: [{
+        hostPath: "addon-a-data",
+        containerPath: "/storage/addon-a"
     }]
 }
 

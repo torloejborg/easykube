@@ -9,13 +9,21 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) PreloadImages(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+
+	return ctx.preloadImages()
+}
+
+func (ctx *Easykube) preloadImages() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
 		ezk := ez.Kube
 
 		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FlagPull)
-		ctx.checkArgs(call, PRELOAD)
+		ctx.checkArgs(call, Preload)
 		config, _ := ez.Kube.LoadConfig()
 
 		var arg = call.Argument(0)
@@ -79,8 +87,6 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 }
 
 func getPrivateRegistryCredentials(registry string, config []ez.MirrorRegistry) *ez.PrivateRegistryCredentials {
-
-	// get the url of the registry
 
 	for i := range config {
 

@@ -7,7 +7,14 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) AddonDir() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) AddonDir(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.addonDir()
+}
+
+func (ctx *Easykube) addonDir() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
 		base := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())

@@ -9,7 +9,15 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) Kustomize() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) Kustomize(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+
+	return ctx.kustomize()
+}
+
+func (ctx *Easykube) kustomize() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 		yamlFile := ez.Kube.KustomizeBuild(filepath.Dir(ctx.AddonCtx.addon.GetAddonFile()))

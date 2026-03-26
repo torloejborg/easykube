@@ -51,7 +51,14 @@ func extractExternalSecrets(filePath string) ([]ez.ExternalSecret, error) {
 	return externalSecrets, nil
 }
 
-func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) ProcessExternalSecrets(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.processExternalSecrets()
+}
+
+func (ctx *Easykube) processExternalSecrets() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
 		ezk := ez.Kube
@@ -62,7 +69,7 @@ func (ctx *Easykube) ProcessExternalSecrets() func(goja.FunctionCall) goja.Value
 		}
 		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
 
-		ctx.checkArgs(call, PROCESS_SECRETS)
+		ctx.checkArgs(call, ProcessSecrets)
 		var arg = call.Argument(0)
 		var namespace = call.Argument(1).String()
 		manifest := call.Argument(2).String() // defaults to ".out.yaml"

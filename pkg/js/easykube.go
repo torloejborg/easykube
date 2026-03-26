@@ -23,33 +23,34 @@ func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 
 	// tag::export[]
 	e := &Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
-
+	isNoop := addon.IsNoop
 	easykubeObj := addon.NewObject()
-	check(easykubeObj.Set(KUSTOMIZE, e.Kustomize()))
-	check(easykubeObj.Set(WAIT_FOR_DEPLOYMENT, e.WaitForDeployment()))
-	check(easykubeObj.Set(AND_THEN_APPLY, e.AndThenApply()))
-	check(easykubeObj.Set(EXEC_IN_CONTAINER, e.ExecInContainer()))
-	check(easykubeObj.Set(PRELOAD, e.PreloadImages()))
-	check(easykubeObj.Set(WAIT_FOR_CRD, e.WaitForCRD()))
-	check(easykubeObj.Set(COPY_TO, e.CopyTo()))
-	check(easykubeObj.Set(CREATE_SECRET, e.CreateSecret()))
-	check(easykubeObj.Set(GET_SECRET, e.GetSecret()))
-	check(easykubeObj.Set(SPARSE_CHECKOUT, e.GitSparseCheckout()))
-	check(easykubeObj.Set(CHECKOUT, e.GitCheckout()))
-	check(easykubeObj.Set(HELM_TEMPLATE, e.HelmTemplate()))
-	check(easykubeObj.Set(PROCESS_SECRETS, e.ProcessExternalSecrets()))
-	check(easykubeObj.Set(KEY_VALUE, e.KeyValue()))
-	check(easykubeObj.Set(KEY_ENV, e.Env()))
-	check(easykubeObj.Set(HTTP, e.Http()))
-	check(easykubeObj.Set(EXEC, e.Exec()))
-	check(easykubeObj.Set(DOCKER_EXEC, e.DockerExec()))
-	check(easykubeObj.Set(ADDON_DIR, e.AddonDir()))
-	check(easykubeObj.Set(CONFIG, e.Config()))
+	check(easykubeObj.Set(Kustomize, e.Kustomize(isNoop)))
+	check(easykubeObj.Set(WaitForDeployment, e.WaitForDeployment(isNoop)))
+	check(easykubeObj.Set(AndThenApply, e.AndThenApply(isNoop)))
+	check(easykubeObj.Set(ExecInContainer, e.ExecInContainer(isNoop)))
+	check(easykubeObj.Set(Preload, e.PreloadImages(isNoop)))
+	check(easykubeObj.Set(WaitForCrd, e.WaitForCRD(isNoop)))
+	check(easykubeObj.Set(CopyTo, e.CopyTo(isNoop)))
+	check(easykubeObj.Set(CreateSecret, e.CreateSecret(isNoop)))
+	check(easykubeObj.Set(GetSecret, e.GetSecret(isNoop)))
+	check(easykubeObj.Set(GitSparseCheckout, e.GitSparseCheckout(isNoop)))
+	check(easykubeObj.Set(GitCheckout, e.GitCheckout(isNoop)))
+	check(easykubeObj.Set(HelmTemplate, e.HelmTemplate(isNoop)))
+	check(easykubeObj.Set(ProcessSecrets, e.ProcessExternalSecrets(isNoop)))
+	check(easykubeObj.Set(KeyValue, e.KeyValue(isNoop)))
+	check(easykubeObj.Set(KeyEnv, e.Env(isNoop)))
+	check(easykubeObj.Set(Http, e.Http(isNoop)))
+	check(easykubeObj.Set(Exec, e.Exec(isNoop)))
+	check(easykubeObj.Set(DockerExec, e.DockerExec(isNoop)))
+	check(easykubeObj.Set(AddonDir, e.AddonDir(isNoop)))
+	check(easykubeObj.Set(Config, e.Config(isNoop)))
+	check(easykubeObj.Set(RestartDeployment, e.Config(isNoop)))
 
 	addon.ExportFunction("_ek", easykubeObj)
 
 	utilsObj := addon.NewObject()
-	check(utilsObj.Set("UUID", e.NewUUID()))
+	check(utilsObj.Set("UUID", e.NewUUID(isNoop)))
 	addon.ExportFunction("_utils", utilsObj)
 	// end::export[]
 }
@@ -94,4 +95,10 @@ func (e *Easykube) extractStringSliceFromArgument(arg goja.Value) []string {
 	}
 
 	return strings
+}
+
+func NoopFunc() func(call goja.FunctionCall) goja.Value {
+	return func(call goja.FunctionCall) goja.Value {
+		return goja.Undefined()
+	}
 }

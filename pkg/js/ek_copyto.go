@@ -7,9 +7,16 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) CopyTo(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.andThenApply()
+}
+
+func (ctx *Easykube) copyTo() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, COPY_TO)
+		ctx.checkArgs(call, CopyTo)
 		ezk := ez.Kube
 
 		if ezk.IsDryRun() {
@@ -35,7 +42,7 @@ func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
 
 		err = ezk.CopyFileToPod(namespace, podName, containerName, filepath.Join(fullPath, sourceFile), destinationFile)
 		if err != nil {
-			ezk.FmtRed("%s failed: %v", COPY_TO, err)
+			ezk.FmtRed("%s failed: %v", CopyTo, err)
 		}
 
 		return call.This

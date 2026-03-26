@@ -5,9 +5,16 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) GetSecret() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) GetSecret(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.getSecret()
+}
+
+func (ctx *Easykube) getSecret() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, GET_SECRET)
+		ctx.checkArgs(call, GetSecret)
 
 		namespace := call.Argument(0).String()
 		name := call.Argument(1).String()

@@ -47,7 +47,7 @@ func TestPreloadImages(t *testing.T) {
 	`
 
 	mock := CreateSyntheticAddon(script, ctl)
-	jsu := jsutils.NewJsUtils(mockCommand, mock)
+	jsu := jsutils.NewJsUtils(mockCommand, mock, false)
 	err := jsu.ExecAddonScript(mock)
 
 	if err != nil {

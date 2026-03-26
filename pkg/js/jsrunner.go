@@ -18,6 +18,7 @@ type JsUtils struct {
 	vm                 *goja.Runtime
 	CobraCommandHelper ez.ICobraCommandHelper
 	AddonRoot          string
+	isNoop             bool
 }
 
 type IJsUtils interface {
@@ -28,6 +29,7 @@ type AddonContext struct {
 	addon               ez.IAddon
 	vm                  *goja.Runtime
 	ICobraCommandHelper ez.ICobraCommandHelper
+	IsNoop              bool
 }
 
 func (ac *AddonContext) ExportFunction(name string, action interface{}) {
@@ -41,13 +43,14 @@ func (ac *AddonContext) NewObject() *goja.Object {
 	return ac.vm.NewObject()
 }
 
-func NewJsUtils(commandHelper ez.ICobraCommandHelper, source ez.IAddon) IJsUtils {
+func NewJsUtils(commandHelper ez.ICobraCommandHelper, source ez.IAddon, isNoop bool) IJsUtils {
 	vm := goja.New()
 
 	ac := &AddonContext{
 		addon:               source,
 		vm:                  vm,
 		ICobraCommandHelper: commandHelper,
+		IsNoop:              isNoop,
 	}
 
 	export := func(name string, action interface{}) {
@@ -59,7 +62,7 @@ func NewJsUtils(commandHelper ez.ICobraCommandHelper, source ez.IAddon) IJsUtils
 
 	ConfigureEasykubeScript(commandHelper, ac)
 
-	export("console", NewCons(commandHelper).Console())
+	export("console", NewCons(commandHelper).Console(isNoop))
 
 	return &JsUtils{
 		vm:                 vm,

@@ -34,7 +34,14 @@ func (er *ExecResult) OnFail(call goja.FunctionCall) goja.Value {
 	return er.self
 }
 
-func (ctx *Easykube) Exec() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) Exec(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.exec()
+}
+
+func (ctx *Easykube) exec() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		er := &ExecResult{runtime: ctx.AddonCtx.vm}
 		obj := ctx.AddonCtx.NewObject()

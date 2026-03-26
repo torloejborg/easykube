@@ -36,7 +36,15 @@ func (er *HttpResult) OnFail(call goja.FunctionCall) goja.Value {
 	return er.self
 }
 
-func (ctx *Easykube) Http() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) Http(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+
+	return ctx.http()
+}
+
+func (ctx *Easykube) http() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
 		htr := &HttpResult{runtime: ctx.AddonCtx.vm, statusCode: -1}

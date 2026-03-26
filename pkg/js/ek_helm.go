@@ -10,7 +10,14 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) HelmTemplate() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) HelmTemplate(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.helmTemplate()
+}
+
+func (ctx *Easykube) helmTemplate() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ezk := ez.Kube
 		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())

@@ -5,7 +5,14 @@ import (
 	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) CreateSecret() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) CreateSecret(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.createSecret()
+}
+
+func (ctx *Easykube) createSecret() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
 		ezk := ez.Kube
@@ -14,7 +21,7 @@ func (ctx *Easykube) CreateSecret() func(goja.FunctionCall) goja.Value {
 			return call.This
 		}
 
-		ctx.checkArgs(call, CREATE_SECRET)
+		ctx.checkArgs(call, CreateSecret)
 		namespace := call.Argument(0).String()
 		name := call.Argument(1).String()
 		secret := make(map[string]string)
