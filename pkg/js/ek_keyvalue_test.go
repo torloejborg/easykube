@@ -3,8 +3,7 @@ package jsutils_test
 import (
 	"testing"
 
-	mock_ez "github.com/torloejborg/easykube/mock"
-	"github.com/torloejborg/easykube/pkg/ez"
+	mock "github.com/torloejborg/easykube/mock"
 	jsutils "github.com/torloejborg/easykube/pkg/js"
 	"go.uber.org/mock/gomock"
 )
@@ -12,13 +11,13 @@ import (
 func TestEasykube_KeyValue(t *testing.T) {
 
 	ctl := gomock.NewController(t)
-	SetUpJsTestEnvironment(t, ctl)
+	ek := SetUpJsTestEnvironment(t, ctl)
 
-	mockCommand := mock_ez.NewMockICobraCommandHelper(ctl)
+	mockCommand := mock.NewMockICobraCommandHelper(ctl)
 	mockCommand.EXPECT().IsDryRun().Return(false).AnyTimes()
 	mockCommand.EXPECT().GetStringFlag(gomock.AnyOf("kv")).Return("hello = world, foo=bar ").AnyTimes()
 
-	ez.Kube.ICobraCommandHelper = mockCommand
+	ek.CommandContext = mockCommand
 
 	script := `
 		if(easykube.kv("hello") === "world") {
@@ -35,9 +34,9 @@ func TestEasykube_KeyValue(t *testing.T) {
 
     `
 
-	mock := CreateSyntheticAddon(script, ctl)
-	jsu := jsutils.NewJsUtils(mockCommand, mock, false)
-	err := jsu.ExecAddonScript(mock)
+	mockAddon := CreateSyntheticAddon(script, ctl)
+	jsu := jsutils.NewJsUtils(ek, mockAddon, false)
+	err := jsu.ExecAddonScript(mockAddon)
 
 	if err != nil {
 		t.Fatal(err)

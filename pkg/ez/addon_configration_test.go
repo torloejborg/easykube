@@ -3,17 +3,16 @@ package ez_test
 import (
 	"testing"
 
-	"github.com/torloejborg/easykube/pkg/ez"
 	"github.com/torloejborg/easykube/test"
 )
 
 func TestScanAddons(t *testing.T) {
 
-	initAddonReaderTest(t)
+	ek := initAddonReaderTest(t)
 
-	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ek.Fs)
 
-	all, err := ez.Kube.GetAddons()
+	all, err := ek.AddonReader.GetAddons()
 	if err != nil {
 		t.Fatal(err)
 	}

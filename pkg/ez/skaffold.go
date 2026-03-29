@@ -20,6 +20,7 @@ type SkaffoldImpl struct {
 func NewSkaffold(ek *core.Ek, addonDir string) core.ISkaffold {
 	return &SkaffoldImpl{
 		AddonDir: addonDir,
+		ek:       ek,
 	}
 }
 
