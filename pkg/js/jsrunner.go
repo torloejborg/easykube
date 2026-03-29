@@ -86,6 +86,10 @@ func (jsu *JsUtils) ExecAddonScript(a ez.IAddon) error {
 		}()
 
 		_, err = jsu.vm.RunString(jsu.GetPseudoJsIncludes() + script)
+
+		cfg := jsu.vm.Get("configuration")
+		fmt.Println(cfg)
+
 		return
 	}()
 
