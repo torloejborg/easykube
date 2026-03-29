@@ -9,7 +9,7 @@ import (
 )
 
 type OsDetailsImpl struct {
-	ek *core.Ek
+	Ek *core.Ek
 }
 
 func (d OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
@@ -21,8 +21,8 @@ func (d OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
 	}
 
 	// allow user to override default configuration directory with program argument
-	if d.ek.CommandContext.GetStringFlag(constants.FlagConfigDir) != "" {
-		return d.ek.CommandContext.GetStringFlag(constants.FlagConfigDir), nil
+	if d.Ek.CommandContext.GetStringFlag(constants.FlagConfigDir) != "" {
+		return d.Ek.CommandContext.GetStringFlag(constants.FlagConfigDir), nil
 	} else {
 		r, err := os.UserConfigDir()
 		if err != nil {

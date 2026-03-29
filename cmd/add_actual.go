@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 	jsutils "github.com/torloejborg/easykube/pkg/js"
 )
 
@@ -19,15 +19,14 @@ type AddOptions struct {
 	DryRun        bool
 }
 
-func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
-	ezk := ez.Kube
+func addActual(opts AddOptions, ek *core.Ek) error {
 
-	if !opts.DryRun && !ezk.IsClusterRunning() {
+	if !opts.DryRun && !ek.ContainerRuntime.IsClusterRunning() {
 		return errors.New("please create or start the cluster before installing addons")
 	}
-	allAddons, err := ez.Kube.GetAddons()
+	allAddons, err := ek.AddonReader.GetAddons()
 
-	ezk.EnsureLocalContext()
+	ek.ExternalTools.EnsureLocalContext()
 
 	wanted, missing := pickAddons(opts.Args, allAddons)
 	if len(missing) > 0 {
@@ -35,28 +34,28 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 	}
 
 	if opts.TargetCluster != "" {
-		ezk.SwitchContext(opts.TargetCluster)
-		defer ezk.SwitchContext(constants.ClusterContext)
+		ek.ExternalTools.SwitchContext(opts.TargetCluster)
+		defer ek.ExternalTools.SwitchContext(constants.ClusterContext)
 	}
 
 	if opts.NoDepends {
-		return jsutils.NewJsUtils(cmdHelper, wanted[0], false).ExecAddonScript(wanted[0])
+		return jsutils.NewJsUtils(ek, wanted[0], false).ExecAddonScript(wanted[0])
 	}
 
-	toInstall, err := ez.ResolveDependencies(wanted, allAddons)
+	toInstall, err := core.ResolveDependencies(wanted, allAddons)
 	if err != nil {
 		return err
 	}
 
-	installed, err := ez.Kube.GetInstalledAddons()
+	installed, err := ek.Kubernetes.GetInstalledAddons()
 
 	for _, addon := range toInstall {
 		if slices.Contains(installed, addon.GetShortName()) && !opts.ForceInstall {
-			ezk.FmtGreen("%s already present in cluster", addon.GetShortName())
+			ek.Printer.FmtGreen("%s already present in cluster", addon.GetShortName())
 			continue
 		}
 
-		if err := jsutils.NewJsUtils(cmdHelper, addon, false).ExecAddonScript(addon); err != nil {
+		if err := jsutils.NewJsUtils(ek, addon, false).ExecAddonScript(addon); err != nil {
 			return err
 		}
 	}
@@ -64,8 +63,8 @@ func addActual(opts AddOptions, cmdHelper ez.ICobraCommandHelper) error {
 	return nil
 }
 
-func pickAddons(name []string, addons map[string]ez.IAddon) ([]ez.IAddon, []string) {
-	result := make([]ez.IAddon, 0)
+func pickAddons(name []string, addons map[string]core.IAddon) ([]core.IAddon, []string) {
+	result := make([]core.IAddon, 0)
 	missing := make([]string, 0)
 
 	for ni := range name {

@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 func NewAddCmd() *cobra.Command {
@@ -13,9 +13,14 @@ func NewAddCmd() *cobra.Command {
 		Long:  `by default addons also applies their dependencies`,
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmdhelper := ez.CommandHelper(cmd)
+			cmdhelper := core.CommandHelper(cmd)
 
-			err := ez.InitializeEasykube(ez.WithMustHaveConfiguration(true))
+			ek, err := CreateEasykube(cmdhelper,
+				WithAddonReader(true),
+				WithKubernetes(true),
+				WithContainerRuntime(true),
+				WithRequiresConfigurationCreated(true),
+			)
 
 			if err != nil {
 				return err
@@ -29,22 +34,22 @@ func NewAddCmd() *cobra.Command {
 				DryRun:        cmdhelper.IsDryRun(),
 			}
 
-			return addActual(addOpts, cmdhelper)
+			return addActual(addOpts, ek)
 		},
-		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-
-			_ = ez.InitializeEasykube()
-			addons := make([]string, 0)
-			a, e := ez.Kube.GetAddons()
-			if e != nil {
-				// ignore for now
-				panic(e)
-			}
-			for _, i := range a {
-				addons = append(addons, i.GetShortName())
-			}
-			return addons, cobra.ShellCompDirectiveNoFileComp
-		},
+		//ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		//
+		//	_ = ez.InitializeEasykube()
+		//	addons := make([]string, 0)
+		//	a, e := ez.Kube.GetAddons()
+		//	if e != nil {
+		//		// ignore for now
+		//		panic(e)
+		//	}
+		//	for _, i := range a {
+		//		addons = append(addons, i.GetShortName())
+		//	}
+		//	return addons, cobra.ShellCompDirectiveNoFileComp
+		//},
 	}
 
 	return cmd

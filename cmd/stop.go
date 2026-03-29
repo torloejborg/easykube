@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
-
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 // stopCmd represents the stop command
@@ -13,27 +12,31 @@ var stopCmd = &cobra.Command{
 	Short: "stops the cluster node and registry container",
 	Long:  "", RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeEasykube(
-			ez.WithKubernetes(false))
+		ek, err := CreateEasykube(core.CommandHelper(cmd),
+			WithKubernetes(false),
+			WithContainerRuntime(true),
+			WithAddonReader(false),
+			WithClusterUtils(false),
+			WithRequiresConfigurationCreated(false),
+		)
 		if err != nil {
 			return err
 		}
 
-		ezk := ez.Kube
-		if running, err := ezk.IsContainerRunning(constants.KindContainer); err != nil {
+		if running, err := ek.ContainerRuntime.IsContainerRunning(constants.KindContainer); err != nil {
 			return err
 		} else if running {
-			ezk.FmtGreen("stopping %s", constants.KindContainer)
-			if e := ezk.StopContainer(constants.KindContainer); e != nil {
+			ek.Printer.FmtGreen("stopping %s", constants.KindContainer)
+			if e := ek.ContainerRuntime.StopContainer(constants.KindContainer); e != nil {
 				return e
 			}
 		}
 
-		if running, err := ezk.IsContainerRunning(constants.RegistryContainer); err != nil {
+		if running, err := ek.ContainerRuntime.IsContainerRunning(constants.RegistryContainer); err != nil {
 			return err
 		} else if running {
-			ezk.FmtGreen("stopping %s", constants.RegistryContainer)
-			if e := ezk.StopContainer(constants.RegistryContainer); e != nil {
+			ek.Printer.FmtGreen("stopping %s", constants.RegistryContainer)
+			if e := ek.ContainerRuntime.StopContainer(constants.RegistryContainer); e != nil {
 				return e
 			}
 		}

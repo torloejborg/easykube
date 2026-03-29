@@ -1,16 +1,20 @@
 package core
 
-import "github.com/spf13/afero"
+import (
+	"github.com/spf13/afero"
+)
 
 type Ek struct {
-	Config           IEasykubeConfig
 	AddonReader      IAddonReader
-	ContainerRuntime IContainerRuntime
+	ClusterUtils     IClusterUtils
 	CommandContext   ICobraCommandHelper
+	Config           IEasykubeConfig
+	ContainerRuntime IContainerRuntime
 	ExternalTools    IExternalTools
+	Fs               afero.Fs
+	Kubernetes       IK8SUtils
 	OsDetails        IOsDetails
 	Printer          IPrinter
-	Kubernetes       IK8SUtils
 	Utils            IUtils
-	Fs               afero.Fs
+	Status           IStatusBuilder
 }
