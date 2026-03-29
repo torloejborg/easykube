@@ -1,4 +1,4 @@
-package ez
+package core
 
 type Stack[T any] []T
 

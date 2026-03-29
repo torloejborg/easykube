@@ -6,15 +6,15 @@ import (
 	"reflect"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 type Easykube struct {
-	CobraCommandHelder ez.ICobraCommandHelper
-	AddonCtx           *AddonContext
+	AddonCtx *AddonContext
+	ek       *core.Ek
 }
 
-func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
+func ConfigureEasykubeScript(ek *core.Ek, addon *AddonContext) {
 	check := func(e error) {
 		if e != nil {
 			panic(e)
@@ -22,7 +22,7 @@ func ConfigureEasykubeScript(ctx ez.ICobraCommandHelper, addon *AddonContext) {
 	}
 
 	// tag::export[]
-	e := &Easykube{CobraCommandHelder: ctx, AddonCtx: addon}
+	e := &Easykube{ek: ek, AddonCtx: addon}
 	isNoop := addon.IsNoop
 	easykubeObj := addon.NewObject()
 	check(easykubeObj.Set(Kustomize, e.Kustomize(isNoop)))
@@ -65,7 +65,7 @@ func (e *Easykube) checkArgs(f goja.FunctionCall, jsName string) {
 	}
 
 	if undef != 0 {
-		ez.Kube.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
+		e.ek.Printer.FmtRed("check addon %s, Call to %s expected %d arguments, %d is missing",
 			e.AddonCtx.addon.GetName(),
 			jsName,
 			argLen,

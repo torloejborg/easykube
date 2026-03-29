@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (e *Easykube) GitCheckout(noop bool) func(goja.FunctionCall) goja.Value {
@@ -21,18 +20,17 @@ func (e *Easykube) gitCheckout() func(goja.FunctionCall) goja.Value {
 
 	return func(call goja.FunctionCall) goja.Value {
 		e.checkArgs(call, GitCheckout)
-		ezk := ez.Kube
 
 		currentDir, _ := os.Getwd()
 		defer func() {
-			if !ezk.IsDryRun() {
+			if !e.ek.CommandContext.IsDryRun() {
 				err := os.Chdir(currentDir)
 				if err != nil {
 					panic(err)
 				}
 			}
-			if ezk.IsVerbose() {
-				ezk.FmtVerbose("cd %s", currentDir)
+			if e.ek.CommandContext.IsVerbose() {
+				e.ek.Printer.FmtVerbose("cd %s", currentDir)
 			}
 		}()
 
@@ -41,13 +39,13 @@ func (e *Easykube) gitCheckout() func(goja.FunctionCall) goja.Value {
 		addonDir := filepath.Dir(e.AddonCtx.addon.GetAddonFile())
 		destination := filepath.Join(addonDir, call.Argument(2).String())
 
-		if ez.FileOrDirExists(destination) {
-			ezk.FmtYellow("%s already exists, skipping checkout", destination)
+		if e.ek.Utils.FileOrDirExists(destination) {
+			e.ek.Printer.FmtYellow("%s already exists, skipping checkout", destination)
 			return call.This
 		}
 
-		if !ezk.IsDryRun() {
-			err := ezk.MkdirAll(destination, 0777)
+		if !e.ek.CommandContext.IsDryRun() {
+			err := e.ek.Fs.MkdirAll(destination, 0777)
 			if err != nil {
 				panic(err)
 			}
@@ -56,12 +54,12 @@ func (e *Easykube) gitCheckout() func(goja.FunctionCall) goja.Value {
 				panic(err)
 			}
 		} else {
-			ezk.FmtDryRun("mkdir -p %s", destination)
-			ezk.FmtDryRun("cd %s", destination)
+			e.ek.Printer.FmtDryRun("mkdir -p %s", destination)
+			e.ek.Printer.FmtDryRun("cd %s", destination)
 		}
 
-		if ezk.IsVerbose() {
-			ezk.FmtVerbose("cd %s", destination)
+		if e.ek.CommandContext.IsVerbose() {
+			e.ek.Printer.FmtVerbose("cd %s", destination)
 		}
 
 		gitCmd := func(args []string) {
@@ -69,17 +67,17 @@ func (e *Easykube) gitCheckout() func(goja.FunctionCall) goja.Value {
 			git := "git"
 			cmdStr := fmt.Sprintf("%s %s", git, strings.Join(args, " "))
 
-			if ezk.IsVerbose() {
-				ezk.FmtVerbose(cmdStr)
+			if e.ek.CommandContext.IsVerbose() {
+				e.ek.Printer.FmtVerbose(cmdStr)
 			}
-			if ezk.IsDryRun() {
-				ezk.FmtDryRun(cmdStr)
+			if e.ek.CommandContext.IsDryRun() {
+				e.ek.Printer.FmtDryRun(cmdStr)
 			} else {
 
-				_, stderr, err := ezk.RunCommand("git", args...)
+				_, stderr, err := e.ek.ExternalTools.RunCommand("git", args...)
 
 				if err != nil {
-					ezk.FmtRed(stderr, err.Error())
+					e.ek.Printer.FmtRed(stderr, err.Error())
 					os.Exit(1)
 				}
 			}

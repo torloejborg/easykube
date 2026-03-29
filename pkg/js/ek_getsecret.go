@@ -2,7 +2,6 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) GetSecret(noop bool) func(goja.FunctionCall) goja.Value {
@@ -19,7 +18,7 @@ func (ctx *Easykube) getSecret() func(goja.FunctionCall) goja.Value {
 		namespace := call.Argument(0).String()
 		name := call.Argument(1).String()
 
-		res, err := ez.Kube.GetSecret(name, namespace)
+		res, err := ctx.ek.Kubernetes.GetSecret(name, namespace)
 
 		m := make(map[string]string)
 

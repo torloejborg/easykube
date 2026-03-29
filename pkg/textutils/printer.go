@@ -4,17 +4,10 @@ import (
 	"fmt"
 
 	"github.com/gookit/color"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
-type IPrinter interface {
-	FmtGreen(out string, args ...any)
-	FmtRed(out string, args ...any)
-	FmtYellow(out string, args ...any)
-	FmtVerbose(out string, args ...any)
-	FmtDryRun(out string, args ...any)
-}
-
-func NewPrinter() IPrinter {
+func NewPrinter() core.IPrinter {
 	return &PrinterImpl{}
 }
 

@@ -8,18 +8,16 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
 type SkaffoldImpl struct {
 	AddonDir string
+	ek       *core.Ek
 }
 
-type ISkaffold interface {
-	CreateNewAddon(name, dest string)
-}
-
-func NewSkaffold(addonDir string) ISkaffold {
+func NewSkaffold(ek *core.Ek, addonDir string) core.ISkaffold {
 	return &SkaffoldImpl{
 		AddonDir: addonDir,
 	}
@@ -31,7 +29,7 @@ type model struct {
 
 func (s *SkaffoldImpl) CreateNewAddon(name, dest string) {
 
-	err := Kube.Fs.MkdirAll(filepath.Join(s.AddonDir, dest, name, "manifests"), os.ModePerm)
+	err := s.ek.Fs.MkdirAll(filepath.Join(s.AddonDir, dest, name, "manifests"), os.ModePerm)
 	if err != nil {
 		println("failed to create addon dir")
 		log.Fatal(err)
@@ -81,7 +79,7 @@ func (a *SkaffoldImpl) renderTemplate(src string, model any) string {
 
 func (a *SkaffoldImpl) saveFile(data string, dest string) {
 
-	file, err := Kube.Fs.Create(dest)
+	file, err := a.ek.Fs.Create(dest)
 
 	if err != nil {
 		log.Fatal(err)

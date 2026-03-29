@@ -9,27 +9,18 @@ import (
 	"strings"
 
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 type ExternalToolsImpl struct {
+	ek *core.Ek
 }
 
-type IExternalTools interface {
-	KustomizeBuild(dir string) string
-	ApplyYaml(yamlFile string)
-	DeleteYaml(yamlFile string)
-	EnsureLocalContext()
-	// SwitchContext Change kube context to name
-	SwitchContext(name string)
-	// RunCommand Runs an OS command
-	RunCommand(name string, args ...string) (stdout string, stderr string, err error)
+func NewExternalTools(ek *core.Ek) core.IExternalTools {
+	return &ExternalToolsImpl{ek: ek}
 }
 
-func NewExternalTools() IExternalTools {
-	return &ExternalToolsImpl{}
-}
-
-func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
+func (eti ExternalToolsImpl) KustomizeBuild(dir string) string {
 
 	cmd := "kustomize"
 	args := []string{
@@ -40,18 +31,18 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
 	outCmd := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 
-	if Kube.IsVerbose() {
-		Kube.FmtVerbose(outCmd)
+	if eti.ek.CommandContext.IsVerbose() {
+		eti.ek.Printer.FmtVerbose(outCmd)
 	}
 
-	if Kube.IsDryRun() {
-		Kube.FmtDryRun(outCmd)
+	if eti.ek.CommandContext.IsDryRun() {
+		eti.ek.Printer.FmtDryRun(outCmd)
 	} else {
 
-		stdout, stderr, err := et.RunCommand(cmd, args...)
+		stdout, stderr, err := eti.RunCommand(cmd, args...)
 
 		if err != nil {
-			Kube.FmtRed("kustomize failed with %s", stderr)
+			eti.ek.Printer.FmtRed("kustomize failed with %s", stderr)
 			panic(err)
 		} else {
 			// save output to file
@@ -77,58 +68,57 @@ func (et *ExternalToolsImpl) KustomizeBuild(dir string) string {
 	return filepath.Join(dir, constants.KustomizeTargetOutput)
 }
 
-func (et *ExternalToolsImpl) ApplyYaml(yamlFile string) {
+func (eti ExternalToolsImpl) ApplyYaml(yamlFile string) {
 
 	cmd := "kubectl"
 	args := []string{"apply", "-f", yamlFile}
 	outCmd := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 
-	if Kube.IsDryRun() {
-		Kube.FmtDryRun(outCmd)
+	if eti.ek.CommandContext.IsDryRun() {
+		eti.ek.Printer.FmtDryRun(outCmd)
 	} else {
-		if Kube.IsVerbose() {
-			Kube.FmtVerbose(outCmd)
+		if eti.ek.CommandContext.IsVerbose() {
+			eti.ek.Printer.FmtVerbose(outCmd)
 		}
-		_, stderr, err := et.RunCommand(cmd, args...)
+		_, stderr, err := eti.RunCommand(cmd, args...)
 
 		if err != nil {
-			Kube.FmtRed("kubectl failed with %s", stderr)
+			eti.ek.Printer.FmtRed("kubectl failed with %s", stderr)
 			os.Exit(-1)
 		}
 	}
 
 }
 
-func (et *ExternalToolsImpl) DeleteYaml(yamlFile string) {
+func (eti ExternalToolsImpl) DeleteYaml(yamlFile string) {
 
 	cmd := "kubectl"
 	args := []string{"delete", "-f", yamlFile}
 	cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 
-	if Kube.IsVerbose() {
-		Kube.FmtVerbose(cmdStr)
+	if eti.ek.CommandContext.IsVerbose() {
+		eti.ek.Printer.FmtVerbose(cmdStr)
 	}
 
-	if Kube.IsDryRun() {
-		Kube.FmtDryRun(cmdStr)
+	if eti.ek.CommandContext.IsDryRun() {
+		eti.ek.Printer.FmtDryRun(cmdStr)
 	} else {
-		_, stderr, err := et.RunCommand(cmd, args...)
+		_, stderr, err := eti.RunCommand(cmd, args...)
 		if err != nil {
-			Kube.FmtRed("kubectl failed with %s", stderr)
+			eti.ek.Printer.FmtRed("kubectl failed with %s", stderr)
 			os.Exit(-1)
 		}
 	}
 
 }
 
-func (et *ExternalToolsImpl) EnsureLocalContext() {
-	k := Kube
+func (eti *ExternalToolsImpl) EnsureLocalContext() {
 	if len(os.Getenv("KUBECONFIG")) == 0 {
-		k.FmtGreen("Please configure the KUBECONFIG environment variable to include .kube/easykube configuration file")
+		eti.ek.Printer.FmtGreen("Please configure the KUBECONFIG environment variable to include .kube/easykube configuration file")
 		fmt.Println()
-		k.FmtGreen("https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable")
+		eti.ek.Printer.FmtGreen("https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable")
 		fmt.Println()
-		k.FmtYellow("(The cluster is running, but you cannot manage it yet)")
+		eti.ek.Printer.FmtYellow("(The cluster is running, but you cannot manage it yet)")
 
 		home, _ := os.UserHomeDir()
 		_ = os.Setenv("KUBECONFIG", filepath.Join(home, ".kube", constants.ClusterName))
@@ -137,46 +127,45 @@ func (et *ExternalToolsImpl) EnsureLocalContext() {
 		cmd := "kubectl"
 		args := []string{"config", "use-context", constants.ClusterContext}
 		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
-		if k.IsDryRun() {
-			k.FmtDryRun(cmdStr)
+		if eti.ek.CommandContext.IsDryRun() {
+			eti.ek.Printer.FmtDryRun(cmdStr)
 		} else {
-			if k.IsVerbose() {
-				k.FmtVerbose(cmdStr)
+			if eti.ek.CommandContext.IsVerbose() {
+				eti.ek.Printer.FmtVerbose(cmdStr)
 			}
-			_, stderr, err := et.RunCommand(cmd, args...)
+			_, stderr, err := eti.RunCommand(cmd, args...)
 
 			if err != nil {
-				Kube.FmtRed("kubectl failed with %s", stderr)
+				eti.ek.Printer.FmtRed("kubectl failed with %s", stderr)
 				os.Exit(-1)
 			}
 		}
 	}
 }
 
-func (et *ExternalToolsImpl) SwitchContext(name string) {
-	k := Kube
+func (eti *ExternalToolsImpl) SwitchContext(name string) {
 	cmd := "kubectl"
 	args := []string{"config", "use-context", name}
 	cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 
-	if k.IsDryRun() {
-		k.FmtDryRun(cmdStr)
+	if eti.ek.CommandContext.IsDryRun() {
+		eti.ek.Printer.FmtDryRun(cmdStr)
 	} else {
 
-		if k.IsVerbose() {
-			k.FmtVerbose(cmdStr)
+		if eti.ek.CommandContext.IsVerbose() {
+			eti.ek.Printer.FmtVerbose(cmdStr)
 		}
-		_, stderr, err := et.RunCommand(cmd, args...)
+		_, stderr, err := eti.RunCommand(cmd, args...)
 
 		if err != nil {
-			Kube.FmtRed("kubectl failed with %s", stderr)
+			eti.ek.Printer.FmtRed("kubectl failed with %s", stderr)
 			os.Exit(-1)
 		}
-		Kube.FmtYellow("operating in context '%s'", name)
+		eti.ek.Printer.FmtYellow("operating in context '%s'", name)
 	}
 }
 
-func (et *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout string, stderr string, err error) {
+func (eti *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout string, stderr string, err error) {
 	var outBuf, errBuf bytes.Buffer
 
 	cmd := exec.Command(name, args...)

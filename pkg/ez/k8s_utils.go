@@ -14,6 +14,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
@@ -37,141 +38,25 @@ import (
 type K8SUtilsImpl struct {
 	Clientset  *kubernetes.Clientset
 	RestConfig *rest.Config
-	EKContext  *CobraCommandHelperImpl
 	Fs         afero.Fs
+	ek         *core.Ek
 }
 
 func (k *K8SUtilsImpl) HasKubeConfig() bool {
 	return k.Clientset != nil && k.RestConfig != nil
 }
 
-// ExternalSecret Defines a struct to capture the structure of an ExternalSecret from the ExternalSecretOperator
-type ExternalSecret struct {
-	ApiVersion string `yaml:"apiVersion"`
-	Kind       string `yaml:"kind"`
-	Metadata   struct {
-		Name string `yaml:"name"`
-	} `yaml:"metadata"`
-	Spec struct {
-		// Define the structure of the spec according to your needs
-		RefreshInterval string `yaml:"refreshInterval"`
-		SecretStoreRef  struct {
-			Name string `yaml:"name"`
-			Kind string `yaml:"kind"`
-		} `yaml:"secretStoreRef"`
-		Data []struct {
-			SecretKey string `yaml:"secretKey"`
-			RemoteRef struct {
-				Key      string `yaml:"key"`
-				Property string `yaml:"property"`
-			} `yaml:"remoteRef"`
-		} `yaml:"data"`
-	} `yaml:"spec"`
-}
-
-// KubernetesSecret represents the structure of a Kubernetes Secret resource.
-type KubernetesSecret struct {
-	ApiVersion string            `yaml:"apiVersion"`
-	Kind       string            `yaml:"kind"`
-	Metadata   map[string]string `yaml:"metadata"`
-	Data       map[string]string `yaml:"data"`
-	Type       string            `yaml:"type"`
-}
-
-type IK8SUtils interface {
-	// ReloadClientSet Reloads the kubernetes client
-	//
-	// After creating a kind cluster a new kubeconfig is generated, this function make
-	// sure we operate on the current one
-	ReloadClientSet() error
-	// CreateSecret
-	//
-	// Creates a kubernetes secret, kubernetes likes to base64 encode secrets, but a map of plain
-	// strings can be passed, some fuzzy check is done to detect if encoding should happen or not. This is
-	// not 100% perfect, and can fail in some instances - A good candidate for rewriting.
-	CreateSecret(namespace, secretName string, data map[string]string) error
-	//GetSecret Fetches a secret from kubernetes
-	//
-	// Returns
-	GetSecret(name, namespace string) (map[string][]byte, error)
-	// CreateConfigmap
-	//
-	// Creates an empty configmap
-	CreateConfigmap(name, namespace string) error
-
-	// DeleteKeyFromConfigmap
-	//
-	// Removes a key from a configmap and saves it
-	DeleteKeyFromConfigmap(name, namespace, key string)
-	// ReadConfigmap
-	//
-	// Fetch a configmap from kubernetes
-	ReadConfigmap(name string, namespace string) (map[string]string, error)
-	// UpdateConfigMap
-	//
-	// Updates a key in a configmap
-	UpdateConfigMap(name, namespace, key string, data []byte)
-	// HasKubeConfig
-	//
-	// true if K8sUtils are ready to go - the clientset and rest client are initialized.
-	HasKubeConfig() bool
-
-	// FindContainerInPod
-	//
-	// Attempts to locate a container in a given deployment, if there are multiple containers matching
-	// containerPartialName, the first is matched. Returns a triplet of (pod.Name, container.Name, error)
-	FindContainerInPod(deploymentName, namespace, containerPartialName string) (string, string, error)
-	// ExecInPod
-	//
-	// Runs a 'kubectl exec' using the API, returns stdout and stderr as strings
-	ExecInPod(namespace, pod, command string, args []string) (string, string, error)
-
-	// CopyFileToPod
-	//
-	// Copies a local file into a remote pod
-	CopyFileToPod(namespace, pod, container, localPath, remotePath string) error
-	// ListPods
-	//
-	// Gets all pod names in a namespace
-	ListPods(namespace string) ([]string, error)
-	// GetInstalledAddons
-	//
-	// Queries the constants.AddonCm configmap for installed addons
-	GetInstalledAddons() ([]string, error)
-
-	// PatchCoreDNS
-	//
-	// Teaches CoreDNS to understand the localtest.me loopback domain
-	PatchCoreDNS()
-
-	// WaitForDeploymentReadyWatch pauses execution until some deployment enters ready state
-	WaitForDeploymentReadyWatch(name, namespace string) error
-
-	// WaitForCRD pauses execution for a duration of time until some custom resources have appeared in a cluster
-	//
-	// group, version, kind are the coordinates for the CRD, timeout specifies wait time
-	WaitForCRD(group, version, kind string, timeout time.Duration) error
-	// TransformExternalSecret creates a kubernetes secret from an external secret definition (ExternalSecretOperator)
-	//
-	// secret is the source which contains keys and references, mockData specifies the replacements for the keys,
-	// addonName is the source of the mockData, namespace specifies where to create the secret
-	TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) KubernetesSecret
-
-	WaitForKindClusterReady(kubeconfig string, timeout time.Duration) error
-
-	RestartDeployment(deploymentName, namespace string) error
-}
-
-func NewK8SUtils() IK8SUtils {
+func NewK8SUtils(ek *core.Ek) core.IK8SUtils {
 
 	impl := &K8SUtilsImpl{
 		Clientset:  nil,
 		RestConfig: nil,
+		ek:         ek,
 	}
 
 	err := impl.ReloadClientSet()
 	if err != nil {
-		Kube.FmtRed("Failed to create Kubernetes client: %v", err)
+		ek.Printer.FmtRed("Failed to create Kubernetes client: %v", err)
 	}
 
 	return impl
@@ -180,14 +65,14 @@ func NewK8SUtils() IK8SUtils {
 func (k *K8SUtilsImpl) ReloadClientSet() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		Kube.FmtRed("cannot determine homedir")
+		k.ek.Printer.FmtRed("cannot determine homedir")
 		os.Exit(-1)
 	}
 
 	kubeconfigPath := filepath.Join(homeDir, ".kube", "easykube")
 
-	if !FileOrDirExists(kubeconfigPath) {
-		Kube.FmtYellow("expecting %s to exist, create the cluster and this message will disappear", kubeconfigPath)
+	if !k.ek.Utils.FileOrDirExists(kubeconfigPath) {
+		k.ek.Printer.FmtYellow("expecting %s to exist, create the cluster and this message will disappear", kubeconfigPath)
 		return nil
 	}
 
@@ -373,7 +258,7 @@ func (k *K8SUtilsImpl) WaitForDeploymentReadyWatch(name, namespace string) error
 
 	defer watcher.Stop()
 
-	Kube.FmtGreen("Waiting for deployment %q in namespace %q to become ready...", name, namespace)
+	k.ek.Printer.FmtGreen("Waiting for deployment %q in namespace %q to become ready...", name, namespace)
 
 	for event := range watcher.ResultChan() {
 		if event.Type == watch.Error {
@@ -386,7 +271,7 @@ func (k *K8SUtilsImpl) WaitForDeploymentReadyWatch(name, namespace string) error
 		}
 
 		if dep.Status.ReadyReplicas == *dep.Spec.Replicas {
-			Kube.FmtGreen("Deployment is ready!")
+			k.ek.Printer.FmtGreen("Deployment is ready!")
 			return nil
 		}
 	}
@@ -527,7 +412,7 @@ func (k *K8SUtilsImpl) CreateSecret(namespace, secretName string, data map[strin
 }
 
 func (k *K8SUtilsImpl) CopyFileToPod(namespace, pod, container, localPath, remotePath string) error {
-	file, err := Kube.Open(localPath)
+	file, err := k.ek.Fs.Open(localPath)
 	if err != nil {
 		return fmt.Errorf("failed to open local file: %w", err)
 	}
@@ -622,10 +507,10 @@ func (k *K8SUtilsImpl) FindContainerInPod(deploymentName, namespace, containerPa
 	return "", "", fmt.Errorf("no pod/container found for deployment=%q, containerPartial=%q", deploymentName, containerPartialName)
 }
 
-func (k *K8SUtilsImpl) TransformExternalSecret(secret ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) KubernetesSecret {
+func (k *K8SUtilsImpl) TransformExternalSecret(secret core.ExternalSecret, mockData map[string]map[string]string, addonName, namespace string) core.KubernetesSecret {
 
 	// Initialize the Kubernetes Secret
-	k8sSecret := KubernetesSecret{
+	k8sSecret := core.KubernetesSecret{
 		ApiVersion: "v1",
 		Kind:       "Secret",
 		Metadata: map[string]string{
@@ -648,14 +533,14 @@ func (k *K8SUtilsImpl) TransformExternalSecret(secret ExternalSecret, mockData m
 
 				k8sSecret.Data[dataItem.SecretKey] = value
 			} else {
-				Kube.FmtYellow("No supplied value were matched for substitution with property '%s' in external secret '%s' mapped by '%s'",
+				k.ek.Printer.FmtYellow("No supplied value were matched for substitution with property '%s' in external secret '%s' mapped by '%s'",
 					property,
 					secret.Metadata.Name,
 					key)
 			}
 		} else {
 
-			Kube.FmtYellow("Warning: Key %s not found in map sourced from addon %s for external secret",
+			k.ek.Printer.FmtYellow("Warning: Key %s not found in map sourced from addon %s for external secret",
 				key,
 				addonName,
 				secret.Metadata.Name)

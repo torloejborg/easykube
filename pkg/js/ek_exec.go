@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 type ExecResult struct {
@@ -54,8 +53,8 @@ func (ctx *Easykube) exec() func(goja.FunctionCall) goja.Value {
 		osCommand := call.Argument(0).String()
 		args := ctx.extractStringSliceFromArgument(call.Argument(1))
 
-		if ez.Kube.IsDryRun() {
-			ez.Kube.FmtDryRun("%s %s", osCommand, strings.Join(args, " "))
+		if ctx.ek.CommandContext.IsDryRun() {
+			ctx.ek.Printer.FmtDryRun("%s %s", osCommand, strings.Join(args, " "))
 			er.success = true
 			return obj
 		} else {

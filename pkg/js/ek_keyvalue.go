@@ -7,7 +7,6 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) KeyValue(noop bool) func(goja.FunctionCall) goja.Value {
@@ -20,7 +19,7 @@ func (ctx *Easykube) KeyValue(noop bool) func(goja.FunctionCall) goja.Value {
 func (ctx *Easykube) keyValue() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		ctx.checkArgs(call, KeyValue)
-		inputStr := ctx.CobraCommandHelder.GetStringFlag(constants.FlagKeyValue)
+		inputStr := ctx.ek.CommandContext.GetStringFlag(constants.FlagKeyValue)
 		if inputStr == "" {
 			return goja.Undefined()
 		}
@@ -29,7 +28,7 @@ func (ctx *Easykube) keyValue() func(goja.FunctionCall) goja.Value {
 		kvmap, err := parseKVPairs(inputStr)
 
 		if err != nil {
-			ez.Kube.FmtYellow("Failed to parse key-value pairs: %s ,input was %s", err.Error(), inputStr)
+			ctx.ek.Printer.FmtYellow("Failed to parse key-value pairs: %s ,input was %s", err.Error(), inputStr)
 			return goja.Undefined()
 		}
 

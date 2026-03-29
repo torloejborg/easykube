@@ -13,36 +13,32 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/vars"
 )
 
-type IAddonReader interface {
-	GetAddons() (map[string]IAddon, error)
-	ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error)
-	ExtractJSON(input string) (string, bool)
-	CheckAddonCompatibility() (string, error)
-}
-
 type AddonReader struct {
-	EkConfig  *EasykubeConfigData
-	EkContext *CobraCommandHelperImpl
+	ek            *core.Ek
+	Configuration *core.EasykubeConfigData
 }
 
-func NewAddonReader(config IEasykubeConfig) IAddonReader {
-	cfg, err := config.LoadConfig()
+func NewAddonReader(ek *core.Ek) core.IAddonReader {
+
+	cfg, err := ek.Config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 
 	return &AddonReader{
-		EkConfig: cfg,
+		ek:            ek,
+		Configuration: cfg,
 	}
 }
 
 func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 
 	// extract version from 1_easykube.js
-	haystack, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JsLib, "1-easykube.js"))
+	haystack, err := afero.ReadFile(adr.ek.Fs, filepath.Join(adr.Configuration.AddonDir, constants.JsLib, "1-easykube.js"))
 	if err != nil {
 		return "", err
 	}
@@ -69,17 +65,17 @@ func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 	return msg, nil
 }
 
-func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
-	addons := make(map[string]IAddon)
+func (adr *AddonReader) GetAddons() (map[string]core.IAddon, error) {
+	addons := make(map[string]core.IAddon)
 	addonExpre := regexp.MustCompile(`^.+\.(ek.js)$`)
 
-	if adr.EkConfig == nil {
+	if adr.Configuration == nil {
 		panic("expected ekconfig pointer!")
 	}
 
 	// Resolve the root directory in case it's a symlink.
-	root := adr.EkConfig.AddonDir
-	if _, err := Kube.Stat(root); err != nil {
+	root := adr.Configuration.AddonDir
+	if _, err := adr.ek.Fs.Stat(root); err != nil {
 		return nil, err
 	}
 	if resolved, err := filepath.EvalSymlinks(root); err == nil {
@@ -116,12 +112,12 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 				return err
 			}
 			// Stat target to see if it is a directory.
-			tinfo, err := Kube.Stat(target)
+			tinfo, err := adr.ek.Fs.Stat(target)
 			if err != nil {
 				return err
 			}
 			if tinfo.IsDir() {
-				return afero.Walk(Kube.Fs, target, walkFunc)
+				return afero.Walk(adr.ek.Fs, target, walkFunc)
 			}
 			// If it’s a symlink to a file, treat it below as a regular file.
 			info = tinfo
@@ -129,7 +125,7 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 		}
 
 		if !info.IsDir() && addonExpre.MatchString(info.Name()) {
-			file, openErr := Kube.Fs.Open(path)
+			file, openErr := adr.ek.Fs.Open(path)
 			if openErr != nil {
 				return openErr
 			}
@@ -137,7 +133,7 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 
 			abs, _ := filepath.Abs(file.Name())
 
-			foundAddon := &Addon{
+			foundAddon := &core.Addon{
 				Name:      info.Name(),
 				ShortName: strings.ReplaceAll(info.Name(), ".ek.js", ""),
 				File:      abs,
@@ -157,7 +153,7 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 		return nil
 	}
 
-	if err := afero.Walk(Kube.Fs, root, walkFunc); err != nil {
+	if err := afero.Walk(adr.ek.Fs, root, walkFunc); err != nil {
 		return nil, err
 	}
 
@@ -165,10 +161,10 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 }
 
 func (adr *AddonReader) resolveExecutionOrder(
-	g *Graph[IAddon],
-	toInstall IAddon,
-	allAddons map[string]IAddon,
-	out *[]IAddon, outgraph *Graph[IAddon]) {
+	g *core.Graph[core.IAddon],
+	toInstall core.IAddon,
+	allAddons map[string]core.IAddon,
+	out *[]core.IAddon, outgraph *core.Graph[core.IAddon]) {
 
 	d := toInstall.GetConfig().DependsOn
 	for x := range d {
@@ -177,7 +173,7 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err := g.AddEdge(toInstall, next)
 
 		if err != nil {
-			Kube.FmtRed(err.Error())
+			adr.ek.Printer.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 
@@ -187,16 +183,16 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err = outgraph.AddEdge(toInstall, next)
 
 		if err != nil {
-			Kube.FmtRed(err.Error())
+			adr.ek.Printer.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 	}
 }
 
-func (adr *AddonReader) ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error) {
-	out := Kube.IPrinter
+func (adr *AddonReader) ExtractConfiguration(unconfigured core.IAddon) (*core.AddonConfig, error) {
+	out := adr.ek.Printer
 
-	code, err := afero.ReadFile(Kube.Fs, unconfigured.GetAddonFile())
+	code, err := afero.ReadFile(adr.ek.Fs, unconfigured.GetAddonFile())
 	if err != nil {
 		panic(err)
 	}
@@ -205,7 +201,7 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured IAddon) (*AddonConfig,
 
 	if len(parsed) == 0 {
 		out.FmtYellow("%s Does not provide any configuration", unconfigured.GetName())
-		return &AddonConfig{
+		return &core.AddonConfig{
 			DependsOn:   nil,
 			ExtraPorts:  nil,
 			ExtraMounts: nil,
@@ -218,12 +214,12 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured IAddon) (*AddonConfig,
 	} else {
 
 		// Parse the JSON string
-		cfg := &AddonConfig{}
+		cfg := &core.AddonConfig{}
 		jsonErr := json.Unmarshal([]byte(parsed), &cfg)
 
 		// Set persistence location for all ExtraMounts
 		for idx, _ := range cfg.ExtraMounts {
-			cfg.ExtraMounts[idx].PersistenceDir = adr.EkConfig.PersistenceDir + "/"
+			cfg.ExtraMounts[idx].PersistenceDir = adr.Configuration.PersistenceDir + "/"
 
 			// An absolute path in HostPath will be respected, and not be relative
 			// to the user persistence directory

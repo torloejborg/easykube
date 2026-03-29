@@ -16,53 +16,28 @@ import (
 	"github.com/gookit/config/v2/yaml"
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
-type MirrorRegistry struct {
-	RegistryUrl string `mapstructure:"registry-url"`
-	UserKey     string `mapstructure:"username"`
-	PasswordKey string `mapstructure:"password"`
-}
-
-type EasykubeConfigData struct {
-	AddonDir          string `mapstructure:"addon-root"`
-	PersistenceDir    string `mapstructure:"persistence-dir"`
-	ConfigurationDir  string `mapstructure:"config-dir"`
-	ContainerRuntime  string `mapstructure:"container-runtime"`
-	ConfigurationFile string
-	MirrorRegistries  []MirrorRegistry `mapstructure:"mirror-registries"`
-}
-
-type IEasykubeConfig interface {
-	LoadConfig() (*EasykubeConfigData, error)
-	MakeConfig() error
-	EditConfig() error
-	LaunchEditor(config, editor string)
-	PathToConfigFile() string
-	IsZotConfigInSync(configData *EasykubeConfigData) (bool, error)
-	GenerateZotRegistryConfig(*EasykubeConfigData) error
-	GenerateZotRegistryCredentials(*EasykubeConfigData) error
-	WriteConfig(*EasykubeConfigData) error
-	CopyConfigResources() error
-	HasConfiguration() bool
-}
-
 type EasykubeConfig struct {
+	ek            *core.Ek
 	ConfigDirName string
 	UserConfigDir string
 }
 
-func NewEasykubeConfig() IEasykubeConfig {
-	return &EasykubeConfig{}
+func NewEasykubeConfig(ek *core.Ek) core.IEasykubeConfig {
+	return &EasykubeConfig{
+		ek: ek,
+	}
 }
 
-func (ec *EasykubeConfig) HasConfiguration() bool {
+func (ec EasykubeConfig) HasConfiguration() bool {
 	_, err := ec.LoadConfig()
 	return err == nil
 }
 
-func (ec *EasykubeConfig) LaunchEditor(config, editor string) {
+func (ec EasykubeConfig) LaunchEditor(config, editor string) {
 	visual, err := exec.LookPath(editor)
 	if err != nil {
 		log.Panic(err)
@@ -79,13 +54,13 @@ func (ec *EasykubeConfig) LaunchEditor(config, editor string) {
 	}
 }
 
-func (ec *EasykubeConfig) PathToConfigFile() string {
+func (ec EasykubeConfig) PathToConfigFile() string {
 
-	configDir, _ := Kube.GetEasykubeConfigDir()
+	configDir, _ := ec.ek.OsDetails.GetEasykubeConfigDir()
 	return filepath.Join(configDir, "config.yaml")
 }
 
-func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
+func (ec EasykubeConfig) LoadConfig() (*core.EasykubeConfigData, error) {
 
 	config.ClearAll()
 	// config.ParseEnv: will parse env var in string value. eg: shell: ${SHELL}
@@ -94,7 +69,7 @@ func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
 	// add driver for support yaml content
 	config.AddDriver(yaml.Driver)
 
-	data, err := ReadFileToBytes(ec.PathToConfigFile())
+	data, err := ec.ek.Utils.ReadFileToBytes(ec.PathToConfigFile())
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +79,7 @@ func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
 		return nil, err
 	}
 
-	easykube := &EasykubeConfigData{}
+	easykube := &core.EasykubeConfigData{}
 	err = config.BindStruct("easykube", easykube)
 
 	if err != nil {
@@ -114,7 +89,7 @@ func (ec *EasykubeConfig) LoadConfig() (*EasykubeConfigData, error) {
 	return easykube, nil
 }
 
-func (ec *EasykubeConfig) EditConfig() error {
+func (ec EasykubeConfig) EditConfig() error {
 	editor := os.Getenv("VISUAL")
 	if len(editor) == 0 {
 		fmt.Println("VISUAL environment variable not set")
@@ -133,37 +108,37 @@ func (ec *EasykubeConfig) EditConfig() error {
 	return nil
 }
 
-func (ec *EasykubeConfig) CopyConfigResources() error {
+func (ec EasykubeConfig) CopyConfigResources() error {
 
-	easykubeConfigDir, err := Kube.GetEasykubeConfigDir()
+	easykubeConfigDir, err := ec.ek.OsDetails.GetEasykubeConfigDir()
 	if nil != err {
 		return err
 	}
 
-	merr := Kube.Fs.MkdirAll(easykubeConfigDir, os.ModePerm)
+	merr := ec.ek.Fs.MkdirAll(easykubeConfigDir, os.ModePerm)
 	if merr != nil {
 		return merr
 	}
 
-	userHomeDir, err := Kube.GetUserHomeDir()
+	userHomeDir, err := ec.ek.OsDetails.GetUserHomeDir()
 	if nil != err {
 		return err
 	}
 
 	pathToConfigFile := ec.PathToConfigFile()
-	_, err = Kube.Fs.Stat(pathToConfigFile)
+	_, err = ec.ek.Fs.Stat(pathToConfigFile)
 
-	err = CopyResourceToConfigDir("cert/localtest.me.crt", "localtest.me.crt")
+	err = ec.ek.Utils.CopyResourceToConfigDir("cert/localtest.me.crt", "localtest.me.crt")
 	if nil != err {
 		return err
 	}
 
-	err = CopyResourceToConfigDir("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
+	err = ec.ek.Utils.CopyResourceToConfigDir("cert/localtest.me.ca.crt", "localtest.me.ca.crt")
 	if nil != err {
 		return err
 	}
 
-	err = CopyResourceToConfigDir("cert/localtest.me.key", "localtest.me.key")
+	err = ec.ek.Utils.CopyResourceToConfigDir("cert/localtest.me.key", "localtest.me.key")
 	if nil != err {
 		return err
 	}
@@ -175,32 +150,32 @@ func (ec *EasykubeConfig) CopyConfigResources() error {
 	}
 
 	certDestDir := filepath.Join(userHomeDir, ".config", "containers", "certs.d", constants.LocalRegistry)
-	_ = Kube.Fs.MkdirAll(certDestDir, os.ModePerm)
+	_ = ec.ek.Fs.MkdirAll(certDestDir, os.ModePerm)
 	cert := filepath.Join(certDestDir, "ca.crt")
-	SaveFileByte(certData, cert)
+	ec.ek.Utils.SaveFileByte(certData, cert)
 
 	return nil
 }
 
-func (ec *EasykubeConfig) MakeConfig() error {
+func (ec EasykubeConfig) MakeConfig() error {
 
-	userHomeDir, err := Kube.GetUserHomeDir()
-	configurationDir, err := Kube.GetEasykubeConfigDir()
+	userHomeDir, err := ec.ek.OsDetails.GetUserHomeDir()
+	configurationDir, err := ec.ek.OsDetails.GetEasykubeConfigDir()
 	if nil != err {
 		return err
 	}
 
 	pathToConfigFile := ec.PathToConfigFile()
-	_, err = Kube.Fs.Stat(pathToConfigFile)
+	_, err = ec.ek.Fs.Stat(pathToConfigFile)
 
 	_ = ec.CopyConfigResources()
 
-	modelData := EasykubeConfigData{
+	modelData := core.EasykubeConfigData{
 		AddonDir:         filepath.Join(userHomeDir, "addons"),
 		ConfigurationDir: configurationDir,
 		PersistenceDir:   filepath.Join(configurationDir, "persistence"),
 		ContainerRuntime: "docker",
-		MirrorRegistries: []MirrorRegistry{
+		MirrorRegistries: []core.MirrorRegistry{
 			{
 				RegistryUrl: "https://registry-1.docker.io",
 			},
@@ -216,7 +191,7 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		},
 	}
 
-	file, err := Kube.Fs.Create(pathToConfigFile)
+	file, err := ec.ek.Fs.Create(pathToConfigFile)
 	if nil != err {
 		return err
 	}
@@ -247,7 +222,7 @@ func (ec *EasykubeConfig) MakeConfig() error {
 	return nil
 }
 
-func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
+func (ec EasykubeConfig) WriteConfig(cfg *core.EasykubeConfigData) error {
 	configData, err := resources.AppResources.ReadFile("data/config.template")
 	if nil != err {
 		return err
@@ -266,7 +241,7 @@ func (ec *EasykubeConfig) WriteConfig(cfg *EasykubeConfigData) error {
 		return err
 	}
 
-	file, err := Kube.Fs.OpenFile(cfg.ConfigurationFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	file, err := ec.ek.Fs.OpenFile(cfg.ConfigurationFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if nil != err {
 		panic(err)
 	}
@@ -296,15 +271,15 @@ func searchInFile(source afero.File, searchFor []string) (int, error) {
 }
 
 // return false if config and zot-config has drifted
-func (ec *EasykubeConfig) IsZotConfigInSync(configData *EasykubeConfigData) (bool, error) {
+func (ec EasykubeConfig) IsZotConfigInSync(configData *core.EasykubeConfigData) (bool, error) {
 
-	configDir, err := Kube.GetEasykubeConfigDir()
+	configDir, err := ec.ek.OsDetails.GetEasykubeConfigDir()
 	if nil != err {
 		return false, err
 	}
 
 	// if the zot-config is not generated yet, return false
-	_, err = Kube.Fs.Stat(filepath.Join(configDir, constants.ZotConfig))
+	_, err = ec.ek.Fs.Stat(filepath.Join(configDir, constants.ZotConfig))
 	if err != nil {
 		return false, nil
 	}
@@ -323,12 +298,12 @@ func (ec *EasykubeConfig) IsZotConfigInSync(configData *EasykubeConfigData) (boo
 	}
 
 	// compare with zot credentials
-	zotConfig, err := Kube.Fs.Open(filepath.Join(configDir, constants.ZotConfig))
+	zotConfig, err := ec.ek.Fs.Open(filepath.Join(configDir, constants.ZotConfig))
 	defer func(zotConfig afero.File) {
 		_ = zotConfig.Close()
 	}(zotConfig)
 
-	zotCredentials, err := Kube.Fs.Open(filepath.Join(configDir, constants.ZotCredentials))
+	zotCredentials, err := ec.ek.Fs.Open(filepath.Join(configDir, constants.ZotCredentials))
 	defer func(zotCredentials afero.File) {
 		_ = zotCredentials.Close()
 	}(zotCredentials)
@@ -343,7 +318,7 @@ func (ec *EasykubeConfig) IsZotConfigInSync(configData *EasykubeConfigData) (boo
 
 }
 
-func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *EasykubeConfigData) error {
+func (ec EasykubeConfig) GenerateZotRegistryConfig(cfg *core.EasykubeConfigData) error {
 
 	zotRegistry := `
 	      {
@@ -377,10 +352,10 @@ func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *EasykubeConfigData) err
 			return err
 		}
 
-		configDir, _ := Kube.GetEasykubeConfigDir()
+		configDir, _ := ec.ek.OsDetails.GetEasykubeConfigDir()
 		zotconfig := filepath.Join(configDir, constants.ZotConfig)
 
-		file, err := Kube.Fs.OpenFile(zotconfig, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		file, err := ec.ek.Fs.OpenFile(zotconfig, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		defer func(file afero.File) {
 			_ = file.Close()
 		}(file)
@@ -399,11 +374,11 @@ func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *EasykubeConfigData) err
 	return nil
 }
 
-func (ec *EasykubeConfig) GenerateZotRegistryCredentials(cfg *EasykubeConfigData) error {
+func (ec EasykubeConfig) GenerateZotRegistryCredentials(cfg *core.EasykubeConfigData) error {
 
 	if len(cfg.MirrorRegistries) > 0 {
 
-		mirrorsWithCredentials := make([]MirrorRegistry, 0)
+		mirrorsWithCredentials := make([]core.MirrorRegistry, 0)
 
 		for _, reg := range cfg.MirrorRegistries {
 			if reg.PasswordKey != "" {
@@ -425,10 +400,10 @@ func (ec *EasykubeConfig) GenerateZotRegistryCredentials(cfg *EasykubeConfigData
 			return err
 		}
 
-		configDir, _ := Kube.GetEasykubeConfigDir()
+		configDir, _ := ec.ek.OsDetails.GetEasykubeConfigDir()
 		zotCredentials := filepath.Join(configDir, constants.ZotCredentials)
 
-		file, err := Kube.Fs.OpenFile(zotCredentials, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		file, err := ec.ek.Fs.OpenFile(zotCredentials, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if nil != err {
 			panic(err)
 		}

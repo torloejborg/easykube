@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) HelmTemplate(noop bool) func(goja.FunctionCall) goja.Value {
@@ -19,9 +18,8 @@ func (ctx *Easykube) HelmTemplate(noop bool) func(goja.FunctionCall) goja.Value 
 
 func (ctx *Easykube) helmTemplate() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ezk := ez.Kube
-		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
 
+		addonDir := filepath.Dir(ctx.AddonCtx.addon.GetAddonFile())
 		chart := filepath.Clean(call.Argument(0).String())
 
 		if !filepath.IsAbs(chart) {
@@ -33,13 +31,13 @@ func (ctx *Easykube) helmTemplate() func(goja.FunctionCall) goja.Value {
 		namespace := call.Argument(3).String()
 		releasename := call.Argument(4).String()
 
-		if !ez.FileOrDirExists(chart) {
-			ez.Kube.FmtRed("specified chart %s does not exist", chart)
+		if !ctx.ek.Utils.FileOrDirExists(chart) {
+			ctx.ek.Printer.FmtRed("specified chart %s does not exist", chart)
 			os.Exit(-1)
 		}
 
-		if !ez.FileOrDirExists(values) {
-			ezk.FmtRed("the value file %s does not exist", values)
+		if !ctx.ek.Utils.FileOrDirExists(values) {
+			ctx.ek.Printer.FmtRed("the value file %s does not exist", values)
 			os.Exit(-1)
 		}
 
@@ -63,21 +61,21 @@ func (ctx *Easykube) helmTemplate() func(goja.FunctionCall) goja.Value {
 		}
 
 		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
-		if ezk.IsVerbose() {
-			ezk.FmtVerbose(cmdStr)
+		if ctx.ek.CommandContext.IsVerbose() {
+			ctx.ek.Printer.FmtVerbose(cmdStr)
 		}
 
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun(cmdStr)
+		if ctx.ek.CommandContext.IsDryRun() {
+			ctx.ek.Printer.FmtDryRun(cmdStr)
 		} else {
-			stdout, stderr, err := ezk.RunCommand(cmd, args...)
+			stdout, stderr, err := ctx.ek.ExternalTools.RunCommand(cmd, args...)
 
 			if err != nil {
-				ezk.FmtRed("helm failed %s", stderr)
+				ctx.ek.Printer.FmtRed("helm failed %s", stderr)
 				os.Exit(-1)
 			}
 
-			ez.SaveFile(stdout, destination)
+			ctx.ek.Utils.SaveFile(stdout, destination)
 		}
 		return call.This
 	}

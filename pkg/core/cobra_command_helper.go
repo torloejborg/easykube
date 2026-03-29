@@ -1,4 +1,4 @@
-package ez
+package core
 
 import (
 	"github.com/spf13/cobra"

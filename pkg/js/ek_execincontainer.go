@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) ExecInContainer(noop bool) func(goja.FunctionCall) goja.Value {
@@ -17,7 +16,6 @@ func (ctx *Easykube) ExecInContainer(noop bool) func(goja.FunctionCall) goja.Val
 
 func (ctx *Easykube) execInContainer() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ezk := ez.Kube
 		ctx.checkArgs(call, ExecInContainer)
 
 		deployment := call.Argument(0).String()
@@ -34,21 +32,21 @@ func (ctx *Easykube) execInContainer() func(goja.FunctionCall) goja.Value {
 		_ = obj.Set("onSuccess", er.OnSuccess)
 		_ = obj.Set("onFail", er.OnFail)
 
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun(infostr)
+		if ctx.ek.CommandContext.IsDryRun() {
+			ctx.ek.Printer.FmtDryRun(infostr)
 			er.success = true
 			return obj
 		}
 
-		pods, _ := ezk.ListPods(namespace)
+		pods, _ := ctx.ek.Kubernetes.ListPods(namespace)
 		for i := range pods {
 			if strings.Contains(pods[i], deployment) {
 
-				if ezk.IsVerbose() {
-					ezk.FmtVerbose(infostr)
+				if ctx.ek.CommandContext.IsVerbose() {
+					ctx.ek.Printer.FmtVerbose(infostr)
 				}
 
-				stdout, stderr, err := ez.Kube.ExecInPod(namespace, pods[i], command, args)
+				stdout, stderr, err := ctx.ek.Kubernetes.ExecInPod(namespace, pods[i], command, args)
 
 				if err != nil {
 					er.output = stdout + stderr + err.Error()

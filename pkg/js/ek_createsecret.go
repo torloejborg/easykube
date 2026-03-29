@@ -2,7 +2,6 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
 func (ctx *Easykube) CreateSecret(noop bool) func(goja.FunctionCall) goja.Value {
@@ -15,9 +14,8 @@ func (ctx *Easykube) CreateSecret(noop bool) func(goja.FunctionCall) goja.Value 
 func (ctx *Easykube) createSecret() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
-		ezk := ez.Kube
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun("skipping createSecret")
+		if ctx.ek.CommandContext.IsDryRun() {
+			ctx.ek.Printer.FmtDryRun("skipping createSecret")
 			return call.This
 		}
 
@@ -25,9 +23,15 @@ func (ctx *Easykube) createSecret() func(goja.FunctionCall) goja.Value {
 		namespace := call.Argument(0).String()
 		name := call.Argument(1).String()
 		secret := make(map[string]string)
-		ctx.AddonCtx.vm.ExportTo(call.Argument(2), &secret)
+		err := ctx.AddonCtx.vm.ExportTo(call.Argument(2), &secret)
+		if err != nil {
+			panic(err)
+		}
 
-		ezk.CreateSecret(namespace, name, secret)
+		err = ctx.ek.Kubernetes.CreateSecret(namespace, name, secret)
+		if err != nil {
+			panic(err)
+		}
 
 		return call.This
 	}
