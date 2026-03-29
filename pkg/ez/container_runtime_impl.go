@@ -83,6 +83,7 @@ func NewContainerRuntimeImpl(ek *core.Ek, runtime string) (core.IContainerRuntim
 		Docker:      docker,
 		ctx:         context.Background(),
 		RuntimeType: runtime,
+		ek:          ek,
 	}, nil
 
 }

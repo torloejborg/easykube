@@ -83,9 +83,6 @@ func (jsu *JsUtils) ExecAddonScript(a core.IAddon) error {
 
 		_, err = jsu.vm.RunString(jsu.GetPseudoJsIncludes() + script)
 
-		cfg := jsu.vm.Get("configuration")
-		fmt.Println(cfg)
-
 		return
 	}()
 
@@ -127,4 +124,12 @@ func (jsu *JsUtils) GetPseudoJsIncludes() string {
 	} else {
 		return ""
 	}
+}
+
+func (jsu *JsUtils) ExtractConfigurationObject(a core.IAddon) (*core.AddonConfig, error) {
+
+	//cfg := jsu.vm.Get("configuration")
+	//fmt.Println(cfg)
+	
+	return nil, nil
 }

@@ -18,10 +18,10 @@ var bootCmd = &cobra.Command{
 		cmdhelper := core.CommandHelper(cmd)
 
 		ek, err := CreateEasykube(cmdhelper,
-			WithKubernetes(false),
-			WithContainerRuntime(false),
-			WithAddonReader(false),
-			WithClusterUtils(false),
+			WithKubernetes(true),
+			WithContainerRuntime(true),
+			WithAddonReader(true),
+			WithClusterUtils(true),
 			WithRequiresConfigurationCreated(true),
 		)
 		if err != nil {

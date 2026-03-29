@@ -32,12 +32,12 @@ func NewEasykubeConfig(ek *core.Ek) core.IEasykubeConfig {
 	}
 }
 
-func (ec EasykubeConfig) HasConfiguration() bool {
+func (ec *EasykubeConfig) HasConfiguration() bool {
 	_, err := ec.LoadConfig()
 	return err == nil
 }
 
-func (ec EasykubeConfig) LaunchEditor(config, editor string) {
+func (ec *EasykubeConfig) LaunchEditor(config, editor string) {
 	visual, err := exec.LookPath(editor)
 	if err != nil {
 		log.Panic(err)
@@ -54,13 +54,13 @@ func (ec EasykubeConfig) LaunchEditor(config, editor string) {
 	}
 }
 
-func (ec EasykubeConfig) PathToConfigFile() string {
+func (ec *EasykubeConfig) PathToConfigFile() string {
 
 	configDir, _ := ec.ek.OsDetails.GetEasykubeConfigDir()
 	return filepath.Join(configDir, "config.yaml")
 }
 
-func (ec EasykubeConfig) LoadConfig() (*core.EasykubeConfigData, error) {
+func (ec *EasykubeConfig) LoadConfig() (*core.EasykubeConfigData, error) {
 
 	config.ClearAll()
 	// config.ParseEnv: will parse env var in string value. eg: shell: ${SHELL}
@@ -89,7 +89,7 @@ func (ec EasykubeConfig) LoadConfig() (*core.EasykubeConfigData, error) {
 	return easykube, nil
 }
 
-func (ec EasykubeConfig) EditConfig() error {
+func (ec *EasykubeConfig) EditConfig() error {
 	editor := os.Getenv("VISUAL")
 	if len(editor) == 0 {
 		fmt.Println("VISUAL environment variable not set")
@@ -108,7 +108,7 @@ func (ec EasykubeConfig) EditConfig() error {
 	return nil
 }
 
-func (ec EasykubeConfig) CopyConfigResources() error {
+func (ec *EasykubeConfig) CopyConfigResources() error {
 
 	easykubeConfigDir, err := ec.ek.OsDetails.GetEasykubeConfigDir()
 	if nil != err {
@@ -157,7 +157,7 @@ func (ec EasykubeConfig) CopyConfigResources() error {
 	return nil
 }
 
-func (ec EasykubeConfig) MakeConfig() error {
+func (ec *EasykubeConfig) MakeConfig() error {
 
 	userHomeDir, err := ec.ek.OsDetails.GetUserHomeDir()
 	configurationDir, err := ec.ek.OsDetails.GetEasykubeConfigDir()
@@ -222,7 +222,7 @@ func (ec EasykubeConfig) MakeConfig() error {
 	return nil
 }
 
-func (ec EasykubeConfig) WriteConfig(cfg *core.EasykubeConfigData) error {
+func (ec *EasykubeConfig) WriteConfig(cfg *core.EasykubeConfigData) error {
 	configData, err := resources.AppResources.ReadFile("data/config.template")
 	if nil != err {
 		return err
@@ -271,7 +271,7 @@ func searchInFile(source afero.File, searchFor []string) (int, error) {
 }
 
 // return false if config and zot-config has drifted
-func (ec EasykubeConfig) IsZotConfigInSync(configData *core.EasykubeConfigData) (bool, error) {
+func (ec *EasykubeConfig) IsZotConfigInSync(configData *core.EasykubeConfigData) (bool, error) {
 
 	configDir, err := ec.ek.OsDetails.GetEasykubeConfigDir()
 	if nil != err {
@@ -318,7 +318,7 @@ func (ec EasykubeConfig) IsZotConfigInSync(configData *core.EasykubeConfigData) 
 
 }
 
-func (ec EasykubeConfig) GenerateZotRegistryConfig(cfg *core.EasykubeConfigData) error {
+func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *core.EasykubeConfigData) error {
 
 	zotRegistry := `
 	      {
@@ -374,7 +374,7 @@ func (ec EasykubeConfig) GenerateZotRegistryConfig(cfg *core.EasykubeConfigData)
 	return nil
 }
 
-func (ec EasykubeConfig) GenerateZotRegistryCredentials(cfg *core.EasykubeConfigData) error {
+func (ec *EasykubeConfig) GenerateZotRegistryCredentials(cfg *core.EasykubeConfigData) error {
 
 	if len(cfg.MirrorRegistries) > 0 {
 

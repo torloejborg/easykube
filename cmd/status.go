@@ -17,9 +17,9 @@ var statusCmd = &cobra.Command{
 		ek, err := CreateEasykube(core.CommandHelper(cmd),
 			WithKubernetes(false),
 			WithContainerRuntime(true),
-			WithAddonReader(false),
+			WithAddonReader(true),
 			WithClusterUtils(false),
-			WithRequiresConfigurationCreated(false),
+			WithRequiresConfigurationCreated(true),
 		)
 
 		if err != nil {

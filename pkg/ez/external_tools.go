@@ -20,7 +20,7 @@ func NewExternalTools(ek *core.Ek) core.IExternalTools {
 	return &ExternalToolsImpl{ek: ek}
 }
 
-func (eti ExternalToolsImpl) KustomizeBuild(dir string) string {
+func (eti *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
 	cmd := "kustomize"
 	args := []string{
@@ -68,7 +68,7 @@ func (eti ExternalToolsImpl) KustomizeBuild(dir string) string {
 	return filepath.Join(dir, constants.KustomizeTargetOutput)
 }
 
-func (eti ExternalToolsImpl) ApplyYaml(yamlFile string) {
+func (eti *ExternalToolsImpl) ApplyYaml(yamlFile string) {
 
 	cmd := "kubectl"
 	args := []string{"apply", "-f", yamlFile}
@@ -90,7 +90,7 @@ func (eti ExternalToolsImpl) ApplyYaml(yamlFile string) {
 
 }
 
-func (eti ExternalToolsImpl) DeleteYaml(yamlFile string) {
+func (eti *ExternalToolsImpl) DeleteYaml(yamlFile string) {
 
 	cmd := "kubectl"
 	args := []string{"delete", "-f", yamlFile}

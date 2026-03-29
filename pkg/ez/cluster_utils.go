@@ -14,10 +14,8 @@ import (
 )
 
 type ClusterUtils struct {
-	Debug     bool
-	EkConfig  *core.EasykubeConfigData
-	EkContext *core.CobraCommandHelperImpl
-	ek        *core.Ek
+	EkConfig *core.EasykubeConfigData
+	ek       *core.Ek
 }
 
 func NewClusterUtils(ek *core.Ek) core.IClusterUtils {
@@ -31,7 +29,7 @@ func NewClusterUtils(ek *core.Ek) core.IClusterUtils {
 	}
 }
 
-func (u ClusterUtils) ConfigurationReport(addonList []core.IAddon) string {
+func (u *ClusterUtils) ConfigurationReport(addonList []core.IAddon) string {
 
 	portTmpl, _ := resources.AppResources.ReadFile("data/createreport.template")
 	sb := new(strings.Builder)
@@ -42,7 +40,7 @@ func (u ClusterUtils) ConfigurationReport(addonList []core.IAddon) string {
 	return sb.String()
 }
 
-func (u ClusterUtils) CreateKindCluster(modules map[string]core.IAddon) (string, error) {
+func (u *ClusterUtils) CreateKindCluster(modules map[string]core.IAddon) (string, error) {
 
 	// see if the cluster has been created
 	search, _ := u.ek.ContainerRuntime.FindContainer(constants.KindContainer)
@@ -126,7 +124,7 @@ func (u ClusterUtils) CreateKindCluster(modules map[string]core.IAddon) (string,
 	return u.ConfigurationReport(addonList), nil
 }
 
-func (u ClusterUtils) RenderToYAML(addonList []core.IAddon, config *core.EasykubeConfigData) string {
+func (u *ClusterUtils) RenderToYAML(addonList []core.IAddon, config *core.EasykubeConfigData) string {
 	data, err := resources.AppResources.ReadFile("data/cluster_config.template")
 	if err != nil {
 		panic(err)
@@ -153,7 +151,7 @@ func (u ClusterUtils) RenderToYAML(addonList []core.IAddon, config *core.Easykub
 	return buf.String()
 }
 
-func (u ClusterUtils) EnsurePersistenceDirectory() error {
+func (u *ClusterUtils) EnsurePersistenceDirectory() error {
 
 	addons, err := u.ek.AddonReader.GetAddons()
 	if err != nil {
