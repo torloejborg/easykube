@@ -1,7 +1,5 @@
 package core
 
-type Stack[T any] []T
-
 // Push adds an element to the top of the stack
 func (s *Stack[T]) Push(v T) {
 	*s = append(*s, v)

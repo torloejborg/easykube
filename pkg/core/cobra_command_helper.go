@@ -4,18 +4,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type ICobraCommandHelper interface {
-	GetBoolFlag(name string) bool
-	GetStringFlag(name string) string
-	GetIntFlag(name string) int
-	IsVerbose() bool
-	IsDryRun() bool
-}
-
-type CobraCommandHelperImpl struct {
-	Command *cobra.Command
-}
-
 func (e CobraCommandHelperImpl) GetBoolFlag(name string) bool {
 	val, err := e.Command.Flags().GetBool(name)
 	if err != nil {

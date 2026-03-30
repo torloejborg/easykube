@@ -1,10 +1,9 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/core"
-
-	"github.com/spf13/cobra"
 )
 
 // skaffoldCmd represents the skaffold command
