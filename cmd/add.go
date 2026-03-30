@@ -36,20 +36,26 @@ func NewAddCmd() *cobra.Command {
 
 			return addActual(addOpts, ek)
 		},
-		//ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		//
-		//	_ = ez.InitializeEasykube()
-		//	addons := make([]string, 0)
-		//	a, e := ez.Kube.GetAddons()
-		//	if e != nil {
-		//		// ignore for now
-		//		panic(e)
-		//	}
-		//	for _, i := range a {
-		//		addons = append(addons, i.GetShortName())
-		//	}
-		//	return addons, cobra.ShellCompDirectiveNoFileComp
-		//},
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+			ek, _ := CreateEasykube(core.CommandHelper(cmd),
+				WithAddonReader(true),
+				WithKubernetes(true),
+				WithContainerRuntime(true),
+				WithRequiresConfigurationCreated(true),
+			)
+
+			addons := make([]string, 0)
+			a, e := ek.AddonReader.GetAddons()
+			if e != nil {
+				// ignore for now
+				panic(e)
+			}
+			for _, i := range a {
+				addons = append(addons, i.GetShortName())
+			}
+			return addons, cobra.ShellCompDirectiveNoFileComp
+		},
 	}
 
 	return cmd

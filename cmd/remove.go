@@ -27,15 +27,25 @@ var removeCmd = &cobra.Command{
 
 		return removeActual(opts, ek)
 	},
-	//ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	//	k8sUtils := ez.CreateK8sUtilsImpl()
-	//	clusterAddons, e := k8sUtils.GetInstalledAddons()
-	//	if e == nil {
-	//		return clusterAddons, cobra.ShellCompDirectiveNoFileComp
-	//	}
-	//
-	//	return nil, cobra.ShellCompDirectiveNoFileComp
-	//},
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+
+		ek, _ := CreateEasykube(core.CommandHelper(cmd),
+			WithKubernetes(true),
+			WithContainerRuntime(true),
+			WithAddonReader(true),
+			WithClusterUtils(true),
+			WithRequiresConfigurationCreated(true),
+		)
+
+		clusterAddons, e := ek.Kubernetes.GetInstalledAddons()
+		if e == nil {
+			return clusterAddons, cobra.ShellCompDirectiveNoFileComp
+		} else {
+			panic(e)
+		}
+
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	},
 }
 
 func init() {
