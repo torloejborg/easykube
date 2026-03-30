@@ -18,9 +18,9 @@
   "log": {"level": "info"},
   "extensions": {
     "ui": { "enable": true },
-    "search": { "enable": false },
+    "search": { "enable": true },
     "sync": {
-      "enable": true,
+      "enable": false,
       "credentialsFile": "/etc/zot/zot-credentials.json",
       "registries": [
            {{- $joined := join . "," -}}
