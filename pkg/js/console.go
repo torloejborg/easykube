@@ -32,7 +32,8 @@ func (cons *ConsImpl) Console(noop bool) map[string]func(goja.FunctionCall) goja
 			},
 			"warn": func(call goja.FunctionCall) goja.Value {
 				return goja.Undefined()
-			}, "error": func(call goja.FunctionCall) goja.Value {
+			},
+			"error": func(call goja.FunctionCall) goja.Value {
 				return goja.Undefined()
 			},
 		}
