@@ -10,8 +10,7 @@ import (
 
 	"github.com/ergochat/readline"
 	"github.com/gookit/color"
-	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 type Registry struct {
@@ -51,22 +50,22 @@ func prompt(promptMessage, defaultValue string, validate func(string) error) str
 	}
 }
 
-func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
+func runConfigActualInteractive(ek *core.Ek) error {
 
-	userConfigDir, err := ez.Kube.GetEasykubeConfigDir()
+	userConfigDir, err := ek.OsDetails.GetEasykubeConfigDir()
 	if err != nil {
 		return err
 	}
-	loadedCfg, _ := ez.Kube.LoadConfig()
+	loadedCfg, _ := ek.Config.LoadConfig()
 
 	if loadedCfg == nil {
-		loadedCfg = &ez.EasykubeConfigData{
+		loadedCfg = &core.EasykubeConfigData{
 			AddonDir:          "",
 			PersistenceDir:    filepath.Join(userConfigDir, "persistence"),
 			ConfigurationDir:  userConfigDir,
 			ContainerRuntime:  "docker",
-			ConfigurationFile: ez.Kube.PathToConfigFile(),
-			MirrorRegistries: []ez.MirrorRegistry{
+			ConfigurationFile: ek.Config.PathToConfigFile(),
+			MirrorRegistries: []core.MirrorRegistry{
 				{RegistryUrl: "https://registry-1.docker.io"},
 				{RegistryUrl: "https://quay.io"},
 				{RegistryUrl: "https://ghcr.io"},
@@ -88,7 +87,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	// Prompt for addon repository path
 	addonDir := prompt("Enter the path to the addon repository:", loadedCfg.AddonDir, func(s string) error {
 
-		fi, err := ez.Kube.Fs.Stat(s)
+		fi, err := ek.Fs.Stat(s)
 		if err != nil {
 			return err
 		}
@@ -121,7 +120,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 	configureRegistries := strings.ToLower(
 		prompt("Do you wish to configure any mirror registries? (y/n):", "y", yesNoValidator)) == "y"
 
-	var registries []ez.MirrorRegistry
+	var registries []core.MirrorRegistry
 	if configureRegistries {
 		for {
 			// Prompt for registry URL
@@ -129,7 +128,7 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 			registryUsername := prompt(fmt.Sprintf("Username for %s (leave blank for no credentials)", registryURL), "", nopValidator)
 			registryPassword := prompt(fmt.Sprintf("Password/token for %s (leave blank for no credentials)", registryURL), "", nopValidator)
 
-			registries = append(registries, ez.MirrorRegistry{
+			registries = append(registries, core.MirrorRegistry{
 				RegistryUrl: registryURL,
 				UserKey:     registryUsername,
 				PasswordKey: registryPassword,
@@ -146,16 +145,16 @@ func runConfigActualInteractive(cmd *cobra.Command, args []string) error {
 		loadedCfg.MirrorRegistries = append(loadedCfg.MirrorRegistries, registry)
 	}
 
-	cfg := &ez.EasykubeConfigData{
+	cfg := &core.EasykubeConfigData{
 		AddonDir:          addonDir,
 		PersistenceDir:    persistenceDir,
 		ConfigurationDir:  configurationDir,
 		ContainerRuntime:  containerRuntime,
-		ConfigurationFile: ez.Kube.PathToConfigFile(),
+		ConfigurationFile: ek.Config.PathToConfigFile(),
 		MirrorRegistries:  loadedCfg.MirrorRegistries,
 	}
 
-	err = ez.Kube.WriteConfig(cfg)
+	err = ek.Config.WriteConfig(cfg)
 	if err != nil {
 		return err
 	}

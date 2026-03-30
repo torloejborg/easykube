@@ -20,7 +20,7 @@
     "ui": { "enable": true },
     "search": { "enable": true },
     "sync": {
-      "enable": true,
+      "enable": false,
       "credentialsFile": "/etc/zot/zot-credentials.json",
       "registries": [
            {{- $joined := join . "," -}}

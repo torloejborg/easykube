@@ -8,7 +8,7 @@ class Easykube {
      * The go binary will extract this, and compare it to its own version, if there is a version
      * mismatch, the status command will complain.
      */
-    EASYKUBE_BINARY_COMPAT="~1.1.6";
+    EASYKUBE_BINARY_COMPAT="~3.0";
 
     /**
      * Creates a new Easykube JavaScript handler. This class is for your IDE's enjoyment.
@@ -32,9 +32,10 @@ class Easykube {
      * @param {string} values the values file to use
      * @param {string} destination output file for rendered template
      * @param {string} namespace sets namespace in templated output
+     * @param {string} nametemplate sets release name in templated output
      */
-    helmTemplate(chart, values, destination, namespace = 'default') {
-        _ek.helmTemplate(chart, values, destination, namespace);
+    helmTemplate(chart, values, destination, namespace = 'default',nametemplate= '') {
+        _ek.helmTemplate(chart, values, destination, namespace, nametemplate);
         return this;
     }
 
@@ -71,11 +72,9 @@ class Easykube {
     }
 
     /**
-     * Runs a command in a container     * @returns {Postgres}
-
+     * Runs a command in a container
      * @param {string} deployment - Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)
      * @param {string} namespace , args) {
-     return _ek.execInContainer(deployment, namespace, - Namespace of container
      * @param {string} command - The command to run, example "ls" or "/usr/local/bin/whatever"
      * @param {string[]} args - Arguments to the command, example ["-la","-v"]
      * @returns {string}
@@ -103,7 +102,7 @@ class Easykube {
      * two (or more) containers exist which matches the partial container name, the first becomes the target.
      *
      * Limitation; The destination MUST be aimed at a deployment, you cannot target a bare container. This is
-     * why you must specify a deployment name
+     * why you must specify a deployment name. Also tar must be available in the container.
      *
      * @param {string} deployment Name of deployment
      * @param {string} namespace Where the target deployment lives
@@ -121,7 +120,7 @@ class Easykube {
      * Creates a secret in a given namespace
      * @param {string} namespace create the secret in this namespace
      * @param {string} name what to call the secret
-     * @param {{[key:string]: string}} data A map, All key and values are strings
+     * @param {Object.<string, string>} data A map, All key and values are strings
      */
     createSecret(namespace, name, data) {
         _ek.createSecret(namespace, name, data)
@@ -169,10 +168,22 @@ class Easykube {
 
 
     /**
-     * Represents an HTTP response object.
+     * @callback HttpSuccessCallback
+     * @param {string} body
+     * @returns {HttpResponse}
+     */
+
+    /**
+     * @callback HttpFailCallback
+     * @param {string} error
+     * @param {number} httpStatusCode
+     * @returns {HttpResponse}
+     */
+
+    /**
      * @typedef {Object} HttpResponse
-     * @property {(cb: (body: string) => any) => HttpResponse} onSuccess callback to handle successes 2xx
-     * @property {(cb: (error: string, httpstatuscode: int) => any) => HttpResponse} onFail hard errors, malformed urls, connection failures etc.
+     * @property {HttpSuccessCallback} onSuccess
+     * @property {HttpFailCallback} onFail
      */
 
     /**
@@ -190,8 +201,8 @@ class Easykube {
     /**
      * Represents a result of exec, this is created and exposed from go
      * @typedef {Object} ExecResult
-     * @property {(cb: (output: string) => any) => string} onSuccess
-     * @property {(cb: (output: string) => any) => string} onFail
+     * @property {function(string): string} onSuccess
+     * @property {function(string): string} onFail
      */
 
     /**
@@ -205,15 +216,24 @@ class Easykube {
     }
 
     /**
+     * Gets the directory of the current addon being evaluated
+     * @returns {string} absolute path to the addon directory
+     */
+    addonDir() {
+        return _ek.addonDir(null);
+    }
+
+    /**
      * Gets the directory of the current addon
      * @param {string} name optional addon name, if specificed will return the path to another addon in the respository
-     * @returns {string} absoultue path to the addon directory
+     * @returns {string} absolute path to the addon directory
      */
-    addonDir(name) {
+    addonDirForName(name) {
         return _ek.addonDir(name);
     }
 }
 
 const easykube = new Easykube();
+const registry_host = "registry.localtest.me:5001";
 
 // newline at end-of-file is needed

@@ -1,22 +1,10 @@
-package ez
+package core
 
 import (
 	"fmt"
 	"slices"
 	"strings"
 )
-
-type EzNode interface {
-	GetName() string
-	GetDependencies() []string
-}
-
-type Graph[T EzNode] struct {
-	Nodes    []T
-	adj      map[string][]T // Key: node ID (string), Value: list of dependent nodes
-	inDegree map[string]int // Key: node ID (string), Value: in-degree count
-	idToNode map[string]T   // Key: node ID (string), Value: node
-}
 
 func NewGraph[T EzNode]() *Graph[T] {
 	return &Graph[T]{

@@ -10,10 +10,19 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/resources"
 )
 
-func HasBinary(binary string) bool {
+type UtilsImpl struct {
+	ek *core.Ek
+}
+
+func NewUtils(ek *core.Ek) core.IUtils {
+	return UtilsImpl{ek: ek}
+}
+
+func (u UtilsImpl) HasBinary(binary string) bool {
 	_, err := exec.LookPath(binary)
 	if err != nil {
 		return false
@@ -21,34 +30,34 @@ func HasBinary(binary string) bool {
 	return true
 }
 
-func FileOrDirExists(path string) bool {
+func (u UtilsImpl) FileOrDirExists(path string) bool {
 
 	path = filepath.Clean(path)
 
-	_, err := Kube.Fs.Stat(path)
+	_, err := u.ek.Fs.Stat(path)
 	return err == nil || os.IsExist(err)
 }
 
 // Copies an embedded resource from src into the user configuration directory
 // dest is a relative path to ~/.config/easykube
-func CopyResourceToConfigDir(src, dest string) error {
+func (u UtilsImpl) CopyResourceToConfigDir(src, dest string) error {
 
-	configDir, err := Kube.GetEasykubeConfigDir()
+	configDir, err := u.ek.OsDetails.GetEasykubeConfigDir()
 	if nil != err {
 		return err
 	}
 
-	Kube.Fs.MkdirAll(configDir, 0755)
+	u.ek.Fs.MkdirAll(configDir, 0755)
 
 	destinationPath := filepath.Join(configDir, dest)
 	base := filepath.Dir(destinationPath)
-	Kube.Fs.MkdirAll(base, 0755)
+	u.ek.Fs.MkdirAll(base, 0755)
 
-	stat, _ := Kube.Fs.Stat(destinationPath)
+	stat, _ := u.ek.Fs.Stat(destinationPath)
 
 	if stat == nil {
 
-		f, _ := Kube.Fs.Create(destinationPath)
+		f, _ := u.ek.Fs.Create(destinationPath)
 		defer f.Close()
 
 		sourceData, err := resources.AppResources.ReadFile("data/" + src)
@@ -65,9 +74,9 @@ func CopyResourceToConfigDir(src, dest string) error {
 	return nil
 }
 
-func SaveFile(data string, dest string) {
+func (u UtilsImpl) SaveFile(data string, dest string) {
 
-	file, err := Kube.Fs.Create(dest)
+	file, err := u.ek.Fs.Create(dest)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,9 +91,9 @@ func SaveFile(data string, dest string) {
 	}
 }
 
-func SaveFileByte(data []byte, dest string) {
+func (u UtilsImpl) SaveFileByte(data []byte, dest string) {
 
-	file, err := Kube.Fs.Create(dest)
+	file, err := u.ek.Fs.Create(dest)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -99,8 +108,8 @@ func SaveFileByte(data []byte, dest string) {
 	}
 }
 
-func ReadPropertyFile(path string) (map[string]string, error) {
-	props, err := Kube.Fs.OpenFile(path, os.O_RDONLY, os.ModePerm)
+func (u UtilsImpl) ReadPropertyFile(path string) (map[string]string, error) {
+	props, err := u.ek.Fs.OpenFile(path, os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +129,7 @@ func ReadPropertyFile(path string) (map[string]string, error) {
 
 }
 
-func IntSliceToStrings(input []int) []string {
+func (u UtilsImpl) IntSliceToStrings(input []int) []string {
 	result := make([]string, len(input))
 	for i, n := range input {
 		result[i] = strconv.Itoa(n)
@@ -128,8 +137,8 @@ func IntSliceToStrings(input []int) []string {
 	return result
 }
 
-func ReadFileToBytes(filename string) ([]byte, error) {
-	file, err := Kube.Fs.Open(filename)
+func (u UtilsImpl) ReadFileToBytes(filename string) ([]byte, error) {
+	file, err := u.ek.Fs.Open(filename)
 	if err != nil {
 		return nil, err
 	}

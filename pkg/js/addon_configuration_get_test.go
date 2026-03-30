@@ -1,6 +1,7 @@
 package jsutils_test
 
 import (
+	"fmt"
 	"testing"
 
 	mock "github.com/torloejborg/easykube/mock"
@@ -8,7 +9,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestEasykube_KeyValue(t *testing.T) {
+func TestAddonConfigurationGet(t *testing.T) {
 
 	ctl := gomock.NewController(t)
 	ek := SetUpJsTestEnvironment(t, ctl)
@@ -20,6 +21,11 @@ func TestEasykube_KeyValue(t *testing.T) {
 	ek.CommandContext = mockCommand
 
 	script := `
+		let configuration = {
+			description:"testing",
+			dependsOn:["foo","bar"]
+		}
+
 		if(easykube.kv("hello") === "world") {
 			console.info("hi!")
 		} else {
@@ -36,7 +42,9 @@ func TestEasykube_KeyValue(t *testing.T) {
 
 	mockAddon := CreateSyntheticAddon(script, ctl)
 	jsu := jsutils.NewJsUtils(ek, mockAddon, false)
-	err := jsu.ExecAddonScript(mockAddon)
+	cfg, err := jsu.ExtractConfigurationObject(mockAddon)
+
+	fmt.Println(cfg)
 
 	if err != nil {
 		t.Fatal(err)

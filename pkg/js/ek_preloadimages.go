@@ -6,17 +6,23 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
-func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) PreloadImages(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+
+	return ctx.preloadImages()
+}
+
+func (ctx *Easykube) preloadImages() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
-		ezk := ez.Kube
-
-		mustPull := ctx.CobraCommandHelder.GetBoolFlag(constants.FlagPull)
-		ctx.checkArgs(call, PRELOAD)
-		config, _ := ez.Kube.LoadConfig()
+		mustPull := ctx.ek.CommandContext.GetBoolFlag(constants.FlagPull)
+		ctx.checkArgs(call, Preload)
+		config, _ := ctx.ek.Config.LoadConfig()
 
 		var arg = call.Argument(0)
 		result := make(map[string]string)
@@ -30,7 +36,7 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 		var wg sync.WaitGroup
 
 		if mustPull {
-			ezk.FmtGreen("🖼 will pull fresh images")
+			ctx.ek.Printer.FmtGreen("🖼 will pull fresh images")
 		}
 
 		for source, dest := range result {
@@ -39,33 +45,33 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 			go func() {
 
 				registryCredentials := getPrivateRegistryCredentials(source, config.MirrorRegistries)
-				if hasImage, err := ezk.HasImageInKindRegistry(dest); err != nil {
+				if hasImage, err := ctx.ek.ContainerRuntime.HasImageInKindRegistry(dest); err != nil {
 					panic(err)
 				} else if !hasImage || mustPull {
 					if registryCredentials != nil {
-						ezk.FmtGreen("🖼 pull from private registry %s using secret keys (%s,%s)", source,
+						ctx.ek.Printer.FmtGreen("🖼 pull from private registry %s using secret keys (%s,%s)", source,
 							registryCredentials.Username,
 							"[redacted]")
-						if err := ezk.PullImage(source, registryCredentials); err != nil {
+						if err := ctx.ek.ContainerRuntime.PullImage(source, registryCredentials); err != nil {
 							panic(err)
 						}
 
 					} else {
-						ezk.FmtGreen("🖼 pull %s", source)
-						if err := ezk.PullImage(source, nil); err != nil {
+						ctx.ek.Printer.FmtGreen("🖼 pull %s", source)
+						if err := ctx.ek.ContainerRuntime.PullImage(source, nil); err != nil {
 							panic(err)
 						}
 					}
 
-					ezk.FmtGreen("🖼 tag %s to %s", source, dest)
-					if err := ezk.TagImage(source, dest); err != nil {
+					ctx.ek.Printer.FmtGreen("🖼 tag %s to %s", source, dest)
+					if err := ctx.ek.ContainerRuntime.TagImage(source, dest); err != nil {
 						panic(err)
 					}
 
-					if err := ezk.PushImage(source, dest); err != nil {
+					if err := ctx.ek.ContainerRuntime.PushImage(source, dest); err != nil {
 						panic(err)
 					}
-					ezk.FmtGreen("🖼 pushed %s", dest)
+					ctx.ek.Printer.FmtGreen("🖼 pushed %s", dest)
 				}
 				defer wg.Done()
 			}()
@@ -78,19 +84,19 @@ func (ctx *Easykube) PreloadImages() func(goja.FunctionCall) goja.Value {
 	}
 }
 
-func getPrivateRegistryCredentials(registry string, config []ez.MirrorRegistry) *ez.PrivateRegistryCredentials {
-
-	// get the url of the registry
+func getPrivateRegistryCredentials(registry string, config []core.MirrorRegistry) *core.PrivateRegistryCredentials {
 
 	for i := range config {
 
-		x := strings.ReplaceAll(config[i].RegistryUrl, "https://", "")
-		x = strings.ReplaceAll(x, "http://", "")
+		if config[i].UserKey != "" {
+			x := strings.ReplaceAll(config[i].RegistryUrl, "https://", "")
+			x = strings.ReplaceAll(x, "http://", "")
 
-		if strings.Contains(registry, x) {
-			return &ez.PrivateRegistryCredentials{
-				Username: config[i].UserKey,
-				Password: config[i].PasswordKey,
+			if strings.Contains(registry, x) {
+				return &core.PrivateRegistryCredentials{
+					Username: config[i].UserKey,
+					Password: config[i].PasswordKey,
+				}
 			}
 		}
 	}

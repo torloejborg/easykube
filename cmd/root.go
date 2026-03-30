@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
-func WithAppContext(ctx context.Context, appCtx *ez.CobraCommandHelperImpl) context.Context {
-	return context.WithValue(ctx, ez.AppCtxKey, appCtx)
+func WithAppContext(ctx context.Context, appCtx *core.CobraCommandHelperImpl) context.Context {
+	return context.WithValue(ctx, core.AppCtxKey, appCtx)
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -22,13 +22,12 @@ bootstrap a single node kubernetes cluster, install development platforms via ad
 
 hint: start with 'easykube config'`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		ctx := ez.CobraCommandHelperImpl{
+		ctx := core.CobraCommandHelperImpl{
 			Command: cmd,
 		}
 
 		cmd.SetContext(WithAppContext(cmd.Context(), &ctx))
 
-		ez.Kube.UseCmdContext(&ez.CobraCommandHelperImpl{Command: cmd})
 	},
 }
 

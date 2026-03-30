@@ -4,16 +4,21 @@ import (
 	"path/filepath"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
-	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, COPY_TO)
-		ezk := ez.Kube
+func (ctx *Easykube) CopyTo(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.andThenApply()
+}
 
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun("skipping copyTo")
+func (ctx *Easykube) copyTo() func(goja.FunctionCall) goja.Value {
+	return func(call goja.FunctionCall) goja.Value {
+		ctx.checkArgs(call, CopyTo)
+
+		if ctx.ek.CommandContext.IsDryRun() {
+			ctx.ek.Printer.FmtDryRun("skipping copyTo")
 			return call.This
 		}
 
@@ -28,14 +33,14 @@ func (ctx *Easykube) CopyTo() func(goja.FunctionCall) goja.Value {
 
 		fullPath := filepath.Dir(addon)
 
-		podName, containerName, err := ezk.FindContainerInPod(deployment, namespace, containerLike)
+		podName, containerName, err := ctx.ek.Kubernetes.FindContainerInPod(deployment, namespace, containerLike)
 		if err != nil {
-			ezk.FmtRed("LocatePod failed: %v", err)
+			ctx.ek.Printer.FmtRed("LocatePod failed: %v", err)
 		}
 
-		err = ezk.CopyFileToPod(namespace, podName, containerName, filepath.Join(fullPath, sourceFile), destinationFile)
+		err = ctx.ek.Kubernetes.CopyFileToPod(namespace, podName, containerName, filepath.Join(fullPath, sourceFile), destinationFile)
 		if err != nil {
-			ezk.FmtRed("%s failed: %v", COPY_TO, err)
+			ctx.ek.Printer.FmtRed("%s failed: %v", CopyTo, err)
 		}
 
 		return call.This

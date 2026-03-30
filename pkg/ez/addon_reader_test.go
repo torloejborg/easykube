@@ -6,20 +6,32 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
+	mock "github.com/torloejborg/easykube/mock"
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/ez"
 	"github.com/torloejborg/easykube/pkg/vars"
 	"github.com/torloejborg/easykube/test"
+	"go.uber.org/mock/gomock"
 )
 
-func initAddonReaderTest(t *testing.T) {
-	osd := test.CreateOsDetailsMock(t)
-	ez.Kube.UseOsDetails(osd)
-	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
+func initAddonReaderTest(t *testing.T) *core.Ek {
 
-	config := ez.NewEasykubeConfig()
-	_ = config.MakeConfig()
-	ez.Kube.UseEasykubeConfig(config)
-	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	command := mock.NewMockICobraCommandHelper(mockCtrl)
+
+	ek := &core.Ek{
+		OsDetails:      test.CreateOsDetailsMock(t),
+		CommandContext: command,
+		Fs:             afero.NewMemMapFs(),
+	}
+	ek.Utils = ez.NewUtils(ek)
+	ek.Config = ez.NewEasykubeConfig(ek)
+	ek.Config.MakeConfig()
+	ek.AddonReader = ez.NewAddonReader(ek)
+
+	return ek
 }
 
 var expectedAddonsForDiscoverTest = []struct {
@@ -33,11 +45,11 @@ var expectedAddonsForDiscoverTest = []struct {
 
 func TestDiscoverAddons(t *testing.T) {
 
-	initAddonReaderTest(t)
+	cut := initAddonReaderTest(t)
 
-	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", cut.Fs)
 
-	all, err := ez.Kube.GetAddons()
+	all, err := cut.AddonReader.GetAddons()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,13 +65,13 @@ func TestDiscoverAddons(t *testing.T) {
 
 func TestBrokenAddon(t *testing.T) {
 
-	initAddonReaderTest(t)
-	test.CopyTestAddonToMemFs("../../test_addons", "broken", "/home/some-user/addons", ez.Kube.Fs)
+	cut := initAddonReaderTest(t)
+	test.CopyTestAddonToMemFs("../../test_addons", "broken", "/home/some-user/addons", cut.Fs)
 
-	_, err := ez.Kube.GetAddons()
+	_, err := cut.AddonReader.GetAddons()
 	if err != nil {
 
-		if !strings.Contains(err.Error(), "invalid character 'x' looking for beginning of object key string") {
+		if !strings.Contains(err.Error(), "failed to parse configuration") {
 			t.Error("expected different errormessage from JS runtime")
 		}
 	} else {
@@ -69,16 +81,16 @@ func TestBrokenAddon(t *testing.T) {
 
 func TestVersionCompatibilityReader(t *testing.T) {
 
-	initAddonReaderTest(t)
+	cut := initAddonReaderTest(t)
 
-	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", cut.Fs)
 
-	vars.Version = "1.1.9"
+	vars.Version = "2.3.0"
 
-	version, err := ez.Kube.CheckAddonCompatibility()
+	version, err := cut.AddonReader.CheckAddonCompatibility()
 	if err != nil {
 		fmt.Println(err.Error())
-		if !strings.Contains(err.Error(), "addon repository want easykube ~1.1.4 but easykube is 1.4.4") {
+		if !strings.Contains(err.Error(), "addon repository want easykube ~3.0 but easykube is 2.3.0") {
 			t.Fail()
 		}
 	}

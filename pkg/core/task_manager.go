@@ -1,25 +1,14 @@
-package ez
+package core
 
 import (
 	"fmt"
 	"slices"
-	"sync"
 	"time"
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/google/uuid"
 )
-
-type IOrderedTask interface {
-	GetName() string
-	GetDependencies() []string
-}
-
-type TaskContainer struct {
-	graph *Graph[Task]
-	mu    sync.Mutex // Mutex to synchronize spinner access
-}
 
 func (t *TaskContainer) AddTask(task Task) {
 	task.graph = t.graph
@@ -41,15 +30,6 @@ func NewTaskContainer() *TaskContainer {
 	return &TaskContainer{
 		graph: NewGraph[Task](),
 	}
-}
-
-type Task struct {
-	Name          string
-	Description   string
-	Dependencies  []string
-	SkipCondition func() bool
-	Execute       func() error
-	graph         *Graph[Task]
 }
 
 func (t Task) GetName() string {
