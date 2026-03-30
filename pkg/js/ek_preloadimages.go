@@ -88,13 +88,15 @@ func getPrivateRegistryCredentials(registry string, config []core.MirrorRegistry
 
 	for i := range config {
 
-		x := strings.ReplaceAll(config[i].RegistryUrl, "https://", "")
-		x = strings.ReplaceAll(x, "http://", "")
+		if config[i].UserKey != "" {
+			x := strings.ReplaceAll(config[i].RegistryUrl, "https://", "")
+			x = strings.ReplaceAll(x, "http://", "")
 
-		if strings.Contains(registry, x) {
-			return &core.PrivateRegistryCredentials{
-				Username: config[i].UserKey,
-				Password: config[i].PasswordKey,
+			if strings.Contains(registry, x) {
+				return &core.PrivateRegistryCredentials{
+					Username: config[i].UserKey,
+					Password: config[i].PasswordKey,
+				}
 			}
 		}
 	}
