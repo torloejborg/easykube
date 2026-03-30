@@ -18,7 +18,7 @@
   "log": {"level": "info"},
   "extensions": {
     "ui": { "enable": true },
-    "search": { "enable": true },
+    "search": { "enable": false },
     "sync": {
       "enable": true,
       "credentialsFile": "/etc/zot/zot-credentials.json",
