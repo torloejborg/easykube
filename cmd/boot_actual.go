@@ -27,11 +27,11 @@ func createActualCmd(ek *core.Ek, currentConfig *core.EasykubeConfigData) error 
 	tasks.AddTask(pullRegistryImageTask(ek))
 	tasks.AddTask(ensurePersistenceDirectoriesTask(ek))
 	tasks.AddTask(createClusterTask(ek))
-	tasks.AddTask(configureZotRegistry(currentConfig, ek))
 	tasks.AddTask(createRegistryTask(ek))
+	tasks.AddTask(configureZotRegistry(currentConfig, ek))
 	tasks.AddTask(connectRegistryToKindTask(ek))
-	tasks.AddTask(restartRegistryTask(ek))
 	tasks.AddTask(startRegistryTask(ek))
+	tasks.AddTask(restartRegistryTask(ek))
 	tasks.AddTask(ensureLocalClusterContextTask(ek))
 	tasks.AddTask(patchCoreDNSTask(ek))
 	tasks.AddTask(ensureAddonConfigMapTask(ek))
@@ -46,7 +46,7 @@ func createActualCmd(ek *core.Ek, currentConfig *core.EasykubeConfigData) error 
 }
 
 func ensureContainerRuntimeTask(ek *core.Ek) core.Task {
-	return core.NewTaskWithSkip("ensure container runtime", func() error {
+	return core.NewTaskWithSkip("check container runtime", func() error {
 		return errors.New("container runtime not available check docker/podman started")
 	}, func() bool {
 		return ek.ContainerRuntime.IsContainerRuntimeAvailable()

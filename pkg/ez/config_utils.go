@@ -219,6 +219,16 @@ func (ec *EasykubeConfig) MakeConfig() error {
 		return err
 	}
 
+	err = ec.GenerateZotRegistryConfig(&modelData)
+	if err != nil {
+		return err
+	}
+
+	err = ec.GenerateZotRegistryCredentials(&modelData)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
