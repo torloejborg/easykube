@@ -37,14 +37,14 @@ Let's examine an addon in detail. We'll look at the Temporal addon, as it uses s
 [source,javascript,linenums]
 ----
 let configuration = { //<1>
-"description": "An opensource workflow engine", //<2>
-"dependsOn" : [ "postgres", "Ingress" ],
-"extraPorts" : [ //<3>
-{
-"hostPort" : 7233,
-"nodePort" : 30950,
-"protocol" : "TCP"
-}]
+    description: "An opensource workflow engine", //<2>
+    dependsOn : [ "postgres", "Ingress" ],
+    extraPorts : [ //<3>
+    {
+        hostPort : 7233,
+        nodePort : 30950,
+        protocol : "TCP"
+    }]
 }
 
 let deployment = "temporal-server"
@@ -73,7 +73,7 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 
 A lot is happening here, so let’s break it down:
 
-<1> Every addon has a configuration directive. This JSON structure is extracted by the main easykube program and used to construct the Kind cluster configuration.
+<1> Every addon has a configuration directive. The configuration structure is extracted by the main easykube program and used to construct the Kind cluster configuration.
 
 <2> [[addons-dependencies]]Addons allow you to express dependencies to other addons. In this case, the Temporal addon requires a database and an ingress controller for its UI. Internally, during addon scanning, a dependency graph is created and a topological sort determines the installation order — similar to a build system like maven, gradle, ant, or make. Tasks depends on other tasks.
 
