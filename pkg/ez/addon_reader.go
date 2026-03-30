@@ -1,7 +1,6 @@
 package ez
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -9,11 +8,11 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"unicode"
 
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/core"
+	jsutils "github.com/torloejborg/easykube/pkg/js"
 	"github.com/torloejborg/easykube/pkg/vars"
 )
 
@@ -190,32 +189,12 @@ func (adr *AddonReader) resolveExecutionOrder(
 }
 
 func (adr *AddonReader) ExtractConfiguration(unconfigured core.IAddon) (*core.AddonConfig, error) {
-	out := adr.ek.Printer
 
-	code, err := afero.ReadFile(adr.ek.Fs, unconfigured.GetAddonFile())
+	cfg, err := jsutils.NewJsUtils(adr.ek, unconfigured, true).ExtractConfigurationObject(unconfigured)
+
 	if err != nil {
-		panic(err)
-	}
-
-	parsed, ok := adr.ExtractJSON(string(code))
-
-	if len(parsed) == 0 {
-		out.FmtYellow("%s Does not provide any configuration", unconfigured.GetName())
-		return &core.AddonConfig{
-			DependsOn:   nil,
-			ExtraPorts:  nil,
-			ExtraMounts: nil,
-			Description: "",
-		}, nil
-	}
-
-	if !ok {
 		return nil, fmt.Errorf("failed to parse configuration")
 	} else {
-
-		// Parse the JSON string
-		cfg := &core.AddonConfig{}
-		jsonErr := json.Unmarshal([]byte(parsed), &cfg)
 
 		// Set persistence location for all ExtraMounts
 		for idx, _ := range cfg.ExtraMounts {
@@ -236,54 +215,7 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured core.IAddon) (*core.Ad
 			}
 		}
 
-		return cfg, jsonErr
+		return cfg, nil
 	}
 
-}
-
-func (adr *AddonReader) ExtractJSON(input string) (string, bool) {
-
-	// remove comments
-	commentRe := regexp.MustCompile(`(?m)//.*$`)
-	input = commentRe.ReplaceAllString(input, "")
-
-	// Match assignment patterns like "let configuration =" or "configuration="
-	re := regexp.MustCompile(`\b(?:let\s+)?configuration\s*=\s*`)
-	loc := re.FindStringIndex(input)
-	if loc == nil {
-		return "", false
-	}
-
-	// Start looking for the JSON object
-	startIdx := loc[1] // Position after "configuration ="
-	for startIdx < len(input) && unicode.IsSpace(rune(input[startIdx])) {
-		startIdx++ // Skip spaces
-	}
-
-	// Ensure we start at '{'
-	if startIdx >= len(input) || input[startIdx] != '{' {
-		return "", false
-	}
-
-	// Extract JSON using a stack to handle nested braces
-	stack := []rune{}
-	var jsonStr strings.Builder
-
-	for i := startIdx; i < len(input); i++ {
-		char := rune(input[i])
-		jsonStr.WriteRune(char)
-
-		if char == '{' {
-			stack = append(stack, char) // Push to stack
-		} else if char == '}' {
-			stack = stack[:len(stack)-1] // Pop from stack
-			if len(stack) == 0 {
-				// Found the full JSON object
-				return jsonStr.String(), true
-			}
-		}
-	}
-
-	// If we reach here, the braces were not balanced
-	return "", false
 }

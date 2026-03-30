@@ -1,17 +1,17 @@
 package jsutils
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
 	"path/filepath"
 	"strings"
 
+	"github.com/dop251/goja"
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/core"
-
-	"github.com/dop251/goja"
 )
 
 type JsUtils struct {
@@ -128,8 +128,31 @@ func (jsu *JsUtils) GetPseudoJsIncludes() string {
 
 func (jsu *JsUtils) ExtractConfigurationObject(a core.IAddon) (*core.AddonConfig, error) {
 
-	//cfg := jsu.vm.Get("configuration")
-	//fmt.Println(cfg)
-	
+	script := a.ReadScriptFile(jsu.ek.Fs)
+	var cfg = &core.AddonConfig{}
+
+	// for safety, the exposed go functions are swapped out with nop versions. Running the
+	// script will cause errors, but the configuration object should be defined in the vm,
+	// and we can extract it
+	_, _ = jsu.vm.RunString(script)
+
+	config := jsu.vm.Get("configuration")
+
+	if config != nil {
+		exported := config.Export()
+		jsonData, err := json.Marshal(exported)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(jsonData, &cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		return cfg, nil
+	}
+
 	return nil, nil
+
 }

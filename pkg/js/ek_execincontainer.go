@@ -9,8 +9,18 @@ import (
 
 func (ctx *Easykube) ExecInContainer(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
+
+		er := &ExecResult{runtime: ctx.AddonCtx.vm}
+		obj := ctx.AddonCtx.NewObject()
+		er.self = obj
+
+		// bind methods
+		_ = obj.Set("onSuccess", NoopFunc)
+		_ = obj.Set("onFail", NoopFunc)
+
 		return NoopFunc()
 	}
+
 	return ctx.execInContainer()
 }
 

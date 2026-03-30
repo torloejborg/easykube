@@ -71,7 +71,7 @@ func TestBrokenAddon(t *testing.T) {
 	_, err := cut.AddonReader.GetAddons()
 	if err != nil {
 
-		if !strings.Contains(err.Error(), "invalid character 'x' looking for beginning of object key string") {
+		if !strings.Contains(err.Error(), "failed to parse configuration") {
 			t.Error("expected different errormessage from JS runtime")
 		}
 	} else {
