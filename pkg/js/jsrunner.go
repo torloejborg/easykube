@@ -153,6 +153,6 @@ func (jsu *JsUtils) ExtractConfigurationObject(a core.IAddon) (*core.AddonConfig
 		return cfg, nil
 	}
 
-	return nil, nil
+	return nil, errors.New("failed to extract configuration object")
 
 }
