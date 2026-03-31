@@ -215,7 +215,8 @@ func (cri *ContainerRuntimeImpl) PushImage(src, dest string) error {
 func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *core.PrivateRegistryCredentials) error {
 
 	opts := image2.PullOptions{
-		All: false,
+		All:      false,
+		Platform: "linux/amd64",
 	}
 
 	if credentials != nil {
@@ -252,6 +253,7 @@ func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *core.Priva
 			})
 
 			opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
+
 		}
 
 	}
