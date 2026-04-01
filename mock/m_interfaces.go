@@ -551,7 +551,7 @@ func (c *MockIClusterUtilsCreateKindClusterCall) DoAndReturn(f func(map[string]c
 }
 
 // EnsurePersistenceDirectory mocks base method.
-func (m *MockIClusterUtils) EnsurePersistenceDirectory() error {
+func (m *MockIClusterUtils) EnsurePersistenceDirectories() error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EnsurePersistenceDirectory")
 	ret0, _ := ret[0].(error)
@@ -561,7 +561,7 @@ func (m *MockIClusterUtils) EnsurePersistenceDirectory() error {
 // EnsurePersistenceDirectory indicates an expected call of EnsurePersistenceDirectory.
 func (mr *MockIClusterUtilsMockRecorder) EnsurePersistenceDirectory() *MockIClusterUtilsEnsurePersistenceDirectoryCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsurePersistenceDirectory", reflect.TypeOf((*MockIClusterUtils)(nil).EnsurePersistenceDirectory))
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsurePersistenceDirectory", reflect.TypeOf((*MockIClusterUtils)(nil).EnsurePersistenceDirectories))
 	return &MockIClusterUtilsEnsurePersistenceDirectoryCall{Call: call}
 }
 

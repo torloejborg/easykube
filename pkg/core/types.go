@@ -42,7 +42,7 @@ type Addon struct {
 	ShortName string
 	// Configuration for the addon
 	Config AddonConfig
-	// Addon javascript file
+	// Addon JavaScript file, the absolute path
 	File string
 	// Root of the addon directory
 	RootDir string

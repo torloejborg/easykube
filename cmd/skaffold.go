@@ -12,7 +12,7 @@ var skaffoldCmd = &cobra.Command{
 	Short: "creates a new addon using a basic template",
 	Long: `creates a new addon with a default deployment, service, ingress and configmap
   
-  if installed without modification, will appear at http://<addonName>.localtest.me 
+  if installed without modification, will appear at https://<addonName>.localtest.me 
   and display "Hello <addonName>" in your browser.
 
   Useful for starting a new addon.

@@ -5,8 +5,12 @@ const FlagForce = "force"
 const FlagKeyValue = "kv"
 const FlagNoDepends = "nodepends"
 const FlagPull = "pull"
-const INGRESS_HTTPS_PORT = "https-port"
-const INGRESS_HTTP_PORT = "http-port"
 const FlagEdit = "edit"
 const FlagConfigDir = "config-dir"
 const FlagUseDefaults = "use-defaults"
+
+// ArgSkaffoldLocation where to create the new addon
+const ArgSkaffoldLocation = "location"
+
+// ArgSkaffoldName what to name a new addon
+const ArgSkaffoldName = "name"

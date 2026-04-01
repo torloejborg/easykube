@@ -1,3 +1,6 @@
+// Package core
+//
+// defines all interfaces and central functionality for easykube
 package core
 
 import (
@@ -6,30 +9,66 @@ import (
 	"github.com/spf13/afero"
 )
 
+// IAddon something that can be added, listed and removed from easykube
 type IAddon interface {
+	// ReadScriptFile Returns the <addon>.ek.js javascript file as string
 	ReadScriptFile(fs afero.Fs) string
+
+	// GetName Name of the addon, this will be <name>.ek.js
 	GetName() string
+
+	// GetShortName Name of the addon, this will be <name>
 	GetShortName() string
+
+	// GetConfig The addon's configuration - it's name, what other addons it depends on,
+	// filesystem mounts and exposed ports
 	GetConfig() AddonConfig
+
+	// GetAddonFile Get the path to the addon *.ek.js file
 	GetAddonFile() string
+
+	// GetRootDir Get the directory of the addon
 	GetRootDir() string
+
+	// GetDependencies Get a list of named dependencies to other addons
 	GetDependencies() []string
 }
 
+// IAddonReader Handles reading and discovery of addons
 type IAddonReader interface {
+	// GetAddons Returns a map keyed by addon name and the addon struct
 	GetAddons() (map[string]IAddon, error)
+
+	// ExtractConfiguration Addons always declare a "configuration" stanza, this function evaluates the script file
+	// in the JS runtime and extracts the configuration to a struct
 	ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error)
+
+	// CheckAddonCompatibility Determine if this addon is compatible with the JS script library functions
 	CheckAddonCompatibility() (string, error)
 }
 
+// IClusterUtils Manage kind cluster creation
 type IClusterUtils interface {
+
+	// CreateKindCluster creates a kind cluster, based on the addons provided, a kind cluster configuration is generated,
+	// and the cluster booted with that custom configuration
 	CreateKindCluster(modules map[string]IAddon) (string, error)
+
+	// RenderToYAML Creates the actual kind cluster configuration text
 	RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string
+
+	// ConfigurationReport Returns a report of how addons contributed to the cluster configuration
 	ConfigurationReport(addonList []IAddon) string
-	EnsurePersistenceDirectory() error
+
+	// EnsurePersistenceDirectories EnsurePersistenceDirectory Based on discovered addons, create directories used in kinds
+	// extraMounts config stanza
+	EnsurePersistenceDirectories() error
 }
 
+// ICobraCommandHelper Handles common flags specified on the command line and shortcuts to get a flag of a given type
 type ICobraCommandHelper interface {
+	// GetBoolFlag bool value for a given flag
+	// see constants/flags.go
 	GetBoolFlag(name string) bool
 	GetStringFlag(name string) string
 	GetIntFlag(name string) int

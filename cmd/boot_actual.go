@@ -238,7 +238,7 @@ func ensureLocalClusterContextTask(ek *core.Ek) core.Task {
 
 func ensurePersistenceDirectoriesTask(ek *core.Ek) core.Task {
 	return core.NewTaskWithSkip("ensure persistence directories", func() error {
-		pdErr := ek.ClusterUtils.EnsurePersistenceDirectory()
+		pdErr := ek.ClusterUtils.EnsurePersistenceDirectories()
 		if pdErr != nil {
 			return pdErr
 		}

@@ -151,7 +151,7 @@ func (u *ClusterUtils) RenderToYAML(addonList []core.IAddon, config *core.Easyku
 	return buf.String()
 }
 
-func (u *ClusterUtils) EnsurePersistenceDirectory() error {
+func (u *ClusterUtils) EnsurePersistenceDirectories() error {
 
 	addons, err := u.ek.AddonReader.GetAddons()
 	if err != nil {

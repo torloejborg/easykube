@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/core"
 )
 
@@ -38,6 +37,5 @@ var bootCmd = &cobra.Command{
 }
 
 func init() {
-	bootCmd.Flags().StringP(constants.ArgSecrets, "s", "", "Property file to load as 'easykube-secrets', useful for image pull secrets and other custom configuration")
 	rootCmd.AddCommand(bootCmd)
 }
