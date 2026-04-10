@@ -139,6 +139,9 @@ class Easykube {
      * Preprocesses an addon's yaml output and the resources related to the ExternalSecretOperator.
      * Secrets will be created without ESO installed, but ESO's custom resource definitions needs to be
      * available.
+     *
+     * If your main deployments use vault, and you want to run easykube without vault, this comes handy.
+     *
      * @param {Map<string,Map<string,any>>} secretMap An arbitrary map which provides the actual keys for the secret
      * @param {string} namespace where to apply the secret
      * @param {string} manifest which output to process, by default, it's the output from kustomize (.out.yaml)
