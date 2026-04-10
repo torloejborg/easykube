@@ -7,10 +7,12 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/olekukonko/errors"
 	"github.com/torloejborg/easykube/pkg/constants"
 	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"sigs.k8s.io/kind/pkg/cluster"
+	"sigs.k8s.io/kind/pkg/exec"
 )
 
 type ClusterUtils struct {
@@ -86,7 +88,13 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]core.IAddon) (string
 
 		clusterErr := cp.Create(constants.ClusterName, optKubeConfig, optConfig, optNodeImage)
 		if nil != clusterErr {
-			panic(err)
+
+			var runerr *exec.RunError
+			if errors.As(clusterErr, &runerr) {
+				return "", errors.New(string(runerr.Output))
+			}
+
+			return "", clusterErr
 		}
 
 		// initial cluster should be running now
