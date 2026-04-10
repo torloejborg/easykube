@@ -9,7 +9,7 @@ require (
 	github.com/docker/go-connections v0.6.0
 	github.com/dop251/goja v0.0.0-20250630131328-58d95d85e994
 	github.com/ergochat/readline v0.1.3
-	github.com/fatih/color v1.18.0
+	github.com/fatih/color v1.19.0
 	github.com/google/uuid v1.6.0
 	github.com/gookit/color v1.6.0
 	github.com/gookit/config/v2 v2.2.7
