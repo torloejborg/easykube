@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 func (e *Easykube) GitCheckout(noop bool) func(goja.FunctionCall) goja.Value {
@@ -64,8 +65,7 @@ func (e *Easykube) gitCheckout() func(goja.FunctionCall) goja.Value {
 
 		gitCmd := func(args []string) {
 
-			git := "git"
-			cmdStr := fmt.Sprintf("%s %s", git, strings.Join(args, " "))
+			cmdStr := fmt.Sprintf("%s %s", constants.GitBinary, strings.Join(args, " "))
 
 			if e.ek.CommandContext.IsVerbose() {
 				e.ek.Printer.FmtVerbose(cmdStr)
@@ -74,7 +74,7 @@ func (e *Easykube) gitCheckout() func(goja.FunctionCall) goja.Value {
 				e.ek.Printer.FmtDryRun(cmdStr)
 			} else {
 
-				_, stderr, err := e.ek.ExternalTools.RunCommand("git", args...)
+				_, stderr, err := e.ek.ExternalTools.RunCommand(constants.GitBinary, args...)
 
 				if err != nil {
 					e.ek.Printer.FmtRed(stderr, err.Error())

@@ -71,6 +71,19 @@ class Easykube {
         return this;
     }
 
+
+    /**
+     * Use the skopeo tool to copy an image from source to destination, typically to the local registry
+     * this saves bandwidth, and will make subsequent installations faster, unlike preload, source images
+     * are not stored in your docker context, thus saving disk-space
+     * @param {Map<string, string>} images
+     * @returns {Easykube}
+     */
+    skopeoPreLoad(images) {
+        _ek.skopeoPreload(images);
+        return this;
+    }
+
     /**
      * Runs a command in a container
      * @param {string} deployment - Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)

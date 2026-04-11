@@ -39,6 +39,7 @@ func createActualCmd(ek *core.Ek, currentConfig *core.EasykubeConfigData) error 
 	core.ExecuteTasks(tasks)
 
 	if clusterCreateReport != "" {
+		fmt.Println("")
 		fmt.Println(clusterCreateReport)
 	}
 

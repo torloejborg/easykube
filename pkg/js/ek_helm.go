@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	"github.com/torloejborg/easykube/pkg/constants"
 )
 
 func (ctx *Easykube) HelmTemplate(noop bool) func(goja.FunctionCall) goja.Value {
@@ -45,7 +46,6 @@ func (ctx *Easykube) helmTemplate() func(goja.FunctionCall) goja.Value {
 			namespace = "default"
 		}
 
-		cmd := "helm"
 		var args = []string{}
 		if len(releasename) > 0 {
 			args = append(args, "template", chart,
@@ -60,7 +60,7 @@ func (ctx *Easykube) helmTemplate() func(goja.FunctionCall) goja.Value {
 
 		}
 
-		cmdStr := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
+		cmdStr := fmt.Sprintf("%s %s", constants.HelmBinary, strings.Join(args, " "))
 		if ctx.ek.CommandContext.IsVerbose() {
 			ctx.ek.Printer.FmtVerbose(cmdStr)
 		}
@@ -68,7 +68,7 @@ func (ctx *Easykube) helmTemplate() func(goja.FunctionCall) goja.Value {
 		if ctx.ek.CommandContext.IsDryRun() {
 			ctx.ek.Printer.FmtDryRun(cmdStr)
 		} else {
-			stdout, stderr, err := ctx.ek.ExternalTools.RunCommand(cmd, args...)
+			stdout, stderr, err := ctx.ek.ExternalTools.RunCommand(constants.HelmBinary, args...)
 
 			if err != nil {
 				ctx.ek.Printer.FmtRed("helm failed %s", stderr)

@@ -22,14 +22,13 @@ func NewExternalTools(ek *core.Ek) core.IExternalTools {
 
 func (eti *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
-	cmd := "kustomize"
 	args := []string{
 		"build",
 		"-enable-helm",
 		"--enable-alpha-plugins",
 		"--enable-exec", dir}
 
-	outCmd := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
+	outCmd := fmt.Sprintf("%s %s", constants.KustomizeBinary, strings.Join(args, " "))
 
 	if eti.ek.CommandContext.IsVerbose() {
 		eti.ek.Printer.FmtVerbose(outCmd)
@@ -39,7 +38,7 @@ func (eti *ExternalToolsImpl) KustomizeBuild(dir string) string {
 		eti.ek.Printer.FmtDryRun(outCmd)
 	} else {
 
-		stdout, stderr, err := eti.RunCommand(cmd, args...)
+		stdout, stderr, err := eti.RunCommand(constants.KustomizeBinary, args...)
 
 		if err != nil {
 			eti.ek.Printer.FmtRed("kustomize failed with %s", stderr)
@@ -70,9 +69,8 @@ func (eti *ExternalToolsImpl) KustomizeBuild(dir string) string {
 
 func (eti *ExternalToolsImpl) ApplyYaml(yamlFile string) {
 
-	cmd := "kubectl"
 	args := []string{"apply", "-f", yamlFile}
-	outCmd := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
+	outCmd := fmt.Sprintf("%s %s", constants.KubectlBinary, strings.Join(args, " "))
 
 	if eti.ek.CommandContext.IsDryRun() {
 		eti.ek.Printer.FmtDryRun(outCmd)
@@ -80,10 +78,10 @@ func (eti *ExternalToolsImpl) ApplyYaml(yamlFile string) {
 		if eti.ek.CommandContext.IsVerbose() {
 			eti.ek.Printer.FmtVerbose(outCmd)
 		}
-		_, stderr, err := eti.RunCommand(cmd, args...)
+		_, stderr, err := eti.RunCommand(constants.KubectlBinary, args...)
 
 		if err != nil {
-			eti.ek.Printer.FmtRed("kubectl failed with %s", stderr)
+			eti.ek.Printer.FmtRed("%s failed with %s", constants.KubectlBinary, stderr)
 			os.Exit(-1)
 		}
 	}
@@ -173,7 +171,9 @@ func (eti *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout st
 	cmd.Stderr = &errBuf
 
 	err = cmd.Run()
+	if err != nil {
+		return "", "", err
+	}
 
-	cmd.Process.Wait()
-	return outBuf.String(), errBuf.String(), err
+	return outBuf.String(), errBuf.String(), nil
 }
