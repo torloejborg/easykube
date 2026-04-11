@@ -43,11 +43,12 @@ Extract the archive, rename the binary to `easykube`, `ek`, or whatever you pref
 
 Use a package manager or download the following software yourself:
 
-* https://www.docker.com/[docker]
+* https://www.docker.com/[docker] / https://podman.io/[podman]
 * https://kubernetes.io/docs/tasks/tools/[kubectl]
 * https://kubectl.docs.kubernetes.io/installation/kustomize/[kustomize]
 * https://helm.sh/docs/intro/quickstart/#install-helm[helm]
 * https://k9scli.io/topics/install/[k9s] (optional)
+* https://github.com/containers/skopeo[skopeo] (optional, however some addons might require it)
 
 CAUTION: On some Linux systems, installing the above packages via snap has proved troublesome for easykube. It may work for you; it may not.
 

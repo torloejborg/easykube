@@ -1,14 +1,42 @@
 = Easykube API Reference
-
-
 :toc:
 :toclevels: 2
 
 
 
-== Methods
+== Methods / Properties
 
-=== helmTemplate
+=== Easykube [[Easykube]]
+
+Creates a new Easykube JavaScript handler. This class is for your IDE&#x27;s enjoyment.
+It wraps exported Go functions to provide type hints and documentation.
+
+[source,javascript]
+----
+Easykube()
+----
+
+=== EASYKUBE_BINARY_COMPAT [[EASYKUBE_BINARY_COMPAT]]
+
+Defines semver constraint for the easykube go-binary, patch versions are free to roll.
+The go binary will extract this, and compare it to its own version, if there is a version
+mismatch, the status command will complain.
+
+[source,javascript]
+----
+EASYKUBE_BINARY_COMPAT()
+----
+
+=== kustomize [[kustomize]]
+
+Runs the kustomize tool, saves the rendered manifests into a .out file, and applies it with kubectl
+
+[source,javascript]
+----
+kustomize()
+----
+
+=== helmTemplate [[helmTemplate]]
 
 Renders a Helm chart to .out, remember to apply the result
 
@@ -40,8 +68,11 @@ helmTemplate(chart, values, destination, namespace, nametemplate)
 
 |===
 
+.Returns
 
-=== waitForDeployment
+`Easykube` — this for chaining
+
+=== waitForDeployment [[waitForDeployment]]
 
 Waits until the specified deployment reaches ready state in the cluster.
 
@@ -66,9 +97,9 @@ waitForDeployment(deployment, namespace)
 
 .Returns
 
-`Easykube` —
+`Easykube` — this for chaining
 
-=== thenApply
+=== thenApply [[thenApply]]
 
 Applies a single yaml resource with kubectl
 
@@ -90,9 +121,9 @@ thenApply(manifest)
 
 .Returns
 
-`Easykube` —
+`Easykube` — this for chaining
 
-=== preload
+=== preload [[preload]]
 
 Preloads images by pulling them retagging and pushing them to your local registry,
 this saves bandwidth, and will make subsequent installations faster
@@ -109,15 +140,41 @@ preload(images)
 
 | `images`
 | Map.&lt;string, string&gt;
-|
+| A map where the key is a source image, and the value is the destination image
 
 |===
 
 .Returns
 
-`Easykube` —
+`Easykube` — this for chaining
 
-=== runCommand
+=== skopeoPreload [[skopeoPreload]]
+
+Use the skopeo tool to copy an image from source to destination, typically to the local registry
+this saves bandwidth, and will make subsequent installations faster, unlike preload, source images
+are not stored in your docker context, thus saving disk-space
+
+[source,javascript]
+----
+skopeoPreload(images)
+----
+
+.Parameters
+[cols="1,1,3"]
+|===
+| Name | Type | Description
+
+| `images`
+| Map.&lt;string, string&gt;
+| A map where the key is a source image, and the value is the destination image
+
+|===
+
+.Returns
+
+`Easykube` — this for chaining
+
+=== runCommand [[runCommand]]
 
 Runs a command in a container
 
@@ -136,7 +193,7 @@ runCommand(deployment, namespace, command, args)
 | Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)
 | `namespace`
 | string
-| , args) {
+| 
 | `command`
 | string
 | The command to run, example &quot;ls&quot; or &quot;/usr/local/bin/whatever&quot;
@@ -148,9 +205,9 @@ runCommand(deployment, namespace, command, args)
 
 .Returns
 
-`string` —
+`Easykube` — this for chaining
 
-=== waitForCustomResourceDefinition
+=== waitForCustomResourceDefinition [[waitForCustomResourceDefinition]]
 
 Waits until a custom resource definition appears (Operators exemplifies this issue, it can
 take some time for an operator to apply its own resources)
@@ -182,9 +239,9 @@ waitForCustomResourceDefinition(group, version, kind, timeout)
 
 .Returns
 
-`Easykube` —
+`Easykube` — this for chaining
 
-=== copyFile
+=== copyFile [[copyFile]]
 
 Copies a local file to a container in a pod. This is done by best effort. A pod can have many containers. If
 two (or more) containers exist which matches the partial container name, the first becomes the target.
@@ -222,9 +279,9 @@ copyFile(deployment, namespace, containerLike, localPath, remotePath)
 
 .Returns
 
-`Easykube` —
+`Easykube` — this for chaining
 
-=== createSecret
+=== createSecret [[createSecret]]
 
 Creates a secret in a given namespace
 
@@ -251,9 +308,9 @@ createSecret(namespace, name, data)
 |===
 
 
-=== getSecret
+=== getSecret [[getSecret]]
 
-
+Extracts a secret from kubernetes
 
 [source,javascript]
 ----
@@ -266,18 +323,21 @@ getSecret(namespace, name)
 | Name | Type | Description
 
 | `namespace`
-|
-|
+| 
+| target namespace
 | `name`
-|
-|
+| 
+| secret name
 
 |===
 
+.Returns
 
-=== processExternalSecrets
+`Object.&lt;string, string&gt;` — the secret as a map with decoded values
 
-Preprocesses an addon&#x27;s yaml output and the resources related to the ExternalSecretOperator.
+=== processExternalSecrets [[processExternalSecrets]]
+
+Preprocesses an addon&#x27;s YAML output and the resources related to the ExternalSecretOperator.
 Secrets will be created without ESO installed, but ESO&#x27;s custom resource definitions needs to be
 available.
 
@@ -304,9 +364,9 @@ processExternalSecrets(secretMap, namespace, manifest)
 |===
 
 
-=== kv
+=== kv [[kv]]
 
-Gets a value from the passed kv easykube commandline argument (easykube add fooaddon --kv foo&#x3D;bar, bing&#x3D;baz)
+Gets a value from the passed kv Easykube commandline argument (easykube add fooaddon --kv foo&#x3D;bar, bing&#x3D;baz)
 
 [source,javascript]
 ----
@@ -328,7 +388,7 @@ kv(key)
 
 `string` — value or undefined if key does not exist
 
-=== env
+=== env [[env]]
 
 Fetch the value of an environment variable
 
@@ -344,7 +404,7 @@ env(key)
 
 | `key`
 | string
-|
+| 
 
 |===
 
@@ -352,7 +412,7 @@ env(key)
 
 `string` — value of env-var, undefined if non-existent
 
-=== http
+=== http [[http]]
 
 Performs http requests using a very basic client
 
@@ -383,9 +443,9 @@ http(url, method, header, body)
 
 .Returns
 
-`HttpResponse` —
+`HttpResponse` — 
 
-=== exec
+=== exec [[exec]]
 
 Executes an arbitrary OS command, this calls in to go&#x27;s os.Exec
 
@@ -412,7 +472,16 @@ exec(command, args)
 
 `ExecResult` — the result
 
-=== addonDirForName
+=== addonDir [[addonDir]]
+
+Gets the directory of the current addon being evaluated
+
+[source,javascript]
+----
+addonDir()
+----
+
+=== addonDirForName [[addonDirForName]]
 
 Gets the directory of the current addon
 
@@ -449,10 +518,10 @@ addonDirForName(name)
 
 | `onSuccess`
 | HttpSuccessCallback
-|
+| 
 | `onFail`
 | HttpFailCallback
-|
+| 
 
 |===
 === ExecResult
@@ -465,10 +534,10 @@ Represents a result of exec, this is created and exposed from go
 
 | `onSuccess`
 | function
-|
+| 
 | `onFail`
 | function
-|
+| 
 
 |===
 

@@ -20,3 +20,6 @@ Unfortunately, there is no straightforward way to attach an external debugger to
 == Sometimes easykube fails with an error about 'deployment not ready' when adding something.
 
 Some workloads simply take longer to become ready, if you are using a machine with constrained resources, this might be an issue. The *waitForDeployment* function times out after 1 minute. In most cases you can just retry. If possible, tweaking or removing readiness/liveness probe thresholds from a deployment may help.
+
+== Easykube claims it's booted, but I can only interact it with using the easykube cli tool
+Check that your xref:ROOT:gettingstarted/boot.adoc#interact-with-easykube[KUBECONFIG environment variable is set correctly]

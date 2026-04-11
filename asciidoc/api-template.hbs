@@ -9,13 +9,12 @@
   {{/if}}
 {{/each}}
 
-== Methods
+== Methods / Properties
 
 {{!-- Only instance methods (they always have memberof + params) --}}
 {{#each this}}
   {{#if memberof}}
-    {{#if params}}
-=== {{name}}
+=== {{name}} [[{{name}}]]
 
 {{description}}
 
@@ -37,7 +36,6 @@
 {{/each}}
 
 |===
-{{/if}}
 
 {{#if returns}}
 .Returns

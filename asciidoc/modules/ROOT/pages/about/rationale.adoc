@@ -2,9 +2,9 @@
 
 * Easykube aims to enable shared development "platforms" via its companion addon repositories.
 
-* If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse.. Experiment, develop locally. Breaking "the system" - Eliminate the "docker-compose" shadow workflow.
+* If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse. Experiment, develop locally. Break stuff, try again.
 
-* Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack  locally, without breaking any shared environment.
+* Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack locally, all without causing trouble in shared environments.
 
 == What is it? [[rationale-easykube]]
 
@@ -12,13 +12,13 @@
 
 * It bootstraps a single-node Kind cluster with opinionated modifications.
 
-* It automatically sets up a local zot docker registry for the cluster and connects it locally.
+* It automatically sets up a local https://zotregistry.dev/v2.1.15/[zot] docker registry for the cluster and connects it.
 
 * Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s shape. Port forwarding and storage requirements are handled automatically.
 
-* Persistent data (if used) survives cluster deletion and recreation. Databases files remain intact.
+* Persistent data (if used) survives cluster deletion and recreation. Databases files and downloaded images remain intact.
 
-* Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It's local, do anything, break everything!
+* Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It's local, do things not possible on the real cluster.
 
 * Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, with some planning, you can choose to install only the parts you need.
 
@@ -32,9 +32,7 @@
 
 * Effortlessly spin up local development stacks: Databases, Web servers, Caches, Workflow engines, OAuth servers, S3-compatible storage - If it runs in kubernetes (or Docker/Podman) -  It runs on Easykube.
 
-* Kubernetes can be complicated, use Easykube as a gateway-drug for new team members - Let them experience the challenges of distributed systems firsthand, on their own machines.
-
-* Perhaps some team members refuse to acknowledge the 'cloud' thing, they are brilliant developers, but will never care about Kubernetes — And that’s OK, no one can be forced to like it. But they can still run stuff locally.
+* Kubernetes can be complicated, use Easykube as a gateway-drug for new team members - Let them experience the challenges of distributed systems firsthand, on their own machines first.
 
 == When not to use Easykube [[rationale-donot]]
 

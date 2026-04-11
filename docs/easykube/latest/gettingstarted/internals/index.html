@@ -145,7 +145,19 @@
 <h2 id="_local_image_registry"><a class="anchor" href="#_local_image_registry"></a>Local image registry</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The local zot registry is your local image cache. You can use the registry as a pull through reqistry, or push images directly into it.</p>
+<p>The local registry is a <a href="https://zotregistry.dev">zot</a> instance, the local image cache. You can use the registry as a pull through registry (if enabled), or push images directly into it (default behavior)</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+By default, zot is not configured for sync (it will not check upstream images), depending on your use-case this can be enabled. However, we recommend enabling this feature if you primarily use private registries - otherwise Zot can be aggressive in its communication with upstreams, and incur rate-limits, this is especially true for dockerhub without a personal access token.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p><code>easykube stop</code> will stop the registry and kind-control plane.</p>
@@ -158,6 +170,18 @@
 </div>
 <div class="paragraph">
 <p>The registry is configured to use HTTPS, this is because Podman refuses to use insecure registries. To make SSL errors go away generate new certificates, or install the <code>localtest.me.ca.crt</code> found in <code>~/.config/easykube</code> to your trust store.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+To enable Zot&#8217;s image sync feature, edit the <code>~/.config/easykube/zot-config.json</code> file, look for the "sync&#8594;enable" section, and change to true - then restart the zot-registry docker container.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -190,11 +214,11 @@ answer auto
 }</code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
+<div class="admonitionblock warning">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-note" title="Note"></i>
+<i class="fa icon-warning" title="Warning"></i>
 </td>
 <td class="content">
 Currently, ext services can only reside in the default namespace.

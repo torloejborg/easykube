@@ -143,10 +143,10 @@
 <p>Easykube aims to enable shared development "platforms" via its companion addon repositories.</p>
 </li>
 <li>
-<p>If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse.. Experiment, develop locally. Breaking "the system" - Eliminate the "docker-compose" shadow workflow.</p>
+<p>If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse. Experiment, develop locally. Break stuff, try again.</p>
 </li>
 <li>
-<p>Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack  locally, without breaking any shared environment.</p>
+<p>Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack locally, all without causing trouble in shared environments.</p>
 </li>
 </ul>
 </div>
@@ -164,16 +164,16 @@
 <p>It bootstraps a single-node Kind cluster with opinionated modifications.</p>
 </li>
 <li>
-<p>It automatically sets up a local zot docker registry for the cluster and connects it locally.</p>
+<p>It automatically sets up a local <a href="https://zotregistry.dev/v2.1.15/">zot</a> docker registry for the cluster and connects it.</p>
 </li>
 <li>
 <p>Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s shape. Port forwarding and storage requirements are handled automatically.</p>
 </li>
 <li>
-<p>Persistent data (if used) survives cluster deletion and recreation. Databases files remain intact.</p>
+<p>Persistent data (if used) survives cluster deletion and recreation. Databases files and downloaded images remain intact.</p>
 </li>
 <li>
-<p>Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It&#8217;s local, do anything, break everything!</p>
+<p>Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It&#8217;s local, do things not possible on the real cluster.</p>
 </li>
 <li>
 <p>Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, with some planning, you can choose to install only the parts you need.</p>
@@ -200,10 +200,7 @@
 <p>Effortlessly spin up local development stacks: Databases, Web servers, Caches, Workflow engines, OAuth servers, S3-compatible storage - If it runs in kubernetes (or Docker/Podman) -  It runs on Easykube.</p>
 </li>
 <li>
-<p>Kubernetes can be complicated, use Easykube as a gateway-drug for new team members - Let them experience the challenges of distributed systems firsthand, on their own machines.</p>
-</li>
-<li>
-<p>Perhaps some team members refuse to acknowledge the 'cloud' thing, they are brilliant developers, but will never care about Kubernetes — And that’s OK, no one can be forced to like it. But they can still run stuff locally.</p>
+<p>Kubernetes can be complicated, use Easykube as a gateway-drug for new team members - Let them experience the challenges of distributed systems firsthand, on their own machines first.</p>
 </li>
 </ul>
 </div>

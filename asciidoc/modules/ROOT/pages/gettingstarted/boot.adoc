@@ -74,6 +74,19 @@ However, mirror registries can be configured at will. Simply add a new registry 
 
 Easykube manages the zot configuration files whenever the boot command is invoked.
 
+== Interacting with easykube [[interact-with-easykube]]
+
+Whenever we use kubectl to interact with a cluster, kubectl expects a `context` to be available, normally contexts lives in the  `~/.kube/config` file. However, easykube will not interact with that config file. It creates its own `~/.kube/easykube` file.
+
+If you get warning about not being able to interact with the cluster when running easykube, then You should set the KUBECONFIG environment variable to include the easykube file.
+
+.setting the KUBECONFIG environment variable
+[source, shell]
+----
+export KUBECONFIG=/homedir/.kube/config:/homedir/.kube/easykube
+----
+
+
 Next steps:
 
 * Discover xref:../addons.adoc#addons-addons[how to use addons icon:arrow-right[role="big"]]

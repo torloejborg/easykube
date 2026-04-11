@@ -53,8 +53,8 @@ let namespace = "default"
 postgres.create("temporal") //<4>
 
 const images = new Map([ //<5>
-["temporalio/auto-setup:1.22.1.0", "localhost:5001/temporalio/auto-setup:1.22.1.0"],
-["temporalio/ui:2.19.0", "localhost:5001/temporalio/ui:2.19.0"]
+["temporalio/auto-setup:1.22.1.0", "registry.localtest.me:5001/temporalio/auto-setup:1.22.1.0"],
+["temporalio/ui:2.19.0", "registry.localtest.me:5001/temporalio/ui:2.19.0"]
 ])
 
 easykube
@@ -81,15 +81,15 @@ A lot is happening here, so let’s break it down:
 
 <4> Easykube’s public addon repository includes a Postgres database server. This instructs Postgres to create a database named temporal (if it doesn’t already exist). Utility functions related to Postgres live in the file 2-postgres.js.
 
-<5> A map of images defines a source and destination.
+<5> A map of images defines a source and destination.  xref:js_reference/easykube.adoc#preload[icon:eye[] preload]
 
-<6> Images are fetched from the internet, re-tagged, and pushed to the local Docker registry. Easykube will not pull images if they already exist in the registry, saving time (at the expense of disk usage). Local deployments refer to images stored in the registry.
+<6> Images are fetched from the internet, re-tagged, and pushed to the local Docker registry. Easykube will not pull images if they already exist in the registry, saving time (at the expense of disk usage). Local deployments refer to images stored in the registry. xref:js_reference/easykube.adoc#preload[icon:eye[] preload]
 
-<7> Invoking kustomize renders the manifests to a file named .out.yaml and applies them using kubectl.
+<7> Invoking kustomize renders the manifests to a file named .out.yaml and applies them using kubectl. xref:js_reference/easykube.adoc#kustomize[icon:eye[] kustomize]
 
-<8> waitForDeployment halts execution until the specified deployment becomes ready (with a 30-second timeout). This is useful in local scenarios where we may need to wait for a database to finish initializing. Real workloads should use better readiness strategies.
+<8> waitForDeployment halts execution until the specified deployment becomes ready (with a 30-second timeout). This is useful in local scenarios where we may need to wait for a database to finish initializing. Real workloads should use better readiness strategies. xref:js_reference/easykube.adoc#waitForDeployment[icon:eye[] waitForDeployment]
 
-<9> Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and much much more.
+<9> Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and much more. xref:js_reference/easykube.adoc#runCommand[icon:eye[] runCommand]
 
 == Limitations [[addons-limitations]]
 
@@ -104,4 +104,27 @@ To write your own addon, copy/paste is a reasonable strategy. Alternatively, you
 `$ easkube skaffold --name myaddon --location utils`
 
 This generates a simple addon skeleton you can adapt for your own purposes. The location parameter is relative to the root of the addon repository.
+
+== Working with docker images in easykube [[work-with-images]]
+
+Almost every addon requires some kind of oci image for it to be useful.
+
+Currently, there are three ways to deploy images;
+
+=== Plain deployments
+
+Apply kubernetes YAML and don't bother with image names and repositories at all. By default, this will not work because it requires the "sync" feature in the ZOT registry-config to be enabled.
+
+Sync is disabled by default, because ZOT can be agressive about it's sync policy and especially docker.io might hit you with a rate-limit, however with internal private registries, this feature can be enabled.
+
+=== Preload
+
+The xref:js_reference/easykube.adoc#preload[easykube.preload(..)] function is the default mode of getting images from the outside world into the local registry. It first pulls a source image, re-tags it before pushing to the local registry.
+
+If the images are not needed on your host machine (in the docker image cache `docker images -a`, then use the skopeo method described below)
+
+
+=== Skopeo
+
+To load images directly local registry use xref:js_reference/easykube.adoc#skopeoPreload[easykube.skopeoPreload(..)] - This requires the skoepo tool to be installed.
 

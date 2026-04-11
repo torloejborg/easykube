@@ -134,6 +134,13 @@
 <li><a href="#addons-dissecting">Dissecting an Addon</a></li>
 <li><a href="#addons-limitations">Limitations</a></li>
 <li><a href="#addons-author">Author a new addon</a></li>
+<li><a href="#work-with-images">Working with docker images in easykube</a>
+<ul class="sectlevel2">
+<li><a href="#_plain_deployments">Plain deployments</a></li>
+<li><a href="#_preload">Preload</a></li>
+<li><a href="#_skopeo">Skopeo</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="sect1">
@@ -189,14 +196,14 @@
 <div class="title">Temporal addon</div>
 <div class="content">
 <pre class="highlight"><code class="language-javascript" data-lang="javascript">let configuration = { <i class="conum" data-value="1"></i><b>(1)</b>
-"description": "An opensource workflow engine", <i class="conum" data-value="2"></i><b>(2)</b>
-"dependsOn" : [ "postgres", "Ingress" ],
-"extraPorts" : [ <i class="conum" data-value="3"></i><b>(3)</b>
-{
-"hostPort" : 7233,
-"nodePort" : 30950,
-"protocol" : "TCP"
-}]
+    description: "An opensource workflow engine", <i class="conum" data-value="2"></i><b>(2)</b>
+    dependsOn : [ "postgres", "Ingress" ],
+    extraPorts : [ <i class="conum" data-value="3"></i><b>(3)</b>
+    {
+        hostPort : 7233,
+        nodePort : 30950,
+        protocol : "TCP"
+    }]
 }
 
 let deployment = "temporal-server"
@@ -205,8 +212,8 @@ let namespace = "default"
 postgres.create("temporal") <i class="conum" data-value="4"></i><b>(4)</b>
 
 const images = new Map([ <i class="conum" data-value="5"></i><b>(5)</b>
-["temporalio/auto-setup:1.22.1.0", "localhost:5001/temporalio/auto-setup:1.22.1.0"],
-["temporalio/ui:2.19.0", "localhost:5001/temporalio/ui:2.19.0"]
+["temporalio/auto-setup:1.22.1.0", "registry.localtest.me:5001/temporalio/auto-setup:1.22.1.0"],
+["temporalio/ui:2.19.0", "registry.localtest.me:5001/temporalio/ui:2.19.0"]
 ])
 
 easykube
@@ -230,7 +237,7 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Every addon has a configuration directive. This JSON structure is extracted by the main easykube program and used to construct the Kind cluster configuration.</td>
+<td>Every addon has a configuration directive. The configuration structure is extracted by the main easykube program and used to construct the Kind cluster configuration.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -246,23 +253,23 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>A map of images defines a source and destination.</td>
+<td>A map of images defines a source and destination.  <a href="../js_reference/easykube/#preload" class="xref page"><span class="icon"><i class="fa fa-eye"></i></span> preload</a></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Images are fetched from the internet, re-tagged, and pushed to the local Docker registry. Easykube will not pull images if they already exist in the registry, saving time (at the expense of disk usage). Local deployments refer to images stored in the registry.</td>
+<td>Images are fetched from the internet, re-tagged, and pushed to the local Docker registry. Easykube will not pull images if they already exist in the registry, saving time (at the expense of disk usage). Local deployments refer to images stored in the registry. <a href="../js_reference/easykube/#preload" class="xref page"><span class="icon"><i class="fa fa-eye"></i></span> preload</a></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>Invoking kustomize renders the manifests to a file named .out.yaml and applies them using kubectl.</td>
+<td>Invoking kustomize renders the manifests to a file named .out.yaml and applies them using kubectl. <a href="../js_reference/easykube/#kustomize" class="xref page"><span class="icon"><i class="fa fa-eye"></i></span> kustomize</a></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="8"></i><b>8</b></td>
-<td>waitForDeployment halts execution until the specified deployment becomes ready (with a 30-second timeout). This is useful in local scenarios where we may need to wait for a database to finish initializing. Real workloads should use better readiness strategies.</td>
+<td>waitForDeployment halts execution until the specified deployment becomes ready (with a 30-second timeout). This is useful in local scenarios where we may need to wait for a database to finish initializing. Real workloads should use better readiness strategies. <a href="../js_reference/easykube/#waitForDeployment" class="xref page"><span class="icon"><i class="fa fa-eye"></i></span> waitForDeployment</a></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="9"></i><b>9</b></td>
-<td>Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and much much more.</td>
+<td>Running arbitrary commands inside a container is a useful feature. In this example, the Temporal deployment requires namespace-a and namespace-b to exist. This mechanism can be used to load test data into a database, create a token inside a container and store it as a Kubernetes secret, and much more. <a href="../js_reference/easykube/#runCommand" class="xref page"><span class="icon"><i class="fa fa-eye"></i></span> runCommand</a></td>
 </tr>
 </table>
 </div>
@@ -290,6 +297,41 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 </div>
 <div class="paragraph">
 <p>This generates a simple addon skeleton you can adapt for your own purposes. The location parameter is relative to the root of the addon repository.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="work-with-images"><a class="anchor" href="#work-with-images"></a>Working with docker images in easykube</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Almost every addon requires some kind of oci image for it to be useful.</p>
+</div>
+<div class="paragraph">
+<p>Currently, there are three ways to deploy images;</p>
+</div>
+<div class="sect2">
+<h3 id="_plain_deployments"><a class="anchor" href="#_plain_deployments"></a>Plain deployments</h3>
+<div class="paragraph">
+<p>Apply kubernetes YAML and don&#8217;t bother with image names and repositories at all. By default, this will not work because it requires the "sync" feature in the ZOT registry-config to be enabled.</p>
+</div>
+<div class="paragraph">
+<p>Sync is disabled by default, because ZOT can be agressive about it&#8217;s sync policy and especially docker.io might hit you with a rate-limit, however with internal private registries, this feature can be enabled.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_preload"><a class="anchor" href="#_preload"></a>Preload</h3>
+<div class="paragraph">
+<p>The <a href="../js_reference/easykube/#preload" class="xref page">easykube.preload(..)</a> function is the default mode of getting images from the outside world into the local registry. It first pulls a source image, re-tags it before pushing to the local registry.</p>
+</div>
+<div class="paragraph">
+<p>If the images are not needed on your host machine (in the docker image cache <code>docker images -a</code>, then use the skopeo method described below)</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_skopeo"><a class="anchor" href="#_skopeo"></a>Skopeo</h3>
+<div class="paragraph">
+<p>To load images directly local registry use <a href="../js_reference/easykube/#skopeoPreload" class="xref page">easykube.skopeoPreload(..)</a> - This requires the skoepo tool to be installed.</p>
+</div>
 </div>
 </div>
 </div>

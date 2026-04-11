@@ -131,6 +131,7 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_reloading_configuration_changes">Reloading configuration changes</a></li>
+<li><a href="#interact-with-easykube">Interacting with easykube</a></li>
 </ul>
 </div>
 <div id="preamble">
@@ -218,6 +219,23 @@ Addon: "postgres.ek.js"
 </div>
 <div class="paragraph">
 <p>Easykube manages the zot configuration files whenever the boot command is invoked.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="interact-with-easykube"><a class="anchor" href="#interact-with-easykube"></a>Interacting with easykube</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Whenever we use kubectl to interact with a cluster, kubectl expects a <code>context</code> to be available, normally contexts lives in the  <code>~/.kube/config</code> file. However, easykube will not interact with that config file. It creates its own <code>~/.kube/easykube</code> file.</p>
+</div>
+<div class="paragraph">
+<p>If you get warning about not being able to interact with the cluster when running easykube, then You should set the KUBECONFIG environment variable to include the easykube file.</p>
+</div>
+<div class="listingblock">
+<div class="title">setting the KUBECONFIG environment variable</div>
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">export KUBECONFIG=/homedir/.kube/config:/homedir/.kube/easykube</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Next steps:</p>

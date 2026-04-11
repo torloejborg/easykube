@@ -1,12 +1,21 @@
-= Postgres API Reference
+= Utils API Reference
 :toc:
 :toclevels: 2
 
 
 
-== Methods
+== Methods / Properties
 
-=== sparseCheckout
+=== newUUID [[newUUID]]
+
+Generates a new UUID
+
+[source,javascript]
+----
+newUUID()
+----
+
+=== sparseCheckout [[sparseCheckout]]
 
 Downloads a particular directory in a git repository
 
@@ -36,7 +45,7 @@ sparseCheckout(repository, branch, directories, destination)
 |===
 
 
-=== checkout
+=== checkout [[checkout]]
 
 Downloads a particular directory in a git repository
 

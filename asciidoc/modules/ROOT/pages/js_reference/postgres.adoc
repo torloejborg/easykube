@@ -4,9 +4,9 @@
 
 
 
-== Methods
+== Methods / Properties
 
-=== create
+=== create [[create]]
 
 Creates a new database in Postgres, the database will only be created if not exists
 
@@ -36,7 +36,7 @@ create(database, schema, force)
 
 `Postgres` — 
 
-=== runLocalScript
+=== runLocalScript [[runLocalScript]]
 
 Applies a local sql script to a target database
 
