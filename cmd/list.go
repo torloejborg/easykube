@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 // listCmd represents the list command
@@ -13,19 +13,23 @@ var listCmd = &cobra.Command{
 	Long:  "installed addons has a tick-mark",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeEasykube()
+		ek, err := CreateEasykube(core.CommandHelper(cmd),
+			WithKubernetes(true),
+			WithContainerRuntime(true),
+			WithAddonReader(true),
+			WithClusterUtils(true),
+			WithRequiresConfigurationCreated(true),
+		)
 		if err != nil {
 			return err
 		}
 
-		helper := ez.CommandHelper(cmd)
-
 		opts := ListOpts{
-			PlainListing:  helper.GetBoolFlag("plain"),
-			ShowInstalled: helper.GetBoolFlag("installed"),
+			PlainListing:  ek.CommandContext.GetBoolFlag("plain"),
+			ShowInstalled: ek.CommandContext.GetBoolFlag("installed"),
 		}
 
-		return listActual(opts)
+		return listActual(opts, ek)
 	},
 }
 

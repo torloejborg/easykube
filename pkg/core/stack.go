@@ -1,6 +1,4 @@
-package ez
-
-type Stack[T any] []T
+package core
 
 // Push adds an element to the top of the stack
 func (s *Stack[T]) Push(v T) {

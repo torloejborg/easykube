@@ -9,31 +9,22 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/textutils"
 )
 
 type StatusBuilderImpl struct {
+	ek           *core.Ek
 	VersionUtils VersionUtils
-}
-
-type IStatusBuilder interface {
-	DoContainerCheck() error
-	DoBinaryCheck() error
-	DoAddonRepositoryCheck() error
-	getDockerVersion() string
-	getHelmVersion() string
-	getKubectlVersion() string
-	getKustomizeVersion() string
-	getPodmanVersion() string
-	getVersionStr(in, wants string, inErr error) string
 }
 
 type binaryCheckStatus struct {
 	HasVersionMismatch bool
 }
 
-func NewStatusBuilder() IStatusBuilder {
+func NewStatusBuilder(ek *core.Ek) core.IStatusBuilder {
 	return &StatusBuilderImpl{
+		ek:           ek,
 		VersionUtils: NewVersionUtils(),
 	}
 }
@@ -42,72 +33,79 @@ func (s *StatusBuilderImpl) DoContainerCheck() error {
 
 	running := func(containerID string) {
 
-		if running, _ := Kube.IsContainerRunning(containerID); running {
-			Kube.FmtGreen("✓ %s container", containerID)
+		if running, _ := s.ek.ContainerRuntime.IsContainerRunning(containerID); running {
+			s.ek.Printer.FmtGreen("✓ %s container", containerID)
 		} else {
-			Kube.FmtRed("⚠ %s container not running", containerID)
+			s.ek.Printer.FmtRed("⚠ %s container not running", containerID)
 		}
 	}
 
-	Kube.FmtGreen("Container configuration")
+	s.ek.Printer.FmtGreen("Container configuration")
 	running(constants.RegistryContainer)
 	running(constants.KindContainer)
 
-	if connected, _ := Kube.IsNetworkConnectedToContainer(constants.RegistryContainer, "kind"); connected {
-		Kube.FmtGreen("✓ %s connected to kind network", constants.RegistryContainer)
+	if connected, _ := s.ek.ContainerRuntime.IsNetworkConnectedToContainer(constants.RegistryContainer, "kind"); connected {
+		s.ek.Printer.FmtGreen("✓ %s connected to kind network", constants.RegistryContainer)
 	} else {
-		Kube.FmtRed("⚠ %s not connected to kind network", constants.RegistryContainer)
+		s.ek.Printer.FmtRed("⚠ %s not connected to kind network", constants.RegistryContainer)
 	}
 
 	return nil
 }
 
-func checkBinary(name string, vFunc func() string) binaryCheckStatus {
+func (s *StatusBuilderImpl) checkBinary(name string, vFunc func() string, optional bool) binaryCheckStatus {
 	_, err := exec.LookPath(name)
 	if err != nil {
-		Kube.FmtRed("⚠ " + name)
+
+		if optional {
+			s.ek.Printer.FmtYellow("%s (optional)", name)
+			return binaryCheckStatus{HasVersionMismatch: false}
+		}
+
+		s.ek.Printer.FmtRed("⚠ " + name)
 		return binaryCheckStatus{HasVersionMismatch: false}
 	} else {
 
 		version := vFunc()
 		if strings.Contains(version, "easykube") {
-			Kube.FmtYellow("%s %s", name, version)
+			s.ek.Printer.FmtYellow("%s %s", name, version)
 			return binaryCheckStatus{HasVersionMismatch: true}
 		} else {
-			Kube.FmtGreen("✓ %s %s", name, version)
+			s.ek.Printer.FmtGreen("✓ %s %s", name, version)
 			return binaryCheckStatus{HasVersionMismatch: false}
 		}
 	}
 }
 
 func (s *StatusBuilderImpl) DoBinaryCheck() error {
-	cfg, err := Kube.IEasykubeConfig.LoadConfig()
+	cfg, err := s.ek.Config.LoadConfig()
 	if err != nil {
 		return err
 	}
 
-	Kube.FmtGreen("Inspecting binary dependencies")
+	s.ek.Printer.FmtGreen("Inspecting binary dependencies")
 	versionCheck := make([]binaryCheckStatus, 0)
 
 	runtime := cfg.ContainerRuntime
 
 	if runtime == "docker" {
-		if !HasBinary("docker") {
+		if !s.ek.Utils.HasBinary(constants.DockerBinary) {
 			return errors.New("docker runtime not available")
 		}
-		versionCheck = append(versionCheck, checkBinary("docker", s.getDockerVersion))
+		versionCheck = append(versionCheck, s.checkBinary(constants.DockerBinary, s.GetDockerVersion, false))
 	}
 
 	if runtime == "podman" {
-		if !HasBinary("podman") {
+		if !s.ek.Utils.HasBinary(constants.PodmanBinary) {
 			return errors.New("podman runtime not available")
 		}
-		versionCheck = append(versionCheck, checkBinary("podman", s.getPodmanVersion))
+		versionCheck = append(versionCheck, s.checkBinary(constants.PodmanBinary, s.GetPodmanVersion, false))
 	}
 
-	versionCheck = append(versionCheck, checkBinary("kubectl", s.getKubectlVersion))
-	versionCheck = append(versionCheck, checkBinary("helm", s.getHelmVersion))
-	versionCheck = append(versionCheck, checkBinary("kustomize", s.getKustomizeVersion))
+	versionCheck = append(versionCheck, s.checkBinary(constants.KustomizeBinary, s.GetKubectlVersion, false))
+	versionCheck = append(versionCheck, s.checkBinary(constants.HelmBinary, s.GetHelmVersion, false))
+	versionCheck = append(versionCheck, s.checkBinary(constants.KustomizeBinary, s.GetKustomizeVersion, false))
+	versionCheck = append(versionCheck, s.checkBinary(constants.SkopeoBinary, s.GetSkopeoVersion, true))
 
 	for i := range versionCheck {
 		if versionCheck[i].HasVersionMismatch {
@@ -120,7 +118,7 @@ func (s *StatusBuilderImpl) DoBinaryCheck() error {
 			|
   			|  Your mileage may vary :)
 			`
-			Kube.FmtYellow(textutils.TrimMargin(msg, "|"))
+			s.ek.Printer.FmtYellow(textutils.TrimMargin(msg, "|"))
 			break
 		}
 	}
@@ -130,64 +128,69 @@ func (s *StatusBuilderImpl) DoBinaryCheck() error {
 
 func (s *StatusBuilderImpl) DoAddonRepositoryCheck() error {
 
-	Kube.FmtGreen("Repository configuration")
+	s.ek.Printer.FmtGreen("Repository configuration")
 
-	addons, aerr := Kube.GetAddons()
+	addons, aerr := s.ek.AddonReader.GetAddons()
 	if aerr != nil {
-		Kube.FmtRed(aerr.Error())
+		s.ek.Printer.FmtRed(aerr.Error())
 	}
 
-	cfg, _ := Kube.LoadConfig()
+	cfg, _ := s.ek.Config.LoadConfig()
 
 	na := len(addons)
 	if _, err := os.Stat(cfg.AddonDir); err == nil {
 		if na == 0 {
-			Kube.FmtYellow("⚠ %d addons discovered, check if '%s' is an addon repository", na, cfg.AddonDir)
+			s.ek.Printer.FmtYellow("⚠ %d addons discovered, check if '%s' is an addon repository", na, cfg.AddonDir)
 		} else {
-			Kube.FmtGreen("✓ %d addons discovered at '%s'", na, cfg.AddonDir)
+			s.ek.Printer.FmtGreen("✓ %d addons discovered at '%s'", na, cfg.AddonDir)
 		}
 
-		msg, err := Kube.CheckAddonCompatibility()
+		msg, err := s.ek.AddonReader.CheckAddonCompatibility()
 		if err != nil {
-			Kube.FmtRed("⚠ %s", err.Error())
+			s.ek.Printer.FmtRed("⚠ %s", err.Error())
 		}
 		if msg != "" {
-			Kube.FmtGreen("✓ %s", msg)
+			s.ek.Printer.FmtGreen("✓ %s", msg)
 		}
 
 	} else {
-		Kube.FmtRed("⚠ addon directory '%s' does not exist, check your config", cfg.AddonDir)
+		s.ek.Printer.FmtRed("⚠ addon directory '%s' does not exist, check your config", cfg.AddonDir)
 	}
 
 	return nil
 }
 
-func (s *StatusBuilderImpl) getKubectlVersion() string {
-	out, _, err := Kube.RunCommand("kubectl", []string{"version", "--client"}...)
-	return s.getVersionStr(out, constants.KubectlSemver, err)
+func (s *StatusBuilderImpl) GetKubectlVersion() string {
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.KubectlBinary, []string{"version", "--client"}...)
+	return s.GetVersionStr(out, constants.KubectlSemver, err)
 }
 
-func (s *StatusBuilderImpl) getDockerVersion() string {
-	out, _, err := Kube.RunCommand("docker", []string{"version", "--format", "{{.Server.Version}}"}...)
-	return s.getVersionStr(out, constants.DockerSemver, err)
+func (s *StatusBuilderImpl) GetDockerVersion() string {
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.DockerBinary, []string{"version", "--format", "{{.Server.Version}}"}...)
+	return s.GetVersionStr(out, constants.DockerSemver, err)
 }
 
-func (s *StatusBuilderImpl) getHelmVersion() string {
-	out, _, err := Kube.RunCommand("helm", []string{"version", "--template", "{{.Version}}"}...)
-	return s.getVersionStr(out, constants.HelmSemver, err)
+func (s *StatusBuilderImpl) GetHelmVersion() string {
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.HelmBinary, []string{"version", "--template", "{{.Version}}"}...)
+	return s.GetVersionStr(out, constants.HelmSemver, err)
 }
 
-func (s *StatusBuilderImpl) getKustomizeVersion() string {
-	out, _, err := Kube.RunCommand("kustomize", []string{"version"}...)
-	return s.getVersionStr(out, constants.KustomizeSemver, err)
+func (s *StatusBuilderImpl) GetKustomizeVersion() string {
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.KustomizeBinary, []string{"version"}...)
+	return s.GetVersionStr(out, constants.KustomizeSemver, err)
 }
 
-func (s *StatusBuilderImpl) getPodmanVersion() string {
-	out, _, err := Kube.RunCommand("podman", []string{"version", "--format", " {{.Version}}"}...)
-	return s.getVersionStr(out, constants.PodmanSemver, err)
+func (s *StatusBuilderImpl) GetPodmanVersion() string {
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.PodmanBinary, []string{"version", "--format", " {{.Version}}"}...)
+	return s.GetVersionStr(out, constants.PodmanSemver, err)
 }
 
-func (s *StatusBuilderImpl) getVersionStr(in, wants string, inErr error) string {
+func (s *StatusBuilderImpl) GetSkopeoVersion() string {
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.SkopeoBinary, []string{"--version"}...)
+	return s.GetVersionStr(out, constants.SkopeoSemver, err)
+}
+
+func (s *StatusBuilderImpl) GetVersionStr(in, wants string, inErr error) string {
 	if inErr != nil {
 		return "?"
 	}

@@ -72,9 +72,21 @@ class Easykube {
     }
 
     /**
+     * Use the skopeo tool to copy an image from source to destination, typically to the local registry
+     * this saves bandwidth, and will make subsequent installations faster, unlike preload, source images
+     * are not stored in your docker context, thus saving disk-space
+     * @param {Map<string, string>} images
+     * @returns {Easykube}
+     */
+    skopeoPreLoad(images) {
+        _ek.skopeoPreload(images);
+        return this;
+    }
+
+    /**
      * Runs a command in a container
      * @param {string} deployment - Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)
-     * @param {string} namespace , args) {
+     * @param {string} namespace
      * @param {string} command - The command to run, example "ls" or "/usr/local/bin/whatever"
      * @param {string[]} args - Arguments to the command, example ["-la","-v"]
      * @returns {string}
@@ -234,6 +246,6 @@ class Easykube {
 }
 
 const easykube = new Easykube();
-const local_registry = "registry.localtest.me:5001";
+const registry_host = "registry.localtest.me:5001";
 
 // newline at end-of-file is needed

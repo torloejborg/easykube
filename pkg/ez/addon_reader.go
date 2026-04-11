@@ -1,7 +1,6 @@
 package ez
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -9,40 +8,36 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"unicode"
 
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
+	jsutils "github.com/torloejborg/easykube/pkg/js"
 	"github.com/torloejborg/easykube/pkg/vars"
 )
 
-type IAddonReader interface {
-	GetAddons() (map[string]IAddon, error)
-	ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error)
-	ExtractJSON(input string) (string, bool)
-	CheckAddonCompatibility() (string, error)
-}
-
 type AddonReader struct {
-	EkConfig  *EasykubeConfigData
-	EkContext *CobraCommandHelperImpl
+	ek            *core.Ek
+	Configuration *core.EasykubeConfigData
 }
 
-func NewAddonReader(config IEasykubeConfig) IAddonReader {
-	cfg, err := config.LoadConfig()
+func NewAddonReader(ek *core.Ek) core.IAddonReader {
+
+	cfg, err := ek.Config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 
 	return &AddonReader{
-		EkConfig: cfg,
+		ek:            ek,
+		Configuration: cfg,
 	}
 }
 
 func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 
 	// extract version from 1_easykube.js
-	haystack, err := afero.ReadFile(Kube.Fs, filepath.Join(adr.EkConfig.AddonDir, constants.JsLib, "1-easykube.js"))
+	haystack, err := afero.ReadFile(adr.ek.Fs, filepath.Join(adr.Configuration.AddonDir, constants.JsLib, "1-easykube.js"))
 	if err != nil {
 		return "", err
 	}
@@ -69,17 +64,17 @@ func (adr *AddonReader) CheckAddonCompatibility() (string, error) {
 	return msg, nil
 }
 
-func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
-	addons := make(map[string]IAddon)
+func (adr *AddonReader) GetAddons() (map[string]core.IAddon, error) {
+	addons := make(map[string]core.IAddon)
 	addonExpre := regexp.MustCompile(`^.+\.(ek.js)$`)
 
-	if adr.EkConfig == nil {
+	if adr.Configuration == nil {
 		panic("expected ekconfig pointer!")
 	}
 
 	// Resolve the root directory in case it's a symlink.
-	root := adr.EkConfig.AddonDir
-	if _, err := Kube.Stat(root); err != nil {
+	root := adr.Configuration.AddonDir
+	if _, err := adr.ek.Fs.Stat(root); err != nil {
 		return nil, err
 	}
 	if resolved, err := filepath.EvalSymlinks(root); err == nil {
@@ -116,12 +111,12 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 				return err
 			}
 			// Stat target to see if it is a directory.
-			tinfo, err := Kube.Stat(target)
+			tinfo, err := adr.ek.Fs.Stat(target)
 			if err != nil {
 				return err
 			}
 			if tinfo.IsDir() {
-				return afero.Walk(Kube.Fs, target, walkFunc)
+				return afero.Walk(adr.ek.Fs, target, walkFunc)
 			}
 			// If it’s a symlink to a file, treat it below as a regular file.
 			info = tinfo
@@ -129,7 +124,7 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 		}
 
 		if !info.IsDir() && addonExpre.MatchString(info.Name()) {
-			file, openErr := Kube.Fs.Open(path)
+			file, openErr := adr.ek.Fs.Open(path)
 			if openErr != nil {
 				return openErr
 			}
@@ -137,7 +132,7 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 
 			abs, _ := filepath.Abs(file.Name())
 
-			foundAddon := &Addon{
+			foundAddon := &core.Addon{
 				Name:      info.Name(),
 				ShortName: strings.ReplaceAll(info.Name(), ".ek.js", ""),
 				File:      abs,
@@ -157,7 +152,7 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 		return nil
 	}
 
-	if err := afero.Walk(Kube.Fs, root, walkFunc); err != nil {
+	if err := afero.Walk(adr.ek.Fs, root, walkFunc); err != nil {
 		return nil, err
 	}
 
@@ -165,10 +160,10 @@ func (adr *AddonReader) GetAddons() (map[string]IAddon, error) {
 }
 
 func (adr *AddonReader) resolveExecutionOrder(
-	g *Graph[IAddon],
-	toInstall IAddon,
-	allAddons map[string]IAddon,
-	out *[]IAddon, outgraph *Graph[IAddon]) {
+	g *core.Graph[core.IAddon],
+	toInstall core.IAddon,
+	allAddons map[string]core.IAddon,
+	out *[]core.IAddon, outgraph *core.Graph[core.IAddon]) {
 
 	d := toInstall.GetConfig().DependsOn
 	for x := range d {
@@ -177,7 +172,7 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err := g.AddEdge(toInstall, next)
 
 		if err != nil {
-			Kube.FmtRed(err.Error())
+			adr.ek.Printer.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 
@@ -187,43 +182,23 @@ func (adr *AddonReader) resolveExecutionOrder(
 		err = outgraph.AddEdge(toInstall, next)
 
 		if err != nil {
-			Kube.FmtRed(err.Error())
+			adr.ek.Printer.FmtRed(err.Error())
 			os.Exit(-1)
 		}
 	}
 }
 
-func (adr *AddonReader) ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error) {
-	out := Kube.IPrinter
+func (adr *AddonReader) ExtractConfiguration(unconfigured core.IAddon) (*core.AddonConfig, error) {
 
-	code, err := afero.ReadFile(Kube.Fs, unconfigured.GetAddonFile())
+	cfg, err := jsutils.NewJsUtils(adr.ek, unconfigured, true).ExtractConfigurationObject(unconfigured)
+
 	if err != nil {
-		panic(err)
-	}
-
-	parsed, ok := adr.ExtractJSON(string(code))
-
-	if len(parsed) == 0 {
-		out.FmtYellow("%s Does not provide any configuration", unconfigured.GetName())
-		return &AddonConfig{
-			DependsOn:   nil,
-			ExtraPorts:  nil,
-			ExtraMounts: nil,
-			Description: "",
-		}, nil
-	}
-
-	if !ok {
 		return nil, fmt.Errorf("failed to parse configuration")
 	} else {
 
-		// Parse the JSON string
-		cfg := &AddonConfig{}
-		jsonErr := json.Unmarshal([]byte(parsed), &cfg)
-
 		// Set persistence location for all ExtraMounts
 		for idx, _ := range cfg.ExtraMounts {
-			cfg.ExtraMounts[idx].PersistenceDir = adr.EkConfig.PersistenceDir + "/"
+			cfg.ExtraMounts[idx].PersistenceDir = adr.Configuration.PersistenceDir + "/"
 
 			// An absolute path in HostPath will be respected, and not be relative
 			// to the user persistence directory
@@ -240,54 +215,7 @@ func (adr *AddonReader) ExtractConfiguration(unconfigured IAddon) (*AddonConfig,
 			}
 		}
 
-		return cfg, jsonErr
+		return cfg, nil
 	}
 
-}
-
-func (adr *AddonReader) ExtractJSON(input string) (string, bool) {
-
-	// remove comments
-	commentRe := regexp.MustCompile(`(?m)//.*$`)
-	input = commentRe.ReplaceAllString(input, "")
-
-	// Match assignment patterns like "let configuration =" or "configuration="
-	re := regexp.MustCompile(`\b(?:let\s+)?configuration\s*=\s*`)
-	loc := re.FindStringIndex(input)
-	if loc == nil {
-		return "", false
-	}
-
-	// Start looking for the JSON object
-	startIdx := loc[1] // Position after "configuration ="
-	for startIdx < len(input) && unicode.IsSpace(rune(input[startIdx])) {
-		startIdx++ // Skip spaces
-	}
-
-	// Ensure we start at '{'
-	if startIdx >= len(input) || input[startIdx] != '{' {
-		return "", false
-	}
-
-	// Extract JSON using a stack to handle nested braces
-	stack := []rune{}
-	var jsonStr strings.Builder
-
-	for i := startIdx; i < len(input); i++ {
-		char := rune(input[i])
-		jsonStr.WriteRune(char)
-
-		if char == '{' {
-			stack = append(stack, char) // Push to stack
-		} else if char == '}' {
-			stack = stack[:len(stack)-1] // Pop from stack
-			if len(stack) == 0 {
-				// Found the full JSON object
-				return jsonStr.String(), true
-			}
-		}
-	}
-
-	// If we reach here, the braces were not balanced
-	return "", false
 }

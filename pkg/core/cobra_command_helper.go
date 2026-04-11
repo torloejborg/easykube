@@ -1,22 +1,10 @@
-package ez
+package core
 
 import (
 	"github.com/spf13/cobra"
 )
 
-type ICobraCommandHelper interface {
-	GetBoolFlag(name string) bool
-	GetStringFlag(name string) string
-	GetIntFlag(name string) int
-	IsVerbose() bool
-	IsDryRun() bool
-}
-
-type CobraCommandHelperImpl struct {
-	Command *cobra.Command
-}
-
-func (e *CobraCommandHelperImpl) GetBoolFlag(name string) bool {
+func (e CobraCommandHelperImpl) GetBoolFlag(name string) bool {
 	val, err := e.Command.Flags().GetBool(name)
 	if err != nil {
 		panic(err)
@@ -24,7 +12,7 @@ func (e *CobraCommandHelperImpl) GetBoolFlag(name string) bool {
 	return val
 }
 
-func (e *CobraCommandHelperImpl) GetIntFlag(name string) int {
+func (e CobraCommandHelperImpl) GetIntFlag(name string) int {
 	val, err := e.Command.Flags().GetInt(name)
 	if err != nil {
 		panic(err)
@@ -32,7 +20,7 @@ func (e *CobraCommandHelperImpl) GetIntFlag(name string) int {
 	return val
 }
 
-func (e *CobraCommandHelperImpl) IsVerbose() bool {
+func (e CobraCommandHelperImpl) IsVerbose() bool {
 	val, err := e.Command.Flags().GetBool("verbose")
 	if err != nil {
 		panic(err)
@@ -40,7 +28,7 @@ func (e *CobraCommandHelperImpl) IsVerbose() bool {
 	return val
 }
 
-func (e *CobraCommandHelperImpl) IsDryRun() bool {
+func (e CobraCommandHelperImpl) IsDryRun() bool {
 	val, err := e.Command.Flags().GetBool("dry-run")
 	if err != nil {
 		panic(err)
@@ -48,7 +36,7 @@ func (e *CobraCommandHelperImpl) IsDryRun() bool {
 	return val
 }
 
-func (e *CobraCommandHelperImpl) GetStringFlag(name string) string {
+func (e CobraCommandHelperImpl) GetStringFlag(name string) string {
 	val, err := e.Command.Flags().GetString(name)
 	if err != nil {
 		panic(err)

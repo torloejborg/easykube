@@ -26,6 +26,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 type ContainerRuntimeImpl struct {
@@ -33,28 +34,29 @@ type ContainerRuntimeImpl struct {
 	ctx         context.Context
 	Fs          afero.Fs
 	RuntimeType string
+	ek          *core.Ek
 }
 
-func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
+func NewContainerRuntimeImpl(ek *core.Ek, runtime string) (core.IContainerRuntime, error) {
 
 	clientsOpts := make([]client.Opt, 0)
 	clientsOpts = append(clientsOpts, client.WithAPIVersionNegotiation())
 
 	switch runtime {
 	case "docker":
-		if !HasBinary("docker") {
+		if !ek.Utils.HasBinary("docker") {
 			return nil, errors.New("docker binary not found, is it installed")
 		}
 		clientsOpts = append(clientsOpts, client.FromEnv)
 		break
 	case "podman":
 
-		if !HasBinary("podman") {
+		if !ek.Utils.HasBinary("podman") {
 			return nil, errors.New("podman binary not found, is it installed")
 		}
 
 		// get the socket location
-		sout, _, err := Kube.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
+		sout, _, err := ek.ExternalTools.RunCommand("podman", []string{"info", "--format", "{{.Host.RemoteSocket.Path}}"}...)
 
 		// some podman versions report unix://, others not.
 		if !strings.Contains(string(sout), "unix") {
@@ -81,6 +83,7 @@ func NewContainerRuntimeImpl(runtime string) (IContainerRuntime, error) {
 		Docker:      docker,
 		ctx:         context.Background(),
 		RuntimeType: runtime,
+		ek:          ek,
 	}, nil
 
 }
@@ -209,10 +212,11 @@ func (cri *ContainerRuntimeImpl) PushImage(src, dest string) error {
 
 }
 
-func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateRegistryCredentials) error {
+func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *core.PrivateRegistryCredentials) error {
 
 	opts := image2.PullOptions{
-		All: false,
+		All:      false,
+		Platform: "linux/amd64",
 	}
 
 	if credentials != nil {
@@ -249,6 +253,7 @@ func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateReg
 			})
 
 			opts.RegistryAuth = base64.StdEncoding.EncodeToString(jsonBytes)
+
 		}
 
 	}
@@ -275,7 +280,7 @@ func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *PrivateReg
 	return nil
 }
 
-func (cri *ContainerRuntimeImpl) FindContainer(name string) (*ContainerSearch, error) {
+func (cri *ContainerRuntimeImpl) FindContainer(name string) (*core.ContainerSearch, error) {
 
 	f := filters.NewArgs()
 	f.Add("name", name)
@@ -293,13 +298,13 @@ func (cri *ContainerRuntimeImpl) FindContainer(name string) (*ContainerSearch, e
 
 		state := resp[0].State == "running"
 
-		return &ContainerSearch{
+		return &core.ContainerSearch{
 			Found:       true,
 			IsRunning:   state,
 			ContainerID: resp[0].ID,
 		}, nil
 	} else {
-		return &ContainerSearch{
+		return &core.ContainerSearch{
 			Found:       false,
 			IsRunning:   false,
 			ContainerID: "",
@@ -421,15 +426,15 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 
 	// make sure that the registry-config file exists
 	configDir, _ := os.UserConfigDir()
-	if err := CopyResourceToConfigDir(constants.ZotConfig, constants.ZotConfig); err != nil {
+	if err := cri.ek.Utils.CopyResourceToConfigDir(constants.ZotConfig, constants.ZotConfig); err != nil {
 		return err
 	}
 
-	if err := CopyResourceToConfigDir("cert/server.crt", "localtest.me.crt"); err != nil {
+	if err := cri.ek.Utils.CopyResourceToConfigDir("cert/server.crt", "localtest.me.crt"); err != nil {
 		return err
 	}
 
-	if err := CopyResourceToConfigDir("cert/server.key", "localtest.me.key"); err != nil {
+	if err := cri.ek.Utils.CopyResourceToConfigDir("cert/server.key", "localtest.me.key"); err != nil {
 		return err
 	}
 
@@ -445,7 +450,7 @@ func (cri *ContainerRuntimeImpl) CreateContainerRegistry() error {
 			Image:        registryImg,
 		}
 
-		configDir, err = Kube.GetEasykubeConfigDir()
+		configDir, err = cri.ek.OsDetails.GetEasykubeConfigDir()
 
 		binds := make([]string, 0)
 		binds = append(binds, filepath.Join(configDir, "localtest.me.crt")+":/etc/ssl/localtest.me.crt:z")

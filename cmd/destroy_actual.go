@@ -5,70 +5,69 @@ import (
 	"time"
 
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
-func destroyActual() error {
+func destroyActual(ek *core.Ek) error {
 
-	tasks := ez.NewTaskContainer()
+	tasks := core.NewTaskContainer()
 
-	tasks.AddTask(stopAndDeleteCluster())
-	tasks.AddTask(stopAndDeleteRegistry())
-	tasks.AddTask(purgeData())
+	tasks.AddTask(stopAndDeleteCluster(ek))
+	tasks.AddTask(stopAndDeleteRegistry(ek))
+	tasks.AddTask(purgeData(ek))
 
-	ez.ExecuteTasks(tasks)
+	core.ExecuteTasks(tasks)
 
 	return nil
 }
 
-func running(name string) bool {
-	result, _ := ez.Kube.IsContainerRunning(name)
+func running(name string, ek *core.Ek) bool {
+	result, _ := ek.ContainerRuntime.IsContainerRunning(name)
 	return result
 }
 
-func stopAndDeleteCluster() ez.Task {
-	return ez.NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.KindContainer), func() error {
-		return stopAndDeleteContainer(constants.KindContainer)
+func stopAndDeleteCluster(ek *core.Ek) core.Task {
+	return core.NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.KindContainer), func() error {
+		return stopAndDeleteContainer(constants.KindContainer, ek)
 	}, func() bool {
-		return !running(constants.KindContainer)
+		return !running(constants.KindContainer, ek)
 	})
 }
 
-func stopAndDeleteRegistry() ez.Task {
-	return ez.NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.RegistryContainer), func() error {
-		return stopAndDeleteContainer(constants.RegistryContainer)
+func stopAndDeleteRegistry(ek *core.Ek) core.Task {
+	return core.NewTaskWithSkip(fmt.Sprintf("stop and delete %s", constants.RegistryContainer), func() error {
+		return stopAndDeleteContainer(constants.RegistryContainer, ek)
 	}, func() bool {
-		return !running(constants.RegistryContainer)
+		return !running(constants.RegistryContainer, ek)
 	})
 }
 
-func purgeData() ez.Task {
-	return ez.NewTaskWithSkip("purge data", func() error {
+func purgeData(ek *core.Ek) core.Task {
+	return core.NewTaskWithSkip("purge data", func() error {
 
-		configDir, err := ez.Kube.GetEasykubeConfigDir()
+		configDir, err := ek.OsDetails.GetEasykubeConfigDir()
 		if err != nil {
 			return err
 		}
 
-		s, _ := ez.Kube.Fs.Stat(configDir)
+		s, _ := ek.Fs.Stat(configDir)
 		if s.IsDir() {
-			return ez.Kube.Fs.RemoveAll(configDir)
+			return ek.Fs.RemoveAll(configDir)
 		}
 
 		return nil
 
 	}, func() bool {
-		return !ez.Kube.GetBoolFlag("purge")
+		return !ek.CommandContext.GetBoolFlag("purge")
 	})
 
 }
 
-func stopAndDeleteContainer(name string) error {
-	ezk := ez.Kube
+func stopAndDeleteContainer(name string, ek *core.Ek) error {
 
-	find := func(name string) (*ez.ContainerSearch, error) {
-		if search, err := ezk.FindContainer(name); err != nil {
-			return &ez.ContainerSearch{
+	find := func(name string) (*core.ContainerSearch, error) {
+		if search, err := ek.ContainerRuntime.FindContainer(name); err != nil {
+			return &core.ContainerSearch{
 				ContainerID: "",
 				Found:       false,
 				IsRunning:   false,
@@ -89,12 +88,12 @@ func stopAndDeleteContainer(name string) error {
 
 		if s.IsRunning {
 
-			stopErr := ezk.StopContainer(s.ContainerID)
+			stopErr := ek.ContainerRuntime.StopContainer(s.ContainerID)
 			if stopErr != nil {
 				return stopErr
 			}
 		} else {
-			err := ezk.RemoveContainer(s.ContainerID)
+			err := ek.ContainerRuntime.RemoveContainer(s.ContainerID)
 			if err != nil {
 				return err
 			}

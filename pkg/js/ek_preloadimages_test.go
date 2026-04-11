@@ -3,8 +3,7 @@ package jsutils_test
 import (
 	"testing"
 
-	mock_ez "github.com/torloejborg/easykube/mock"
-	"github.com/torloejborg/easykube/pkg/ez"
+	mock "github.com/torloejborg/easykube/mock"
 	jsutils "github.com/torloejborg/easykube/pkg/js"
 	"github.com/torloejborg/easykube/test"
 	"go.uber.org/mock/gomock"
@@ -12,30 +11,31 @@ import (
 
 func TestPreloadImages(t *testing.T) {
 	ctl := gomock.NewController(t)
-	SetUpJsTestEnvironment(t, ctl)
+	ek := SetUpJsTestEnvironment(t, ctl)
 
-	mockCommand := mock_ez.NewMockICobraCommandHelper(ctl)
+	mockCommand := mock.NewMockICobraCommandHelper(ctl)
 	mockCommand.EXPECT().IsDryRun().Return(false).AnyTimes()
 	mockCommand.EXPECT().GetBoolFlag(gomock.AnyOf("pull")).Return(true).AnyTimes()
-	ez.Kube.ICobraCommandHelper = mockCommand
+
+	ek.CommandContext = mockCommand
 
 	sec := make(map[string][]byte)
 	sec["artifactoryUsername"] = []byte("user")
 	sec["artifactoryPassword"] = []byte("ohsosecret")
 
-	k8s := mock_ez.NewMockIK8SUtils(ctl)
+	k8s := mock.NewMockIK8SUtils(ctl)
 	k8s.EXPECT().GetSecret(gomock.Any(), gomock.Any()).Return(sec, nil).AnyTimes()
-	ez.Kube.UseK8sUtils(k8s)
+	ek.Kubernetes = k8s
 
-	dockerMock := mock_ez.NewMockIContainerRuntime(ctl)
+	dockerMock := mock.NewMockIContainerRuntime(ctl)
 	dockerMock.EXPECT().HasImageInKindRegistry(gomock.Any()).Return(false, nil).AnyTimes()
 	dockerMock.EXPECT().PullImage(gomock.Any(), gomock.Any()).AnyTimes()
 	dockerMock.EXPECT().TagImage(gomock.Any(), gomock.Any()).AnyTimes()
 	dockerMock.EXPECT().PushImage(gomock.Any(), gomock.Any()).AnyTimes()
 
-	ez.Kube.UseContainerRuntime(dockerMock)
+	ek.ContainerRuntime = dockerMock
 
-	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ez.Kube.Fs)
+	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ek.Fs)
 
 	script := `
 		const images = new Map([
@@ -46,9 +46,9 @@ func TestPreloadImages(t *testing.T) {
 		easykube.preload(images);
 	`
 
-	mock := CreateSyntheticAddon(script, ctl)
-	jsu := jsutils.NewJsUtils(mockCommand, mock)
-	err := jsu.ExecAddonScript(mock)
+	mockAddon := CreateSyntheticAddon(script, ctl)
+	jsu := jsutils.NewJsUtils(ek, mockAddon, false)
+	err := jsu.ExecAddonScript(mockAddon)
 
 	if err != nil {
 		t.Fatal(err)

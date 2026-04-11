@@ -8,7 +8,7 @@ import (
 	"sort"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 type ListOpts struct {
@@ -16,23 +16,22 @@ type ListOpts struct {
 	ShowInstalled bool
 }
 
-func listActual(opts ListOpts) error {
-	ezk := ez.Kube
+func listActual(opts ListOpts, ek *core.Ek) error {
 
-	modules, aerr := ez.Kube.GetAddons()
+	modules, aerr := ek.AddonReader.GetAddons()
 	if aerr != nil {
 		return errors.New(fmt.Sprintf("list failed: %s", aerr.Error()))
 	}
 	installed := make([]string, 0)
-	if ezk.IsClusterRunning() {
-		i, err := ez.Kube.GetInstalledAddons()
+	if ek.ContainerRuntime.IsClusterRunning() {
+		i, err := ek.Kubernetes.GetInstalledAddons()
 		if err != nil {
 			errMsg := fmt.Sprintf("list failed, cannot get installed addons: %s (was the configmap deleted by accident?)", err.Error())
 			return errors.New(errMsg)
 		}
 		installed = append(installed, i...)
 	} else {
-		ezk.FmtYellow("Kind cluster not running, will not show installed addons\n")
+		ek.Printer.FmtYellow("Kind cluster not running, will not show installed addons\n")
 	}
 
 	// Extract and sort the keys
@@ -53,7 +52,7 @@ func listActual(opts ListOpts) error {
 
 	if opts.PlainListing {
 		for _, pm := range keys {
-			ezk.FmtGreen(pm)
+			ek.Printer.FmtGreen(pm)
 		}
 	} else {
 

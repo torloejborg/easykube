@@ -5,17 +5,14 @@ import (
 	"path/filepath"
 
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
-type OsDetails interface {
-	GetEasykubeConfigDir() (string, error)
-	GetUserHomeDir() (string, error)
-}
-
 type OsDetailsImpl struct {
+	Ek *core.Ek
 }
 
-func (d *OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
+func (d OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
 
 	// setting config dir from environment takes precedence
 	value, present := os.LookupEnv(constants.EnvEasykubeConfigDir)
@@ -24,8 +21,8 @@ func (d *OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
 	}
 
 	// allow user to override default configuration directory with program argument
-	if Kube.GetStringFlag(constants.FlagConfigDir) != "" {
-		return Kube.GetStringFlag(constants.FlagConfigDir), nil
+	if d.Ek.CommandContext.GetStringFlag(constants.FlagConfigDir) != "" {
+		return d.Ek.CommandContext.GetStringFlag(constants.FlagConfigDir), nil
 	} else {
 		r, err := os.UserConfigDir()
 		if err != nil {
@@ -38,7 +35,7 @@ func (d *OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
 	}
 }
 
-func (d *OsDetailsImpl) GetUserHomeDir() (string, error) {
+func (d OsDetailsImpl) GetUserHomeDir() (string, error) {
 	r, err := os.UserHomeDir()
 
 	if err != nil {

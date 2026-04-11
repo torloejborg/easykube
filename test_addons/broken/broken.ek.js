@@ -1,3 +1,4 @@
 let configuration = {
-    x:""
+    x:"",
+    dependsOn: "this cannot unmarshal"
 }

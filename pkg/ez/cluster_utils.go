@@ -7,35 +7,31 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/olekukonko/errors"
 	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/resources"
 	"sigs.k8s.io/kind/pkg/cluster"
+	"sigs.k8s.io/kind/pkg/exec"
 )
 
-type IClusterUtils interface {
-	CreateKindCluster(modules map[string]IAddon) (string, error)
-	RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string
-	ConfigurationReport(addonList []IAddon) string
-	EnsurePersistenceDirectory() error
-}
-
 type ClusterUtils struct {
-	Debug     bool
-	EkConfig  *EasykubeConfigData
-	EkContext *CobraCommandHelperImpl
+	EkConfig *core.EasykubeConfigData
+	ek       *core.Ek
 }
 
-func NewClusterUtils() IClusterUtils {
-	cfg, err := Kube.LoadConfig()
+func NewClusterUtils(ek *core.Ek) core.IClusterUtils {
+	cfg, err := ek.Config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 	return &ClusterUtils{
 		EkConfig: cfg,
+		ek:       ek,
 	}
 }
 
-func (u *ClusterUtils) ConfigurationReport(addonList []IAddon) string {
+func (u *ClusterUtils) ConfigurationReport(addonList []core.IAddon) string {
 
 	portTmpl, _ := resources.AppResources.ReadFile("data/createreport.template")
 	sb := new(strings.Builder)
@@ -46,17 +42,17 @@ func (u *ClusterUtils) ConfigurationReport(addonList []IAddon) string {
 	return sb.String()
 }
 
-func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, error) {
+func (u *ClusterUtils) CreateKindCluster(modules map[string]core.IAddon) (string, error) {
 
 	// see if the cluster has been created
-	search, _ := Kube.FindContainer(constants.KindContainer)
+	search, _ := u.ek.ContainerRuntime.FindContainer(constants.KindContainer)
 
-	addonList := make([]IAddon, 0)
+	addonList := make([]core.IAddon, 0)
 	for _, addon := range modules {
 		addonList = append(addonList, addon)
 	}
 
-	homedir, _ := Kube.GetUserHomeDir()
+	homedir, _ := u.ek.OsDetails.GetUserHomeDir()
 	kubeconfigPath := filepath.Join(homedir, ".kube", "easykube")
 
 	if !search.Found {
@@ -74,16 +70,16 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 			panic("no cluster provider")
 		}
 
-		configDir, _ := Kube.GetEasykubeConfigDir()
+		configDir, _ := u.ek.OsDetails.GetEasykubeConfigDir()
 
-		cfg, err := Kube.LoadConfig()
+		cfg, err := u.ek.Config.LoadConfig()
 		if err != nil {
 			panic(err)
 		}
 
 		configFile := u.RenderToYAML(addonList, cfg)
 
-		SaveFile(configFile, filepath.Join(configDir, "easykube-cluster.yaml"))
+		u.ek.Utils.SaveFile(configFile, filepath.Join(configDir, "easykube-cluster.yaml"))
 
 		optNodeImage := cluster.CreateWithNodeImage(constants.KindImage)
 
@@ -92,21 +88,27 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 
 		clusterErr := cp.Create(constants.ClusterName, optKubeConfig, optConfig, optNodeImage)
 		if nil != clusterErr {
-			panic(err)
+
+			var runerr *exec.RunError
+			if errors.As(clusterErr, &runerr) {
+				return "", errors.New(string(runerr.Output))
+			}
+
+			return "", clusterErr
 		}
 
 		// initial cluster should be running now
-		search, _ = Kube.FindContainer(constants.KindContainer)
+		search, _ = u.ek.ContainerRuntime.FindContainer(constants.KindContainer)
 
 		if search.IsRunning {
 
 			localhostReg := []string{"mkdir", "-p", "/etc/containerd/certs.d/_default"}
-			if err := Kube.Exec(search.ContainerID, localhostReg); err != nil {
+			if err := u.ek.ContainerRuntime.Exec(search.ContainerID, localhostReg); err != nil {
 				return "", err
 			}
 
 			hosts, _ := resources.AppResources.ReadFile("data/cert.d/hosts.toml")
-			if err := Kube.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/_default", "hosts.toml", hosts); err != nil {
+			if err := u.ek.ContainerRuntime.ContainerWriteFile(search.ContainerID, "/etc/containerd/certs.d/_default", "hosts.toml", hosts); err != nil {
 				return "", err
 			}
 
@@ -115,14 +117,14 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 
 	if search.Found && !search.IsRunning {
 
-		err := Kube.StartContainer(search.ContainerID)
+		err := u.ek.ContainerRuntime.StartContainer(search.ContainerID)
 		if err != nil {
 			return "", err
 		}
 
 	}
 
-	err := Kube.WaitForKindClusterReady(kubeconfigPath, 5*time.Minute)
+	err := u.ek.Kubernetes.WaitForKindClusterReady(kubeconfigPath, 5*time.Minute)
 	if err != nil {
 		return "", err
 	}
@@ -130,15 +132,15 @@ func (u *ClusterUtils) CreateKindCluster(modules map[string]IAddon) (string, err
 	return u.ConfigurationReport(addonList), nil
 }
 
-func (u *ClusterUtils) RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string {
+func (u *ClusterUtils) RenderToYAML(addonList []core.IAddon, config *core.EasykubeConfigData) string {
 	data, err := resources.AppResources.ReadFile("data/cluster_config.template")
 	if err != nil {
 		panic(err)
 	}
 
 	x := struct {
-		Config    *EasykubeConfigData
-		AddonList []IAddon
+		Config    *core.EasykubeConfigData
+		AddonList []core.IAddon
 	}{Config: config, AddonList: addonList}
 
 	templ := template.New("config")
@@ -159,7 +161,7 @@ func (u *ClusterUtils) RenderToYAML(addonList []IAddon, config *EasykubeConfigDa
 
 func (u *ClusterUtils) EnsurePersistenceDirectory() error {
 
-	addons, err := Kube.GetAddons()
+	addons, err := u.ek.AddonReader.GetAddons()
 	if err != nil {
 		return err
 	}
@@ -169,11 +171,11 @@ func (u *ClusterUtils) EnsurePersistenceDirectory() error {
 			mounts := a.GetConfig().ExtraMounts
 			for m := range mounts {
 				path := filepath.Join(mounts[m].PersistenceDir, mounts[m].HostPath)
-				err := Kube.MkdirAll(path, 0777)
+				err := u.ek.Fs.MkdirAll(path, 0777)
 				if err != nil {
 					panic(err)
 				}
-				err = Kube.Chmod(path, 0777)
+				err = u.ek.Fs.Chmod(path, 0777)
 				if err != nil {
 					// ignore for now
 				}

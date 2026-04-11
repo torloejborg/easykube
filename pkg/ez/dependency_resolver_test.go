@@ -5,16 +5,16 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 func TestTopologicalSort(t *testing.T) {
-	graph := ez.NewGraph[ez.IAddon]()
+	graph := core.NewGraph[core.IAddon]()
 
-	ingress := &ez.Addon{Name: "nginx-controller"}
-	jenkins := &ez.Addon{Name: "jenkins-lts"}
-	storage := &ez.Addon{Name: "storage-provider"}
-	postgres := &ez.Addon{Name: "postgresql"}
+	ingress := &core.Addon{Name: "nginx-controller"}
+	jenkins := &core.Addon{Name: "jenkins-lts"}
+	storage := &core.Addon{Name: "storage-provider"}
+	postgres := &core.Addon{Name: "postgresql"}
 
 	graph.Nodes = append(graph.Nodes,
 		ingress,
@@ -43,12 +43,12 @@ func TestTopologicalSort(t *testing.T) {
 }
 
 func TestDiamondGraph(t *testing.T) {
-	graph := ez.NewGraph[ez.IAddon]()
+	graph := core.NewGraph[core.IAddon]()
 
-	a := &ez.Addon{Name: "a"}
-	b := &ez.Addon{Name: "b"}
-	c := &ez.Addon{Name: "c"}
-	d := &ez.Addon{Name: "d"}
+	a := &core.Addon{Name: "a"}
+	b := &core.Addon{Name: "b"}
+	c := &core.Addon{Name: "c"}
+	d := &core.Addon{Name: "d"}
 
 	graph.Nodes = append(graph.Nodes, a, b, c, d)
 

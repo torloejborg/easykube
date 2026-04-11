@@ -7,39 +7,44 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
+	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/ez"
 	"github.com/torloejborg/easykube/pkg/textutils"
 	"github.com/torloejborg/easykube/test"
 )
 
-func initConfigTests(t *testing.T) {
+func initConfigTests(t *testing.T) *core.Ek {
 
 	osd := test.CreateOsDetailsMock(t)
 	osd.EXPECT().GetEasykubeConfigDir().Return("/home/some-user/.config", nil).AnyTimes()
 	osd.EXPECT().GetUserHomeDir().Return("/home/some-user", nil).AnyTimes()
 
-	ez.Kube.UseOsDetails(osd)
-	ez.Kube.UseFilesystemLayer(afero.NewMemMapFs())
-	config := ez.NewEasykubeConfig()
-	ez.Kube.UseEasykubeConfig(config)
-	_ = ez.Kube.MakeConfig()
+	ek := &core.Ek{
+		OsDetails: osd,
+		Fs:        afero.NewMemMapFs(),
+	}
+	ek.Utils = ez.NewUtils(ek)
+	ek.Config = ez.NewEasykubeConfig(ek)
+	_ = ek.Config.MakeConfig()
 
-	ez.Kube.UseAddonReader(ez.CreateAddonReaderImpl(config))
-	ez.Kube.UseClusterUtils(ez.CreateClusterUtilsImpl())
+	ek.AddonReader = ez.NewAddonReader(ek)
+	ek.ClusterUtils = ez.NewClusterUtils(ek)
+	ek.Utils = ez.NewUtils(ek)
 
+	return ek
 }
 
 func TestMakeDefaultConfig(t *testing.T) {
-	initConfigTests(t)
-	cfgdir, _ := ez.Kube.GetEasykubeConfigDir()
-	homeDir, _ := ez.Kube.GetUserHomeDir()
+	ek := initConfigTests(t)
+	cfgdir, _ := ek.OsDetails.GetEasykubeConfigDir()
+	homeDir, _ := ek.OsDetails.GetUserHomeDir()
 
-	exists := ez.FileOrDirExists(filepath.Join(cfgdir, "config.yaml"))
+	exists := ek.Utils.FileOrDirExists(filepath.Join(cfgdir, "config.yaml"))
 	if !exists {
 		t.Errorf("expected easykube config file to exist")
 	}
 
-	data, err := ez.Kube.LoadConfig()
+	data, err := ek.Config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +56,7 @@ func TestMakeDefaultConfig(t *testing.T) {
 }
 
 func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
-	initConfigTests(t)
+	ek := initConfigTests(t)
 
 	// use config with private registries enabled
 	cfg := textutils.TrimMargin(`
@@ -69,15 +74,15 @@ func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {
 	|     password: passkey2
 	`, "|")
 
-	f, _ := ez.Kube.Fs.OpenFile(ez.Kube.IEasykubeConfig.PathToConfigFile(), os.O_TRUNC|os.O_WRONLY, os.ModePerm)
+	f, _ := ek.Fs.OpenFile(ek.Config.PathToConfigFile(), os.O_TRUNC|os.O_WRONLY, os.ModePerm)
 	_, _ = f.WriteString(cfg)
 
-	exists := ez.FileOrDirExists(ez.Kube.IEasykubeConfig.PathToConfigFile())
+	exists := ek.Utils.FileOrDirExists(ek.Config.PathToConfigFile())
 	if !exists {
 		t.Errorf("expected easykube config file to exist")
 	}
 
-	data, err := ez.Kube.LoadConfig()
+	data, err := ek.Config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -107,12 +112,12 @@ var filesExist = []struct {
 }
 
 func TestVerifyConfigurationFilesCopiedToConfigDir(t *testing.T) {
-	initConfigTests(t)
-	cfgdir, _ := ez.Kube.GetEasykubeConfigDir()
+	ek := initConfigTests(t)
+	cfgdir, _ := ek.OsDetails.GetEasykubeConfigDir()
 
 	for _, tt := range filesExist {
 		t.Run(tt.file, func(t *testing.T) {
-			found := ez.FileOrDirExists(filepath.Join(cfgdir, tt.file))
+			found := ek.Utils.FileOrDirExists(filepath.Join(cfgdir, tt.file))
 			if found != tt.exists {
 				t.Errorf("expected file %v file to exist in %v, was %v", tt.file, cfgdir, found)
 			}
@@ -121,15 +126,15 @@ func TestVerifyConfigurationFilesCopiedToConfigDir(t *testing.T) {
 }
 
 func TestZotConfigGeneration(t *testing.T) {
-	initConfigTests(t)
+	ek := initConfigTests(t)
 
-	cfg := &ez.EasykubeConfigData{
+	cfg := &core.EasykubeConfigData{
 		AddonDir:          "",
 		PersistenceDir:    "",
 		ConfigurationDir:  "",
 		ContainerRuntime:  "",
 		ConfigurationFile: "",
-		MirrorRegistries: []ez.MirrorRegistry{
+		MirrorRegistries: []core.MirrorRegistry{
 			{
 				RegistryUrl: "https://foo.com",
 				UserKey:     "none",
@@ -146,8 +151,8 @@ func TestZotConfigGeneration(t *testing.T) {
 		},
 	}
 
-	ez.Kube.GenerateZotRegistryConfig(cfg)
-	ez.Kube.GenerateZotRegistryCredentials(cfg)
+	ek.Config.GenerateZotRegistryConfig(cfg)
+	ek.Config.GenerateZotRegistryCredentials(cfg)
 
 	fmt.Println("done")
 }

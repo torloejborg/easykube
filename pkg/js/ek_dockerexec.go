@@ -4,27 +4,32 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) DockerExec() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) DockerExec(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+	return ctx.dockerExec()
+}
+
+func (ctx *Easykube) dockerExec() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		ctx.checkArgs(call, COPY_TO)
-		ezk := ez.Kube
+		ctx.checkArgs(call, CopyTo)
 
 		container := call.Argument(0).String()
 		command := ctx.extractStringSliceFromArgument(call.Argument(1))
 
-		if ezk.IsVerbose() {
-			ezk.FmtVerbose("docker exec %s %s", container, strings.Join(command, " "))
+		if ctx.ek.CommandContext.IsVerbose() {
+			ctx.ek.Printer.FmtVerbose("docker exec %s %s", container, strings.Join(command, " "))
 		}
 
-		if ezk.IsDryRun() {
-			ezk.FmtDryRun("skipping dockerExec")
+		if ctx.ek.CommandContext.IsDryRun() {
+			ctx.ek.Printer.FmtDryRun("skipping dockerExec")
 			return call.This
 		}
 
-		ezk.Exec(container, command)
+		ctx.ek.ContainerRuntime.Exec(container, command)
 
 		return call.This
 	}

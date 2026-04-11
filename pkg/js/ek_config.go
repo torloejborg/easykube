@@ -2,13 +2,20 @@ package jsutils
 
 import (
 	"github.com/dop251/goja"
-	"github.com/torloejborg/easykube/pkg/ez"
 )
 
-func (ctx *Easykube) Config() func(goja.FunctionCall) goja.Value {
+func (ctx *Easykube) Config(noop bool) func(goja.FunctionCall) goja.Value {
+	if noop {
+		return NoopFunc()
+	}
+
+	return ctx.config()
+}
+
+func (ctx *Easykube) config() func(goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 
-		cfg, err := ez.Kube.LoadConfig()
+		cfg, err := ctx.ek.Config.LoadConfig()
 		if err != nil {
 			panic(err)
 		}

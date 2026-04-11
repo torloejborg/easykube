@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"github.com/torloejborg/easykube/pkg/constants"
-
 	"github.com/spf13/cobra"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/constants"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 // skaffoldCmd represents the skaffold command
@@ -19,21 +18,23 @@ var skaffoldCmd = &cobra.Command{
   Useful for starting a new addon.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		err := ez.InitializeEasykube(
-			ez.WithKubernetes(false),
-			ez.WithContainerRuntime(false))
+		ek, err := CreateEasykube(core.CommandHelper(cmd),
+			WithKubernetes(false),
+			WithContainerRuntime(false),
+			WithAddonReader(false),
+			WithClusterUtils(false),
+			WithRequiresConfigurationCreated(true),
+		)
 		if err != nil {
 			return err
 		}
 
-		commandHelper := ez.CommandHelper(cmd)
 		opts := SkaffoldOpts{
-			AddonName:     commandHelper.GetStringFlag(constants.ArgSkaffoldName),
-			AddonLocation: commandHelper.GetStringFlag(constants.ArgSkaffoldLocation),
+			AddonName:     ek.CommandContext.GetStringFlag(constants.ArgSkaffoldName),
+			AddonLocation: ek.CommandContext.GetStringFlag(constants.ArgSkaffoldLocation),
 		}
 
-		return skaffoldActual(opts)
+		return skaffoldActual(opts, ek)
 	},
 }
 

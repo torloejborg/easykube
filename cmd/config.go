@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 // configCmd represents the config command
@@ -15,34 +15,34 @@ var configCmd = &cobra.Command{
 	Long:  "editor is chosen via VISUAL or EDITOR environment variable",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeEasykube(
-			ez.WithMustHaveConfiguration(false),
-			ez.WithKubernetes(false),
-			ez.WithContainerRuntime(false),
-			ez.WithAddonReader(false),
-			ez.WithClusterUtils(false),
+		ek, err := CreateEasykube(core.CommandHelper(cmd),
+			WithKubernetes(false),
+			WithContainerRuntime(false),
+			WithAddonReader(false),
+			WithClusterUtils(false),
+			WithRequiresConfigurationCreated(false),
 		)
 		if err != nil {
 			return err
 		}
 
-		if ez.Kube.GetBoolFlag(constants.FlagUseDefaults) {
-			err := ez.Kube.MakeConfig()
+		if ek.CommandContext.GetBoolFlag(constants.FlagUseDefaults) {
+			err := ek.Config.MakeConfig()
 			if err != nil {
 				panic(err)
 			}
 			os.Exit(0)
 		}
 
-		if ez.Kube.GetBoolFlag(constants.FlagEdit) {
-			err := ez.Kube.EditConfig()
+		if ek.CommandContext.GetBoolFlag(constants.FlagEdit) {
+			err := ek.Config.EditConfig()
 			if err != nil {
-				ez.Kube.FmtGreen(err.Error())
+				ek.Printer.FmtGreen(err.Error())
 			}
 			os.Exit(0)
 		}
 
-		return runConfigActualInteractive(cmd, args)
+		return runConfigActualInteractive(ek)
 	},
 }
 

@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"github.com/torloejborg/easykube/pkg/constants"
-	"github.com/torloejborg/easykube/pkg/ez"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
-func startActual() error {
-	ezk := ez.Kube
+func startActual(ek *core.Ek) error {
+
 	type StartStatus struct {
 		Name    string
 		Message string
@@ -14,7 +14,7 @@ func startActual() error {
 	}
 
 	findAndStart := func(container string) (*StartStatus, error) {
-		f, err := ez.Kube.FindContainer(container)
+		f, err := ek.ContainerRuntime.FindContainer(container)
 		if err != nil {
 			return nil, err
 		}
@@ -32,7 +32,7 @@ func startActual() error {
 				OK:      true,
 			}, nil
 		} else if !f.IsRunning {
-			if err := ezk.StartContainer(container); err != nil {
+			if err := ek.ContainerRuntime.StartContainer(container); err != nil {
 				return nil, err
 			}
 			return &StartStatus{
@@ -54,19 +54,19 @@ func startActual() error {
 	}
 
 	if cluster.OK {
-		ezk.FmtGreen(cluster.Message)
+		ek.Printer.FmtGreen(cluster.Message)
 	} else {
-		ezk.FmtRed(cluster.Message)
+		ek.Printer.FmtRed(cluster.Message)
 	}
 
 	if registry.OK {
-		ezk.FmtGreen(registry.Message)
+		ek.Printer.FmtGreen(registry.Message)
 	} else {
-		ezk.FmtRed(registry.Message)
+		ek.Printer.FmtRed(registry.Message)
 	}
 
 	if !registry.OK && !cluster.OK {
-		ezk.FmtGreen("Hint:\n")
+		ek.Printer.FmtGreen("Hint:\n")
 		_ = bootCmd.Help()
 	}
 

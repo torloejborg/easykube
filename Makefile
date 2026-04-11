@@ -32,16 +32,8 @@ dist: linux windows osx_amd64 osx_arm64
 
 .PHONY:mock
 mock:
-	mockgen -typed --source pkg/ez/addon_reader.go --destination mock/m_addon_reader.go
-	mockgen -typed --source pkg/ez/container_runtime.go --destination mock/m_container_runtime.go
-	mockgen -typed --source pkg/ez/cobra_command_helper.go --destination mock/m_cobra_command_helper.go
-	mockgen -typed --source pkg/ez/config_utils.go --destination mock/m_config_utils.go
-	mockgen -typed --source pkg/ez/cluster_utils.go --destination mock/m_cluster_utils.go
-	mockgen -typed --source pkg/ez/external_tools.go --destination mock/m_external_m.go
-	mockgen -typed --source pkg/ez/k8s_utils.go --destination mock/m_k8s_utils.go
-	mockgen -typed --source pkg/ez/os_details.go --destination mock/m_os_details.go
-	mockgen -typed --source pkg/ez/addon_types.go --destination mock/m_addon.go
-	mockgen -typed --source pkg/js/jsrunner.go --package mock_ez --destination mock/m_jsrunner.go
+	# core interfaces
+	mockgen -typed --source pkg/core/interfaces.go --destination mock/m_interfaces.go
 
 gomod2nix:
 	nix run github:nix-community/gomod2nix -- generate

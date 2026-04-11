@@ -3,9 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/torloejborg/easykube/pkg/ez"
-
 	"github.com/spf13/cobra"
+	"github.com/torloejborg/easykube/pkg/core"
 )
 
 // statusCmd represents the status command
@@ -15,12 +14,18 @@ var statusCmd = &cobra.Command{
 	Long:  "",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := ez.InitializeEasykube()
+		ek, err := CreateEasykube(core.CommandHelper(cmd),
+			WithKubernetes(false),
+			WithContainerRuntime(true),
+			WithAddonReader(true),
+			WithClusterUtils(false),
+			WithRequiresConfigurationCreated(true),
+		)
+
 		if err != nil {
 			return err
 		}
-
-		status := ez.NewStatusBuilder()
+		status := ek.Status
 
 		_ = status.DoBinaryCheck()
 		fmt.Println()
