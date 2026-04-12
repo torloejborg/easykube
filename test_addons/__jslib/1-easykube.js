@@ -19,7 +19,8 @@ class Easykube {
 
     /**
      * Runs the kustomize tool, saves the rendered manifests into a .out file, and applies it with kubectl
-     * @returns {Easykube}
+     *
+     * @returns {Easykube} this for chaining
      */
     kustomize() {
         _ek.kustomize();
@@ -33,6 +34,7 @@ class Easykube {
      * @param {string} destination output file for rendered template
      * @param {string} namespace sets namespace in templated output
      * @param {string} nametemplate sets release name in templated output
+     * @return {Easykube} this for chaining
      */
     helmTemplate(chart, values, destination, namespace = 'default',nametemplate= '') {
         _ek.helmTemplate(chart, values, destination, namespace, nametemplate);
@@ -43,7 +45,7 @@ class Easykube {
      * Waits until the specified deployment reaches ready state in the cluster.
      * @param {string} deployment - Deployment to wait for
      * @param {string} namespace - Where the deployment lives
-     * @returns {Easykube}
+     * @return {Easykube} this for chaining
      */
     waitForDeployment(deployment, namespace) {
         _ek.waitForDeployment(deployment, namespace);
@@ -53,7 +55,7 @@ class Easykube {
     /**
      * Applies a single yaml resource with kubectl
      * @param {string} manifest - The yaml file to apply the path must be relative to the addon script
-     * @returns {Easykube}
+     * @return {Easykube} this for chaining
      */
     thenApply(manifest) {
         _ek.thenApply(manifest);
@@ -63,23 +65,22 @@ class Easykube {
     /**
      * Preloads images by pulling them retagging and pushing them to your local registry,
      * this saves bandwidth, and will make subsequent installations faster
-     * @param {Map<string, string>} images
-     * @returns {Easykube}
+     * @param images {Map<string, string>} A map where the key is a source image, and the value is the destination image
+     * @return {Easykube} this for chaining
      */
     preload(images) {
         _ek.preload(images);
         return this;
     }
 
-
     /**
      * Use the skopeo tool to copy an image from source to destination, typically to the local registry
      * this saves bandwidth, and will make subsequent installations faster, unlike preload, source images
      * are not stored in your docker context, thus saving disk-space
-     * @param {Map<string, string>} images
-     * @returns {Easykube}
+     * @param {Map<string, string>} images A map where the key is a source image, and the value is the destination image
+     * @return {Easykube} this for chaining
      */
-    skopeoPreLoad(images) {
+    skopeoPreload(images) {
         _ek.skopeoPreload(images);
         return this;
     }
@@ -87,10 +88,10 @@ class Easykube {
     /**
      * Runs a command in a container
      * @param {string} deployment - Name of the deployment (If A deployment has more than one container, the first discovered becomes the target)
-     * @param {string} namespace , args) {
+     * @param {string} namespace
      * @param {string} command - The command to run, example "ls" or "/usr/local/bin/whatever"
      * @param {string[]} args - Arguments to the command, example ["-la","-v"]
-     * @returns {string}
+     * @return {Easykube} this for chaining
      */
     runCommand(deployment, namespace, command, args) {
         return _ek.execInContainer(deployment, namespace, command, args);
@@ -103,7 +104,7 @@ class Easykube {
      * @param {string} version V1
      * @param {string} kind the kind of resource, 'Widget'
      * @param {number} timeout duration in seconds to wait before giving up
-     * @returns {Easykube}
+     * @return {Easykube} this for chaining
      */
     waitForCustomResourceDefinition(group, version, kind, timeout) {
         _ek.waitForCRD(group, version, kind, timeout);
@@ -122,7 +123,7 @@ class Easykube {
      * @param {string} containerLike The partial name of the target container
      * @param {string} localPath Source file, relative to the *.ek.js module definition
      * @param {string} remotePath Destination file in container, destination must be writeable
-     * @returns {Easykube}
+     * @return {Easykube} this for chaining
      */
     copyFile(deployment, namespace, containerLike, localPath, remotePath) {
         _ek.copyTo(deployment, namespace, containerLike, localPath, remotePath)
@@ -140,16 +141,17 @@ class Easykube {
     }
 
     /**
-     *
-     * @param namespace
-     * @param name
+     * Extracts a secret from kubernetes
+     * @param namespace target namespace
+     * @param name secret name
+     * @returns {Object.<string, string>} the secret as a map with decoded values
      */
     getSecret(namespace, name) {
         return _ek.getSecret(namespace, name)
     }
 
     /**
-     * Preprocesses an addon's yaml output and the resources related to the ExternalSecretOperator.
+     * Preprocesses an addon's YAML output and the resources related to the ExternalSecretOperator.
      * Secrets will be created without ESO installed, but ESO's custom resource definitions needs to be
      * available.
      * @param {Map<string,Map<string,any>>} secretMap An arbitrary map which provides the actual keys for the secret
@@ -162,7 +164,7 @@ class Easykube {
     }
 
     /**
-     * Gets a value from the passed kv easykube commandline argument (easykube add fooaddon --kv foo=bar, bing=baz)
+     * Gets a value from the passed kv Easykube commandline argument (easykube add fooaddon --kv foo=bar, bing=baz)
      * @param {string} key in the map
      * @return {string} value or undefined if key does not exist
      */
@@ -246,7 +248,14 @@ class Easykube {
     }
 }
 
+/**
+ * @type {Easykube} The Easykube instance
+ */
 const easykube = new Easykube();
+
+/**
+ * @type {string} Default local registry
+ */
 const registry_host = "registry.localtest.me:5001";
 
 // newline at end-of-file is needed
