@@ -21,7 +21,7 @@ require (
 	go.uber.org/mock v0.6.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.35.3
-	k8s.io/apimachinery v0.35.3
+	k8s.io/apimachinery v0.35.4
 	k8s.io/client-go v0.35.3
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/kind v0.31.0
@@ -66,7 +66,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.19 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
-	github.com/moby/spdystream v0.5.0 // indirect
+	github.com/moby/spdystream v0.5.1 // indirect
 	github.com/moby/sys/atomicwriter v0.1.0 // indirect
 	github.com/moby/term v0.5.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
