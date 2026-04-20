@@ -7,7 +7,7 @@ require (
 	github.com/briandowns/spinner v1.23.2
 	github.com/chelnak/ysmrr v0.6.0
 	github.com/docker/docker v28.5.2+incompatible
-	github.com/docker/go-connections v0.6.0
+	github.com/docker/go-connections v0.7.0
 	github.com/dop251/goja v0.0.0-20250630131328-58d95d85e994
 	github.com/ergochat/readline v0.1.3
 	github.com/fatih/color v1.19.0
