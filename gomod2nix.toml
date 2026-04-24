@@ -70,8 +70,8 @@ schema = 3
     hash = 'sha256-M8Q4m6vNbxKVpmEyYXwBnGinWvnN2LyH84zH73dDClE='
 
   [mod.'github.com/docker/go-connections']
-    version = 'v0.6.0'
-    hash = 'sha256-RoK/DIT7Q1Yxzbr0xcgYP7ORJgH894tjlKDp+voznGM='
+    version = 'v0.7.0'
+    hash = 'sha256-J+3epfT+oKV2Q8ELESsPyBFIzgnXfITH1GlgbDSkRwg='
 
   [mod.'github.com/docker/go-units']
     version = 'v0.5.0'
@@ -198,8 +198,8 @@ schema = 3
     hash = 'sha256-xwSNLmMagzywdGJIuhrWl1r7cIWBYCOMNYbuDDT6Jhs='
 
   [mod.'github.com/moby/spdystream']
-    version = 'v0.5.0'
-    hash = 'sha256-9gVkh6e3y75zBlCBhnwO3k+TL8jnRYg+hGYSFJRA42Y='
+    version = 'v0.5.1'
+    hash = 'sha256-2vAgWBcBoG+DRVG+3rHsSnzovw68oTYb0DFozh1uBUI='
 
   [mod.'github.com/moby/sys/atomicwriter']
     version = 'v0.1.0'
@@ -234,8 +234,8 @@ schema = 3
     hash = 'sha256-zkV9QYPu+fXO90ARQ/gn+gDkngJbBFaPqbTU378ki1Y='
 
   [mod.'github.com/olekukonko/errors']
-    version = 'v1.2.0'
-    hash = 'sha256-X/0DVJtYUWuakel8UhqsMDC11W+bX/W4ztPClvTAxHk='
+    version = 'v1.3.0'
+    hash = 'sha256-e//bXtAyskC1o6hzfy3Zi9mOK8cmA5KxS9ItBPkBlyw='
 
   [mod.'github.com/olekukonko/ll']
     version = 'v0.1.6'
@@ -394,16 +394,16 @@ schema = 3
     hash = 'sha256-eAxnRrF2bQugeFYzGLOr+4sLyCPOpaTWpoZsIKNP1WE='
 
   [mod.'k8s.io/api']
-    version = 'v0.35.3'
-    hash = 'sha256-MIl5MB5b6QsV/VSWoDDmqx8GdNnfNmAnXIe0DRKo5vI='
+    version = 'v0.35.4'
+    hash = 'sha256-QiykPDGY9yD/uwEXd3P56VHgImHudLiE9Sag4+GY8f4='
 
   [mod.'k8s.io/apimachinery']
-    version = 'v0.35.3'
-    hash = 'sha256-+dplbHUOfaCaD2E9IS4F3lnjSCr/a4LjTgdB9de92Pw='
+    version = 'v0.35.4'
+    hash = 'sha256-2THXGj+IHegAUB6l+4FVW1apliSNgrfgz6M4saX66yY='
 
   [mod.'k8s.io/client-go']
-    version = 'v0.35.3'
-    hash = 'sha256-AO5PGH8y95OOb3wInCHDgyxerbFmo7DBTyc1c8DImSk='
+    version = 'v0.35.4'
+    hash = 'sha256-gnzJG0M89eu2LpgAXiFQak91eX/1byIfoOI8nk6huNo='
 
   [mod.'k8s.io/klog/v2']
     version = 'v2.130.1'
