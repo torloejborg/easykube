@@ -3,7 +3,7 @@ module github.com/torloejborg/easykube
 go 1.25.0
 
 require (
-	github.com/Masterminds/semver/v3 v3.4.0
+	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/briandowns/spinner v1.23.2
 	github.com/chelnak/ysmrr v0.6.0
 	github.com/docker/docker v28.5.2+incompatible
