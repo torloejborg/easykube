@@ -14,8 +14,8 @@ schema = 3
     hash = 'sha256-wX8bEVo7swuuAlm0awTIiV1KNCAXnm7Epzwl+wzyqhw='
 
   [mod.'github.com/Masterminds/semver/v3']
-    version = 'v3.4.0'
-    hash = 'sha256-75kRraVwYVjYLWZvuSlts4Iu28Eh3SpiF0GHc7vCYHI='
+    version = 'v3.5.0'
+    hash = 'sha256-Ps7gEw0nkHDZO/iDru/s+X8rMaUkNmiZ7id1GsIKlDU='
 
   [mod.'github.com/Microsoft/go-winio']
     version = 'v0.6.2'
@@ -150,8 +150,8 @@ schema = 3
     hash = 'sha256-VWl9sqUzdOuhW0KzQlv0gwwUQClYkmZwSydHG2sALYw='
 
   [mod.'github.com/gookit/color']
-    version = 'v1.6.0'
-    hash = 'sha256-R0yyFzLdIGakHs4stb2cPadCJUsrR3j9IDQFIE9Talw='
+    version = 'v1.6.1'
+    hash = 'sha256-6dEcshQv7qZ6mwkCeGRzV/uvech7YAzpSv6Vg944it8='
 
   [mod.'github.com/gookit/config/v2']
     version = 'v2.2.7'
