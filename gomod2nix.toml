@@ -10,8 +10,8 @@ schema = 3
     hash = 'sha256-p6jdiHlLEfZES8vJnDywG4aVzIe16p0CU6iglglIweA='
 
   [mod.'github.com/BurntSushi/toml']
-    version = 'v1.5.0'
-    hash = 'sha256-wX8bEVo7swuuAlm0awTIiV1KNCAXnm7Epzwl+wzyqhw='
+    version = 'v1.6.0'
+    hash = 'sha256-ptdUJvuc21ixeLt+M5way/na3aCnCO4MYHWulWp8NEY='
 
   [mod.'github.com/Masterminds/semver/v3']
     version = 'v3.5.0'
@@ -130,12 +130,12 @@ schema = 3
     hash = 'sha256-gGAJ+HDOWppmwuTEeQ5pAYUSxPafljlIpzY26P3ITIc='
 
   [mod.'github.com/go-viper/mapstructure/v2']
-    version = 'v2.4.0'
-    hash = 'sha256-lLfcV9z4n94hDhgyXJlde4bFB0hfzlbh+polqcJCwGE='
+    version = 'v2.5.0'
+    hash = 'sha256-LbrCBANBprVI84M0CWrXc7rriJL5ac5VKbh58LBTw7U='
 
   [mod.'github.com/goccy/go-yaml']
-    version = 'v1.18.0'
-    hash = 'sha256-7WH1WraWyGj7SvrOCnZkWdoGOVrQ9dkpj/zrckHq9+I='
+    version = 'v1.19.2'
+    hash = 'sha256-pkqkwtziwXoWlTOxJsPFdMc7Mj0mSC3Ll/xUmYAYcYE='
 
   [mod.'github.com/google/gnostic-models']
     version = 'v0.7.0'
@@ -154,12 +154,12 @@ schema = 3
     hash = 'sha256-6dEcshQv7qZ6mwkCeGRzV/uvech7YAzpSv6Vg944it8='
 
   [mod.'github.com/gookit/config/v2']
-    version = 'v2.2.7'
-    hash = 'sha256-aKw8HyLV8XVXxedxIJI/qfJwufSX63+ovNMuDkS4DP8='
+    version = 'v2.2.8'
+    hash = 'sha256-XJ9PWBRvR4Juh7C1IDd7iL1vUc24fStAlh+7OF/EQ3c='
 
   [mod.'github.com/gookit/goutil']
-    version = 'v0.7.1'
-    hash = 'sha256-8zWoD/iRE2ttzqndHFI41Yhebxk6r4Rix5VirbOtKjc='
+    version = 'v0.7.5'
+    hash = 'sha256-1tNbrqih7SlWYIxLNtn9HCDz9gNqreZfVa1apSkPqug='
 
   [mod.'github.com/gorilla/websocket']
     version = 'v1.5.4-0.20250319132907-e064f32e3674'
