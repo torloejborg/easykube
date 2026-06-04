@@ -82,8 +82,8 @@ schema = 3
     hash = 'sha256-S0Elu0z91ZcdjpgiE1HxjTVFmUEDn6LZLxJIMzLCres='
 
   [mod.'github.com/emicklei/go-restful/v3']
-    version = 'v3.12.2'
-    hash = 'sha256-eQ0qtVH7c5jgqB7F9B17GhZujYelBA2g9KwpPuSS0sE='
+    version = 'v3.13.0'
+    hash = 'sha256-lB2Z29RDLiVQE5NrsV1s2iHeQ4ciGwNj5OG1zJxwZV8='
 
   [mod.'github.com/ergochat/readline']
     version = 'v0.1.3'
@@ -225,10 +225,6 @@ schema = 3
     version = 'v0.0.0-20191010083416-a7dc8b61c822'
     hash = 'sha256-79URDDFenmGc9JZu+5AXHToMrtTREHb3BC84b/gym9Q='
 
-  [mod.'github.com/mxk/go-flowrate']
-    version = 'v0.0.0-20140419014527-cca7078d478f'
-    hash = 'sha256-gRTfRfff/LRxC1SXXnQd2tV3UTcTx9qu90DJIVIaGn8='
-
   [mod.'github.com/olekukonko/cat']
     version = 'v0.0.0-20250911104152-50322a0618f6'
     hash = 'sha256-zkV9QYPu+fXO90ARQ/gn+gDkngJbBFaPqbTU378ki1Y='
@@ -245,14 +241,6 @@ schema = 3
     version = 'v1.1.4'
     hash = 'sha256-eYHt9ejVyQ9wXRhPcVS973cDF3y6HI7M55ajDPNVyTI='
 
-  [mod.'github.com/onsi/ginkgo/v2']
-    version = 'v2.27.3'
-    hash = 'sha256-8rYXtDcKRStw+j1kXcAsMGxxRfszj3qRut1SxJHKI9k='
-
-  [mod.'github.com/onsi/gomega']
-    version = 'v1.38.3'
-    hash = 'sha256-dz6Q5L0Rxu/rhdLRz5iCrO+kpTTRFa09yGTBqWi5Bvs='
-
   [mod.'github.com/opencontainers/go-digest']
     version = 'v1.0.0'
     hash = 'sha256-cfVDjHyWItmUGZ2dzQhCHgmOmou8v7N+itDkLZVkqkQ='
@@ -268,10 +256,6 @@ schema = 3
   [mod.'github.com/pkg/errors']
     version = 'v0.9.1'
     hash = 'sha256-mNfQtcrQmu3sNg/7IwiieKWOgFQOVVe2yXgKBpe/wZw='
-
-  [mod.'github.com/pmezard/go-difflib']
-    version = 'v1.0.1-0.20181226105442-5d4384ee4fb2'
-    hash = 'sha256-XA4Oj1gdmdV/F/+8kMI+DBxKPthZ768hbKsO3d9Gx90='
 
   [mod.'github.com/sirupsen/logrus']
     version = 'v1.9.4-0.20251023124752-b61f268f75b6'
@@ -374,8 +358,8 @@ schema = 3
     hash = 'sha256-fVjpq0ieUHVEOTSElDVleMWvfdcqojZchqdUXiC7NnY='
 
   [mod.'google.golang.org/protobuf']
-    version = 'v1.36.11'
-    hash = 'sha256-7W+6jntfI/awWL3JP6yQedxqP5S9o3XvPgJ2XxxsIeE='
+    version = 'v1.36.12-0.20260120151049-f2248ac996af'
+    hash = 'sha256-G6dblBo/FH3sIvIrHuco6fpaRIWBdV2xtorLFU49r5I='
 
   [mod.'gopkg.in/evanphx/json-patch.v4']
     version = 'v4.13.0'
@@ -394,28 +378,32 @@ schema = 3
     hash = 'sha256-eAxnRrF2bQugeFYzGLOr+4sLyCPOpaTWpoZsIKNP1WE='
 
   [mod.'k8s.io/api']
-    version = 'v0.35.4'
-    hash = 'sha256-QiykPDGY9yD/uwEXd3P56VHgImHudLiE9Sag4+GY8f4='
+    version = 'v0.36.1'
+    hash = 'sha256-q2WxUi79+XokS64FVPKDcy2aXHcnUZ56FiBBrEYcwO8='
 
   [mod.'k8s.io/apimachinery']
-    version = 'v0.35.4'
-    hash = 'sha256-2THXGj+IHegAUB6l+4FVW1apliSNgrfgz6M4saX66yY='
+    version = 'v0.36.1'
+    hash = 'sha256-EOPS0A7Z2yX/5PFMLZyPj8y8MFNPkY4TzEqqDLFGVf4='
 
   [mod.'k8s.io/client-go']
-    version = 'v0.35.4'
-    hash = 'sha256-gnzJG0M89eu2LpgAXiFQak91eX/1byIfoOI8nk6huNo='
+    version = 'v0.36.1'
+    hash = 'sha256-9H+A1bjd98n65p5t47576HzvA+krvOGUBvg69vpFZ94='
 
   [mod.'k8s.io/klog/v2']
-    version = 'v2.130.1'
-    hash = 'sha256-n5vls1o1a0V0KYv+3SULq4q3R2Is15K8iDHhFlsSH4o='
+    version = 'v2.140.0'
+    hash = 'sha256-TbA5ZdLRzxa7WRnz3zgPPtTplgC33eY9yKKqVFDrPWU='
 
   [mod.'k8s.io/kube-openapi']
-    version = 'v0.0.0-20250910181357-589584f1c912'
-    hash = 'sha256-p34xQitGZDlha75SDiavMn6Cxilvo7L46p0C05wqwhQ='
+    version = 'v0.0.0-20260317180543-43fb72c5454a'
+    hash = 'sha256-tcNu4BjJxxWFlbe2BuicgVNxwmD78JCbv4o9Bgc1tO0='
+
+  [mod.'k8s.io/streaming']
+    version = 'v0.36.1'
+    hash = 'sha256-gU+vH3cDGdCgmGnvByP99quR6okpRlNfsvOafU9UJyA='
 
   [mod.'k8s.io/utils']
-    version = 'v0.0.0-20251002143259-bc988d571ff4'
-    hash = 'sha256-Z3gfQXu5D5U58IyV7dYamQjrLbFSB0BmlJtFWvgHIgg='
+    version = 'v0.0.0-20260210185600-b8788abfbbc2'
+    hash = 'sha256-yV4Uv2+bUhZlAIbxc9YYzjzrBnpN5iN5dQELKeJ5dZM='
 
   [mod.'sigs.k8s.io/json']
     version = 'v0.0.0-20250730193827-2d320260d730'
@@ -430,8 +418,8 @@ schema = 3
     hash = 'sha256-xldQxDwW84hmlihdSOFfjXyauhxEWV9KmIDLZMTcYNo='
 
   [mod.'sigs.k8s.io/structured-merge-diff/v6']
-    version = 'v6.3.0'
-    hash = 'sha256-2EqUZSaHUhwTrdjoZuv+Z99tZYrX1E6rxf2ejeKd2BM='
+    version = 'v6.3.2'
+    hash = 'sha256-4ZUkeHKvdhsZmFSSZKAL/1GZdPO6735BY6FqRc+8tog='
 
   [mod.'sigs.k8s.io/yaml']
     version = 'v1.6.0'
