@@ -30,7 +30,7 @@
         pkgsUnstable.kubectl
         pkgsUnstable.kubernetes-helm
         pkgsUnstable.kustomize
-        pkgsUnstable.go_1_25
+        pkgsUnstable.go_1_26
       ];
     in {
       packages.${system}.default = pkgsUnstable.buildGoApplication {
