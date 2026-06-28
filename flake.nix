@@ -2,7 +2,7 @@
   description = "easykube";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     gomod2nix.url = "github:nix-community/gomod2nix";
   };
@@ -30,7 +30,7 @@
         pkgsUnstable.kubectl
         pkgsUnstable.kubernetes-helm
         pkgsUnstable.kustomize
-        pkgsUnstable.go_1_25
+        pkgsUnstable.go_1_26
       ];
 
        docsPackages = with pkgs; [
@@ -46,6 +46,7 @@
 
     in {
       packages.${system}.default = pkgsUnstable.buildGoApplication {
+        go = pkgsUnstable.go_1_26;
         pname = "easykube";
         version = "latest";
         src = self;

@@ -140,6 +140,10 @@ func (cri *ContainerRuntimeImpl) HasImageInKindRegistry(image string) (bool, err
 		_ = Body.Close()
 	}(resp.Body)
 
+	if resp.StatusCode == 404 {
+		return false, nil
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if nil != err {
 		return false, err
