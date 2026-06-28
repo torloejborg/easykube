@@ -73,7 +73,7 @@
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             export PS1="ek-light $ "
-            echo "Welcome to the easykube light dev shell (no build)"
+            echo "Welcome to the easykube light dev shell"
           '';
         };
       };

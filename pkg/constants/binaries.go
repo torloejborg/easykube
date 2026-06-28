@@ -1,11 +1,11 @@
 package constants
 
 const DockerSemver = "^29"
-const HelmSemver = "~3.19"
-const KubectlSemver = "~1.35"
+const HelmSemver = "~3"
+const KubectlSemver = "~1.36"
 const KustomizeSemver = "~5.8"
 const PodmanSemver = "~5.8"
-const SkopeoSemver = "~1.22"
+const SkopeoSemver = "~1.23"
 
 const DockerBinary = "docker"
 const HelmBinary = "helm"
