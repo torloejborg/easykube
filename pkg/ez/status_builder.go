@@ -53,9 +53,15 @@ func (s *StatusBuilderImpl) DoContainerCheck() error {
 	return nil
 }
 
-func (s *StatusBuilderImpl) checkBinary(name string, vFunc func() string) binaryCheckStatus {
+func (s *StatusBuilderImpl) checkBinary(name string, vFunc func() string, optional bool) binaryCheckStatus {
 	_, err := exec.LookPath(name)
 	if err != nil {
+
+		if optional {
+			s.ek.Printer.FmtYellow("%s (optional)", name)
+			return binaryCheckStatus{HasVersionMismatch: false}
+		}
+
 		s.ek.Printer.FmtRed("⚠ " + name)
 		return binaryCheckStatus{HasVersionMismatch: false}
 	} else {
@@ -83,22 +89,23 @@ func (s *StatusBuilderImpl) DoBinaryCheck() error {
 	runtime := cfg.ContainerRuntime
 
 	if runtime == "docker" {
-		if !s.ek.Utils.HasBinary("docker") {
+		if !s.ek.Utils.HasBinary(constants.DockerBinary) {
 			return errors.New("docker runtime not available")
 		}
-		versionCheck = append(versionCheck, s.checkBinary("docker", s.GetDockerVersion))
+		versionCheck = append(versionCheck, s.checkBinary(constants.DockerBinary, s.GetDockerVersion, false))
 	}
 
 	if runtime == "podman" {
-		if !s.ek.Utils.HasBinary("podman") {
+		if !s.ek.Utils.HasBinary(constants.PodmanBinary) {
 			return errors.New("podman runtime not available")
 		}
-		versionCheck = append(versionCheck, s.checkBinary("podman", s.GetPodmanVersion))
+		versionCheck = append(versionCheck, s.checkBinary(constants.PodmanBinary, s.GetPodmanVersion, false))
 	}
 
-	versionCheck = append(versionCheck, s.checkBinary("kubectl", s.GetKubectlVersion))
-	versionCheck = append(versionCheck, s.checkBinary("helm", s.GetHelmVersion))
-	versionCheck = append(versionCheck, s.checkBinary("kustomize", s.GetKustomizeVersion))
+	versionCheck = append(versionCheck, s.checkBinary(constants.KustomizeBinary, s.GetKubectlVersion, false))
+	versionCheck = append(versionCheck, s.checkBinary(constants.HelmBinary, s.GetHelmVersion, false))
+	versionCheck = append(versionCheck, s.checkBinary(constants.KustomizeBinary, s.GetKustomizeVersion, false))
+	versionCheck = append(versionCheck, s.checkBinary(constants.SkopeoBinary, s.GetSkopeoVersion, true))
 
 	for i := range versionCheck {
 		if versionCheck[i].HasVersionMismatch {
@@ -154,28 +161,33 @@ func (s *StatusBuilderImpl) DoAddonRepositoryCheck() error {
 }
 
 func (s *StatusBuilderImpl) GetKubectlVersion() string {
-	out, _, err := s.ek.ExternalTools.RunCommand("kubectl", []string{"version", "--client"}...)
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.KubectlBinary, []string{"version", "--client"}...)
 	return s.GetVersionStr(out, constants.KubectlSemver, err)
 }
 
 func (s *StatusBuilderImpl) GetDockerVersion() string {
-	out, _, err := s.ek.ExternalTools.RunCommand("docker", []string{"version", "--format", "{{.Server.Version}}"}...)
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.DockerBinary, []string{"version", "--format", "{{.Server.Version}}"}...)
 	return s.GetVersionStr(out, constants.DockerSemver, err)
 }
 
 func (s *StatusBuilderImpl) GetHelmVersion() string {
-	out, _, err := s.ek.ExternalTools.RunCommand("helm", []string{"version", "--template", "{{.Version}}"}...)
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.HelmBinary, []string{"version", "--template", "{{.Version}}"}...)
 	return s.GetVersionStr(out, constants.HelmSemver, err)
 }
 
 func (s *StatusBuilderImpl) GetKustomizeVersion() string {
-	out, _, err := s.ek.ExternalTools.RunCommand("kustomize", []string{"version"}...)
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.KustomizeBinary, []string{"version"}...)
 	return s.GetVersionStr(out, constants.KustomizeSemver, err)
 }
 
 func (s *StatusBuilderImpl) GetPodmanVersion() string {
-	out, _, err := s.ek.ExternalTools.RunCommand("podman", []string{"version", "--format", " {{.Version}}"}...)
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.PodmanBinary, []string{"version", "--format", " {{.Version}}"}...)
 	return s.GetVersionStr(out, constants.PodmanSemver, err)
+}
+
+func (s *StatusBuilderImpl) GetSkopeoVersion() string {
+	out, _, err := s.ek.ExternalTools.RunCommand(constants.SkopeoBinary, []string{"--version"}...)
+	return s.GetVersionStr(out, constants.SkopeoSemver, err)
 }
 
 func (s *StatusBuilderImpl) GetVersionStr(in, wants string, inErr error) string {

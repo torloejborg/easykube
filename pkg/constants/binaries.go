@@ -19,3 +19,12 @@ const KustomizeSemver = "~5.8"
 // PodmanSemver which podman version is compatible with easykube
 // see: https://podman.io
 const PodmanSemver = "~5.8"
+const SkopeoSemver = "~1.22"
+
+const DockerBinary = "docker"
+const HelmBinary = "helm"
+const KubectlBinary = "kubectl"
+const KustomizeBinary = "kustomize"
+const PodmanBinary = "podman"
+const SkopeoBinary = "skopeo"
+const GitBinary = "git"

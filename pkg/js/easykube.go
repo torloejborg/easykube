@@ -46,6 +46,7 @@ func ConfigureEasykubeScript(ek *core.Ek, addon *AddonContext) {
 	check(easykubeObj.Set(AddonDir, e.AddonDir(isNoop)))
 	check(easykubeObj.Set(Config, e.Config(isNoop)))
 	check(easykubeObj.Set(RestartDeployment, e.Config(isNoop)))
+	check(easykubeObj.Set(SkopeoPreload, e.SkopeoPreload(isNoop)))
 
 	addon.ExportFunction("_ek", easykubeObj)
 
