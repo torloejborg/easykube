@@ -1,6 +1,6 @@
 // Package core
 //
-// defines all interfaces and central functionality for easykube
+// Defines all interfaces and central functionality for Easykube
 package core
 
 import (
@@ -77,6 +77,7 @@ type ICobraCommandHelper interface {
 }
 
 type IEasykubeConfig interface {
+	// Loads configuration from disk
 	LoadConfig() (*EasykubeConfigData, error)
 	MakeConfig() error
 	EditConfig() error
