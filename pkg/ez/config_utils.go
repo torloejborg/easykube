@@ -280,7 +280,7 @@ func searchInFile(source afero.File, searchFor []string) (int, error) {
 	return matches, nil
 }
 
-// return false if config and zot-config has drifted
+// IsZotConfigInSync return false if config and zot-config has drifted
 func (ec *EasykubeConfig) IsZotConfigInSync(configData *core.EasykubeConfigData) (bool, error) {
 
 	configDir, err := ec.ek.OsDetails.GetEasykubeConfigDir()
