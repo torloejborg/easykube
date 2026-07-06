@@ -25,7 +25,10 @@ func (ctx *Easykube) andThenApply() func(goja.FunctionCall) goja.Value {
 		}
 		ctx.checkArgs(call, AndThenApply)
 
-		ctx.ek.ExternalTools.ApplyYaml(toApply)
+		err := ctx.ek.ExternalTools.ApplyYaml(toApply)
+		if err != nil {
+			panic(err)
+		}
 
 		return call.This
 	}

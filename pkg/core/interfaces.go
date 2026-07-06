@@ -51,27 +51,35 @@ type IEasykubeConfig interface {
 	HasConfiguration() bool
 }
 
+// IContainerRuntime defines the interface for container runtime operations.
 type IContainerRuntime interface {
-	IsContainerRunning(containerID string) (bool, error)
-	PushImage(src, image string) error
-	PullImage(image string, credentials *PrivateRegistryCredentials) error
-	HasImage(image string) (bool, error)
-	TagImage(source, target string) error
+	// Container operations
 	FindContainer(name string) (*ContainerSearch, error)
 	StartContainer(id string) error
 	StopContainer(id string) error
 	RemoveContainer(id string) error
-	ContainerWriteFile(containerId string, dst string, filename string, data []byte) error
-	NetworkConnect(containerId string, networkId string) error
-	IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error)
-	IsClusterRunning() bool
-	HasImageInKindRegistry(name string) (bool, error)
+	IsContainerRunning(containerID string) (bool, error)
+	IsNetworkConnectedToContainer(containerID, networkID string) (bool, error)
 	Exec(containerId string, cmd []string) error
-	CloseContainerRuntime()
-	IsContainerRuntimeAvailable() bool
-	CreateContainerRegistry() error
+	ContainerWriteFile(containerId, dst, filename string, data []byte) error
+	NetworkConnect(containerId, networkId string) error
+
+	// Image operations
+	HasImage(image string) (bool, error)
+	HasImageInKindRegistry(image string) (bool, error)
+	PushImage(src, dest string) error
+	PullImage(image string, credentials *PrivateRegistryCredentials) error
+	TagImage(source, target string) error
+
+	// Registry operations
 	StartContainerRegistry() error
-	Commit(containerID string)
+	CreateContainerRegistry() error
+
+	// Utility operations
+	IsContainerRuntimeAvailable() bool
+	IsClusterRunning() bool // Added
+	CloseContainerRuntime()
+	Commit(containerID string) (string, error)
 }
 
 type IJsUtils interface {
@@ -165,7 +173,7 @@ type IK8SUtils interface {
 
 type IExternalTools interface {
 	KustomizeBuild(dir string) string
-	ApplyYaml(yamlFile string)
+	ApplyYaml(yamlFile string) error
 	DeleteYaml(yamlFile string)
 	EnsureLocalContext()
 	// SwitchContext Change kube context to name
