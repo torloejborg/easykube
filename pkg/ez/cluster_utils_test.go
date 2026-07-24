@@ -42,7 +42,7 @@ func TestCreatePersistenceDirectories(t *testing.T) {
 	ek := initClusterUtilsTest(t)
 
 	test.CopyTestAddonToMemFs("../../test_addons", "diamond", "/home/some-user/addons", ek.Fs)
-	err := ek.ClusterUtils.EnsurePersistenceDirectory()
+	err := ek.ClusterUtils.EnsurePersistenceDirectories()
 
 	if err != nil {
 		t.Errorf("Failed to create directories %v", err)

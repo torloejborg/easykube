@@ -1,3 +1,6 @@
+// Package core
+//
+// Defines all interfaces and central functionality for Easykube
 package core
 
 import (
@@ -6,30 +9,66 @@ import (
 	"github.com/spf13/afero"
 )
 
+// IAddon something that can be added, listed and removed from easykube
 type IAddon interface {
+	// ReadScriptFile Returns the <addon>.ek.js javascript file as string
 	ReadScriptFile(fs afero.Fs) string
+
+	// GetName Name of the addon, this will be <name>.ek.js
 	GetName() string
+
+	// GetShortName Name of the addon, this will be <name>
 	GetShortName() string
+
+	// GetConfig The addon's configuration - it's name, what other addons it depends on,
+	// filesystem mounts and exposed ports
 	GetConfig() AddonConfig
+
+	// GetAddonFile Get the path to the addon *.ek.js file
 	GetAddonFile() string
+
+	// GetRootDir Get the directory of the addon
 	GetRootDir() string
+
+	// GetDependencies Get a list of named dependencies to other addons
 	GetDependencies() []string
 }
 
+// IAddonReader Handles reading and discovery of addons
 type IAddonReader interface {
+	// GetAddons Returns a map keyed by addon name and the addon struct
 	GetAddons() (map[string]IAddon, error)
+
+	// ExtractConfiguration Addons always declare a "configuration" stanza, this function evaluates the script file
+	// in the JS runtime and extracts the configuration to a struct
 	ExtractConfiguration(unconfigured IAddon) (*AddonConfig, error)
+
+	// CheckAddonCompatibility Determine if this addon is compatible with the JS script library functions
 	CheckAddonCompatibility() (string, error)
 }
 
+// IClusterUtils Manage kind cluster creation
 type IClusterUtils interface {
+
+	// CreateKindCluster creates a kind cluster, based on the addons provided, a kind cluster configuration is generated,
+	// and the cluster booted with that custom configuration
 	CreateKindCluster(modules map[string]IAddon) (string, error)
+
+	// RenderToYAML Creates the actual kind cluster configuration text
 	RenderToYAML(addonList []IAddon, config *EasykubeConfigData) string
+
+	// ConfigurationReport Returns a report of how addons contributed to the cluster configuration
 	ConfigurationReport(addonList []IAddon) string
-	EnsurePersistenceDirectory() error
+
+	// EnsurePersistenceDirectories EnsurePersistenceDirectory Based on discovered addons, create directories used in kinds
+	// extraMounts config stanza
+	EnsurePersistenceDirectories() error
 }
 
+// ICobraCommandHelper Handles common flags specified on the command line and shortcuts to get a flag of a given type
 type ICobraCommandHelper interface {
+	// GetBoolFlag bool value for a given flag
+	// see constants/flags.go
 	GetBoolFlag(name string) bool
 	GetStringFlag(name string) string
 	GetIntFlag(name string) int
@@ -38,6 +77,7 @@ type ICobraCommandHelper interface {
 }
 
 type IEasykubeConfig interface {
+	// Loads configuration from disk
 	LoadConfig() (*EasykubeConfigData, error)
 	MakeConfig() error
 	EditConfig() error
@@ -51,27 +91,35 @@ type IEasykubeConfig interface {
 	HasConfiguration() bool
 }
 
+// IContainerRuntime defines the interface for container runtime operations.
 type IContainerRuntime interface {
-	IsContainerRunning(containerID string) (bool, error)
-	PushImage(src, image string) error
-	PullImage(image string, credentials *PrivateRegistryCredentials) error
-	HasImage(image string) (bool, error)
-	TagImage(source, target string) error
+	// Container operations
 	FindContainer(name string) (*ContainerSearch, error)
 	StartContainer(id string) error
 	StopContainer(id string) error
 	RemoveContainer(id string) error
-	ContainerWriteFile(containerId string, dst string, filename string, data []byte) error
-	NetworkConnect(containerId string, networkId string) error
-	IsNetworkConnectedToContainer(containerID string, networkID string) (bool, error)
-	IsClusterRunning() bool
-	HasImageInKindRegistry(name string) (bool, error)
+	IsContainerRunning(containerID string) (bool, error)
+	IsNetworkConnectedToContainer(containerID, networkID string) (bool, error)
 	Exec(containerId string, cmd []string) error
-	CloseContainerRuntime()
-	IsContainerRuntimeAvailable() bool
-	CreateContainerRegistry() error
+	ContainerWriteFile(containerId, dst, filename string, data []byte) error
+	NetworkConnect(containerId, networkId string) error
+
+	// Image operations
+	HasImage(image string) (bool, error)
+	HasImageInKindRegistry(image string) (bool, error)
+	PushImage(src, dest string) error
+	PullImage(image string, credentials *PrivateRegistryCredentials) error
+	TagImage(source, target string) error
+
+	// Registry operations
 	StartContainerRegistry() error
-	Commit(containerID string)
+	CreateContainerRegistry() error
+
+	// Utility operations
+	IsContainerRuntimeAvailable() bool
+	IsClusterRunning() bool // Added
+	CloseContainerRuntime()
+	Commit(containerID string) (string, error)
 }
 
 type IJsUtils interface {
@@ -165,7 +213,7 @@ type IK8SUtils interface {
 
 type IExternalTools interface {
 	KustomizeBuild(dir string) string
-	ApplyYaml(yamlFile string)
+	ApplyYaml(yamlFile string) error
 	DeleteYaml(yamlFile string)
 	EnsureLocalContext()
 	// SwitchContext Change kube context to name
