@@ -32,8 +32,6 @@ import (
 // Custom error types for container runtime operations.
 var (
 	ErrContainerNotFound    = errors.New("container not found")
-	ErrContainerNotRunning  = errors.New("container not running")
-	ErrImageNotFound        = errors.New("image not found")
 	ErrImagePushFailed      = errors.New("failed to push image")
 	ErrImagePullFailed      = errors.New("failed to pull image")
 	ErrContainerOperation   = errors.New("container operation failed")
