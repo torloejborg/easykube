@@ -67,7 +67,7 @@ func (eti *ExternalToolsImpl) KustomizeBuild(dir string) string {
 	return filepath.Join(dir, constants.KustomizeTargetOutput)
 }
 
-func (eti *ExternalToolsImpl) ApplyYaml(yamlFile string) {
+func (eti *ExternalToolsImpl) ApplyYaml(yamlFile string) error {
 
 	args := []string{"apply", "-f", yamlFile}
 	outCmd := fmt.Sprintf("%s %s", constants.KubectlBinary, strings.Join(args, " "))
@@ -78,13 +78,20 @@ func (eti *ExternalToolsImpl) ApplyYaml(yamlFile string) {
 		if eti.ek.CommandContext.IsVerbose() {
 			eti.ek.Printer.FmtVerbose(outCmd)
 		}
-		_, stderr, err := eti.RunCommand(constants.KubectlBinary, args...)
+		stdout, stderr, err := eti.RunCommand(constants.KubectlBinary, args...)
 
 		if err != nil {
+
+			fmt.Println(stdout)
+
 			eti.ek.Printer.FmtRed("%s failed with %s", constants.KubectlBinary, stderr)
-			os.Exit(-1)
+			fmt.Printf("%s failed with %s\n", constants.KubectlBinary, err)
+			return err
+
 		}
 	}
+
+	return nil
 
 }
 
@@ -172,8 +179,9 @@ func (eti *ExternalToolsImpl) RunCommand(name string, args ...string) (stdout st
 
 	err = cmd.Run()
 	if err != nil {
-		return "", "", err
+		return outBuf.String(), errBuf.String(), err
 	}
 
 	return outBuf.String(), errBuf.String(), nil
+
 }

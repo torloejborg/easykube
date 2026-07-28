@@ -6,12 +6,6 @@ TAGS		= ""
 linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-linux-amd64
 
-osx_amd64:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-darwin-amd64
-
-osx_arm64:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-darwin-arm64
-
 windows:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -tags $(TAGS) $(LDFLAGS) -o build/easykube-windows-amd64.exe
 
@@ -23,12 +17,8 @@ dist: linux windows osx_amd64 osx_arm64
 	mkdir -p dist
 	@command -v upx >/dev/null && upx -9 build/easykube-linux-amd64 || echo "UPX not installed, skipping compression"
 	@command -v upx >/dev/null && upx -9 build/easykube-windows-amd64.exe || echo "UPX not installed, skipping compression"
-	@command -v upx >/dev/null && upx -9 build/easykube-darwin-amd64 || echo "UPX not installed, skipping compression"
-	@command -v upx >/dev/null && upx -9 build/easykube-darwin-arm64 || echo "UPX not installed, skipping compression"
 	zip -jv dist/easykube-linux-amd64.zip build/easykube-linux-amd64
 	zip -jv dist/easykube-windows-amd64.zip build/easykube-windows-amd64.exe
-	zip -jv dist/easykube-darwin-amd64.zip build/easykube-darwin-amd64
-	zip -jv dist/easykube-darwin-arm64.zip build/easykube-darwin-arm64
 
 .PHONY:mock
 mock:

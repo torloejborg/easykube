@@ -550,40 +550,40 @@ func (c *MockIClusterUtilsCreateKindClusterCall) DoAndReturn(f func(map[string]c
 	return c
 }
 
-// EnsurePersistenceDirectory mocks base method.
-func (m *MockIClusterUtils) EnsurePersistenceDirectory() error {
+// EnsurePersistenceDirectories mocks base method.
+func (m *MockIClusterUtils) EnsurePersistenceDirectories() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EnsurePersistenceDirectory")
+	ret := m.ctrl.Call(m, "EnsurePersistenceDirectories")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// EnsurePersistenceDirectory indicates an expected call of EnsurePersistenceDirectory.
-func (mr *MockIClusterUtilsMockRecorder) EnsurePersistenceDirectory() *MockIClusterUtilsEnsurePersistenceDirectoryCall {
+// EnsurePersistenceDirectories indicates an expected call of EnsurePersistenceDirectories.
+func (mr *MockIClusterUtilsMockRecorder) EnsurePersistenceDirectories() *MockIClusterUtilsEnsurePersistenceDirectoriesCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsurePersistenceDirectory", reflect.TypeOf((*MockIClusterUtils)(nil).EnsurePersistenceDirectory))
-	return &MockIClusterUtilsEnsurePersistenceDirectoryCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsurePersistenceDirectories", reflect.TypeOf((*MockIClusterUtils)(nil).EnsurePersistenceDirectories))
+	return &MockIClusterUtilsEnsurePersistenceDirectoriesCall{Call: call}
 }
 
-// MockIClusterUtilsEnsurePersistenceDirectoryCall wrap *gomock.Call
-type MockIClusterUtilsEnsurePersistenceDirectoryCall struct {
+// MockIClusterUtilsEnsurePersistenceDirectoriesCall wrap *gomock.Call
+type MockIClusterUtilsEnsurePersistenceDirectoriesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIClusterUtilsEnsurePersistenceDirectoryCall) Return(arg0 error) *MockIClusterUtilsEnsurePersistenceDirectoryCall {
+func (c *MockIClusterUtilsEnsurePersistenceDirectoriesCall) Return(arg0 error) *MockIClusterUtilsEnsurePersistenceDirectoriesCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIClusterUtilsEnsurePersistenceDirectoryCall) Do(f func() error) *MockIClusterUtilsEnsurePersistenceDirectoryCall {
+func (c *MockIClusterUtilsEnsurePersistenceDirectoriesCall) Do(f func() error) *MockIClusterUtilsEnsurePersistenceDirectoriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIClusterUtilsEnsurePersistenceDirectoryCall) DoAndReturn(f func() error) *MockIClusterUtilsEnsurePersistenceDirectoryCall {
+func (c *MockIClusterUtilsEnsurePersistenceDirectoriesCall) DoAndReturn(f func() error) *MockIClusterUtilsEnsurePersistenceDirectoriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1343,9 +1343,12 @@ func (c *MockIContainerRuntimeCloseContainerRuntimeCall) DoAndReturn(f func()) *
 }
 
 // Commit mocks base method.
-func (m *MockIContainerRuntime) Commit(containerID string) {
+func (m *MockIContainerRuntime) Commit(containerID string) (string, error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Commit", containerID)
+	ret := m.ctrl.Call(m, "Commit", containerID)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Commit indicates an expected call of Commit.
@@ -1361,19 +1364,19 @@ type MockIContainerRuntimeCommitCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIContainerRuntimeCommitCall) Return() *MockIContainerRuntimeCommitCall {
-	c.Call = c.Call.Return()
+func (c *MockIContainerRuntimeCommitCall) Return(arg0 string, arg1 error) *MockIContainerRuntimeCommitCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIContainerRuntimeCommitCall) Do(f func(string)) *MockIContainerRuntimeCommitCall {
+func (c *MockIContainerRuntimeCommitCall) Do(f func(string) (string, error)) *MockIContainerRuntimeCommitCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIContainerRuntimeCommitCall) DoAndReturn(f func(string)) *MockIContainerRuntimeCommitCall {
+func (c *MockIContainerRuntimeCommitCall) DoAndReturn(f func(string) (string, error)) *MockIContainerRuntimeCommitCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1571,18 +1574,18 @@ func (c *MockIContainerRuntimeHasImageCall) DoAndReturn(f func(string) (bool, er
 }
 
 // HasImageInKindRegistry mocks base method.
-func (m *MockIContainerRuntime) HasImageInKindRegistry(name string) (bool, error) {
+func (m *MockIContainerRuntime) HasImageInKindRegistry(image string) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HasImageInKindRegistry", name)
+	ret := m.ctrl.Call(m, "HasImageInKindRegistry", image)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // HasImageInKindRegistry indicates an expected call of HasImageInKindRegistry.
-func (mr *MockIContainerRuntimeMockRecorder) HasImageInKindRegistry(name any) *MockIContainerRuntimeHasImageInKindRegistryCall {
+func (mr *MockIContainerRuntimeMockRecorder) HasImageInKindRegistry(image any) *MockIContainerRuntimeHasImageInKindRegistryCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasImageInKindRegistry", reflect.TypeOf((*MockIContainerRuntime)(nil).HasImageInKindRegistry), name)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasImageInKindRegistry", reflect.TypeOf((*MockIContainerRuntime)(nil).HasImageInKindRegistry), image)
 	return &MockIContainerRuntimeHasImageInKindRegistryCall{Call: call}
 }
 
@@ -1840,17 +1843,17 @@ func (c *MockIContainerRuntimePullImageCall) DoAndReturn(f func(string, *core.Pr
 }
 
 // PushImage mocks base method.
-func (m *MockIContainerRuntime) PushImage(src, image string) error {
+func (m *MockIContainerRuntime) PushImage(src, dest string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PushImage", src, image)
+	ret := m.ctrl.Call(m, "PushImage", src, dest)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PushImage indicates an expected call of PushImage.
-func (mr *MockIContainerRuntimeMockRecorder) PushImage(src, image any) *MockIContainerRuntimePushImageCall {
+func (mr *MockIContainerRuntimeMockRecorder) PushImage(src, dest any) *MockIContainerRuntimePushImageCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PushImage), src, image)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushImage", reflect.TypeOf((*MockIContainerRuntime)(nil).PushImage), src, dest)
 	return &MockIContainerRuntimePushImageCall{Call: call}
 }
 
@@ -2941,9 +2944,11 @@ func (m *MockIExternalTools) EXPECT() *MockIExternalToolsMockRecorder {
 }
 
 // ApplyYaml mocks base method.
-func (m *MockIExternalTools) ApplyYaml(yamlFile string) {
+func (m *MockIExternalTools) ApplyYaml(yamlFile string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "ApplyYaml", yamlFile)
+	ret := m.ctrl.Call(m, "ApplyYaml", yamlFile)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // ApplyYaml indicates an expected call of ApplyYaml.
@@ -2959,19 +2964,19 @@ type MockIExternalToolsApplyYamlCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIExternalToolsApplyYamlCall) Return() *MockIExternalToolsApplyYamlCall {
-	c.Call = c.Call.Return()
+func (c *MockIExternalToolsApplyYamlCall) Return(arg0 error) *MockIExternalToolsApplyYamlCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIExternalToolsApplyYamlCall) Do(f func(string)) *MockIExternalToolsApplyYamlCall {
+func (c *MockIExternalToolsApplyYamlCall) Do(f func(string) error) *MockIExternalToolsApplyYamlCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIExternalToolsApplyYamlCall) DoAndReturn(f func(string)) *MockIExternalToolsApplyYamlCall {
+func (c *MockIExternalToolsApplyYamlCall) DoAndReturn(f func(string) error) *MockIExternalToolsApplyYamlCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
