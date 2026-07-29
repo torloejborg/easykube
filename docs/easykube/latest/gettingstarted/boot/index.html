@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Boot / Operate :: Easykube Documentation</title>
+    <title>Boot :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/gettingstarted/boot/">
-    <meta name="generator" content="Antora 3.1.9">
+    <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
 
@@ -55,13 +55,16 @@
     <span class="nav-text">Getting started</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../using/">Using Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../install/">Install</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../configure/">Configure</a>
   </li>
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="./">Operate</a>
+    <a class="nav-link" href="./">Boot</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
@@ -117,7 +120,7 @@
   <ul>
     <li><a href="../../">EasyKube</a></li>
     <li>Getting started</li>
-    <li><a href="./">Operate</a></li>
+    <li><a href="./">Boot</a></li>
   </ul>
 </nav>
 </div>
@@ -126,7 +129,7 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Boot / Operate</h1>
+<h1 class="page">Boot</h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
@@ -143,7 +146,7 @@
 <p>Now you&#8217;re ready to boot easykube</p>
 </div>
 <div class="paragraph">
-<p><span class="icon"><i class="fa fa-terminal"></i></span><code>easkube boot</code> is the main command for operating easykube, try it out. You should see the following output</p>
+<p><span class="icon big"><i class="fa fa-terminal"></i></span><code>easkube boot</code> is the main command for operating easykube, try it out. You should see the following output</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -199,6 +202,12 @@ Addon: "postgres.ek.js"
 <div class="paragraph">
 <p>The cluster creation report tells us how each addon influenced the kind configuration. You can inspect the kind config by viewing the file <code>~/.config/easykube/easykube-cluster.yaml</code></p>
 </div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="../../_images/svg-f7ae5b3281a68574eb0b91b1fe004958e14b82da.svg" alt="booting a new easykube cluster">
+</div>
+<div class="title">Figure 1. booting a new easykube cluster</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -208,7 +217,7 @@ Addon: "postgres.ek.js"
 <p>There are some limitations on what can be reloaded, for instance, if you create an addon that expose a new port or defines storage, you will need to destroy and re-create the cluster (because docker containers are immutable)</p>
 </div>
 <div class="paragraph">
-<p>However, mirror registries can be configured at will. Simply add a new registry to the main configuration file <code>~/.config/easykube/config.yaml</code> and re-isssue <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube boot</code> then you should see green lines like.</p>
+<p>However, mirror registries can be configured at will. Simply add a new registry to the main configuration file <code>~/.config/easykube/config.yaml</code> and re-isssue <span class="icon big"><i class="fa fa-terminal"></i></span> <code>easykube boot</code> then you should see green lines like.</p>
 </div>
 <div class="listingblock">
 <div class="content">

@@ -2,29 +2,29 @@
 
 * Easykube aims to enable shared development "platforms" via its companion addon repositories.
 
-* If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse. Experiment, develop locally. Break stuff, try again.
+If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse. Experiment, develop locally. Break stuff, try again.
 
-* Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack locally, all without causing trouble in shared environments.
+Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack locally, all without causing trouble in shared environments.
 
-== What is it? [[rationale-easykube]]
+What is it? [[rationale-easykube]]::
 
-* Easykube is built using the https://kind.sigs.k8s.io/[Kind] project (Kubernetes in Docker) and the https://github.com/dop251/goja[Goja] JavaScript runtime Go library.
+Easykube is built using the https://kind.sigs.k8s.io/[Kind] project (Kubernetes in Docker) and the https://github.com/dop251/goja[Goja] JavaScript runtime Go library.
 
-* It bootstraps a single-node Kind cluster with opinionated modifications.
+It bootstraps a single-node Kind cluster with opinionated modifications.
 
-* It automatically sets up a local https://zotregistry.dev/v2.1.15/[zot] docker registry for the cluster and connects it.
+It automatically sets up a local https://zotregistry.dev/v2.1.15/[zot] docker registry for the cluster and connects it.
 
-* Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s shape. Port forwarding and storage requirements are handled automatically.
+Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s shape. Port forwarding and storage requirements are handled automatically.
 
-* Persistent data (if used) survives cluster deletion and recreation. Databases files and downloaded images remain intact.
+Persistent data (if used) survives cluster deletion and recreation. Databases files and downloaded images remain intact.
 
-* Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It's local, do things not possible on the real cluster.
+Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It's local, do things not possible on the real cluster.
 
-* Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, with some planning, you can choose to install only the parts you need.
+Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, with some planning, you can choose to install only the parts you need.
 
-* A CoreDNS hack lets you access everything from "localtest.me" — never touch the /etc/hosts (or c:\windows\system32\drivers\etc\hosts) file again. If your addon workloads define many ingresses, you can still make everything work locally.
+A CoreDNS hack lets you access everything from "localtest.me" — never touch the /etc/hosts (or c:\windows\system32\drivers\etc\hosts) file again. If your addon workloads define many ingresses, you can still make everything work locally.
 
-== Easykube helps you with[[rationale-dowith]]
+== Easykube can help you with[[rationale-dowith]]
 
 * Enabling your team to install and run your cloud-native application(s) locally.
 
@@ -41,3 +41,16 @@
 * If you have a multitude of microservices (say, 20+) - Easykube might not be the thing you are looking for (unless developers are issued powerful machines). Continue putting credits in the cloud providers slot machine.
 
 * Never, ever, spin up easykube in a production setting, or use it for something really important. It's meant for trashing; Try, fail, start over.  Run your real workloads on a secured cluster. Easykube is built for local development only.
+
+== When to use Easykube
+
+Starting some pods in a cluster is nice, but easykube is a developer tool, so how can a local cluster help? Everything (almost) Easykube do, could be done with a docker compose-file without all the kubernetes stuff.
+
+True.
+
+However, once you are familiar with installing addons and juggling kubernetes manifests, and your production environment is on Kubernetes anyway, the real power of Easykube is revealed - You gain logical parity.
+
+Containerized applications have the disadvantage that containers (in many ecosystems) must be rebuilt and re-started / redeployed for every change made - when a CI pipeline is involved, this becomes especially troublesome.
+
+Read about a near optimal workflow xref::gettingstarted/using.adoc#_a_near_optimal_workflow[here].
+

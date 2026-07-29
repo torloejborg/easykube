@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Configuration :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/gettingstarted/configure/">
-    <meta name="generator" content="Antora 3.1.9">
+    <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
 
@@ -55,13 +55,16 @@
     <span class="nav-text">Getting started</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../using/">Using Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../install/">Install</a>
   </li>
   <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="./">Configure</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../boot/">Operate</a>
+    <a class="nav-link" href="../boot/">Boot</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
@@ -140,7 +143,7 @@
 <p>Prerequisite: <a href="../install/#install-install" class="xref page"><span class="icon big"><i class="fa fa-arrow-left"></i></span> easykube installed</a></p>
 </div>
 <div class="paragraph">
-<p>You configure easykube with the <span class="icon"><i class="fa fa-terminal"></i></span> <code>config</code> command</p>
+<p>You configure easykube with the <span class="icon big"><i class="fa fa-terminal"></i></span> <code>config</code> command</p>
 </div>
 <div class="listingblock">
 <div class="title">easykube config --help</div>
@@ -162,13 +165,13 @@ Global Flags:
 </div>
 </div>
 <div class="paragraph">
-<p><span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config</code> without any arguments will start an interactive session, where you are prompted for the addon-root and persistence directories.</p>
+<p><span class="icon big"><i class="fa fa-terminal"></i></span><code>easykube config</code> without any arguments will start an interactive session, where you are prompted for the addon-root and persistence directories.</p>
 </div>
 <div class="paragraph">
-<p>Create a default configuration with <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config --use-defaults</code></p>
+<p>Create a default configuration with <span class="icon big"><i class="fa fa-terminal"></i></span><code>easykube config --use-defaults</code></p>
 </div>
 <div class="paragraph">
-<p>Next, try opening it with <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config --edit</code>, the listing below should pop up in your editor.</p>
+<p>Next, try opening it with <span class="icon big"><i class="fa fa-terminal"></i></span><code>easykube config --edit</code>, the listing below should pop up in your editor.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -250,7 +253,7 @@ The next sections assume the addon repository is placed in <code>/home/jane/code
 </table>
 </div>
 <div class="paragraph">
-<p>When you have cloned an addon repository, proceed to configure easykube with <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube config --edit</code> - You might get an error complaining about the <code>VISUAL</code> environment variable not being set. Set it to something familiar; code, nano, vi, notepad.</p>
+<p>When you have cloned an addon repository, proceed to configure easykube with <span class="icon big"><i class="fa fa-terminal"></i></span><code>easykube config --edit</code> - You might get an error complaining about the <code>VISUAL</code> environment variable not being set. Set it to something familiar; code, nano, vi, notepad.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -259,7 +262,7 @@ The next sections assume the addon repository is placed in <code>/home/jane/code
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-It&#8217;s possible to override the default configuration directory&#8217;s location with the global argument <span class="icon"><i class="fa fa-terminal"></i></span><code>easykube --config-dir &lt;command&gt;</code> or set the environment variable <code>EASYKUBE_CONFIG_DIR</code>
+It&#8217;s possible to override the default configuration directory&#8217;s location with the global argument <span class="icon big"><i class="fa fa-terminal"></i></span><code>easykube --config-dir &lt;command&gt;</code> or set the environment variable <code>EASYKUBE_CONFIG_DIR</code>
 </td>
 </tr>
 </table>
@@ -288,7 +291,7 @@ It&#8217;s possible to override the default configuration directory&#8217;s loca
 <p>(fork the repository and change the certificates in <code>pkg/resources/data/cert</code>, also make sure the ingress addon will use your own certificate)</p>
 </div>
 <div class="paragraph">
-<p>Next: proceed to <a href="../boot/#boot" class="xref page">operate easykube <span class="icon big"><i class="fa fa-arrow-right"></i></span></a></p>
+<p>Next: proceed to <a href="../boot/#boot" class="xref page">booting easykube <span class="icon big"><i class="fa fa-arrow-right"></i></span></a></p>
 </div>
 </div>
 </div>

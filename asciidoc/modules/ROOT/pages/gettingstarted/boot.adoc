@@ -1,4 +1,4 @@
-= Boot / Operate [[boot]]
+= Boot [[boot]]
 :icons: font
 :source-highlighter: rouge
 
@@ -6,7 +6,7 @@ Prerequisite: xref:./configure.adoc#configure[ icon:arrow-left[role="big"] easyk
 
 Now you're ready to boot easykube
 
-icon:terminal[]`easkube boot` is the main command for operating easykube, try it out. You should see the following output
+icon:terminal[role="big"]`easkube boot` is the main command for operating easykube, try it out. You should see the following output
 
 ----
 ✔ ensure container runtime
@@ -60,11 +60,30 @@ Some of the lines with beginning with ✔ might be greyed out, this is because w
 
 The cluster creation report tells us how each addon influenced the kind configuration. You can inspect the kind config by viewing the file `~/.config/easykube/easykube-cluster.yaml`
 
+.booting a new easykube cluster
+
+[plantuml, svg]
+----
+
+@startuml
+
+hide footbox
+Command->Easykube : boot
+Easykube->Docker : pull kind image
+Easykube->Docker : pull registry image
+Easykube->Kind: create cluster
+note right: Kind configuration dynamically\ncreated based on the entire set of addons
+Easykube->Docker: create local registry
+Easykube->Kubernetes: patch coredns
+@enduml
+----
+
+
 == Reloading configuration changes
 
 There are some limitations on what can be reloaded, for instance, if you create an addon that expose a new port or defines storage, you will need to destroy and re-create the cluster (because docker containers are immutable)
 
-However, mirror registries can be configured at will. Simply add a new registry to the main configuration file `~/.config/easykube/config.yaml` and re-isssue icon:terminal[]`easykube boot` then you should see green lines like.
+However, mirror registries can be configured at will. Simply add a new registry to the main configuration file `~/.config/easykube/config.yaml` and re-isssue icon:terminal[role="big"] `easykube boot` then you should see green lines like.
 
 ----
 ✔ re-configure zot registry

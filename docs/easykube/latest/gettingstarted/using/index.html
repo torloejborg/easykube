@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Container Runtimes :: Easykube Documentation</title>
-    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/gettingstarted/container_runtimes/">
+    <title>Using Easykube :: Easykube Documentation</title>
+    <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/gettingstarted/using/">
     <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
@@ -54,8 +54,8 @@
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Getting started</span>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../using/">Using Easykube</a>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="./">Using Easykube</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../install/">Install</a>
@@ -66,8 +66,8 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../boot/">Boot</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="./">Container Runtimes</a>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../container_runtimes/">Container Runtimes</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../addons/">Addons explained</a>
@@ -120,7 +120,7 @@
   <ul>
     <li><a href="../../">EasyKube</a></li>
     <li>Getting started</li>
-    <li><a href="./">Container Runtimes</a></li>
+    <li><a href="./">Using Easykube</a></li>
   </ul>
 </nav>
 </div>
@@ -129,84 +129,69 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Container Runtimes</h1>
+<h1 class="page">Using Easykube</h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_docker">Docker</a></li>
-<li><a href="#_podman">Podman</a></li>
+<li><a href="#_basic_usage">Basic Usage</a></li>
+<li><a href="#_a_near_optimal_workflow">A near optimal workflow</a></li>
 </ul>
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph">
-<p>Currently, easykube supports Docker and Podman container runtimes. Each has subtle differences and modes of operation.</p>
-</div>
-<div class="paragraph">
-<p>Choosing a runtime is done in the easykube configuration file:</p>
-</div>
-<div class="paragraph">
-<p>$ easykube config</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_docker"><a class="anchor" href="#_docker"></a>Docker</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Docker is widely used and available on many platforms, often bundled with a desktop manager. In most cases Docker runs with permissive privileges (on default installations it runs as the superuser - root), which has both pros and cons.</p>
-</div>
-<div class="paragraph">
-<p>On a developer machine, elevated permissions are often acceptable. However, in some organizations Docker is banned due to security concerns.</p>
-</div>
-<div class="paragraph">
-<p>Easykube has not been tested with rootless Docker. For rootless operation, consider using Podman instead.</p>
-</div>
-<div class="paragraph">
-<p>However; Privileged Docker generally results in less friction.</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Prerequisites</dt>
+<dd>
+<p>You have <a href="../install/" class="xref page">installed</a>,
+<a href="../configure/" class="xref page">configured</a>, and
+ <a href="../boot/" class="xref page">booted</a> easykube</p>
+</dd>
+</dl>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_podman"><a class="anchor" href="#_podman"></a>Podman</h2>
+<h2 id="_basic_usage"><a class="anchor" href="#_basic_usage"></a>Basic Usage</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In constrained environments, it is possible to use easykube together with rootless Podman. If you are migrating from docker to Podman, there are a few subtle differences you should be aware of.</p>
+<p>To discover available addons, use <code><span class="icon big"><i class="fa fa-terminal"></i></span> easykube list</code> this tells you what can be installed, and what has previously been installed.</p>
 </div>
 <div class="paragraph">
-<p>Image names are not automatically resolved.</p>
+<p><code><span class="icon big"><i class="fa fa-terminal"></i></span> easykube add &lt;addon&gt;</code> install that addon including its dependencies</p>
 </div>
 <div class="paragraph">
-<p>Also, you would need to change the ingress node ports to unprivileged ports, you cannot bind to 80 and 443 (unless explicitly configured on our host)</p>
+<p>To see what commands easykube orchestrates, you can use the flags
+<code>-v</code> verbose, or <code>-d</code> for dry-run</p>
 </div>
 <div class="paragraph">
-<p>This means you must specify the fully qualified registry name of an image.
-For instance, the image busybox:latest will not automatically resolve when using the Podman. Using Docker, it is assumed that the image will naturally live on DockerHub. Using Podman, the image must be specified explicitly as:</p>
+<p>A typical workflow involves changing some manifests, apply them, and observe the outcome. Do this with</p>
 </div>
 <div class="paragraph">
-<p>dockerhub.io/library/busybox:latest</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Easykube expects to communicate with Podman via a socket. On Linux systems, this socket is typically found at:
-</td>
-</tr>
-</table>
+<p><code><span class="icon big"><i class="fa fa-terminal"></i></span> easykube add &lt;addon&gt; -fn</code></p>
 </div>
 <div class="paragraph">
-<p><code>/run/user/&lt;uid&gt;/podman/podman.socket</code></p>
+<p>The flag <code>-f</code> or <code>--force</code>, installs the addon even if previously added. The <code>-n</code> or <code>--no-depends</code> flag adds only the target addon. If you need to update an image, use the <code>-p</code> or <code>--pull</code> flag.</p>
 </div>
 <div class="paragraph">
-<p>If the socket is not present, and you are using a systemd-based OS, try starting it with:
-systemctl --user start podman.socket</p>
+<p>The addon system lets you design and experiment with intricate services and their dependencies all wrapped in one fire-and-forget command.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_a_near_optimal_workflow"><a class="anchor" href="#_a_near_optimal_workflow"></a>A near optimal workflow</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are some really neat tricks you can pull off. This involves third party tooling, some are open-source some closed and commercial.</p>
 </div>
 <div class="paragraph">
-<p>You can override the podman socket location by setting the CONTAINER_HOST environment variable. (useful when running a corpo-machine with <code>toolbox</code>)</p>
+<p>A personal favorite is <a href="https://github.com/metalbear-co/mirrord">Mirrord</a>, it currently sits in the intersection of between opensource and commercial tiers.</p>
+</div>
+<div class="paragraph">
+<p>With a tool like this, easykube establishes a base-line for all team members, install your application(s) locally - then use tooling to avoid container rebuilds and time-consuming ci pipelines.</p>
+</div>
+<div class="paragraph">
+<p>The initial runs with a toolchain like this, are truly amazing.</p>
 </div>
 </div>
 </div>

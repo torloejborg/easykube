@@ -5,9 +5,10 @@
 ** xref:about/faq.adoc[FAQ]
 
 * Getting started
+** xref:gettingstarted/using.adoc[Using Easykube]
 ** xref:gettingstarted/install.adoc[Install]
 ** xref:gettingstarted/configure.adoc[Configure]
-** xref:gettingstarted/boot.adoc[Operate]
+** xref:gettingstarted/boot.adoc[Boot]
 ** xref:gettingstarted/container_runtimes.adoc[Container Runtimes]
 ** xref:addons.adoc[Addons explained]
 ** xref:gettingstarted/internals.adoc[Internals]

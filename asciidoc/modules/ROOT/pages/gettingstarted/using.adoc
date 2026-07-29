@@ -1,0 +1,42 @@
+= Using Easykube
+
+Prerequisites::
+You have xref:gettingstarted/install.adoc[installed],
+xref:gettingstarted/configure.adoc[configured], and
+ xref:gettingstarted/boot.adoc[booted] easykube
+
+== Basic Usage
+
+To discover available addons, use `icon:terminal[role="big"] easykube list` this tells you what can be installed, and what has previously been installed.
+
+
+`icon:terminal[role="big"] easykube add <addon>` install that addon including its dependencies
+
+To see what commands easykube orchestrates, you can use the flags
+`-v` verbose, or `-d` for dry-run
+
+A typical workflow involves changing some manifests, apply them, and observe the outcome. Do this with
+
+`icon:terminal[role="big"] easykube add <addon> -fn`
+
+The flag `-f` or `--force`, installs the addon even if previously added. The `-n` or `--no-depends` flag adds only the target addon. If you need to update an image, use the `-p` or `--pull` flag.
+
+The addon system lets you design and experiment with intricate services and their dependencies all wrapped in one fire-and-forget command.
+
+[#_a_near_optimal_workflow]
+== A near optimal workflow
+There are some really neat tricks you can pull off. This involves third party tooling, some are open-source some closed and commercial.
+
+A personal favorite is https://github.com/metalbear-co/mirrord[Mirrord], it currently sits in the intersection of between opensource and commercial tiers.
+
+With a tool like this, easykube establishes a base-line for all team members, install your application(s) locally - then use tooling to avoid container rebuilds and time-consuming ci pipelines.
+
+The initial runs with a toolchain like this, are truly amazing.
+
+
+
+
+
+
+
+

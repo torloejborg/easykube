@@ -72,7 +72,7 @@ func (k *K8SUtilsImpl) ReloadClientSet() error {
 	kubeconfigPath := filepath.Join(homeDir, ".kube", "easykube")
 
 	if !k.ek.Utils.FileOrDirExists(kubeconfigPath) {
-		k.ek.Printer.FmtYellow("expecting %s to exist, create the cluster and this message will disappear", kubeconfigPath)
+		k.ek.Printer.FmtYellow("expecting %s to exist, boot the cluster and this message will disappear", kubeconfigPath)
 		return nil
 	}
 

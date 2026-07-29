@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Rationale :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/about/rationale/">
-    <meta name="generator" content="Antora 3.1.9">
+    <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
 
@@ -55,13 +55,16 @@
     <span class="nav-text">Getting started</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/using/">Using Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../gettingstarted/install/">Install</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../gettingstarted/configure/">Configure</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../../gettingstarted/boot/">Operate</a>
+    <a class="nav-link" href="../../gettingstarted/boot/">Boot</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../gettingstarted/container_runtimes/">Container Runtimes</a>
@@ -130,9 +133,9 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#rationale-easykube">What is it?</a></li>
-<li><a href="#_easykube_helps_you_with">Easykube helps you with</a></li>
+<li><a href="#_easykube_can_help_you_with">Easykube can help you with</a></li>
 <li><a href="#rationale-donot">When not to use Easykube</a></li>
+<li><a href="#_when_to_use_easykube">When to use Easykube</a></li>
 </ul>
 </div>
 <div id="preamble">
@@ -142,51 +145,47 @@
 <li>
 <p>Easykube aims to enable shared development "platforms" via its companion addon repositories.</p>
 </li>
-<li>
+</ul>
+</div>
+<div class="paragraph">
 <p>If Kubernetes are used for workloads, why not re-use the stuff already written? The devops team must have produced something you can reuse. Experiment, develop locally. Break stuff, try again.</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>Easykube is designed to be a team and individual enabler: Everyone can install and work with a cloud-native application’s particular stack locally, all without causing trouble in shared environments.</p>
-</li>
-</ul>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="rationale-easykube"><a class="anchor" href="#rationale-easykube"></a>What is it?</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">What is it? <a id="rationale-easykube"></a></dt>
+<dd>
 <p>Easykube is built using the <a href="https://kind.sigs.k8s.io/">Kind</a> project (Kubernetes in Docker) and the <a href="https://github.com/dop251/goja">Goja</a> JavaScript runtime Go library.</p>
-</li>
-<li>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
 <p>It bootstraps a single-node Kind cluster with opinionated modifications.</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>It automatically sets up a local <a href="https://zotregistry.dev/v2.1.15/">zot</a> docker registry for the cluster and connects it.</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>Based on available addons, a Kind cluster configuration is generated for the particular addon repository’s shape. Port forwarding and storage requirements are handled automatically.</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>Persistent data (if used) survives cluster deletion and recreation. Databases files and downloaded images remain intact.</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>Addon installation is programmable via the embedded JavaScript library. Highly customizable and extensible; Provision databases, caches, inject secrets, patch deployments - It&#8217;s local, do things not possible on the real cluster.</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>Easykube has built-in dependency resolution. Addons can depend on other addons. If you have a large-ish system, with some planning, you can choose to install only the parts you need.</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>A CoreDNS hack lets you access everything from "localtest.me" — never touch the /etc/hosts (or c:\windows\system32\drivers\etc\hosts) file again. If your addon workloads define many ingresses, you can still make everything work locally.</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_easykube_helps_you_with"><a class="anchor" href="#_easykube_helps_you_with"></a>Easykube helps you with<a id="rationale-dowith"></a></h2>
+<h2 id="_easykube_can_help_you_with"><a class="anchor" href="#_easykube_can_help_you_with"></a>Easykube can help you with<a id="rationale-dowith"></a></h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -221,6 +220,26 @@
 <p>Never, ever, spin up easykube in a production setting, or use it for something really important. It&#8217;s meant for trashing; Try, fail, start over.  Run your real workloads on a secured cluster. Easykube is built for local development only.</p>
 </li>
 </ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_when_to_use_easykube"><a class="anchor" href="#_when_to_use_easykube"></a>When to use Easykube</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Starting some pods in a cluster is nice, but easykube is a developer tool, so how can a local cluster help? Everything (almost) Easykube do, could be done with a docker compose-file without all the kubernetes stuff.</p>
+</div>
+<div class="paragraph">
+<p>True.</p>
+</div>
+<div class="paragraph">
+<p>However, once you are familiar with installing addons and juggling kubernetes manifests, and your production environment is on Kubernetes anyway, the real power of Easykube is revealed - You gain logical parity.</p>
+</div>
+<div class="paragraph">
+<p>Containerized applications have the disadvantage that containers (in many ecosystems) must be rebuilt and re-started / redeployed for every change made - when a CI pipeline is involved, this becomes especially troublesome.</p>
+</div>
+<div class="paragraph">
+<p>Read about a near optimal workflow <a href="../../gettingstarted/using/#_a_near_optimal_workflow" class="xref page">here</a>.</p>
 </div>
 </div>
 </div>

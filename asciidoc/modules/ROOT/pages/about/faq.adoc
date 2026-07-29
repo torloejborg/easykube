@@ -1,25 +1,25 @@
 = FAQ
 
-== Why javascript?? I thought this thing was written in Go
+Why javascript?? I thought this thing was written in Go?::
 
 Easykube is designed to be flexible, used in different contexts with different addon repositories. Easykube defines a core set of utility functions that can be combined in useful ways, using https://github.com/dop251/goja[Goja], a JavaScript VM for Golang.
 
-== When I try icon:terminal[]`*$ easykube boot*` it complains about occupied ports, what should I do?
+When I try icon:terminal[role="big"]`*$ easykube boot*` it complains about occupied ports, what should I do?::
 
 As the error state, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the *extraPorts* section in the offending addon.
 
-== Where did all my diskspace go?
+Where did all my diskspace go?::
 
 Images are cached in the local zot registry. They will exist there and on the kind-control plane. You can delete images in the registry ui - or simply wipe your persistence directory.
 
 
-== My Easykube addon javascript throws errors, how can I debug what's going on?
+My Easykube addon javascript throws errors, how can I debug what's going on?::
 
 Unfortunately, there is no straightforward way to attach an external debugger to the Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.
 
-== Sometimes easykube fails with an error about 'deployment not ready' when adding something.
+Sometimes easykube fails with an error about 'deployment not ready' when adding something.::
 
 Some workloads simply take longer to become ready, if you are using a machine with constrained resources, this might be an issue. The *waitForDeployment* function times out after 1 minute. In most cases you can just retry. If possible, tweaking or removing readiness/liveness probe thresholds from a deployment may help.
 
-== Easykube claims it's booted, but I can only interact it with using the easykube cli tool
+Easykube claims it's booted, but I can only interact it with using the easykube cli tool::
 Check that your xref:ROOT:gettingstarted/boot.adoc#interact-with-easykube[KUBECONFIG environment variable is set correctly]

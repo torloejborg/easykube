@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>FAQ :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/about/faq/">
-    <meta name="generator" content="Antora 3.1.9">
+    <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../../_/css/site.css">
 <link rel="stylesheet" href="../../../../_/css/vendor/asciinema-player.css">
 
@@ -55,13 +55,16 @@
     <span class="nav-text">Getting started</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../../gettingstarted/using/">Using Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../gettingstarted/install/">Install</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../gettingstarted/configure/">Configure</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../../gettingstarted/boot/">Operate</a>
+    <a class="nav-link" href="../../gettingstarted/boot/">Boot</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../../gettingstarted/container_runtimes/">Container Runtimes</a>
@@ -127,64 +130,33 @@
 </aside>
 <article class="doc">
 <h1 class="page">FAQ</h1>
-<div id="toc" class="toc">
-<div id="toctitle">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#_why_javascript_i_thought_this_thing_was_written_in_go">Why javascript?? I thought this thing was written in Go</a></li>
-<li><a href="#_when_i_try_easykube_boot_it_complains_about_occupied_ports_what_should_i_do">When I try <span class="icon"><i class="fa fa-terminal"></i></span><code><strong>$ easykube boot</strong></code> it complains about occupied ports, what should I do?</a></li>
-<li><a href="#_where_did_all_my_diskspace_go">Where did all my diskspace go?</a></li>
-<li><a href="#_my_easykube_addon_javascript_throws_errors_how_can_i_debug_whats_going_on">My Easykube addon javascript throws errors, how can I debug what&#8217;s going on?</a></li>
-<li><a href="#_sometimes_easykube_fails_with_an_error_about_deployment_not_ready_when_adding_something">Sometimes easykube fails with an error about 'deployment not ready' when adding something.</a></li>
-<li><a href="#_easykube_claims_its_booted_but_i_can_only_interact_it_with_using_the_easykube_cli_tool">Easykube claims it&#8217;s booted, but I can only interact it with using the easykube cli tool</a></li>
-</ul>
-</div>
-<div class="sect1">
-<h2 id="_why_javascript_i_thought_this_thing_was_written_in_go"><a class="anchor" href="#_why_javascript_i_thought_this_thing_was_written_in_go"></a>Why javascript?? I thought this thing was written in Go</h2>
-<div class="sectionbody">
-<div class="paragraph">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Why javascript?? I thought this thing was written in Go?</dt>
+<dd>
 <p>Easykube is designed to be flexible, used in different contexts with different addon repositories. Easykube defines a core set of utility functions that can be combined in useful ways, using <a href="https://github.com/dop251/goja">Goja</a>, a JavaScript VM for Golang.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_when_i_try_easykube_boot_it_complains_about_occupied_ports_what_should_i_do"><a class="anchor" href="#_when_i_try_easykube_boot_it_complains_about_occupied_ports_what_should_i_do"></a>When I try <span class="icon"><i class="fa fa-terminal"></i></span><code><strong>$ easykube boot</strong></code> it complains about occupied ports, what should I do?</h2>
-<div class="sectionbody">
-<div class="paragraph">
+</dd>
+<dt class="hdlist1">When I try <span class="icon big"><i class="fa fa-terminal"></i></span><code><strong>$ easykube boot</strong></code> it complains about occupied ports, what should I do?</dt>
+<dd>
 <p>As the error state, hunt down any services already running on those ports and shut them down. Alternatively, you can comment out or remove the <strong>extraPorts</strong> section in the offending addon.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_where_did_all_my_diskspace_go"><a class="anchor" href="#_where_did_all_my_diskspace_go"></a>Where did all my diskspace go?</h2>
-<div class="sectionbody">
-<div class="paragraph">
+</dd>
+<dt class="hdlist1">Where did all my diskspace go?</dt>
+<dd>
 <p>Images are cached in the local zot registry. They will exist there and on the kind-control plane. You can delete images in the registry ui - or simply wipe your persistence directory.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_my_easykube_addon_javascript_throws_errors_how_can_i_debug_whats_going_on"><a class="anchor" href="#_my_easykube_addon_javascript_throws_errors_how_can_i_debug_whats_going_on"></a>My Easykube addon javascript throws errors, how can I debug what&#8217;s going on?</h2>
-<div class="sectionbody">
-<div class="paragraph">
+</dd>
+<dt class="hdlist1">My Easykube addon javascript throws errors, how can I debug what&#8217;s going on?</dt>
+<dd>
 <p>Unfortunately, there is no straightforward way to attach an external debugger to the Goja runtime. Your best option is classic print-line debugging. At least easykube will tell you which addon is causing the issue.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_sometimes_easykube_fails_with_an_error_about_deployment_not_ready_when_adding_something"><a class="anchor" href="#_sometimes_easykube_fails_with_an_error_about_deployment_not_ready_when_adding_something"></a>Sometimes easykube fails with an error about 'deployment not ready' when adding something.</h2>
-<div class="sectionbody">
-<div class="paragraph">
+</dd>
+<dt class="hdlist1">Sometimes easykube fails with an error about 'deployment not ready' when adding something.</dt>
+<dd>
 <p>Some workloads simply take longer to become ready, if you are using a machine with constrained resources, this might be an issue. The <strong>waitForDeployment</strong> function times out after 1 minute. In most cases you can just retry. If possible, tweaking or removing readiness/liveness probe thresholds from a deployment may help.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_easykube_claims_its_booted_but_i_can_only_interact_it_with_using_the_easykube_cli_tool"><a class="anchor" href="#_easykube_claims_its_booted_but_i_can_only_interact_it_with_using_the_easykube_cli_tool"></a>Easykube claims it&#8217;s booted, but I can only interact it with using the easykube cli tool</h2>
-<div class="sectionbody">
-<div class="paragraph">
+</dd>
+<dt class="hdlist1">Easykube claims it&#8217;s booted, but I can only interact it with using the easykube cli tool</dt>
+<dd>
 <p>Check that your <a href="../../gettingstarted/boot/#interact-with-easykube" class="xref page">KUBECONFIG environment variable is set correctly</a></p>
-</div>
-</div>
+</dd>
+</dl>
 </div>
 </article>
   </div>

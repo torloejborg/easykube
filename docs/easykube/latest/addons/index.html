@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Addons :: Easykube Documentation</title>
     <link rel="canonical" href="http://torloejborg.github.io/easykube/easykube/latest/addons/">
-    <meta name="generator" content="Antora 3.1.9">
+    <meta name="generator" content="Antora 3.1.15">
     <link rel="stylesheet" href="../../../_/css/site.css">
 <link rel="stylesheet" href="../../../_/css/vendor/asciinema-player.css">
 
@@ -55,13 +55,16 @@
     <span class="nav-text">Getting started</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../gettingstarted/using/">Using Easykube</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../gettingstarted/install/">Install</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../gettingstarted/configure/">Configure</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../gettingstarted/boot/">Operate</a>
+    <a class="nav-link" href="../gettingstarted/boot/">Boot</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../gettingstarted/container_runtimes/">Container Runtimes</a>
@@ -141,6 +144,7 @@
 <li><a href="#_skopeo">Skopeo</a></li>
 </ul>
 </li>
+<li><a href="#_what_happens_during_addon_installation">What happens during addon installation</a></li>
 </ul>
 </div>
 <div class="sect1">
@@ -197,7 +201,7 @@
 <div class="content">
 <pre class="highlight"><code class="language-javascript" data-lang="javascript">let configuration = { <i class="conum" data-value="1"></i><b>(1)</b>
     description: "An opensource workflow engine", <i class="conum" data-value="2"></i><b>(2)</b>
-    dependsOn : [ "postgres", "Ingress" ],
+    dependsOn : [ "postgres", "ingress" ],
     extraPorts : [ <i class="conum" data-value="3"></i><b>(3)</b>
     {
         hostPort : 7233,
@@ -279,7 +283,7 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 <h2 id="addons-limitations"><a class="anchor" href="#addons-limitations"></a>Limitations</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>It may appear that the jslib has some sort of global context, but this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside each addon&#8217;s context.</p>
+<p>It may appear that the jslib has some sort of global context, this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside each addon&#8217;s context.</p>
 </div>
 <div class="paragraph">
 <p>This means you cannot share or maintain global state between addons during script execution.</p>
@@ -332,6 +336,20 @@ easykube.runCommand(deployment, namespace, "tctl", ["--ns", "namespace-b", "n", 
 <div class="paragraph">
 <p>To load images directly local registry use <a href="../js_reference/easykube/#skopeoPreload" class="xref page">easykube.skopeoPreload(..)</a> - This requires the skoepo tool to be installed.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_happens_during_addon_installation"><a class="anchor" href="#_what_happens_during_addon_installation"></a>What happens during addon installation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The installation process of an addon is outlined in the diagram below. You tell easykube what to do, and it will orchestrate various tooling for you.</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="../_images/svg-e02024ea46b11e52d15bfa4e1e00b6758b25ca40.svg" alt="outline of adding an addon">
+</div>
+<div class="title">Figure 1. outline of adding an addon</div>
 </div>
 </div>
 </div>

@@ -38,7 +38,7 @@ Let's examine an addon in detail. We'll look at the Temporal addon, as it uses s
 ----
 let configuration = { //<1>
     description: "An opensource workflow engine", //<2>
-    dependsOn : [ "postgres", "Ingress" ],
+    dependsOn : [ "postgres", "ingress" ],
     extraPorts : [ //<3>
     {
         hostPort : 7233,
@@ -93,7 +93,7 @@ A lot is happening here, so let’s break it down:
 
 == Limitations [[addons-limitations]]
 
-It may appear that the jslib has some sort of global context, but this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside each addon's context.
+It may appear that the jslib has some sort of global context, this is not the case. Every addon is executed in its own isolated context. jslib files are simply concatenated and evaluated inside each addon's context.
 
 This means you cannot share or maintain global state between addons during script execution.
 
@@ -128,3 +128,34 @@ If the images are not needed on your host machine (in the docker image cache `do
 
 To load images directly local registry use xref:js_reference/easykube.adoc#skopeoPreload[easykube.skopeoPreload(..)] - This requires the skoepo tool to be installed.
 
+== What happens during addon installation
+The installation process of an addon is outlined in the diagram below. You tell easykube what to do, and it will orchestrate various tooling for you.
+
+.outline of adding an addon
+
+[plantuml,svg]
+----
+@startuml
+hide footbox
+
+cmd -> addonreader : find target addon
+cmd->addonreader: discover dependencies
+loop
+    cmd->cmd: install dependency
+    cmd->goja: execute *.ek.js script
+    goja->goja: invoke go functions
+
+    goja->jsutils: call function
+    jsutils->tool: execute external tool
+end
+
+
+cmd->cmd: install target addon
+cmd->goja: execute *.ek.js script
+goja->goja: invoke go functions
+
+goja->jsutils: call function
+jsutils->tool: execute external tool
+
+@enduml
+----

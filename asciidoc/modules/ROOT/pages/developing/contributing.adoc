@@ -17,7 +17,7 @@ Then clone the repository. The default shell will set everything up and compile 
 
 == Light
 
-`nix develop .#light`
+`icon:terminal[role="big"] nix develop .#light`
 
 This creates a shell with all the tools needed for building and testing.
 
@@ -25,7 +25,7 @@ This creates a shell with all the tools needed for building and testing.
 
 Another shell is available on the `docs` branch. This branch is dedicated to writing documentation and comes with an additional set of tools.
 
-`nix develop .#docs`
+`icon:terminal[role="big"] nix develop .#docs`
 
 Currently, no GitHub Actions workflow is set up to generate and publish documentation. This means the workflow is semi-manual, which is useful because you can review the results before publishing.
 
@@ -33,6 +33,6 @@ We use Asciidoctor and Antora to write and generate the static documentation sit
 
 Generate the documentation with:
 
-`make docs` — The output is generated into the `/docs` directory.
+`icon:terminal[role="big"] make docs` — The output is generated into the `/docs` directory.
 
 Then commit, push, and create a PR.
