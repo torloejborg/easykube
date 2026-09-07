@@ -84,7 +84,7 @@ func (e *Easykube) extractStringSliceFromArgument(arg goja.Value) []string {
 	}
 
 	// Convert to []interface{} first
-	ifaceArray := arg.Export().([]interface{})
+	ifaceArray := arg.Export().([]any)
 	strings := make([]string, len(ifaceArray))
 
 	for i, v := range ifaceArray {

@@ -48,9 +48,9 @@ func parseKVPairs(input string) (map[string]string, error) {
 	input = regexp.MustCompile(`\s*,\s*`).ReplaceAllString(input, ",")
 
 	// Split by comma to get individual key-value pairs
-	pairs := strings.Split(input, ",")
+	pairs := strings.SplitSeq(input, ",")
 
-	for _, pair := range pairs {
+	for pair := range pairs {
 		// Split each pair by the first '=' found (ignoring spaces)
 		keyValue := strings.FieldsFunc(pair, func(r rune) bool {
 			return r == '=' && !strings.ContainsRune(strings.TrimSpace(string([]rune(pair)[0:strings.IndexRune(pair, r)])), ' ')

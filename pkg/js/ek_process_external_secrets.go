@@ -25,7 +25,7 @@ func (ctx *Easykube) extractExternalSecrets(filePath string) ([]core.ExternalSec
 	var externalSecrets []core.ExternalSecret
 	decoder := yaml.NewDecoder(yamlReader)
 	for {
-		var item map[string]interface{}
+		var item map[string]any
 		decodeErr := decoder.Decode(&item)
 		if decodeErr != nil {
 			break // Exit loop on error (e.g., EOF)

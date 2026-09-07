@@ -63,7 +63,7 @@ func inspectPortsFreeTask(ek *core.Ek) core.Task {
 		}
 
 		IsPortAvailable := func(host string, port int) bool {
-			addr := fmt.Sprintf("%s:%d", host, port)
+			addr := net.JoinHostPort(host, fmt.Sprintf("%d", port))
 			l, err := net.DialTimeout("tcp", addr, 500*time.Millisecond)
 			if err != nil {
 				return true

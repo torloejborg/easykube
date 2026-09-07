@@ -23,16 +23,16 @@ func (d OsDetailsImpl) GetEasykubeConfigDir() (string, error) {
 	// allow user to override default configuration directory with program argument
 	if d.Ek.CommandContext.GetStringFlag(constants.FlagConfigDir) != "" {
 		return d.Ek.CommandContext.GetStringFlag(constants.FlagConfigDir), nil
-	} else {
-		r, err := os.UserConfigDir()
-		if err != nil {
-			panic(err)
-		}
-
-		r = filepath.Join(r, "easykube")
-
-		return r, nil
 	}
+
+	r, err := os.UserConfigDir()
+	if err != nil {
+		panic(err)
+	}
+
+	r = filepath.Join(r, "easykube")
+
+	return r, nil
 }
 
 func (d OsDetailsImpl) GetUserHomeDir() (string, error) {

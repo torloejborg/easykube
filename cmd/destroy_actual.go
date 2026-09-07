@@ -79,7 +79,7 @@ func stopAndDeleteContainer(name string, ek *core.Ek) error {
 		return nil, fmt.Errorf("container %s not found", name)
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 
 		s, e := find(name)
 		if e != nil {

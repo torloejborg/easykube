@@ -63,7 +63,7 @@ func (ctx *Easykube) http() func(goja.FunctionCall) goja.Value {
 		}
 		headers := make(map[string]string)
 		if len(call.Arguments) > 2 {
-			if h, ok := call.Argument(2).Export().(map[string]interface{}); ok {
+			if h, ok := call.Argument(2).Export().(map[string]any); ok {
 				for k, v := range h {
 					headers[k] = fmt.Sprintf("%v", v)
 				}

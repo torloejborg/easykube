@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
 	"strings"
@@ -210,9 +211,7 @@ func (k8s *K8SUtilsImpl) ReadConfigmap(name string, namespace string) (map[strin
 		return nil, err
 	}
 
-	for key, val := range cmap.Data {
-		result[key] = val
-	}
+	maps.Copy(result, cmap.Data)
 
 	return result, nil
 }

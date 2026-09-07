@@ -64,16 +64,15 @@ func (s *StatusBuilderImpl) checkBinary(name string, vFunc func() string, option
 
 		s.ek.Printer.FmtRed("⚠ " + name)
 		return binaryCheckStatus{HasVersionMismatch: false}
-	} else {
+	}
 
-		version := vFunc()
-		if strings.Contains(version, "easykube") {
-			s.ek.Printer.FmtYellow("%s %s", name, version)
-			return binaryCheckStatus{HasVersionMismatch: true}
-		} else {
-			s.ek.Printer.FmtGreen("✓ %s %s", name, version)
-			return binaryCheckStatus{HasVersionMismatch: false}
-		}
+	version := vFunc()
+	if strings.Contains(version, "easykube") {
+		s.ek.Printer.FmtYellow("%s %s", name, version)
+		return binaryCheckStatus{HasVersionMismatch: true}
+	} else {
+		s.ek.Printer.FmtGreen("✓ %s %s", name, version)
+		return binaryCheckStatus{HasVersionMismatch: false}
 	}
 }
 
@@ -200,12 +199,11 @@ func (s *StatusBuilderImpl) GetVersionStr(in, wants string, inErr error) string 
 
 	if err != nil {
 		return "?"
-	} else {
-
-		if !semv.Check(v) {
-			return fmt.Sprintf("(easykube want %s, actual is %s)", semv.String(), v.String())
-		}
-
-		return fmt.Sprintf("%s (%s)", v.String(), semv.String())
 	}
+
+	if !semv.Check(v) {
+		return fmt.Sprintf("(easykube want %s, actual is %s)", semv.String(), v.String())
+	}
+
+	return fmt.Sprintf("%s (%s)", v.String(), semv.String())
 }

@@ -29,7 +29,7 @@ type AddonContext struct {
 	ek     *core.Ek
 }
 
-func (ac *AddonContext) ExportFunction(name string, action interface{}) {
+func (ac *AddonContext) ExportFunction(name string, action any) {
 	err := ac.vm.Set(name, action)
 	if err != nil {
 		panic(err)
@@ -50,7 +50,7 @@ func NewJsUtils(ek *core.Ek, source core.IAddon, isNoop bool) core.IJsUtils {
 		ek:     ek,
 	}
 
-	export := func(name string, action interface{}) {
+	export := func(name string, action any) {
 		err := vm.Set(name, action)
 		if err != nil {
 			panic(err)

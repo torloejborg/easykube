@@ -65,11 +65,9 @@ func (g *Graph[T]) hasCycle() error {
 		}
 		visited[node.GetName()] = true
 		recStack[node.GetName()] = true
-		for _, neighbor := range g.adj[node.GetName()] {
-			if dfs(neighbor) {
-				cycle = append(cycle, node)
-				return true
-			}
+		if slices.ContainsFunc(g.adj[node.GetName()], dfs) {
+			cycle = append(cycle, node)
+			return true
 		}
 		recStack[node.GetName()] = false
 		return false
