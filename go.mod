@@ -15,7 +15,7 @@ require (
 	github.com/gookit/color v1.6.1
 	github.com/gookit/config/v2 v2.2.9
 	github.com/olekukonko/errors v1.3.0
-	github.com/olekukonko/tablewriter v1.1.4
+	github.com/olekukonko/tablewriter v1.1.5
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2
 	go.uber.org/mock v0.6.0
