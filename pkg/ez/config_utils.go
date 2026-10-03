@@ -26,6 +26,14 @@ type EasykubeConfig struct {
 	UserConfigDir string
 }
 
+type ConfigError struct {
+	Message string
+}
+
+func (e *ConfigError) Error() string {
+	return fmt.Sprintf("config error: %s", e.Message)
+}
+
 func NewEasykubeConfig(ek *core.Ek) core.IEasykubeConfig {
 	return &EasykubeConfig{
 		ek: ek,
@@ -71,19 +79,19 @@ func (ec *EasykubeConfig) LoadConfig() (*core.EasykubeConfigData, error) {
 
 	data, err := ec.ek.Utils.ReadFileToBytes(ec.PathToConfigFile())
 	if err != nil {
-		return nil, err
+		return nil, &ConfigError{Message: err.Error()}
 	}
 
 	err = config.LoadSources("yaml", data)
 	if err != nil {
-		return nil, err
+		return nil, &ConfigError{Message: err.Error()}
 	}
 
 	easykube := &core.EasykubeConfigData{}
 	err = config.BindStruct("easykube", easykube)
 
 	if err != nil {
-		return nil, err
+		return nil, &ConfigError{Message: err.Error()}
 	}
 
 	return easykube, nil

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"errors"
-
 	"github.com/spf13/afero"
 	"github.com/torloejborg/easykube/pkg/core"
 	"github.com/torloejborg/easykube/pkg/ez"
@@ -84,7 +82,8 @@ func CreateEasykube(cmd *core.CobraCommandHelperImpl, opts ...EkOpt) (ek *core.E
 	if ekOpts.initializeWithMustHaveConfiguration {
 		_, err := ek.Config.LoadConfig()
 		if err != nil {
-			return nil, errors.New("failed to load configuration")
+
+			return nil, err
 		}
 	}
 
