@@ -70,8 +70,8 @@ schema = 3
     hash = 'sha256-M8Q4m6vNbxKVpmEyYXwBnGinWvnN2LyH84zH73dDClE='
 
   [mod.'github.com/docker/go-connections']
-    version = 'v0.8.1'
-    hash = 'sha256-rL4pL7wCdQCo6mMScwCb1P5amJEj7glJrjEork0DmXE='
+    version = 'v0.8.2'
+    hash = 'sha256-Fp4ekXeNvPSgym+22GClOH+htjKfqt5GK/aQLWQKFws='
 
   [mod.'github.com/docker/go-units']
     version = 'v0.5.0'

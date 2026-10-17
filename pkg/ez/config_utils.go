@@ -259,6 +259,13 @@ func (ec *EasykubeConfig) WriteConfig(cfg *core.EasykubeConfigData) error {
 		return err
 	}
 
+	if !ec.ek.Utils.FileOrDirExists(cfg.ConfigurationDir) {
+		err := os.MkdirAll(cfg.ConfigurationDir, 0o755)
+		if err != nil {
+			return err
+		}
+	}
+
 	file, err := ec.ek.Fs.OpenFile(cfg.ConfigurationFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if nil != err {
 		panic(err)
