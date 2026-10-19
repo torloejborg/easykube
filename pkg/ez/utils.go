@@ -55,15 +55,28 @@ func (u UtilsImpl) CopyResourceToConfigDir(src, dest string) error {
 
 	stat, _ := u.ek.Fs.Stat(destinationPath)
 
-	if stat == nil {
+	// If something other than a regular file occupies the path (typically a
+	// directory auto-created by docker for a missing bind-mount source),
+	// remove it so the file can be recreated.
+	if stat != nil && !stat.Mode().IsRegular() {
+		if err := u.ek.Fs.RemoveAll(destinationPath); err != nil {
+			return err
+		}
+		stat = nil
+	}
 
-		f, _ := u.ek.Fs.Create(destinationPath)
-		defer f.Close()
+	if stat == nil {
 
 		sourceData, err := resources.AppResources.ReadFile("data/" + src)
 		if nil != err {
 			return err
 		}
+
+		f, err := u.ek.Fs.Create(destinationPath)
+		if nil != err {
+			return err
+		}
+		defer f.Close()
 
 		_, err = f.WriteString(string(sourceData))
 		if nil != err {
