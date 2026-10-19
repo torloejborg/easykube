@@ -27,8 +27,11 @@ func createActualCmd(ek *core.Ek, currentConfig *core.EasykubeConfigData) error 
 	tasks.AddTask(pullRegistryImageTask(ek))
 	tasks.AddTask(ensurePersistenceDirectoriesTask(ek))
 	tasks.AddTask(createClusterTask(ek))
-	tasks.AddTask(createRegistryTask(ek))
+	// The zot config/credentials files must exist before the registry container
+	// is created: docker silently creates missing bind-mount sources as
+	// directories on the host, which corrupts the config directory.
 	tasks.AddTask(configureZotRegistry(currentConfig, ek))
+	tasks.AddTask(createRegistryTask(ek))
 	tasks.AddTask(connectRegistryToKindTask(ek))
 	tasks.AddTask(startRegistryTask(ek))
 	tasks.AddTask(restartRegistryTask(ek))

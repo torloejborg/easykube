@@ -295,6 +295,21 @@ func searchInFile(source afero.File, searchFor []string) (int, error) {
 	return matches, nil
 }
 
+// ensureRegularFile removes dest when it exists but is not a regular file.
+// Docker creates missing bind-mount sources as directories; this repairs
+// such paths so configuration files can be written again.
+func (ec *EasykubeConfig) ensureRegularFile(dest string) error {
+	stat, err := ec.ek.Fs.Stat(dest)
+	if err != nil {
+		// does not exist yet, OpenFile with O_CREATE handles it
+		return nil
+	}
+	if !stat.Mode().IsRegular() {
+		return ec.ek.Fs.RemoveAll(dest)
+	}
+	return nil
+}
+
 // IsZotConfigInSync return false if config and zot-config has drifted
 func (ec *EasykubeConfig) IsZotConfigInSync(configData *core.EasykubeConfigData) (bool, error) {
 
@@ -380,6 +395,10 @@ func (ec *EasykubeConfig) GenerateZotRegistryConfig(cfg *core.EasykubeConfigData
 		configDir, _ := ec.ek.OsDetails.GetEasykubeConfigDir()
 		zotconfig := filepath.Join(configDir, constants.ZotConfig)
 
+		if err := ec.ensureRegularFile(zotconfig); err != nil {
+			return err
+		}
+
 		file, err := ec.ek.Fs.OpenFile(zotconfig, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		defer func(file afero.File) {
 			_ = file.Close()
@@ -428,9 +447,13 @@ func (ec *EasykubeConfig) GenerateZotRegistryCredentials(cfg *core.EasykubeConfi
 		configDir, _ := ec.ek.OsDetails.GetEasykubeConfigDir()
 		zotCredentials := filepath.Join(configDir, constants.ZotCredentials)
 
+		if err := ec.ensureRegularFile(zotCredentials); err != nil {
+			return err
+		}
+
 		file, err := ec.ek.Fs.OpenFile(zotCredentials, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if nil != err {
-			panic(err)
+			return err
 		}
 
 		_, err = file.WriteString(buf.String())
