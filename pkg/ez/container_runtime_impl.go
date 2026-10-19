@@ -96,7 +96,6 @@ func NewContainerRuntimeImpl(ek *core.Ek, runtime string) (core.IContainerRuntim
 func (cri *ContainerRuntimeImpl) IsClusterRunning() bool {
 	running, err := cri.IsContainerRunning(constants.KindContainer)
 	if err != nil {
-		cri.ek.Printer.FmtRed("failed to check if cluster is running: %v", err)
 		return false
 	}
 	return running
