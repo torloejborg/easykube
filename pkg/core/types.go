@@ -88,6 +88,7 @@ type EasykubeConfigData struct {
 	PersistenceDir    string `mapstructure:"persistence-dir"`
 	ConfigurationDir  string `mapstructure:"config-dir"`
 	ContainerRuntime  string `mapstructure:"container-runtime"`
+	ImagePlatform     string `mapstructure:"image-platform"`
 	ConfigurationFile string
 	MirrorRegistries  []MirrorRegistry `mapstructure:"mirror-registries"`
 }

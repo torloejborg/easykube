@@ -53,6 +53,10 @@ func TestMakeDefaultConfig(t *testing.T) {
 		t.Errorf("expected addons dir to be ./addons")
 	}
 
+	if data.ImagePlatform != "" {
+		t.Errorf("expected image-platform to be empty by default, got %q", data.ImagePlatform)
+	}
+
 }
 
 func TestLoadDefaultConfigWithPrivateRegistries(t *testing.T) {

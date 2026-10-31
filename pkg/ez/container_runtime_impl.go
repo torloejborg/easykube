@@ -221,9 +221,22 @@ func (cri *ContainerRuntimeImpl) PushImage(src, dest string) error {
 }
 
 func (cri *ContainerRuntimeImpl) PullImage(image string, credentials *core.PrivateRegistryCredentials) error {
+// image-platform is read from config.yaml. When empty (the default)
+	// the platform matching the host/VM architecture is pulled, so kind
+	// nodes run natively (e.g. linux/arm64 on Apple Silicon Macs) instead
+	// of being forced through amd64 emulation.
+	platform := ""
+	if cri.ek.Config != nil {
+		cfg, err := cri.ek.Config.LoadConfig()
+		if err != nil {
+			return fmt.Errorf("failed to load easykube configuration: %w", err)
+		}
+		platform = cfg.ImagePlatform
+	}
+
 	opts := image2.PullOptions{
 		All:      false,
-		Platform: "linux/amd64",
+		Platform: platform,
 	}
 
 	if credentials != nil {
