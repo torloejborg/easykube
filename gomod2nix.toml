@@ -194,8 +194,8 @@ schema = 3
     hash = 'sha256-VWl9sqUzdOuhW0KzQlv0gwwUQClYkmZwSydHG2sALYw='
 
   [mod.'github.com/gookit/color']
-    version = 'v1.6.1'
-    hash = 'sha256-6dEcshQv7qZ6mwkCeGRzV/uvech7YAzpSv6Vg944it8='
+    version = 'v1.6.3'
+    hash = 'sha256-00pKAEmVF8Ibk5FqBRMLYFZiFU49PrLvXgTBYYvDyc4='
 
   [mod.'github.com/gookit/config/v2']
     version = 'v2.2.9'
