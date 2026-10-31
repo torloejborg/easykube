@@ -13,6 +13,11 @@ easykube:
   # Container Runtime docker or podman
   container-runtime: {{ .ContainerRuntime }}
 
+  # force the platform used when pulling images, e.g. linux/amd64
+  # leave empty (default) to pull the variant matching the host architecture,
+  # so kind nodes run natively (e.g. linux/arm64 on Apple Silicon Macs)
+  image-platform: "{{ .ImagePlatform }}"
+
   # use pull through caching on these container registries
   mirror-registries:
     {{- range .MirrorRegistries }}
