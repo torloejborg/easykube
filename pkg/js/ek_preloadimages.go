@@ -35,35 +35,35 @@ func (ctx *Easykube) preloadImages() func(goja.FunctionCall) goja.Value {
 		} else if !hasImage || mustPull {
 			spinner := sm.AddSpinner("")
 			if registryCredentials != nil {
-				spinner.UpdateMessagef("pull %s from private registry using credentials (%s,%s)", source,
+				spinner.UpdateMessage(spinnerMessage("pull %s from private registry using credentials (%s,%s)", source,
 					registryCredentials.Username,
-					"[redacted]")
+					"[redacted]"))
 
 				if err := ctx.ek.ContainerRuntime.PullImage(source, registryCredentials); err != nil {
-					spinner.ErrorWithMessagef("pull %s from private registry failed: %s", source, err)
+					spinner.ErrorWithMessage(spinnerMessage("pull %s from private registry failed: %s", source, err))
 				}
 
 			} else {
-				spinner.UpdateMessagef("pull %s", source)
+				spinner.UpdateMessage(spinnerMessage("pull %s", source))
 				if err := ctx.ek.ContainerRuntime.PullImage(source, nil); err != nil {
-					spinner.ErrorWithMessagef("pull %s failed: %s", source, err)
+					spinner.ErrorWithMessage(spinnerMessage("pull %s failed: %s", source, err))
 					<-sem
 					return err
 				}
 			}
 
 			if err := ctx.ek.ContainerRuntime.TagImage(source, destination); err != nil {
-				spinner.ErrorWithMessagef("tag %s to %s failed: %s", source, destination, err)
+				spinner.ErrorWithMessage(spinnerMessage("tag %s to %s failed: %s", source, destination, err))
 				<-sem
 				return err
 			}
 
 			if err := ctx.ek.ContainerRuntime.PushImage(source, destination); err != nil {
-				spinner.ErrorWithMessagef("push %s to %s failed: %s", source, destination, err)
+				spinner.ErrorWithMessage(spinnerMessage("push %s to %s failed: %s", source, destination, err))
 				<-sem
 				return err
 			}
-			spinner.CompleteWithMessagef("pushed %s", destination)
+			spinner.CompleteWithMessage(spinnerMessage("pushed %s", destination))
 		}
 
 		<-sem
