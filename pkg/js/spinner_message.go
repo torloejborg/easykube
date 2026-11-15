@@ -31,7 +31,7 @@ func spinnerMessage(format string, a ...any) string {
 // be determined (for example when output is piped or in tests).
 func truncateToTerminalWidth(msg string) string {
 	width := 0
-	if w, err := term.GetSize(int(os.Stdout.Fd())); err == nil {
+	if w, _, err := term.GetSize(int(os.Stdout.Fd())); err == nil {
 		width = w
 	}
 	if width <= 0 {
