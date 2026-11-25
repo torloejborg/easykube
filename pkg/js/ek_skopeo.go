@@ -10,6 +10,20 @@ import (
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
+var SkopeoPreloadDoc = []DocumentedFunction{
+	{
+		Name: "skopeoPreLoad",
+		Self: "",
+		Description: "Runs the skopeo tool to copy an image from source to destination, typically to the local registry\n" +
+			"this saves bandwidth, and will make subsequent installations faster, unlike preload, source images\n" +
+			"are not stored in your docker context, thus saving disk-space",
+		Params: []DocumentedParam{
+			{Name: "images", Type: "Map<string,string>", Optional: false, Description: "map of images"},
+		},
+		Returns: "void",
+	},
+}
+
 func (ctx *Easykube) SkopeoPreload(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

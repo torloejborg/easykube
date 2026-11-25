@@ -1,0 +1,14 @@
+interface ek {
+{{- range . -}}
+
+ /**
+ * {{ .Description }}
+ */
+ {{ .Name }} (
+  {{- range .Params -}}
+    {{.Name}} : {{.Type}} {{- if .Optional -}}?{{- end -}}
+  {{- end }}
+ ) : {{.Returns}} ;
+
+{{- end -}}
+}

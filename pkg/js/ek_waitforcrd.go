@@ -6,6 +6,16 @@ import (
 	"github.com/dop251/goja"
 )
 
+var WaitForCRDDoc = []DocumentedFunction{
+	{Name: "waitForCRD", Description: "Waits until a custom resource definition appears (Operators exemplifies this issue, it can" +
+		"\ntake some time for an operator to apply its own resources)", Returns: "this", Params: []DocumentedParam{
+		{Name: "group", Description: "group name of crd", Type: "string", Optional: false},
+		{Name: "version", Description: "version of the crd", Type: "string", Optional: false},
+		{Name: "kind", Description: "type of crd", Type: "string", Optional: false},
+		{Name: "timeout", Description: "seconds to wait before timeout", Type: "number", Optional: false},
+	}},
+}
+
 func (ctx *Easykube) WaitForCRD(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

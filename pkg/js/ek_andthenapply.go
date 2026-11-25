@@ -6,6 +6,14 @@ import (
 	"github.com/dop251/goja"
 )
 
+var AndThenApplyDoc = []DocumentedFunction{
+	{Name: "thenApply", Description: "Applies a single yaml resource with kubectl", Returns: "this",
+		Params: []DocumentedParam{
+			{Name: "manifest", Type: "string", Optional: false,
+				Description: "The yaml file to apply the path must be relative to the executing addon script"},
+		}},
+}
+
 func (ctx *Easykube) AndThenApply(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

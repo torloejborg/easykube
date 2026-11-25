@@ -10,6 +10,17 @@ import (
 	"github.com/torloejborg/easykube/pkg/core"
 )
 
+var PreloadImagesDoc = []DocumentedFunction{
+	{
+		Description: "preloads images",
+		Name:        "preload",
+		Returns:     "void",
+		Params: []DocumentedParam{
+			{Name: "map", Type: "Map<string, string>", Description: "key is source image, value is destination to push to the local registry"},
+		},
+	},
+}
+
 func (ctx *Easykube) PreloadImages(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

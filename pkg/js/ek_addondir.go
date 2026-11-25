@@ -6,6 +6,11 @@ import (
 	"github.com/dop251/goja"
 )
 
+var AddonDirDoc = []DocumentedFunction{
+	{Name: "addonDir", Description: "Gets the directory of the current addon being evaluated",
+		Returns: "string", ReturnsDoc: "absolute path to the addon directory"},
+}
+
 func (ctx *Easykube) AddonDir(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

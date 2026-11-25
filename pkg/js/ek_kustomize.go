@@ -8,6 +8,16 @@ import (
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
+var EkDocKustomize = []DocumentedFunction{
+	{
+		Name:        "kustomize",
+		Description: "Runs kustomize build for this addon, its output is saved to an .out.yaml in the addon directory",
+		Params:      []DocumentedParam{},
+		Returns:     "void",
+		ReturnsDoc:  "",
+	},
+}
+
 func (ctx *Easykube) Kustomize(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()
