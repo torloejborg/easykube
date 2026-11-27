@@ -30,6 +30,9 @@ var jsDocCmd = &cobra.Command{
 
 		_ = template.Must(t.Parse(string(docTemplate))).Execute(sb,
 			slices.Concat(
+				jsutils.KeyValueDoc,
+				jsutils.CreateSecretDoc,
+				jsutils.CopyToDoc,
 				jsutils.WaitForCRDDoc,
 				jsutils.SkopeoPreloadDoc,
 				jsutils.AndThenApplyDoc,
@@ -48,10 +51,6 @@ var jsDocCmd = &cobra.Command{
 		return nil
 
 	},
-}
-
-func writeDoc(function []jsutils.DocumentedFunction, out *os.File) {
-
 }
 
 func init() {

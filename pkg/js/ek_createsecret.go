@@ -4,6 +4,16 @@ import (
 	"github.com/dop251/goja"
 )
 
+var CreateSecretDoc = []DocumentedFunction{{
+	Name: CreateSecret, Description: "Creates a secret in a given namespace",
+	Returns: "this",
+	Params: []DocumentedParam{
+		{Name: "namespace", Type: "string", Description: "target namespace for secret"},
+		{Name: "name", Type: "string", Description: "name of secret"},
+		{Name: "data", Type: "Map<string, string>", Description: "the secret as key/value pairs"},
+	},
+}}
+
 func (ctx *Easykube) CreateSecret(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

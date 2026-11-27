@@ -7,7 +7,7 @@ import (
 )
 
 var WaitForCRDDoc = []DocumentedFunction{
-	{Name: "waitForCRD", Description: "Waits until a custom resource definition appears (Operators exemplifies this issue, it can" +
+	{Name: WaitForCrd, Description: "Waits until a custom resource definition appears (Operators exemplifies this issue, it can" +
 		"\ntake some time for an operator to apply its own resources)", Returns: "this", Params: []DocumentedParam{
 		{Name: "group", Description: "group name of crd", Type: "string", Optional: false},
 		{Name: "version", Description: "version of the crd", Type: "string", Optional: false},

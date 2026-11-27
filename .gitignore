@@ -12,3 +12,4 @@ complete.zsh
 /node_modules
 /package-lock.json
 /package.json
+easykube.d.ts

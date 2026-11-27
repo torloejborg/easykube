@@ -13,7 +13,7 @@ import (
 var PreloadImagesDoc = []DocumentedFunction{
 	{
 		Description: "preloads images",
-		Name:        "preload",
+		Name:        Preload,
 		Returns:     "void",
 		Params: []DocumentedParam{
 			{Name: "map", Type: "Map<string, string>", Description: "key is source image, value is destination to push to the local registry"},

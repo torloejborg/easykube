@@ -9,6 +9,13 @@ import (
 	"github.com/torloejborg/easykube/pkg/constants"
 )
 
+var KeyValueDoc = []DocumentedFunction{{
+	Name: KeyValue, Description: "Use in conjunction with the commandline -kv argument(s)",
+	Returns: "string", ReturnsDoc: "the value of the key", Params: []DocumentedParam{{
+		Name: "key", Description: "The key specified on the commandline", Type: "string",
+	}},
+}}
+
 func (ctx *Easykube) KeyValue(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

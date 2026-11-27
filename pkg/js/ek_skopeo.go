@@ -12,7 +12,7 @@ import (
 
 var SkopeoPreloadDoc = []DocumentedFunction{
 	{
-		Name: "skopeoPreLoad",
+		Name: SkopeoPreload,
 		Self: "",
 		Description: "Runs the skopeo tool to copy an image from source to destination, typically to the local registry\n" +
 			"this saves bandwidth, and will make subsequent installations faster, unlike preload, source images\n" +

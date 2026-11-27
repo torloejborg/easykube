@@ -7,7 +7,7 @@ import (
 )
 
 var AndThenApplyDoc = []DocumentedFunction{
-	{Name: "thenApply", Description: "Applies a single yaml resource with kubectl", Returns: "this",
+	{Name: AndThenApply, Description: "Applies a single yaml resource with kubectl", Returns: "this",
 		Params: []DocumentedParam{
 			{Name: "manifest", Type: "string", Optional: false,
 				Description: "The yaml file to apply the path must be relative to the executing addon script"},

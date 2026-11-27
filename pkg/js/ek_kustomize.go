@@ -10,7 +10,7 @@ import (
 
 var EkDocKustomize = []DocumentedFunction{
 	{
-		Name:        "kustomize",
+		Name:        Kustomize,
 		Description: "Runs kustomize build for this addon, its output is saved to an .out.yaml in the addon directory",
 		Params:      []DocumentedParam{},
 		Returns:     "void",

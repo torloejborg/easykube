@@ -6,6 +6,10 @@ import (
 	"github.com/dop251/goja"
 )
 
+var DockerExecDoc = []DocumentedFunction{{
+	Name: "dockerExec", Description: "Runs a command in a container",
+}}
+
 func (ctx *Easykube) DockerExec(noop bool) func(goja.FunctionCall) goja.Value {
 	if noop {
 		return NoopFunc()

@@ -1,14 +1,14 @@
-interface ek {
-{{- range . -}}
-
- /**
- * {{ .Description }}
- */
- {{ .Name }} (
-  {{- range .Params -}}
-    {{.Name}} : {{.Type}} {{- if .Optional -}}?{{- end -}}
-  {{- end }}
- ) : {{.Returns}} ;
-
+export class ek {
+{{ range . }}
+/**
+{{ .Description -}}{{"\n"}}
+{{- range .Params -}}
+@param {{"{"}}{{.Type}}{{"}"}} {{.Name}} {{.Description}}{{"\n"}}
 {{- end -}}
+**/
+{{ .Name }} (
+{{- range .Params -}}
+{{.Name}} : {{.Type}} {{- if .Optional -}}?{{- end }},
+{{- end -}}) : {{.Returns}} ;
+{{ end -}}
 }

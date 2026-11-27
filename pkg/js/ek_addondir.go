@@ -7,7 +7,7 @@ import (
 )
 
 var AddonDirDoc = []DocumentedFunction{
-	{Name: "addonDir", Description: "Gets the directory of the current addon being evaluated",
+	{Name: AddonDir, Description: "Gets the directory of the current addon being evaluated",
 		Returns: "string", ReturnsDoc: "absolute path to the addon directory"},
 }
 

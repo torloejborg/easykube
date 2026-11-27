@@ -8,7 +8,7 @@ import (
 
 var EkDocEnv = []DocumentedFunction{
 	{
-		Name:        "env",
+		Name:        KeyEnv,
 		Description: "Fetch the value of an environment variable",
 		Returns:     "string",
 		Params: []DocumentedParam{
